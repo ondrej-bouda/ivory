@@ -1,0 +1,29 @@
+autogenerate:
+* data types
+* relations for tables, views, table functions
+* relation constants - read from the relation data
+
+The generator will have a configuration script saying:
+* what kinds of objects to generate
+* what objects to generate (custom filtering possible)
+* where to search (which schemas)
+* how to recognize the relation constants (if ever)
+
+
+
+Supporting PostgreSQL features:
+* SQL available to the user in its full strength.
+* Communication with the database server encapsulated in an object-oriented interface:
+** asynchronous queries
+** transactions
+* Writable views, not only tables.
+* Leveraging constraints info - e.g., unique keys are useful for intelligent UPSERTs.
+* Prepared statements.
+
+
+
+INSERT/UPDATE/DELETE:
+* solve the simple CRUD operations with something like active record
+* offer the RETURNING variants, e.g., updateReturning(), which would return a relation
+* also implement more complicated operations, such as UPSERT
+
