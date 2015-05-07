@@ -1,14 +1,37 @@
-autogenerate:
-* data types
-* relations for tables, views, table functions
-* relation constants - read from the relation data
+Main Features
+* relation-centric
+** data = relation => getting data = getting relation
+** sources of relations:
+*** static objects in database: tables, (materialized) views, set-returning functions
+*** static queries = the relation structure (= the list of column names) is static
+*** dynamic queries = the relation structure depends on runtime/data
+* true data types support
+** the result of a query is a data row, which is nothing else than an item of the type RECORD - a data type like any other, having nested attributes of other types
+** names and types of a database table columns are just a data type; PostgreSQL has this attitude, too - it generates the corresponding composite data type for each table
+* Model classes reflecting database tables are just relations giving items of a given type
+** auto-generate them, including nullable information, comments, etc.
+** table (set-returning) functions are also relations, like tables or views; corresponding classes should also be auto-generated for them
 
-The generator will have a configuration script saying:
-* what kinds of objects to generate
-* what objects to generate (custom filtering possible)
-* where to search (which schemas)
-* how to recognize the relation constants (if ever)
 
+
+Generator:
+* generate:
+** data types; mapping to native/auto-generated/recognized PHP types
+** relations for tables, views, table functions
+** relation constants - read from the relation data
+* configuration script saying:
+** what kinds of objects to generate
+** what objects to generate (custom filtering possible)
+** where to search (which schemas)
+** how to recognize the relation constants (if ever)
+
+
+
+Relation Features:
+* easily support trivial CRUD operations; something like active record
+* offer the RETURNING variants; e.g., updateReturning() would return a relation
+* compound operations; e.g., UPSERT, INSERT IGNORE...
+* writable shall be relations inferred from table or writable view relations
 
 
 Supporting PostgreSQL features:
@@ -22,8 +45,9 @@ Supporting PostgreSQL features:
 
 
 
-INSERT/UPDATE/DELETE:
-* solve the simple CRUD operations with something like active record
-* offer the RETURNING variants, e.g., updateReturning(), which would return a relation
-* also implement more complicated operations, such as UPSERT
+IDE Support:
+* static analysis
+* ability to systematically recognize all database queries or input yielding a query, and search just within them
+* ability to search for all usages of a database object (table, view, column, function, ...); e.g., search for all usages of person.name column
+* symbols completion, ideally context-sensitive; especially, names of attributes of queried relations
 

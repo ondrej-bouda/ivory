@@ -1,0 +1,8 @@
+* SQL is the best way for specification what data to retrieve
+* switching from one DBMS to another in an existing project is unrealistic even if a database abstraction layer is used
+* it is natural to use the full feature set of the DBMS being used, not just CRUD or standardized SQL
+* relations shall be the first-class citizens of a good database layer
+** data retrieved from a relational database are always relations, no matter if they were selected from a table or view, a join, a set-returning function or write queries using the RETURNING clause
+** retrieving data shall be independent of from where the data comes - it always is just a relation
+** a relation may be defined in terms of other relations - e.g., JOIN rel, EXISTS(rel), field IN (rel), etc.
+

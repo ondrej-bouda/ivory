@@ -1,0 +1,4 @@
+JOOQ
+* http://www.jooq.org/
+* not helpful, classical domain-specific language approach
+
