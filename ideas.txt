@@ -1,4 +1,18 @@
-Main Features
+To Do:
+* consider how to test the business logic if it is on the database (instead of at the application side - when an ORM is used)
+* design the interface for write operations
+* design the interface for write operations combined with read operations (the application takes results from the database, modifies them somehow, and stores them back; that should also work for combinations of several relations)
+
+
+
+Names Brainstorming:
+* PPG
+* Pigi
+* Elis (two elephants)
+
+
+
+Main Features:
 * relation-centric
 ** data = relation => getting data = getting relation
 ** sources of relations:
@@ -34,6 +48,7 @@ Relation Features:
 * writable shall be relations inferred from table or writable view relations
 
 
+
 Supporting PostgreSQL features:
 * SQL available to the user in its full strength.
 * Communication with the database server encapsulated in an object-oriented interface:
@@ -50,4 +65,6 @@ IDE Support:
 * ability to systematically recognize all database queries or input yielding a query, and search just within them
 * ability to search for all usages of a database object (table, view, column, function, ...); e.g., search for all usages of person.name column
 * symbols completion, ideally context-sensitive; especially, names of attributes of queried relations
+
+
 
