@@ -9,7 +9,7 @@ $valRel = new ValuesRelation([
 	[5, 'g', 2.81, false],
 ]);
 $sel = new StatementRelation(
-	"SELECT * FROM % vals (num, letter, decim, flag) WHERE flag",
+	"SELECT * FROM % AS vals (num, letter, decim, flag) WHERE flag",
 	$valRel
 );
 foreach ($sel as $row) {

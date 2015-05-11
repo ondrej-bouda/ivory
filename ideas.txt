@@ -68,3 +68,7 @@ IDE Support:
 
 
 
+Statement macros:
+* inspire at http://dibiphp.com/cs/quick-start - e.g., consider %like, %~like, %like~, and %~like~, and the i-variants
+* inspire at http://phpfashion.com/temer-v-cili-dibi-0-9b
+
