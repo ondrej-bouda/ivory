@@ -68,7 +68,13 @@ IDE Support:
 
 
 
-Statement macros:
-* inspire at http://dibiphp.com/cs/quick-start - e.g., consider %like, %~like, %like~, and %~like~, and the i-variants
-* inspire at http://phpfashion.com/temer-v-cili-dibi-0-9b
-
+Other Layers:
+* Dibi:
+** http://dibiphp.com/cs/quick-start - e.g., consider %like, %~like, %like~, and %~like~, and the i-variants
+** http://phpfashion.com/temer-v-cili-dibi-0-9b
+* Nette Database: http://doc.nette.org/cs/2.3/database
+* NotORM: http://www.notorm.com
+* Pomm:
+** http://www.pomm-project.org/whatis
+** http://www.pomm-project.org/documentation/manual-1.2
+** https://github.com/chanmix51/elcaro/blob/english/documentation/article.md
