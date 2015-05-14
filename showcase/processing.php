@@ -1,13 +1,18 @@
 <?php
 /**
  * Processing the results to a structure.
+ *
+ * Proposes API for processing the results on the PHP side. Note that PostgreSQL
+ * itself is strong enough to structure the result any way (e.g., using the
+ * GROUP BY clause, ARRAY or RECORD data types, etc.). Doing the job on the PHP
+ * side might, however, be simpler, more readable, and the users might be
+ * acustomed to it. If really big data sets are processed, however, PostgreSQL
+ * proves to be a much more efficient data cruncher, so using this API is
+ * recommended only for reasonably small result sets.
  */
 namespace Ppg\Showcase\Issues;
 
-use Ppg\Data\DbViewRelation;
 use Ppg\Data\StatementRelation;
-
-$vwRel = new DbViewRelation('vw_lesson_available_person');
 
 /*
  * The following statement queries the database for lessons and persons (teachers) assigned to them.
@@ -20,7 +25,7 @@ $vwRel = new DbViewRelation('vw_lesson_available_person');
 $rel = new StatementRelation(
 	'SELECT lesson.id AS lesson_id, lesson.name AS lesson_name,
             lp.schedulingstatus,
-			p.id AS person_id, p.firstname AS person_firstname, p.lastname AS person_lastname, p.schedabbr AS person_schedabbr
+	    p.id AS person_id, p.firstname AS person_firstname, p.lastname AS person_lastname, p.schedabbr AS person_schedabbr
 	 FROM lesson
 	      JOIN lessonperson lp ON lp.lesson_id = lesson.id
 	      JOIN person p ON p.id = lp.person_id
@@ -83,71 +88,27 @@ $res = $rel->project(['lesson_id', 'person_id']);
 var_dump($res[3]['lesson_id']); // prints, e.g., 142, which is the lesson ID of the fourth returned lesson-person row
 
 // note all the above cases are called on a single $rel object; this should be possible - the relation shall create
-//   a new result object with each map()/filter()/project() call
+//   a new result object with each map()/list()/filter()/project() call
+// each call on the result object might either:
+//   1) create a new result object with the additional setting - but that might degrade performance (although
+//      that might not be that bad if shortcut were used - see below; moreover, the result object would only
+//      refer to the relation and hold the settings specified so far, which might be cheap)
+//   2) modify the same result object - but that leads to a slightly less transparent API
+//   3) another solution would be to get the result object by calling $rel->getResult() - then, all
+//      calls to map()/list()/filter()/project() would modify the same object and it would be clear, but
+//      leads to an extra getResult() call necessary for each relation results processing - and for
+//      the API to be consistent, simple iteration over the rows of relation results
+//      (foreach ($rel as $row)) shall also use the explicit $rel->getResult(), which is pretty redundant
 
 
 
 // SHORTCUT PROPOSITIONS
 
-// shortcut for CASE 2; consecutive operands of the same processing operation merged into a single operation call
+// shortcut for CASE 2; consecutive operands of the same processing operation merged into a single operation call (only relevant to map() - other operations are not applicable or appropriate)
 $res = $rel->map('lesson_id', 'person_id')->project('person_lastname');
 
-// shortcut for CASE 3; projecting all columns with a given prefix using a star
+// shortcut for CASE 3; projecting all columns with a given prefix using a star - covers the typical naming of columns from multiple tables
 $res = $rel->map('lesson_id')->map('person_id')->project(['schedulingstatus', 'person_*']);
 
-// shortcut for CASE 7; combination of mapping and projection
+// shortcut for CASE 7; combination of mapping and projection - which is quite typical
 $res = $rel->map('lesson_id')->map('schedulingstatus')->assoc('person_id', 'person_lastname');
-
-
-
-
-
-
-$rel = new StatementRelation(
-	'SELECT lesson_id, person_id, person.lastname, person.firstname
-	 FROM %
-	      JOIN person ON person.id = person_id
-	 WHERE lesson_id IN %ld AND person_id IN %ld
-	 ORDER BY lesson_id, person.lastname, person.firstname',
-	$vwRel,
-	[1, 3, 4],
-	['8', '23', '4'] // never mind these are strings - they get converted to a list of ints due to "%ld"
-);
-
-
-// VERSION 1
-// +: flexible, explicit
-// -: readability
-
-$map = $rel->map('lesson_id', $rel->map('person_id', function ($row) {
-	return Person::getScheduleIdentifier($row);
-}));
-
-
-
-// VERSION 2
-// +: resembles the resulting data map
-// -: does not allow a closure to be used for constructing the map keys
-
-$map = $rel->fetch(['lesson_id' => ['person_id' => function ($row) {
-	return Person::getScheduleIdentifier($row);
-}]]);
-
-
-
-// VERSION 3
-
-$map = $rel->assoc('lesson_id,person_id', function ($row) {
-	return Person::getScheduleIdentifier($row);
-});
-
-
-
-// VERSION 4
-// +: clear, readable
-// -: might be limited - how to combine structures of multiple types, e.g., map of lists of maps?; maybe using some special instructions within the arguments?
-
-$map = $rel->assoc('lesson_id', 'person_id', function ($row) {
-	return Person::getScheduleIdentifier($row);
-});
-
