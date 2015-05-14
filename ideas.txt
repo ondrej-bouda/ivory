@@ -73,7 +73,7 @@ IDE Support:
 
 Other Layers:
 * Dibi:
-** http://dibiphp.com/cs/quick-start - e.g., consider %like, %~like, %like~, and %~like~, and the i-variants
+** http://dibiphp.com/cs/quick-start - e.g., consider %like, %~like, %like~, and %~like~, which escape the argument as a string for LIKE or ILIKE
 ** http://phpfashion.com/temer-v-cili-dibi-0-9b
 * Nette Database: http://doc.nette.org/cs/2.3/database
 * NotORM: http://www.notorm.com
