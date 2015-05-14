@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" hash="4215195482">
+    <data-source source="LOCAL" name="Ivory Scratch" uuid="2b5ee52b-2b7b-465a-91b1-fe3363fb6236">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/ivory_scratch</jdbc-url>
+      <libraries />
+    </data-source>
+    <data-source source="LOCAL" name="Ivory Test" uuid="ae6f6df5-4f65-4586-a782-6cdd7f891fbe">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/ivory_test</jdbc-url>
+      <libraries />
+    </data-source>
+  </component>
+</project>
