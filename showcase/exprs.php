@@ -1,8 +1,8 @@
 <?php
-namespace Ppg\Showcase;
+namespace Ivory\Showcase;
 
-use Ppg\Data\StatementRelation;
-use Ppg\Data\ValuesRelation;
+use Ivory\Data\StatementRelation;
+use Ivory\Data\ValuesRelation;
 
 $valRel = new ValuesRelation([
 	[1, 'a', 3.14, true],

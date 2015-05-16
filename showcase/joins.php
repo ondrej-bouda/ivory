@@ -1,8 +1,8 @@
 <?php
-namespace Ppg\Showcase;
+namespace Ivory\Showcase;
 
-use Ppg\Data\DbTableRelation;
-use Ppg\Data\DbViewRelation;
+use Ivory\Data\DbTableRelation;
+use Ivory\Data\DbViewRelation;
 
 $personRel = new DbTableRelation('person');
 $availPersonRel = new DbViewRelation('vw_avail_person', 'datatemplate');

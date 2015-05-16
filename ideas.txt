@@ -5,16 +5,6 @@ To Do:
 
 
 
-Names Brainstorming:
-* PPG
-* Pigi
-* Elis (two elephants)
-* Elph
-* Ebur (ivory)
-* Relephant
-
-
-
 Main Features:
 * relation-centric
 ** data = relation => getting data = getting relation

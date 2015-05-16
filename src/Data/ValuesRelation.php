@@ -1,5 +1,5 @@
 <?php
-namespace Ppg\Data;
+namespace Ivory\Data;
 
 /**
  * Relation on explicit data. Corresponds to the <tt>VALUES()</tt> construct.

@@ -1,5 +1,5 @@
 <?php
-namespace Ppg\Data;
+namespace Ivory\Data;
 
 class Relation
 {

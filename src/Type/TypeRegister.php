@@ -1,5 +1,5 @@
 <?php
-namespace Ppg\Type;
+namespace Ivory\Type;
 
 /**
  * Manages the correspondence between PostgreSQL types and PHP types.

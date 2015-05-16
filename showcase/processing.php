@@ -10,9 +10,9 @@
  * proves to be a much more efficient data cruncher, so using this API is
  * recommended only for reasonably small result sets.
  */
-namespace Ppg\Showcase\Issues;
+namespace Ivory\Showcase\Issues;
 
-use Ppg\Data\StatementRelation;
+use Ivory\Data\StatementRelation;
 
 /*
  * The following statement queries the database for lessons and persons (teachers) assigned to them.

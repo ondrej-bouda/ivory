@@ -1,7 +1,7 @@
 <?php
-namespace Ppg\Showcase;
+namespace Ivory\Showcase;
 
-use Ppg\Data\StatementRelation;
+use Ivory\Data\StatementRelation;
 
 
 

@@ -1,5 +1,5 @@
 <?php
-namespace Ppg\Data;
+namespace Ivory\Data;
 
 /**
  * Relation constructed from an expression. E.g., <tt>UNION</tt> or <tt>EXCEPT</tt> of some relations.
