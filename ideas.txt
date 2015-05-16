@@ -1,5 +1,7 @@
 To Do:
 * consider how to test the business logic if it is on the database (instead of at the application side - when an ORM is used)
+** phpunit/dbunit: https://phpunit.de/manual/current/en/database.html
+** pgTAP: http://pgtap.org
 * design the interface for write operations
 * design the interface for write operations combined with read operations (the application takes results from the database, modifies them somehow, and stores them back; that should also work for combinations of several relations)
 
