@@ -15,19 +15,25 @@ Names Brainstorming:
 
 
 
-Main Features:
+Relational Approach:
 * relation-centric
 ** data = relation => getting data = getting relation
 ** sources of relations:
 *** static objects in database: tables, (materialized) views, set-returning functions
 *** static queries = the relation structure (= the list of column names) is static
 *** dynamic queries = the relation structure depends on runtime/data
+
+
+
+Type System:
 * true data types support
 ** the result of a query is a data row, which is nothing else than an item of the type RECORD - a data type like any other, having nested attributes of other types
 ** names and types of a database table columns are just a data type; PostgreSQL has this attitude, too - it generates the corresponding composite data type for each table
 * Model classes reflecting database tables are just relations giving items of a given type
 ** auto-generate them, including nullable information, comments, etc.
 ** table (set-returning) functions are also relations, like tables or views; corresponding classes should also be auto-generated for them
+* see the PostgreSQL object types sketch from the DVN project to get the notion of all data types
+** the sketch only reflects the static types, i.e., those recognized or stored permanently by the database; dynamic runtime types shall be addressed, too
 
 
 
