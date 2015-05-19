@@ -4,6 +4,11 @@ namespace Ivory;
 interface IConnection
 {
 	/**
+	 * @return string name of the connection
+	 */
+	function getName();
+
+	/**
 	 * @return ConnectionParameters
 	 */
 	function getConnectionParameters();

@@ -3,6 +3,7 @@ namespace Ivory;
 
 class Connection implements IConnection
 {
+	private $name;
 	private $params;
 
 	/** @var resource the connection handler */
@@ -10,11 +11,12 @@ class Connection implements IConnection
 
 
 	/**
+	 * @param string $name name for the connection
 	 * @param ConnectionParameters|array|string $params either a connection parameters object, or an associative array
 	 *                                                    of parameters for {@link ConnectionParameters::fromArray()},
 	 *                                                    or a URL for {@link ConnectionParameters::fromUrl()}
 	 */
-	public function __construct($params)
+	public function __construct($name, $params)
 	{
 		if (is_array($params)) {
 			$params = ConnectionParameters::fromArray($params);
@@ -27,6 +29,12 @@ class Connection implements IConnection
 		}
 
 		$this->params = $params;
+		$this->name = $name;
+	}
+
+	public function getName()
+	{
+		return $this->name;
 	}
 
 	public function getConnectionParameters()
@@ -46,17 +54,17 @@ class Connection implements IConnection
 
 	public function close()
 	{
-		if ($this->handler !== null) {
-			// TODO: handle the case if there are any open LO handles
-			$closed = pg_close($this->handler);
-			if (!$closed) {
-				throw new
-			}
-			$this->handler = null;
-			return true;
-		}
-		else {
+		if ($this->handler === null) {
 			return false;
 		}
+
+		// TODO: handle the case if there are any open LO handles
+
+		$closed = pg_close($this->handler);
+		if (!$closed) {
+			throw new ConnectionException('Error closing the connection');
+		}
+		$this->handler = null;
+		return true;
 	}
 }

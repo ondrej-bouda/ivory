@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Type;
 
+use Ivory\Connection;
+
 /**
  * Manages the correspondence between PostgreSQL types and PHP types.
  *
@@ -21,15 +23,61 @@ class TypeRegister
 
 
 	/**
-	 * Registers a data type object for representing a PostgreSQL data type.
+	 * Returns a type object corresponding to the requested PostgreSQL type.
 	 *
 	 * @param string $typeName name of the type; e.g., <tt>"VARCHAR"</tt>
-	 * @param string $schemaName name of schema the type is defined in
-	 * @param \Ivory\Connection|string|null $connection (name of) the connection to register the data type object for;
+	 * @param string $schemeName name of schema the type is defined in
+	 * @param Connection|string|null $connection (name of) connection for which to retrieve the type object;
+	 *                                  <tt>null</tt> to only search within global types
+	 * @return IType the requested type object
+	 * @throws \Ivory\UndefinedTypeException if no corresponding type is defined
+	 */
+	public function getType($typeName, $schemeName, $connection)
+	{
+
+	}
+
+	/**
+	 * Finds out whether Returns a type object corresponding to the requested PostgreSQL type.
+	 *
+	 * @param string $typeName name of the type; e.g., <tt>"VARCHAR"</tt>
+	 * @param string $schemeName name of schema the type is defined in
+	 * @param Connection|string|null $connection (name of) connection for which to retrieve the type object;
+	 *                                  <tt>null</tt> to only search within global types
+	 * @return IType the requested type object
+	 * @throws \Ivory\UndefinedTypeException if no corresponding type is defined
+	 */
+	public function hasType($typeName, $schemeName, $connection)
+	{
+
+	}
+
+	/**
+	 * Registers a data type object for representing a PostgreSQL data type.
+	 *
+	 * If a data type object has already been registered, it gets overwritten with the
+	 *
+	 * @param INamedType $type the type object to register
+	 * @param Connection|string|null $connection (name of) the connection to register the data type object for;
 	 *                                  if <tt>null</tt>, the type is registered globally, i.e., will be used for all
 	 *                                    connections which do not themselves define a type of the same name
 	 */
-	public function registerType($typeName, $schemaName, $connection = null)
+	public function registerType(INamedType $type, $connection = null)
+	{
+
+	}
+
+	/**
+	 * Unregisters a data type object, previously registered by {@link registerType()} or loaded by a data type loader.
+	 *
+	 * @param INamedType|string $typeOrName (name of) the type to unregister
+	 * @param string|null $schemaName name of schema the type is defined in - relevant only if <tt>$typeOrName</tt> is a
+	 *                                  <tt>string</tt> (and thus contains a name); skip with <tt>null</tt>
+	 * @param Connection|string|null $connection (name of) connection to unregister the data type object for;
+	 *                                  if <tt>null</tt>, a global registered type is unregistered
+	 * @return bool whether the type has actually been unregistered (<tt>false</tt> if it was not registered)
+	 */
+	public function unregisterType($typeOrName, $schemaName = null, $connection = null)
 	{
 
 	}
@@ -38,7 +86,7 @@ class TypeRegister
 	 * Registers a data type loader.
 	 *
 	 * @param ITypeLoader $typeLoader type loader to register
-	 * @param \Ivory\Connection|string|null $connection (name of) the connection to register the data type loader for;
+	 * @param Connection|string|null $connection (name of) the connection to register the data type loader for;
 	 *                                  if <tt>null</tt>, the type loader is registered globally, i.e., will be used for
 	 *                                    all connections;
 	 *                                  when loading a type object, the connection-specific type loaders are tried in
@@ -53,9 +101,10 @@ class TypeRegister
 	/**
 	 * Unregisters a previously registered data type loader.
 	 *
-	 * @param ITypeLoader $typeLoader
-	 * @param \Ivory\Connection|string|null $connection (name of) the connection to unregister the data type loader for;
+	 * @param ITypeLoader $typeLoader type loader to unregister
+	 * @param Connection|string|null $connection (name of) the connection to unregister the data type loader for;
 	 *                                  <tt>null</tt> to unregister a global data type loader
+	 * @return bool whether the type loader has actually been unregistered (<tt>false</tt> if it was not registered)
 	 */
 	public function unregisterTypeLoader(ITypeLoader $typeLoader, $connection = null)
 	{
@@ -65,7 +114,7 @@ class TypeRegister
 	/**
 	 * Retrieves all the registered type loaders for a given connection, or the global ones.
 	 *
-	 * @param \Ivory\Connection|string|null $connection (name of) the connection to get the data type loaders for;
+	 * @param Connection|string|null $connection (name of) the connection to get the data type loaders for;
 	 *                                  <tt>null</tt> to get the global data type loaders
 	 * @return ITypeLoader[] the list of the registered data type loaders, in the registration order
 	 */
@@ -75,7 +124,6 @@ class TypeRegister
 	}
 
 
-	// TODO: methods for registering concrete types as well as type loaders
 	// TODO: standard type loaders:
 	//       - interface-based: recognizes all types implementing a specific marking interface;
 	//                          especially, all types generated by the type generator are tagged by this interface
