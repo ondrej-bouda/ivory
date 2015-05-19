@@ -1,5 +1,5 @@
 <?php
-namespace Ppg\Sandpit;
+namespace Ivory\Sandpit;
 
 class Foo { }
 

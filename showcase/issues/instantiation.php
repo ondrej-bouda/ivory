@@ -1,20 +1,20 @@
 <?php
 /**
- * Instantiation of Ppg objects: connection, statements, etc.
+ * Instantiation of Ivory objects: connection, statements, etc.
  */
-namespace Ppg\Showcase\Issues;
+namespace Ivory\Showcase\Issues;
 
 // assume that two connections were configured somehow, the default and 'other'
 
 
-// VERSION 1: Ppg as a singleton register
-$stmtOnDefaultConn = \Ppg\Ppg::getConnection()->stmt();
-$stmtOnOtherConn = \Ppg\Ppg::getConnection('other')->stmt();
+// VERSION 1: Ivory as a singleton register
+$stmtOnDefaultConn = \Ivory\Ivory::getConnection()->stmt();
+$stmtOnOtherConn = \Ivory\Ivory::getConnection('other')->stmt();
 
 
-// VERSION 2: Ppg as a singleton connection array object
-$stmtOnDefaultConn = \Ppg\Ppg::getInstance()->stmt();
-$stmtOnOtherConn = \Ppg\Ppg::getInstance()['other']->stmt();
+// VERSION 2: Ivory as a singleton connection array object
+$stmtOnDefaultConn = \Ivory\Ivory::getInstance()->stmt();
+$stmtOnOtherConn = \Ivory\Ivory::getInstance()['other']->stmt();
 
 
 

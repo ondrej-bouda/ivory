@@ -2,9 +2,9 @@
 /**
  * Decide whether methods called on relations shall modify them directly, or rather create a new relation configured appropriately.
  */
-namespace Ppg\Showcase\Issues;
+namespace Ivory\Showcase\Issues;
 
-use Ppg\Data\DbTableRelation;
+use Ivory\Data\DbTableRelation;
 
 
 $personRel = new DbTableRelation('person');

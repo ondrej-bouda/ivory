@@ -2,11 +2,11 @@
 /**
  * Decide how to alias relations.
  */
-namespace Ppg\Showcase\Issues;
+namespace Ivory\Showcase\Issues;
 
-use Ppg\Data\DbTableRelation;
-use Ppg\Data\DbViewRelation;
-use Ppg\Data\StatementRelation;
+use Ivory\Data\DbTableRelation;
+use Ivory\Data\DbViewRelation;
+use Ivory\Data\StatementRelation;
 
 
 // VERSION 1

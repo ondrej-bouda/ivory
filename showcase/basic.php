@@ -1,7 +1,7 @@
 <?php
-namespace Ppg\Showcase;
+namespace Ivory\Showcase;
 
-use Ppg\Data\DbTableRelation;
+use Ivory\Data\DbTableRelation;
 
 
 $personRel = new DbTableRelation('person');

@@ -1,5 +1,5 @@
 <?php
-namespace Ppg\Data;
+namespace Ivory\Data;
 
 /**
  * Relation computed by a table function.
