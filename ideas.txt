@@ -33,6 +33,13 @@ Generator:
 ** what objects to generate (custom filtering possible)
 ** where to search (which schemas)
 ** how to recognize the relation constants (if ever)
+* usage of the whole generator is optional
+** the generated types, and type resolvers, get registered at the static Ivory
+** if there is an unknown type within some results, Ivory creates a generic object on-the-fly (if it is possible)
+*** for enum types, it creates an enum object, holding the enum type name and the value string
+*** for range types, it creates an appropriate range type object based on the subtype
+*** for composite types, it creates a generic composite type object with attributes corresponding to the database type
+** the auto-generated type gets registered so that further processing of this type does not query the database repeatedly
 
 
 
