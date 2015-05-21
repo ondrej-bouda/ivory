@@ -135,6 +135,14 @@ class TypeRegister
 	// TODO: support type aliases
 	// TODO: allow to cover multiple PostgreSQL types by a single Ivory type;
 	//       remember the PostgreSQL type, though; that leads to type constructors
+	// TODO: embed arrays support; see http://www.postgresql.org/docs/9.4/static/arrays.html - especially:
+	//       - array dimensions or size is not a restriction, it is merely a documentation (it is possible to find out
+	//         whether a column is of type "text", "text[]" or, e.g., "text[][][]")
+	//       - arrays may only be of a single subtype
+	//       - the string representation of arrays uses pg_type.delim as item delimiters according to the subtype (find
+	//         out what the delimiter might be)
+	//       - to pass arrays to PostgreSQL, do not use the string representation, but rather the ARRAY[] construct
+	//         which is much simpler to use (no escaping of naughty characters or the NULL value)
 
 
 	// define mapping for native types
