@@ -32,7 +32,7 @@ class Connection implements IConnection
 		$this->name = $name;
 	}
 
-	public function getName()
+	final public function getName()
 	{
 		return $this->name;
 	}
@@ -58,7 +58,7 @@ class Connection implements IConnection
 			return false;
 		}
 
-		// TODO: handle the case if there are any open LO handles
+		// TODO: handle the case when there are any open LO handles (an LO shall be an IType registered at the connection)
 
 		$closed = pg_close($this->handler);
 		if (!$closed) {
