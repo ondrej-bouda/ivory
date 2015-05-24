@@ -13,23 +13,14 @@ class Connection implements IConnection
 	/**
 	 * @param string $name name for the connection
 	 * @param ConnectionParameters|array|string $params either a connection parameters object, or an associative array
-	 *                                                    of parameters for {@link ConnectionParameters::fromArray()},
-	 *                                                    or a URL for {@link ConnectionParameters::fromUrl()}
+	 *                                                    of parameters for {@link ConnectionParameters::__construct()},
+	 *                                                    or a URL for {@link ConnectionParameters::fromUrl()},
+	 *                                                    or a PostgreSQL connection string (see {@link pg_connect()})
 	 */
 	public function __construct($name, $params)
 	{
-		if (is_array($params)) {
-			$params = ConnectionParameters::fromArray($params);
-		}
-		elseif (is_string($params)) {
-			$params = ConnectionParameters::fromUrl($params);
-		}
-		elseif (!$params instanceof ConnectionParameters) {
-			throw new \InvalidArgumentException('params');
-		}
-
-		$this->params = $params;
 		$this->name = $name;
+		$this->params = ConnectionParameters::create($params);
 	}
 
 	final public function getName()
@@ -48,8 +39,23 @@ class Connection implements IConnection
 			return null;
 		}
 		else {
-			return (pg_connection_status($this->handler) == PGSQL_CONNECTION_OK);
+			// NOTE: pg_connection_status() may also return null
+			return (pg_connection_status($this->handler) === PGSQL_CONNECTION_OK);
 		}
+	}
+
+	public function connect()
+	{
+		if ($this->handler !== null) {
+			return false;
+		}
+
+		$this->handler = pg_connect($this->params->buildConnectionString(), PGSQL_CONNECT_FORCE_NEW);
+		if ($this->handler === false) {
+			throw new ConnectionException('Error connecting to the database');
+		}
+
+		return true;
 	}
 
 	public function close()
