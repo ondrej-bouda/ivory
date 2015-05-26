@@ -5,4 +5,17 @@
 ** data retrieved from a relational database are always relations, no matter if they were selected from a table or view, a join, a set-returning function or write queries using the RETURNING clause
 ** retrieving data shall be independent of from where the data comes - it always is just a relation
 ** a relation may be defined in terms of other relations - e.g., JOIN rel, EXISTS(rel), field IN (rel), etc.
+* PostgreSQL is a mature database management system with plenty of features, both standard and extensions, and the database layer shall support them
+** inheritance
+** array types
+** EXPLAIN and processing of its results
+** VACUUM - database maintenance
+** LISTEN, NOTIFY
+** asynchronous execution
+** common table expressions
+** OIDs
+** large objects
+** type system features (user-defined types, special types such as HSTORE or JSON, range types, ...)
+* strive for specification compliance so that any non-standard cases are handled correctly
+** array item delimiters really according to the subtype, not hard-wired comma
 
