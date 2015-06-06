@@ -3,7 +3,7 @@ To Do:
 ** phpunit/dbunit: https://phpunit.de/manual/current/en/database.html
 ** pgTAP: http://pgtap.org
 * design the interface for write operations
-* design the interface for write operations combined with read operations (the application takes results from the database, modifies them somehow, and stores them back; that should also work for combinations of several relations)
+* design the interface for write operations combined with read operations (the application takes results from the database, modifies them somehow, and stores them back; that should also work for combinations of several relations; use the unique keys known for participating relations)
 
 
 
@@ -23,7 +23,7 @@ Type System:
 ** names and types of a database table columns are just a data type; PostgreSQL has this attitude, too - it generates the corresponding composite data type for each table
 * Model classes reflecting database tables are just relations giving items of a given type
 ** auto-generate them, including nullable information, comments, etc.
-** table (set-returning) functions are also relations, like tables or views; corresponding classes should also be auto-generated for them
+** table (set-returning) functions are also relations, like tables or views; corresponding classes should also be auto-generated for them (also support function aliases)
 * see the PostgreSQL object types sketch from the DVN project to get the notion of all data types
 ** the sketch only reflects the static types, i.e., those recognized or stored permanently by the database; dynamic runtime types shall be addressed, too
 
@@ -54,6 +54,7 @@ Relation Features:
 * offer the RETURNING variants; e.g., updateReturning() would return a relation
 * compound operations; e.g., UPSERT, INSERT IGNORE...
 * writable shall be relations inferred from table or writable view relations
+** or from combinations of them - use the unique keys
 
 
 

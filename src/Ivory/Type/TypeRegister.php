@@ -12,7 +12,7 @@ use Ivory\Connection;
  */
 class TypeRegister
 {
-	use \Ivory\Utils\Singleton; // TODO: consider implementing the singleton using static methods to be consistent with the Ivory class
+	use \Ivory\Utils\Singleton; // TODO: consider implementing the singleton using static methods to be consistent with the Ivory class; or even better, let the type register be 1) attribute of the Connection, holding connection-specific types, and 2) static attribute of Ivory, holding global types
 
 
 	/** @var IType[][][] map: connection name => map: schema name => map: type name => type object */
@@ -25,29 +25,44 @@ class TypeRegister
 	/**
 	 * Returns a type object corresponding to the requested PostgreSQL type.
 	 *
+	 * If the type has not already been registered, it is loaded using the registered type loaders.
+	 *
 	 * @param string $typeName name of the type; e.g., <tt>"VARCHAR"</tt>
-	 * @param string $schemeName name of schema the type is defined in
+	 * @param string $schemaName name of schema the type is defined in
 	 * @param Connection|string|null $connection (name of) connection for which to retrieve the type object;
 	 *                                  <tt>null</tt> to only search within global types
 	 * @return IType the requested type object
 	 * @throws \Ivory\UndefinedTypeException if no corresponding type is defined
 	 */
-	public function getType($typeName, $schemeName, $connection)
+	public function getType($typeName, $schemaName, $connection)
 	{
 
 	}
 
 	/**
-	 * Finds out whether Returns a type object corresponding to the requested PostgreSQL type.
+	 * @param string $typeName name of the type; e.g., <tt>"VARCHAR"</tt>
+	 * @param string $schemaName name of schema the type is defined in
+	 * @param Connection|string|null $connection (name of) connection for which to load the type object;
+	 *                                           <tt>null</tt> to load in the global scope
+	 */
+	public function loadType($typeName, $schemaName, $connection)
+	{
+
+	}
+
+	/**
+	 * Finds out whether a type has been registered (using {@link registerType()}) or loaded (using {@link loadType()}).
+	 *
+	 * This method does not try to load the type. It merely finds out whether it is already loaded or registered
+	 * explicitly.
 	 *
 	 * @param string $typeName name of the type; e.g., <tt>"VARCHAR"</tt>
-	 * @param string $schemeName name of schema the type is defined in
+	 * @param string $schemaName name of schema the type is defined in
 	 * @param Connection|string|null $connection (name of) connection for which to retrieve the type object;
 	 *                                  <tt>null</tt> to only search within global types
-	 * @return IType the requested type object
-	 * @throws \Ivory\UndefinedTypeException if no corresponding type is defined
+	 * @return bool
 	 */
-	public function hasType($typeName, $schemeName, $connection)
+	public function hasType($typeName, $schemaName, $connection)
 	{
 
 	}
@@ -131,10 +146,12 @@ class TypeRegister
 	//                         above
 	//       - introspector: generates the type on-the-fly by querying the database for the type metadata;
 	//                       this might serve the ones who do not use the type generator, or as the last resort;
-	//                       some caching shall be provided
+	//                       some caching shall be provided, e.g., using a shared memcache
 	// TODO: support type aliases
 	// TODO: allow to cover multiple PostgreSQL types by a single Ivory type;
-	//       remember the PostgreSQL type, though; that leads to type constructors
+	//       remember the PostgreSQL type, though; that leads to type constructors;
+	//       aliases might be treated the same - Ivory does not have to know what is alias and what is a type covered by
+	//       the same Ivory type class
 	// TODO: embed arrays support; see http://www.postgresql.org/docs/9.4/static/arrays.html - especially:
 	//       - array dimensions or size is not a restriction, it is merely a documentation (it is possible to find out
 	//         whether a column is of type "text", "text[]" or, e.g., "text[][][]")

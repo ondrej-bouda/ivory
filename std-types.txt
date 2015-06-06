@@ -1,21 +1,12 @@
 PostgreSQL built-in types yet to be supported:
 
 Name	Aliases	Description
-bigint	                    int8	            signed eight-byte integer
-bigserial	                serial8	            autoincrementing eight-byte integer
-bit [ (n) ]	 	                                fixed-length bit string
-bit varying [ (n) ]	        varbit              variable-length bit string
-boolean	                    bool	            logical Boolean (true/false)
 box	 	                                        rectangular box on a plane
-bytea	 	                                    binary data ("byte array")
-character [ (n) ]	        char [ (n) ]	    fixed-length character string
-character varying [ (n) ]	varchar [ (n) ]	    variable-length character string
 cidr	 	                                    IPv4 or IPv6 network address
 circle	 	                                    circle on a plane
 date	 	                                    calendar date (year, month, day)
 double precision	        float8	            double precision floating-point number (8 bytes)
 inet	 	                                    IPv4 or IPv6 host address
-integer                     int, int4	        signed four-byte integer
 interval [ fields ] [ (p) ]	 	                time span
 json	 	                                    textual JSON data
 jsonb	 	                                    binary JSON data, decomposed
@@ -29,10 +20,6 @@ pg_lsn	 	                                    PostgreSQL Log Sequence Number
 point	 	                                    geometric point on a plane
 polygon	 	                                    closed geometric path on a plane
 real	                    float4	            single precision floating-point number (4 bytes)
-smallint	                int2	            signed two-byte integer
-smallserial	                serial2	            autoincrementing two-byte integer
-serial	                    serial4	            autoincrementing four-byte integer
-text	 	                                    variable-length character string
 time [ (p) ] [ without time zone ]	            time of day (no time zone)
 time [ (p) ] with time zone	timetz	            time of day, including time zone
 timestamp [ (p) ] [ without time zone ]         date and time (no time zone)

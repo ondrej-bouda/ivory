@@ -16,6 +16,6 @@
 ** OIDs
 ** large objects
 ** type system features (user-defined types, special types such as HSTORE or JSON, range types, ...)
-* strive for specification compliance so that any non-standard cases are handled correctly
-** array item delimiters really according to the subtype, not hard-wired comma
-
+* strive for specification compliance so that any non-standard cases are handled correctly ("...a database layer made the correct way")
+** use array item delimiters really according to the subtype, not hard-wired comma
+** support multiple types of same names in different schemas, not simplified to just type name
