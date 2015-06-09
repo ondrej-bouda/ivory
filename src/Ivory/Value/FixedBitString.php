@@ -54,4 +54,53 @@ class FixedBitString extends BitString
 	{
 		return new FixedBitString(substr($this->bits, $offset, $length));
 	}
+
+
+	/**
+	 * Returns a non-negative integer encoded by the bits in the bit string.
+	 *
+	 * The standard binary encoding is used. The rightmost bit in the string is the least significant in the integer.
+	 *
+	 * Only that many rightmost bits are taken which allow the encoded integer be represented correctly by the PHP
+	 * <tt>int</tt> type. That is 31 bits or 63 bits depending on whether this is a 32-bit or 64-bit compilation of PHP.
+	 *
+	 * For getting an arbitrary-length integer instead of the truncated <tt>int</tt>, use {@link toNumber()}.
+	 *
+	 * @return int
+	 */
+	public function toInt()
+	{
+		// TODO
+	}
+
+	/**
+	 * Returns a non-negative arbitrary-length integer encoded by the bits in the bit string.
+	 *
+	 * The standard binary encoding is used. The rightmost bit in the string is the least significant in the integer.
+	 *
+	 * Contrary to {@link toInt()}, this method uses all the bits to constitute the result.
+	 *
+	 * @return object
+	 */
+	public function toNumber()
+	{
+		// TODO: make up an object of the class for representing arbitrary-length integers, and fix the interface (method name) and phpdoc
+	}
+
+	/**
+	 * Returns an array of octets made up from the bits of this bit string.
+	 *
+	 * The first octet is made from the 8 rightmost bits, the second octet from the next 8 bits, etc.
+	 * Each octet is represented by an integer. The standard binary encoding is used, i.e., the rightmost bit in the
+	 * substring is the least significant bit in the integer.
+	 *
+	 * E.g., bit string <tt>10011001111001</tt> results in <tt>[0b1111001, 0b100110]</tt>, which is <tt>[121, 38]</tt>.
+	 *
+	 * @return int[]
+	 */
+	public function toOctetArray()
+	{
+		// TODO
+	}
+
 }

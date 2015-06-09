@@ -62,10 +62,19 @@ class VarBitString extends BitString
 		$this->maxLength = $maxLength;
 	}
 
+	public function equals(BitString $other)
+	{
+		if (!parent::equals($other)) {
+			return false;
+		}
+		/** @var VarBitString $other */
+		return ($this->maxLength == $other->maxLength);
+	}
+
 	/**
 	 * @return int|null maximal length this bit string might have carried, or <tt>null</tt> for unlimited length
 	 */
-	public function getMaximalLength()
+	public function getMaxLength()
 	{
 		return $this->maxLength;
 	}
