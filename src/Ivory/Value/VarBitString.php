@@ -78,18 +78,4 @@ class VarBitString extends BitString
 	{
 		return $this->maxLength;
 	}
-
-	public function substr($offset, $length = null)
-	{
-		$newBits = substr($this->bits, $offset, $length);
-
-		if ($this->maxLength === null) {
-			$newMaxLen = null;
-		}
-		else {
-			$newMaxLen = $this->maxLength - ($this->len - strlen($newBits));
-		}
-
-		return new VarBitString($newBits, $newMaxLen);
-	}
 }

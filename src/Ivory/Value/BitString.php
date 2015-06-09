@@ -2,6 +2,7 @@
 namespace Ivory\Value;
 
 use Ivory\ImmutableException;
+use Ivory\UndefinedOperationException;
 
 /**
  * A common super type for bit string types - strings of 1's and 0's.
@@ -111,14 +112,42 @@ abstract class BitString implements \ArrayAccess
 	/**
 	 * Extracts a bit substring from this bit string.
 	 *
-	 * The arguments are the same as for PHP {@link substr()} function, except that this method works on a string of 1's
-	 * and 0's.
+	 * Note the semantics are according to the SQL standard, which PostgreSQL implements. That is, the arguments do NOT
+	 * work the same as for PHP <tt>substr()</tt> function.
 	 *
-	 * @param int $offset
-	 * @param int|null $length
+	 * Examples:
+	 * - <tt>substring(2) on <tt>'1101001'</tt> yields <tt>'101001'</tt>
+	 * - <tt>substring(2, 4) on <tt>'1101001'</tt> yields <tt>'1010'</tt>
+	 * - <tt>substring(2, 0) on <tt>'1101001'</tt> yields <tt>''</tt>
+	 * - <tt>substring(-2, 4) on <tt>'1101001'</tt> yields <tt>'1'</tt>
+	 *
+	 * @param int $from position to start at;
+	 *                  one-based - e.g., <tt>$start = 2</tt> omits the first character;
+	 *                  if less than one, it yields the start of the string, but counting from the given (negative or
+	 *                    zero) position, effectively decreasing the <tt>$for</tt> argument, if given
+	 * @param int|null $for number of characters to take; must be non-negative;
+	 *                      <tt>null</tt> for the rest of the string
 	 * @return static the substring of the bit string
+	 * @throws UndefinedOperationException when <tt>$for</tt> is negative
 	 */
-	abstract public function substr($offset, $length = null);
+	public function substring($from, $for = null)
+	{
+		$offset = min(0, $from - 1);
+		if ($for === null) {
+			$length = null;
+		}
+		elseif ($for < 0) {
+			throw new UndefinedOperationException('negative substring length not allowed');
+		}
+		elseif ($from < 1) {
+			$length = max(0, $for + $from);
+		}
+		else {
+			$length = $for;
+		}
+
+		return new static(substr($this->bits, $offset, $length));
+	}
 
 	/**
 	 * Concatenates this bit string with another one.
@@ -139,6 +168,7 @@ abstract class BitString implements \ArrayAccess
 	 *
 	 * @param BitString $other the other operand
 	 * @return BitString new bit string: <tt>$this & $other</tt>
+	 * @throws UndefinedOperationException if the operands are of different bit lengths
 	 */
 	abstract public function bitAnd(BitString $other);
 
@@ -147,6 +177,7 @@ abstract class BitString implements \ArrayAccess
 	 *
 	 * @param BitString $other the other operand
 	 * @return BitString new bit string: <tt>$this | $other</tt>
+	 * @throws UndefinedOperationException if the operands are of different bit lengths
 	 */
 	abstract public function bitOr(BitString $other);
 
@@ -155,6 +186,7 @@ abstract class BitString implements \ArrayAccess
 	 *
 	 * @param BitString $other the other operand
 	 * @return BitString new bit string: <tt>$this ^ $other</tt>
+	 * @throws UndefinedOperationException if the operands are of different bit lengths
 	 */
 	abstract public function bitXor(BitString $other);
 

@@ -50,12 +50,6 @@ class FixedBitString extends BitString
 	}
 
 
-	public function substr($offset, $length = null)
-	{
-		return new FixedBitString(substr($this->bits, $offset, $length));
-	}
-
-
 	/**
 	 * Returns a non-negative integer encoded by the bits in the bit string.
 	 *
