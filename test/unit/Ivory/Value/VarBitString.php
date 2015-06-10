@@ -191,31 +191,31 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 
 	public function testBitAnd()
 	{
-		$this->assertTrue(VarBitString::fromString('00001')->equals(
+		$this->assertTrue(FixedBitString::fromString('00001')->equals(
 			VarBitString::fromString('10001', 7)->bitAnd(
 				VarBitString::fromString('01101')
 			)
 		));
 
-		$this->assertTrue(VarBitString::fromString('00001', 7)->equals(
+		$this->assertTrue(FixedBitString::fromString('00001')->equals(
 			VarBitString::fromString('10001', 7)->bitAnd(
 				VarBitString::fromString('01101', 6)
 			)
 		));
 
-		$this->assertTrue(VarBitString::fromString('00001', 6)->equals(
+		$this->assertTrue(FixedBitString::fromString('00001')->equals(
 			VarBitString::fromString('10001', 6)->bitAnd(
 				VarBitString::fromString('01101', 6)
 			)
 		));
 
-		$this->assertTrue(VarBitString::fromString('')->equals(
+		$this->assertTrue(FixedBitString::fromString('')->equals(
 			VarBitString::fromString('')->bitAnd(
 				VarBitString::fromString('')
 			)
 		));
 
-		$this->assertTrue(VarBitString::fromString('1001000000100011000100010')->equals(
+		$this->assertTrue(FixedBitString::fromString('1001000000100011000100010')->equals(
 			VarBitString::fromString('1111011000100111000110010')->bitAnd(
 				VarBitString::fromString('1001100100101011000100011')
 			)
@@ -238,31 +238,31 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 
 	public function testBitOr()
 	{
-		$this->assertTrue(VarBitString::fromString('11101')->equals(
+		$this->assertTrue(FixedBitString::fromString('11101')->equals(
 			VarBitString::fromString('10001', 7)->bitOr(
 				VarBitString::fromString('01101')
 			)
 		));
 
-		$this->assertTrue(VarBitString::fromString('11101', 7)->equals(
+		$this->assertTrue(FixedBitString::fromString('11101')->equals(
 			VarBitString::fromString('10001', 7)->bitOr(
 				VarBitString::fromString('01101', 6)
 			)
 		));
 
-		$this->assertTrue(VarBitString::fromString('11101', 6)->equals(
+		$this->assertTrue(FixedBitString::fromString('11101')->equals(
 			VarBitString::fromString('10001', 6)->bitOr(
 				VarBitString::fromString('01101', 6)
 			)
 		));
 
-		$this->assertTrue(VarBitString::fromString('')->equals(
+		$this->assertTrue(FixedBitString::fromString('')->equals(
 			VarBitString::fromString('')->bitOr(
 				VarBitString::fromString('')
 			)
 		));
 
-		$this->assertTrue(VarBitString::fromString('1111111100101111000110011')->equals(
+		$this->assertTrue(FixedBitString::fromString('1111111100101111000110011')->equals(
 			VarBitString::fromString('1111011000100111000110010')->bitOr(
 				VarBitString::fromString('1001100100101011000100011')
 			)
@@ -285,31 +285,31 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 
 	public function testBitXor()
 	{
-		$this->assertTrue(VarBitString::fromString('11100')->equals(
+		$this->assertTrue(FixedBitString::fromString('11100')->equals(
 			VarBitString::fromString('10001', 7)->bitXor(
 				VarBitString::fromString('01101')
 			)
 		));
 
-		$this->assertTrue(VarBitString::fromString('11100', 7)->equals(
+		$this->assertTrue(FixedBitString::fromString('11100')->equals(
 			VarBitString::fromString('10001', 7)->bitXor(
 				VarBitString::fromString('01101', 6)
 			)
 		));
 
-		$this->assertTrue(VarBitString::fromString('11100', 6)->equals(
+		$this->assertTrue(FixedBitString::fromString('11100')->equals(
 			VarBitString::fromString('10001', 6)->bitXor(
 				VarBitString::fromString('01101', 6)
 			)
 		));
 
-		$this->assertTrue(VarBitString::fromString('')->equals(
+		$this->assertTrue(FixedBitString::fromString('')->equals(
 			VarBitString::fromString('')->bitXor(
 				VarBitString::fromString('')
 			)
 		));
 
-		$this->assertTrue(VarBitString::fromString('0110111100001100000010001')->equals(
+		$this->assertTrue(FixedBitString::fromString('0110111100001100000010001')->equals(
 			VarBitString::fromString('1111011000100111000110010')->bitXor(
 				VarBitString::fromString('1001100100101011000100011')
 			)
@@ -332,176 +332,179 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 
 	public function testBitNot()
 	{
-		$this->assertTrue(VarBitString::fromString('001101001')->bitNot()
-			->equals(VarBitString::fromString('110010110'))
+		$this->assertTrue(FixedBitString::fromString('110010110')
+			->equals(VarBitString::fromString('001101001')->bitNot())
 		);
-		$this->assertTrue(VarBitString::fromString('001101001', 9)->bitNot()
-			->equals(VarBitString::fromString('110010110'))
+		$this->assertTrue(FixedBitString::fromString('110010110')
+			->equals(VarBitString::fromString('001101001', 9)->bitNot())
 		);
-		$this->assertTrue(VarBitString::fromString('1')->bitNot()
-			->equals(VarBitString::fromString('0'))
+		$this->assertTrue(FixedBitString::fromString('0')
+			->equals(VarBitString::fromString('1')->bitNot())
 		);
-		$this->assertTrue(VarBitString::fromString('000', 6)->bitNot()
-			->equals(VarBitString::fromString('111'))
+		$this->assertTrue(FixedBitString::fromString('')
+			->equals(VarBitString::fromString('')->bitNot())
 		);
-		$this->assertTrue(VarBitString::fromString('1111011000100111000110010', 25)->bitNot()
-			->equals(VarBitString::fromString('0000100111011000111001101'))
+		$this->assertTrue(FixedBitString::fromString('111')
+			->equals(VarBitString::fromString('000', 6)->bitNot())
 		);
-		$this->assertTrue(VarBitString::fromString('1101')->bitNot()
-			->equals(VarBitString::fromString('0010'))
+		$this->assertTrue(FixedBitString::fromString('0000100111011000111001101')
+			->equals(VarBitString::fromString('1111011000100111000110010', 25)->bitNot())
+		);
+		$this->assertTrue(FixedBitString::fromString('0010')
+			->equals(VarBitString::fromString('1101')->bitNot())
 		);
 	}
 
 	public function testBitShiftLeft()
 	{
-		$this->assertTrue(VarBitString::fromString('0')->bitShiftLeft(4)
-			->equals(VarBitString::fromString('0'))
+		$this->assertTrue(FixedBitString::fromString('0')
+			->equals(VarBitString::fromString('0')->bitShiftLeft(4))
 		);
-		$this->assertTrue(VarBitString::fromString('11001')->bitShiftLeft(4)
-			->equals(VarBitString::fromString('10000'))
+		$this->assertTrue(FixedBitString::fromString('10000')
+			->equals(VarBitString::fromString('11001')->bitShiftLeft(4))
 		);
-		$this->assertTrue(VarBitString::fromString('110001', 6)->bitShiftLeft(3)
-			->equals(VarBitString::fromString('01000'))
+		$this->assertTrue(FixedBitString::fromString('01000')
+			->equals(VarBitString::fromString('110001', 6)->bitShiftLeft(3))
 		);
-		$this->assertTrue(VarBitString::fromString('1111011000100111000110010')->bitShiftLeft(5)
-			->equals(VarBitString::fromString('1100010011100011001000000'))
+		$this->assertTrue(FixedBitString::fromString('1100010011100011001000000')
+			->equals(VarBitString::fromString('1111011000100111000110010')->bitShiftLeft(5))
 		);
-		$this->assertTrue(VarBitString::fromString('1111011000100111000110010', 99)->bitShiftLeft(5)
-			->equals(VarBitString::fromString('1100010011100011001000000'))
+		$this->assertTrue(FixedBitString::fromString('1100010011100011001000000')
+			->equals(VarBitString::fromString('1111011000100111000110010', 99)->bitShiftLeft(5))
 		);
-		$this->assertTrue(VarBitString::fromString('1111011000100111000110010')->bitShiftLeft(0)
-			->equals(VarBitString::fromString('1111011000100111000110010'))
+		$this->assertTrue(FixedBitString::fromString('1111011000100111000110010')
+			->equals(VarBitString::fromString('1111011000100111000110010')->bitShiftLeft(0))
 		);
-		$this->assertTrue(VarBitString::fromString('110100')->bitShiftLeft(-1)
-			->equals(VarBitString::fromString('011010'))
+		$this->assertTrue(FixedBitString::fromString('011010')
+			->equals(VarBitString::fromString('110100')->bitShiftLeft(-1))
 		);
-		$this->assertTrue(VarBitString::fromString('110100')->bitShiftLeft(123456789)
-			->equals(VarBitString::fromString('000000'))
+		$this->assertTrue(FixedBitString::fromString('000000')
+			->equals(VarBitString::fromString('110100')->bitShiftLeft(123456789))
 		);
-		$this->assertTrue(VarBitString::fromString('110100')->bitShiftLeft(-123456789)
-			->equals(VarBitString::fromString('000000'))
+		$this->assertTrue(FixedBitString::fromString('000000')
+			->equals(VarBitString::fromString('110100')->bitShiftLeft(-123456789))
 		);
 	}
 
 	public function testBitShiftRight()
 	{
-		$this->assertTrue(VarBitString::fromString('11001')->bitShiftRight(6)
-			->equals(VarBitString::fromString('00000'))
+		$this->assertTrue(FixedBitString::fromString('00000')
+			->equals(VarBitString::fromString('11001')->bitShiftRight(6))
 		);
-		$this->assertTrue(VarBitString::fromString('11001')->bitShiftRight(5)
-			->equals(VarBitString::fromString('00000'))
+		$this->assertTrue(FixedBitString::fromString('00000')
+			->equals(VarBitString::fromString('11001')->bitShiftRight(5))
 		);
-		$this->assertTrue(VarBitString::fromString('11001')->bitShiftRight(4)
-			->equals(VarBitString::fromString('00001'))
+		$this->assertTrue(FixedBitString::fromString('00001')
+			->equals(VarBitString::fromString('11001')->bitShiftRight(4))
 		);
-		$this->assertTrue(VarBitString::fromString('110101', 6)->bitShiftRight(3)
-			->equals(VarBitString::fromString('000110'))
+		$this->assertTrue(FixedBitString::fromString('000110')
+			->equals(VarBitString::fromString('110101', 6)->bitShiftRight(3))
 		);
-		$this->assertTrue(VarBitString::fromString('1111011000100111000110010')->bitShiftRight(5)
-			->equals(VarBitString::fromString('0000011110110001001110001'))
+		$this->assertTrue(FixedBitString::fromString('0000011110110001001110001')
+			->equals(VarBitString::fromString('1111011000100111000110010')->bitShiftRight(5))
 		);
-		$this->assertTrue(VarBitString::fromString('1111011000100111000110010', 99)->bitShiftRight(5)
-			->equals(VarBitString::fromString('0000011110110001001110001'))
+		$this->assertTrue(FixedBitString::fromString('0000011110110001001110001')
+			->equals(VarBitString::fromString('1111011000100111000110010', 99)->bitShiftRight(5))
 		);
-		$this->assertTrue(VarBitString::fromString('1111011000100111000110010')->bitShiftRight(0)
-			->equals(VarBitString::fromString('1111011000100111000110010'))
+		$this->assertTrue(FixedBitString::fromString('1111011000100111000110010')
+			->equals(VarBitString::fromString('1111011000100111000110010')->bitShiftRight(0))
 		);
-		$this->assertTrue(VarBitString::fromString('110100')->bitShiftRight(-1)
-			->equals(VarBitString::fromString('101000'))
+		$this->assertTrue(FixedBitString::fromString('101000')
+			->equals(VarBitString::fromString('110100')->bitShiftRight(-1))
 		);
-		$this->assertTrue(VarBitString::fromString('110100')->bitShiftRight(123456789)
-			->equals(VarBitString::fromString('000000'))
+		$this->assertTrue(FixedBitString::fromString('000000')
+			->equals(VarBitString::fromString('110100')->bitShiftRight(123456789))
 		);
-		$this->assertTrue(VarBitString::fromString('110100')->bitShiftRight(-123456789)
-			->equals(VarBitString::fromString('000000'))
+		$this->assertTrue(FixedBitString::fromString('000000')
+			->equals(VarBitString::fromString('110100')->bitShiftRight(-123456789))
 		);
 	}
 
 	public function testBitRotateLeft()
 	{
-		$this->assertTrue(VarBitString::fromString('')->equals(
+		$this->assertTrue(FixedBitString::fromString('')->equals(
 			VarBitString::fromString('')->bitRotateLeft(1)
 		));
 
-		$this->assertTrue(VarBitString::fromString('00111')->equals(
+		$this->assertTrue(FixedBitString::fromString('00111')->equals(
 			VarBitString::fromString('10011')->bitRotateLeft(1)
 		));
 
-		$this->assertTrue(VarBitString::fromString('00111', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('00111', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(1)
 		));
 
-		$this->assertTrue(VarBitString::fromString('10011', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('10011', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(0)
 		));
 
-		$this->assertTrue(VarBitString::fromString('10011', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('10011', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(5)
 		));
 
-		$this->assertTrue(VarBitString::fromString('00111', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('00111', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(6)
 		));
 
-		$this->assertTrue(VarBitString::fromString('11001', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('11001', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(-1)
 		));
 
-		$this->assertTrue(VarBitString::fromString('11001', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('11001', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(-6)
 		));
 
-		$this->assertTrue(VarBitString::fromString('11001', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('11001', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(123456789)
 		));
 	}
 
 	public function testBitRotateRight()
 	{
-		$this->assertTrue(VarBitString::fromString('')->equals(
+		$this->assertTrue(FixedBitString::fromString('')->equals(
 			VarBitString::fromString('')->bitRotateRight(1)
 		));
 
-		$this->assertTrue(VarBitString::fromString('11001')->equals(
+		$this->assertTrue(FixedBitString::fromString('11001')->equals(
 			VarBitString::fromString('10011')->bitRotateRight(1)
 		));
 
-		$this->assertTrue(VarBitString::fromString('11001', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('11001', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(1)
 		));
 
-		$this->assertTrue(VarBitString::fromString('10011', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('10011', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(0)
 		));
 
-		$this->assertTrue(VarBitString::fromString('10011', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('10011', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(5)
 		));
 
-		$this->assertTrue(VarBitString::fromString('11001', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('11001', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(6)
 		));
 
-		$this->assertTrue(VarBitString::fromString('00111', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('00111', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(-1)
 		));
 
-		$this->assertTrue(VarBitString::fromString('00111', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('00111', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(-6)
 		));
 
-		$this->assertTrue(VarBitString::fromString('00111', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('00111', 8)->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(123456789)
 		));
 	}
 
 	public function testSubstring()
 	{
-		$this->assertTrue(VarBitString::fromString('101001')->equals(
+		$this->assertTrue(FixedBitString::fromString('101001')->equals(
 			VarBitString::fromString('1101001')->substring(2)
 		));
 
-		$this->assertTrue(VarBitString::fromString('1010')->equals(
+		$this->assertTrue(FixedBitString::fromString('1010')->equals(
 			VarBitString::fromString('1101001')->substring(2, 4)
 		));
 
@@ -512,15 +515,15 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 		catch (UndefinedOperationException $e) {
 		}
 
-		$this->assertTrue(VarBitString::fromString('')->equals(
+		$this->assertTrue(FixedBitString::fromString('')->equals(
 			VarBitString::fromString('1101001')->substring(2, 0)
 		));
 
-		$this->assertTrue(VarBitString::fromString('1')->equals(
+		$this->assertTrue(FixedBitString::fromString('1')->equals(
 			VarBitString::fromString('1101001')->substring(-2, 4)
 		));
 
-		$this->assertTrue(VarBitString::fromString('1010')->equals(
+		$this->assertTrue(FixedBitString::fromString('1010')->equals(
 			VarBitString::fromString('1101001', 15)->substring(2, 4)
 		));
 	}

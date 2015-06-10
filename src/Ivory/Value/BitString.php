@@ -127,7 +127,7 @@ abstract class BitString implements \ArrayAccess
 	 *                    zero) position, effectively decreasing the <tt>$for</tt> argument, if given
 	 * @param int|null $for number of characters to take; must be non-negative;
 	 *                      <tt>null</tt> for the rest of the string
-	 * @return static the substring of the bit string
+	 * @return FixedBitString the substring of the bit string
 	 * @throws UndefinedOperationException when <tt>$for</tt> is negative
 	 */
 	public function substring($from, $for = null)
@@ -159,7 +159,7 @@ abstract class BitString implements \ArrayAccess
 	 * string of length <tt>A+B</tt>. Otherwise, the result is a variable-length bit string.
 	 *
 	 * @param BitString $concatenated
-	 * @return BitString bit string made up by concatenating the <tt>$concatenated</tt> after this bit string
+	 * @return VarBitString bit string made up by concatenating the <tt>$concatenated</tt> after this bit string
 	 */
 	abstract public function concat(BitString $concatenated);
 
@@ -167,7 +167,7 @@ abstract class BitString implements \ArrayAccess
 	 * Bitwise AND operation. Only legal for operands of equal bit lengths.
 	 *
 	 * @param BitString $other the other operand
-	 * @return BitString new bit string: <tt>$this & $other</tt>
+	 * @return FixedBitString new bit string: <tt>$this & $other</tt>
 	 * @throws UndefinedOperationException if the operands are of different bit lengths
 	 */
 	abstract public function bitAnd(BitString $other);
@@ -176,7 +176,7 @@ abstract class BitString implements \ArrayAccess
 	 * Bitwise OR operation. Only legal for operands of equal bit lengths.
 	 *
 	 * @param BitString $other the other operand
-	 * @return BitString new bit string: <tt>$this | $other</tt>
+	 * @return FixedBitString new bit string: <tt>$this | $other</tt>
 	 * @throws UndefinedOperationException if the operands are of different bit lengths
 	 */
 	abstract public function bitOr(BitString $other);
@@ -185,7 +185,7 @@ abstract class BitString implements \ArrayAccess
 	 * Bitwise exclusive OR operation. Only legal for operands of equal bit lengths.
 	 *
 	 * @param BitString $other the other operand
-	 * @return BitString new bit string: <tt>$this ^ $other</tt>
+	 * @return FixedBitString new bit string: <tt>$this ^ $other</tt>
 	 * @throws UndefinedOperationException if the operands are of different bit lengths
 	 */
 	abstract public function bitXor(BitString $other);
@@ -193,7 +193,7 @@ abstract class BitString implements \ArrayAccess
 	/**
 	 * Bitwise negation, i.e., reverses all bits of the bit string.
 	 *
-	 * @return BitString new bit string: <tt>~$this</tt>
+	 * @return FixedBitString new bit string: <tt>~$this</tt>
 	 */
 	abstract public function bitNot();
 
@@ -205,7 +205,7 @@ abstract class BitString implements \ArrayAccess
 	 *
 	 * @param int $shift number of positions to shift the bits to the left;
 	 *                   might even be negative (results in shifting to the right by <tt>-$shift</tt>)
-	 * @return BitString a bit string with bits shifted by <tt>$shift</tt> to the left
+	 * @return FixedBitString a bit string with bits shifted by <tt>$shift</tt> to the left
 	 */
 	public function bitShiftLeft($shift)
 	{
@@ -220,7 +220,7 @@ abstract class BitString implements \ArrayAccess
 	 *
 	 * @param int $shift number of positions to shift the bits to the right;
 	 *                   might even be negative (results in shifting to the left by <tt>-$shift</tt>)
-	 * @return BitString a bit string with bits shifted by <tt>$shift</tt> to the right
+	 * @return FixedBitString a bit string with bits shifted by <tt>$shift</tt> to the right
 	 */
 	public function bitShiftRight($shift)
 	{
@@ -231,7 +231,7 @@ abstract class BitString implements \ArrayAccess
 	 * Rotates the bits to the left.
 	 *
 	 * @param int $rot the length of the rotation
-	 * @return BitString a bit string with <tt>$rot</tt> (mod length) leftmost bits moved to the back of the bit string
+	 * @return FixedBitString a bit string with <tt>$rot</tt> (mod length) leftmost bits moved to the back of the bit string
 	 */
 	public function bitRotateLeft($rot)
 	{
@@ -242,7 +242,7 @@ abstract class BitString implements \ArrayAccess
 	 * Rotates the bits to the right.
 	 *
 	 * @param int $rot the length of the rotation
-	 * @return BitString a bit string with <tt>$rot</tt> (mod length) rightmost bits moved to the front of the bit
+	 * @return FixedBitString a bit string with <tt>$rot</tt> (mod length) rightmost bits moved to the front of the bit
 	 *                     string
 	 */
 	public function bitRotateRight($rot)

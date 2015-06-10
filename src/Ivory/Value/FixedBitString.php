@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Value;
 
+use Ivory\NotImplementedException;
+
 /**
  * Fixed-length bit string - a string of 1's and 0's.
  *
@@ -92,6 +94,7 @@ class FixedBitString extends BitString
 	public static function fromNumber($number)
 	{
 		// TODO: make up an object of the class for representing arbitrary-length integers, and fix the interface (method name) and phpdoc
+		throw new NotImplementedException();
 	}
 
 	/**
@@ -106,5 +109,6 @@ class FixedBitString extends BitString
 	public function toNumber()
 	{
 		// TODO: make up an object of the class for representing arbitrary-length integers, and fix the interface (method name) and phpdoc
+		throw new NotImplementedException();
 	}
 }

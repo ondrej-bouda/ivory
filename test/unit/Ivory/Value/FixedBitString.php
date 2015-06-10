@@ -343,6 +343,9 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(FixedBitString::fromString('0')
 			->equals(FixedBitString::fromString('1')->bitNot())
 		);
+		$this->assertTrue(FixedBitString::fromString('')
+			->equals(FixedBitString::fromString('')->bitNot())
+		);
 		$this->assertTrue(FixedBitString::fromString('111111')
 			->equals(FixedBitString::fromString('000', 6)->bitNot())
 		);
