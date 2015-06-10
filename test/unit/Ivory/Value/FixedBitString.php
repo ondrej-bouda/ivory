@@ -2,24 +2,34 @@
 namespace Ivory\Value;
 
 use Ivory\ImmutableException;
+use Ivory\UndefinedOperationException;
 
-// FIXME: revise the whole test file, as well as the FixedBitString interface
 class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 {
+	public function testEquals()
+	{
+		$this->assertTrue(FixedBitString::fromString('00101')->equals(FixedBitString::fromString('00101')));
+		$this->assertTrue(FixedBitString::fromString('1')->equals(FixedBitString::fromString('1')));
+		$this->assertTrue(FixedBitString::fromString('00101', 5)->equals(FixedBitString::fromString('00101', 5)));
+
+		$this->assertFalse(FixedBitString::fromString('101')->equals(FixedBitString::fromString('1010')));
+		$this->assertFalse(FixedBitString::fromString('1')->equals(FixedBitString::fromString('0')));
+		$this->assertFalse(FixedBitString::fromString('00101', 5)->equals(FixedBitString::fromString('00101', 6)));
+		$this->assertFalse(FixedBitString::fromString('001010')->equals(FixedBitString::fromString('00101', 6)));
+	}
+
 	public function testFromString()
 	{
-		$this->assertSame('10011000011011001', FixedBitString::fromString('10011000011011001')->toString());
-		$this->assertSame('001', FixedBitString::fromString('001')->toString());
-		$this->assertSame('001', FixedBitString::fromString('001', 3)->toString());
-		$this->assertSame('101', (new BitString(5))->toString());
-		$this->assertSame('0101', (new BitString(5, 4))->toString());
-		$this->assertSame('0', (new BitString(0))->toString());
-		$this->assertSame('11000011011010001011100101', (new BitString(51225317))->toString());
-		$this->assertSame('00000011000011011010001011100101', (new BitString(51225317, 32))->toString());
-		$this->assertSame('111111111110000000001011110', (new BitString([7, 127, 0, 94]))->toString());
-		$this->assertSame('1', (new BitString([1]))->toString());
-		$this->assertSame('0', (new BitString([0]))->toString());
-		$this->assertSame('1101', FixedBitString::fromString(1101)->toString());
+		$this->assertTrue(FixedBitString::fromString('10011000011011001')->equals(
+			FixedBitString::fromString('10011000011011001')
+		));
+
+		$this->assertTrue(FixedBitString::fromString('')->equals(FixedBitString::fromString('')));
+		$this->assertTrue(FixedBitString::fromString('001')->equals(FixedBitString::fromString('001')));
+		$this->assertTrue(FixedBitString::fromString('001')->equals(FixedBitString::fromString('001', 3)));
+		$this->assertTrue(FixedBitString::fromString('0010')->equals(FixedBitString::fromString('001', 4)));
+		$this->assertTrue(FixedBitString::fromString('1101')->equals(FixedBitString::fromString(1101)));
+		$this->assertTrue(FixedBitString::fromString('11010')->equals(FixedBitString::fromString(1101, 5)));
 
 		try {
 			FixedBitString::fromString('10011', 0);
@@ -40,10 +50,101 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 		catch (\InvalidArgumentException $e) { }
 
 		try {
-			new BitString([]);
+			FixedBitString::fromString(10311);
 			$this->fail('InvalidArgumentException expected');
 		}
 		catch (\InvalidArgumentException $e) { }
+
+		$fbs = null;
+		try {
+			$fbs = FixedBitString::fromString('1010010110110100111010101011010111001101011010', 4);
+			$this->fail('a warning is expected due to truncation');
+		}
+		catch (\PHPUnit_Framework_Error_Warning $e) {
+			$this->assertTrue(FixedBitString::fromString('1010')->equals($fbs));
+		}
+	}
+
+	public function testToString()
+	{
+		$this->assertSame('', FixedBitString::fromString('')->toString());
+		$this->assertSame('1010', FixedBitString::fromString('101', 4)->toString());
+		$this->assertSame('1010', FixedBitString::fromString(101, 4)->toString());
+		$this->assertSame('1010010110110100111010101011010111001101011010',
+			FixedBitString::fromString('1010010110110100111010101011010111001101011010')->toString()
+		);
+
+		$this->assertSame('1010', (string)FixedBitString::fromString('101', 4));
+
+		$fbs = null;
+		try {
+			$fbs = FixedBitString::fromString('1010010110110100111010101011010111001101011010', 4);
+			$this->fail('a warning is expected due to truncation');
+		}
+		catch (\PHPUnit_Framework_Error_Warning $e) {
+			$this->assertSame('1010', $fbs->toString());
+		}
+	}
+
+	public function testFromInt()
+	{
+		$this->assertTrue(FixedBitString::fromString('101')->equals(FixedBitString::fromInt(5, 3)));
+		$this->assertTrue(FixedBitString::fromString('00101')->equals(FixedBitString::fromInt(5, 5)));
+		$this->assertTrue(FixedBitString::fromString('01')->equals(FixedBitString::fromInt(5, 2)));
+		$this->assertTrue(FixedBitString::fromString('0')->equals(FixedBitString::fromInt(0, 1)));
+		$this->assertTrue(FixedBitString::fromString('0000')->equals(FixedBitString::fromInt(0, 4)));
+		$this->assertTrue(FixedBitString::fromString('1111010110')->equals(FixedBitString::fromInt(-42, 10)));
+		$this->assertTrue(FixedBitString::fromString('1010110')->equals(FixedBitString::fromInt(-42, 7)));
+		$this->assertTrue(FixedBitString::fromString('010110')->equals(FixedBitString::fromInt(-42, 6)));
+
+		$this->assertTrue(FixedBitString::fromString('000000011000011011010001011100101')
+			->equals(FixedBitString::fromInt(51225317, 33))
+		);
+		$this->assertTrue(FixedBitString::fromString('111111100111100100101110100011011')
+			->equals(FixedBitString::fromInt(-51225317, 33))
+		);
+
+		try {
+			FixedBitString::fromInt('10011', 0);
+			$this->fail('InvalidArgumentException expected');
+		}
+		catch (\InvalidArgumentException $e) { }
+
+		try {
+			FixedBitString::fromInt('10011', -4);
+			$this->fail('InvalidArgumentException expected');
+		}
+		catch (\InvalidArgumentException $e) { }
+	}
+
+	public function testToInt()
+	{
+		$this->assertSame(13, FixedBitString::fromString('1101')->toInt());
+		$this->assertSame(208, FixedBitString::fromString('1101', 8)->toInt());
+		$this->assertSame(0, FixedBitString::fromString('0')->toInt());
+		$this->assertSame(2147483647, FixedBitString::fromString('1111111111111111111111111111111')->toInt());
+		if (PHP_INT_SIZE == 4) {
+			$this->assertSame(5, FixedBitString::fromString('10000000000000000000000000000101')->toInt());
+			$this->assertSame(5, FixedBitString::fromString('110000000000000000000000000000101')->toInt());
+			$this->assertSame(1, FixedBitString::fromString('1000000000000000000000000000000000000000000000000000000000000001')->toInt());
+			$this->assertSame(0, FixedBitString::fromString('110011000000000000000000000000000000000000000000000000000000000000000')->toInt());
+		}
+		elseif (PHP_INT_SIZE == 8) {
+			$this->assertSame(2147483653, FixedBitString::fromString('10000000000000000000000000000101')->toInt());
+			$this->assertSame(6442450949, FixedBitString::fromString('110000000000000000000000000000101')->toInt());
+			$this->assertSame(1, FixedBitString::fromString('1000000000000000000000000000000000000000000000000000000000000001')->toInt());
+			$this->assertSame(0, FixedBitString::fromString('110011000000000000000000000000000000000000000000000000000000000000000')->toInt());
+		}
+	}
+
+	public function testFromNumber()
+	{
+		// TODO once the interface is specified
+	}
+
+	public function testToNumber()
+	{
+		// TODO once the interface is specified
 	}
 
 	public function testGetLength()
@@ -55,8 +156,8 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 		$this->assertSame(5, FixedBitString::fromString('10010', 5)->getLength());
 		$this->assertSame(5, FixedBitString::fromString('110', 5)->getLength());
 		$this->assertSame(25, FixedBitString::fromString('1111011000100111000110010', 25)->getLength());
-		$this->assertSame(24, FixedBitString::fromString('111101100010011100011001', 25)->getMaxLength());
-		$this->assertSame(1, FixedBitString::fromString('1', 1025)->getMaxLength());
+		$this->assertSame(25, FixedBitString::fromString('111101100010011100011001', 25)->getLength());
+		$this->assertSame(1025, FixedBitString::fromString('1', 1025)->getLength());
 	}
 
 	public function testZero()
@@ -76,17 +177,15 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 
 	public function testBitEquals()
 	{
+		$this->assertTrue(FixedBitString::fromString('')->bitEquals(FixedBitString::fromString('')));
 		$this->assertTrue(FixedBitString::fromString('11001')->bitEquals(FixedBitString::fromString('11001')));
-		$this->assertTrue(FixedBitString::fromString('11001', 8)->bitEquals(FixedBitString::fromString('11001')));
-		$this->assertTrue(FixedBitString::fromString('11001')->bitEquals(FixedBitString::fromString('11001', 9)));
-		$this->assertTrue(FixedBitString::fromString('11001')->bitEquals(FixedBitString::fromString('00011001')));
-		$this->assertTrue(FixedBitString::fromString('00011001')->bitEquals(FixedBitString::fromString('11001')));
-		$this->assertTrue(FixedBitString::fromString('00011001')->bitEquals(FixedBitString::fromString('0011001')));
-		$this->assertTrue(FixedBitString::fromString('11001', 14)->bitEquals(FixedBitString::fromString('11001', 12)));
-		$this->assertTrue(FixedBitString::fromString(25)->bitEquals(FixedBitString::fromString('11001')));
+		$this->assertTrue(FixedBitString::fromString('11001', 8)->bitEquals(FixedBitString::fromString('11001000')));
+		$this->assertTrue(FixedBitString::fromString('101')->bitEquals(FixedBitString::fromString(101)));
 
+		$this->assertFalse(FixedBitString::fromString('11001', 8)->bitEquals(FixedBitString::fromString('11001')));
+		$this->assertFalse(FixedBitString::fromString('00011001')->bitEquals(FixedBitString::fromString('11001')));
+		$this->assertFalse(FixedBitString::fromString('11001', 14)->bitEquals(FixedBitString::fromString('11001', 12)));
 		$this->assertFalse(FixedBitString::fromString('10010')->bitEquals(FixedBitString::fromString(10)));
-		$this->assertFalse(FixedBitString::fromString('101')->bitEquals(FixedBitString::fromString(10)));
 		$this->assertFalse(FixedBitString::fromString('10101')->bitEquals(FixedBitString::fromString('00011001')));
 
 		$this->assertTrue(
@@ -95,9 +194,9 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 				)
 		);
 
-		$this->assertTrue(
+		$this->assertFalse(
 				FixedBitString::fromString('1111011000100111000110010', 25)->bitEquals(
-				FixedBitString::fromString('1111011000110111000110010')
+					FixedBitString::fromString('1111011000110111000110010')
 				)
 		);
 	}
@@ -110,254 +209,325 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(FixedBitString::fromString('1')->intersects(FixedBitString::fromString('1101')));
 		$this->assertTrue(FixedBitString::fromString('1', 3)->intersects(FixedBitString::fromString('1101')));
 
-		$this->assertFalse(FixedBitString::fromString('11010')->intersects(FixedBitString::fromString('100')));
-		$this->assertTrue(FixedBitString::fromString('1')->intersects(FixedBitString::fromString('1100')));
-	}
-
-	public function testToInt()
-	{
-		$this->assertSame(13, FixedBitString::fromString('1101')->toInt());
-		$this->assertSame(13, FixedBitString::fromString('1101', 8)->toInt());
-		$this->assertSame(0, FixedBitString::fromString('0')->toInt());
-		$this->assertSame(2147483647, FixedBitString::fromString('1111111111111111111111111111111')->toInt());
-		if (PHP_INT_SIZE == 4) {
-			$this->assertSame(5, FixedBitString::fromString('10000000000000000000000000000101')->toInt());
-			$this->assertSame(5, FixedBitString::fromString('110000000000000000000000000000101')->toInt());
-			$this->assertSame(1, FixedBitString::fromString('1000000000000000000000000000000000000000000000000000000000000001')->toInt());
-			$this->assertSame(0, FixedBitString::fromString('110011000000000000000000000000000000000000000000000000000000000000000')->toInt());
-		}
-		elseif (PHP_INT_SIZE == 8) {
-			$this->assertSame(2147483653, FixedBitString::fromString('10000000000000000000000000000101')->toInt());
-			$this->assertSame(6442450949, FixedBitString::fromString('110000000000000000000000000000101')->toInt());
-			$this->assertSame(1, FixedBitString::fromString('1000000000000000000000000000000000000000000000000000000000000001')->toInt());
-			$this->assertSame(0, FixedBitString::fromString('110011000000000000000000000000000000000000000000000000000000000000000')->toInt());
-		}
-	}
-
-	public function testToOctetArray()
-	{
-		$this->assertSame([121, 38], (new BitString('10011001111001'))->toOctetArray());
-		$this->assertSame([5], (new BitString('101'))->toOctetArray());
-		$this->assertSame([0], (new BitString('0'))->toOctetArray());
-		$this->assertSame(
-			[77, 130, 75, 169, 129, 31, 174, 184, 14, 174, 90, 28, 108, 44, 1],
-			(new BitString('10010110001101100000111000101101010101110000011101011100010101110000111111000000110101001010010111000001001001101'))->toOctetArray()
-		);
-	}
-
-	public function testToNumber()
-	{
-		// TODO once the interface is specified
+		$this->assertFalse(FixedBitString::fromString('11010')->intersects(FixedBitString::fromString('00100')));
+		$this->assertFalse(FixedBitString::fromString('001', 4)->intersects(FixedBitString::fromString('1100')));
 	}
 
 	public function testConcat()
 	{
+		$this->assertTrue(VarBitString::fromString('10001011')->equals(
+			FixedBitString::fromString('10001')->concat(FixedBitString::fromString('011'))
+		));
+
+		$this->assertTrue(VarBitString::fromString('1000100011')->equals(
+			FixedBitString::fromString('10001', 7)->concat(FixedBitString::fromString('011'))
+		));
+
+		$this->assertTrue(VarBitString::fromString('1000101100')->equals(
+			FixedBitString::fromString('10001')->concat(FixedBitString::fromString('011', 5))
+		));
+
+		$exp = VarBitString::fromString('100101');
+		$str = FixedBitString::fromString('100101');
+		$this->assertTrue($exp->equals($str->concat(FixedBitString::fromString(''))));
+		$this->assertTrue($exp->equals(FixedBitString::fromString('')->concat($str)));
 	}
 
 	public function testBitAnd()
 	{
-		$resVV = (new BitString('1100101'))->bitAnd(new BitString('110'));
-		$this->assertNull($resVV->getFixedLength());
-		$this->assertSame('100', $resVV->toString());
+		$this->assertTrue(FixedBitString::fromString('')->equals(
+			FixedBitString::fromString('')->bitAnd(
+				FixedBitString::fromString('')
+			)
+		));
 
-		$resVV2 = (new BitString('110'))->bitAnd(new BitString('1100101'));
-		$this->assertNull($resVV2->getFixedLength());
-		$this->assertSame('100', $resVV2->toString());
+		$this->assertTrue(FixedBitString::fromString('1000000')->equals(
+			FixedBitString::fromString('1100101')->bitAnd(
+				FixedBitString::fromString('101', 7)
+			)
+		));
 
+		$this->assertTrue(FixedBitString::fromString('0')->equals(
+			FixedBitString::fromString('0')->bitAnd(
+				FixedBitString::fromString('1')
+			)
+		));
 
-		$resFV = (new BitString('10011', 8))->bitAnd(new BitString('111010'));
-		$this->assertSame(8, $resFV->getFixedLength());
-		$this->assertSame('00010010', $resFV->toString());
+		$this->assertTrue(FixedBitString::fromString('1001000000100011000100010')->equals(
+			FixedBitString::fromString('1111011000100111000110010')->bitAnd(
+				FixedBitString::fromString('1001100100101011000100011')
+			)
+		));
 
-		$resFV2 = (new BitString('111010', 8))->bitAnd(new BitString('10011'));
-		$this->assertSame(8, $resFV2->getFixedLength());
-		$this->assertSame('00010010', $resFV2->toString());
-
-
-		$resVF = (new BitString('10011'))->bitAnd(new BitString('111010', 8));
-		$this->assertSame(8, $resVF->getFixedLength());
-		$this->assertSame('00010010', $resVF->toString());
-
-		$resVF2 = (new BitString('111010'))->bitAnd(new BitString('10011', 8));
-		$this->assertSame(8, $resVF2->getFixedLength());
-		$this->assertSame('00010010', $resVF2->toString());
-
-
-		$resFF = (new BitString('10011', 8))->bitAnd(new BitString('111010', 8));
-		$this->assertSame(8, $resFF->getFixedLength());
-		$this->assertSame('00010010', $resFF->toString());
-
-		$resFF2 = (new BitString('111010', 8))->bitAnd(new BitString('10011', 8));
-		$this->assertSame(8, $resFF2->getFixedLength());
-		$this->assertSame('00010010', $resFF2->toString());
-
-		$this->assertSame(
-            '1001000000100011000100010',
-			(new BitString('1111011000100111000110010', 25))->bitAnd(
-			    new BitString('1001100100101011000100011', 25)
-			)->toString()
-		);
+		try {
+			FixedBitString::fromString('10010')->bitAnd(FixedBitString::fromString('101'));
+			$this->fail('UndefinedOperationException expected');
+		}
+		catch (UndefinedOperationException $e) {
+		}
 	}
 
 	public function testBitOr()
 	{
-		$resVV = (new BitString('1100101'))->bitOr(new BitString('110'));
-		$this->assertNull($resVV->getFixedLength());
-		$this->assertSame('1100111', $resVV->toString());
+		$this->assertTrue(FixedBitString::fromString('')->equals(
+			FixedBitString::fromString('')->bitOr(
+				FixedBitString::fromString('')
+			)
+		));
 
-		$resVV2 = (new BitString('110'))->bitOr(new BitString('1100101'));
-		$this->assertNull($resVV2->getFixedLength());
-		$this->assertSame('1100111', $resVV2->toString());
+		$this->assertTrue(FixedBitString::fromString('1110101')->equals(
+			FixedBitString::fromString('1100101')->bitOr(
+				FixedBitString::fromString('101', 7)
+			)
+		));
 
+		$this->assertTrue(FixedBitString::fromString('1')->equals(
+			FixedBitString::fromString('0')->bitOr(
+				FixedBitString::fromString('1')
+			)
+		));
 
-		$resFV = (new BitString('10011', 8))->bitOr(new BitString('111010'));
-		$this->assertSame(8, $resFV->getFixedLength());
-		$this->assertSame('00111011', $resFV->toString());
+		$this->assertTrue(FixedBitString::fromString('1111111100101111000110011')->equals(
+			FixedBitString::fromString('1111011000100111000110010')->bitOr(
+				FixedBitString::fromString('1001100100101011000100011')
+			)
+		));
 
-		$resFV2 = (new BitString('111010', 8))->bitOr(new BitString('10011'));
-		$this->assertSame(8, $resFV2->getFixedLength());
-		$this->assertSame('00111011', $resFV2->toString());
-
-
-		$resVF = (new BitString('10011'))->bitOr(new BitString('111010', 8));
-		$this->assertSame(8, $resVF->getFixedLength());
-		$this->assertSame('00111011', $resVF->toString());
-
-		$resVF2 = (new BitString('111010'))->bitOr(new BitString('10011', 8));
-		$this->assertSame(8, $resVF2->getFixedLength());
-		$this->assertSame('00111011', $resVF2->toString());
-
-
-		$resFF = (new BitString('10011', 8))->bitOr(new BitString('111010', 8));
-		$this->assertSame(8, $resFF->getFixedLength());
-		$this->assertSame('00111011', $resFF->toString());
-
-		$resFF2 = (new BitString('111010', 8))->bitOr(new BitString('10011', 8));
-		$this->assertSame(8, $resFF2->getFixedLength());
-		$this->assertSame('00111011', $resFF2->toString());
-
-		$this->assertSame(
-            '1111111100101111000110011',
-			(new BitString('1111011000100111000110010', 25))->bitOr(
-				new BitString('1001100100101011000100011', 25)
-			)->toString()
-		);
+		try {
+			FixedBitString::fromString('10010')->bitOr(FixedBitString::fromString('101'));
+			$this->fail('UndefinedOperationException expected');
+		}
+		catch (UndefinedOperationException $e) {
+		}
 	}
 
 	public function testBitXor()
 	{
-		$resVV = (new BitString('1100101'))->bitXor(new BitString('110'));
-		$this->assertNull($resVV->getFixedLength());
-		$this->assertSame('1100011', $resVV->toString());
+		$this->assertTrue(FixedBitString::fromString('')->equals(
+			FixedBitString::fromString('')->bitXor(
+				FixedBitString::fromString('')
+			)
+		));
 
-		$resVV2 = (new BitString('110'))->bitXor(new BitString('1100101'));
-		$this->assertNull($resVV2->getFixedLength());
-		$this->assertSame('1100011', $resVV2->toString());
+		$this->assertTrue(FixedBitString::fromString('0110101')->equals(
+			FixedBitString::fromString('1100101')->bitXor(
+				FixedBitString::fromString('101', 7)
+			)
+		));
 
+		$this->assertTrue(FixedBitString::fromString('1')->equals(
+			FixedBitString::fromString('0')->bitXor(
+				FixedBitString::fromString('1')
+			)
+		));
 
-		$resFV = (new BitString('10011', 8))->bitXor(new BitString('111010'));
-		$this->assertSame(8, $resFV->getFixedLength());
-		$this->assertSame('00101001', $resFV->toString());
+		$this->assertTrue(FixedBitString::fromString('0110111100001100000010001')->equals(
+			FixedBitString::fromString('1111011000100111000110010')->bitXor(
+				FixedBitString::fromString('1001100100101011000100011')
+			)
+		));
 
-		$resFV2 = (new BitString('111010', 8))->bitXor(new BitString('10011'));
-		$this->assertSame(8, $resFV2->getFixedLength());
-		$this->assertSame('00101001', $resFV2->toString());
-
-
-		$resVF = (new BitString('10011'))->bitXor(new BitString('111010', 8));
-		$this->assertSame(8, $resVF->getFixedLength());
-		$this->assertSame('00101001', $resVF->toString());
-
-		$resVF2 = (new BitString('111010'))->bitXor(new BitString('10011', 8));
-		$this->assertSame(8, $resVF2->getFixedLength());
-		$this->assertSame('00101001', $resVF2->toString());
-
-
-		$resFF = (new BitString('10011', 8))->bitXor(new BitString('111010', 8));
-		$this->assertSame(8, $resFF->getFixedLength());
-		$this->assertSame('00101001', $resFF->toString());
-
-		$resFF2 = (new BitString('111010', 8))->bitXor(new BitString('10011', 8));
-		$this->assertSame(8, $resFF2->getFixedLength());
-		$this->assertSame('00101001', $resFF2->toString());
-
-		$this->assertSame(
-			'0110111100001100000010001',
-				FixedBitString::fromString('1111011000100111000110010', 25)->bitXor(
-				FixedBitString::fromString('1001100100101011000100011', 25)
-			)->toString()
-		);
+		try {
+			FixedBitString::fromString('10010')->bitXor(FixedBitString::fromString('101'));
+			$this->fail('UndefinedOperationException expected');
+		}
+		catch (UndefinedOperationException $e) {
+		}
 	}
 
 	public function testBitNot()
 	{
-		$this->assertSame('110010110', FixedBitString::fromString('001101001', 9)->bitNot()->toString());
-		$this->assertSame('0', FixedBitString::fromString('1', 1)->bitNot()->toString());
-		$this->assertSame('111111', FixedBitString::fromString('000', 6)->bitNot()->toString());
-		$this->assertSame('0000100111011000111001101', FixedBitString::fromString('1111011000100111000110010', 25)->bitNot()->toString());
-		$this->assertSame('0010', FixedBitString::fromString('1101')->bitNot()->toString());
-	}
-
-	public function testBitShiftRight()
-	{
-		$this->assertSame('0', FixedBitString::fromString('11001')->bitShiftRight(6)->toString());
-		$this->assertSame('0', FixedBitString::fromString('11001')->bitShiftRight(5)->toString());
-		$this->assertSame('1', FixedBitString::fromString('11001')->bitShiftRight(4)->toString());
-		$this->assertSame('000110', FixedBitString::fromString('110101', 6)->bitShiftRight(3)->toString());
-		$this->assertSame('11110110001001110001', FixedBitString::fromString('1111011000100111000110010')->bitShiftRight(5)->toString());
-		$this->assertSame('1111011000100111000110010', FixedBitString::fromString('1111011000100111000110010')->bitShiftRight(0)->toString());
-
-		$this->assertSame('101100', FixedBitString::fromString('110110')->bitShiftRight(-1));
+		$this->assertTrue(FixedBitString::fromString('110010110')
+			->equals(FixedBitString::fromString('001101001')->bitNot())
+		);
+		$this->assertTrue(FixedBitString::fromString('0')
+			->equals(FixedBitString::fromString('1')->bitNot())
+		);
+		$this->assertTrue(FixedBitString::fromString('111111')
+			->equals(FixedBitString::fromString('000', 6)->bitNot())
+		);
+		$this->assertTrue(FixedBitString::fromString('0010')
+			->equals(FixedBitString::fromString('1101')->bitNot())
+		);
+		$this->assertTrue(FixedBitString::fromString('00001001110110001110011011')
+			->equals(FixedBitString::fromString('1111011000100111000110010', 26)->bitNot())
+		);
 	}
 
 	public function testBitShiftLeft()
 	{
-		$this->assertSame('0', FixedBitString::fromString('0')->bitShiftLeft(4)->toString());
-		$this->assertSame('110010000', FixedBitString::fromString('11001')->bitShiftLeft(4)->toString());
-		$this->assertSame('001000', FixedBitString::fromString('110001', 6)->bitShiftLeft(3)->toString());
-		$this->assertSame('111101100010011100011001000000', FixedBitString::fromString('1111011000100111000110010')->bitShiftLeft(5)->toString());
-		$this->assertSame('1100010011100011001000000', FixedBitString::fromString('1111011000100111000110010', 25)->bitShiftLeft(5)->toString());
-		$this->assertSame('1111011000100111000110010', FixedBitString::fromString('1111011000100111000110010')->bitShiftLeft(0)->toString());
-
-		$this->assertSame('011011', FixedBitString::fromString('110110')->bitShiftLeft(-1)->toString());
+		$this->assertTrue(FixedBitString::fromString('0')
+			->equals(FixedBitString::fromString('0')->bitShiftLeft(4))
+		);
+		$this->assertTrue(FixedBitString::fromString('001000')
+			->equals(FixedBitString::fromString('110001')->bitShiftLeft(3))
+		);
+		$this->assertTrue(FixedBitString::fromString('0100000000')
+			->equals(FixedBitString::fromString('11001', 10)->bitShiftLeft(3))
+		);
+		$this->assertTrue(FixedBitString::fromString('1100010011100011001000000')
+			->equals(FixedBitString::fromString('1111011000100111000110010')->bitShiftLeft(5))
+		);
+		$this->assertTrue(FixedBitString::fromString('1111011000100111000110010')
+			->equals(FixedBitString::fromString('1111011000100111000110010')->bitShiftLeft(0))
+		);
+		$this->assertTrue(FixedBitString::fromString('000110')
+			->equals(FixedBitString::fromString('110110')->bitShiftLeft(-3))
+		);
+		$this->assertTrue(FixedBitString::fromString('000000')
+			->equals(FixedBitString::fromString('110110')->bitShiftLeft(123456789))
+		);
+		$this->assertTrue(FixedBitString::fromString('000000')
+			->equals(FixedBitString::fromString('110110')->bitShiftLeft(-123456789))
+		);
 	}
 
-	public function testBitRotates()
+	public function testBitShiftRight()
 	{
-		// TODO
+		$this->assertTrue(FixedBitString::fromString('00000')
+			->equals(FixedBitString::fromString('11001')->bitShiftRight(6))
+		);
+		$this->assertTrue(FixedBitString::fromString('00000')
+			->equals(FixedBitString::fromString('11001')->bitShiftRight(5))
+		);
+		$this->assertTrue(FixedBitString::fromString('00001')
+			->equals(FixedBitString::fromString('11001')->bitShiftRight(4))
+		);
+		$this->assertTrue(FixedBitString::fromString('000110')
+			->equals(FixedBitString::fromString('110101')->bitShiftRight(3))
+		);
+		$this->assertTrue(FixedBitString::fromString('0000011110110001001110001')
+			->equals(FixedBitString::fromString('1111011000100111000110010')->bitShiftRight(5))
+		);
+		$this->assertTrue(FixedBitString::fromString('1111011000100111000110010')
+			->equals(FixedBitString::fromString('1111011000100111000110010')->bitShiftRight(0))
+		);
+		$this->assertTrue(FixedBitString::fromString('')
+			->equals(FixedBitString::fromString('')->bitShiftRight(0))
+		);
+		$this->assertTrue(FixedBitString::fromString('')
+			->equals(FixedBitString::fromString('')->bitShiftRight(4))
+		);
+		$this->assertTrue(FixedBitString::fromString('101100')
+			->equals(FixedBitString::fromString('110110')->bitShiftRight(-1))
+		);
+		$this->assertTrue(FixedBitString::fromString('101100')
+			->equals(FixedBitString::fromString('000000')->bitShiftRight(-123456789))
+		);
+		$this->assertTrue(FixedBitString::fromString('101100')
+			->equals(FixedBitString::fromString('000000')->bitShiftRight(123456789))
+		);
+	}
+
+	public function testBitRotateLeft()
+	{
+		$this->assertTrue(FixedBitString::fromString('')
+			->equals(FixedBitString::fromString('')->bitRotateLeft(1))
+		);
+		$this->assertTrue(FixedBitString::fromString('100110')
+			->equals(FixedBitString::fromString('100110')->bitRotateLeft(0))
+		);
+		$this->assertTrue(FixedBitString::fromString('011010')
+			->equals(FixedBitString::fromString('100110')->bitRotateLeft(2))
+		);
+		$this->assertTrue(FixedBitString::fromString('011010')
+			->equals(FixedBitString::fromString('100110')->bitRotateLeft(8))
+		);
+		$this->assertTrue(FixedBitString::fromString('010011')
+			->equals(FixedBitString::fromString('100110')->bitRotateLeft(-1))
+		);
+		$this->assertTrue(FixedBitString::fromString('001101')
+			->equals(FixedBitString::fromString('100110')->bitRotateLeft(1234567))
+		);
+		$this->assertTrue(FixedBitString::fromString('010011')
+			->equals(FixedBitString::fromString('100110')->bitRotateLeft(-1234567))
+		);
+	}
+
+	public function testBitRotateRight()
+	{
+		$this->assertTrue(FixedBitString::fromString('')
+			->equals(FixedBitString::fromString('')->bitRotateRight(1))
+		);
+		$this->assertTrue(FixedBitString::fromString('100110')
+			->equals(FixedBitString::fromString('100110')->bitRotateRight(0))
+		);
+		$this->assertTrue(FixedBitString::fromString('101001')
+			->equals(FixedBitString::fromString('100110')->bitRotateRight(2))
+		);
+		$this->assertTrue(FixedBitString::fromString('101001')
+			->equals(FixedBitString::fromString('100110')->bitRotateRight(8))
+		);
+		$this->assertTrue(FixedBitString::fromString('001101')
+			->equals(FixedBitString::fromString('100110')->bitRotateRight(-1))
+		);
+		$this->assertTrue(FixedBitString::fromString('010011')
+			->equals(FixedBitString::fromString('100110')->bitRotateRight(1234567))
+		);
+		$this->assertTrue(FixedBitString::fromString('001101')
+			->equals(FixedBitString::fromString('100110')->bitRotateRight(-1234567))
+		);
+	}
+
+	public function testSubstring()
+	{
+		$this->assertTrue(FixedBitString::fromString('101001')->equals(
+			FixedBitString::fromString('1101001')->substring(2)
+		));
+
+		$this->assertTrue(FixedBitString::fromString('1010')->equals(
+			FixedBitString::fromString('1101001')->substring(2, 4)
+		));
+
+		try {
+			FixedBitString::fromString('1101001')->substring(2, -1);
+			$this->fail('UndefinedOperationException expected');
+		}
+		catch (UndefinedOperationException $e) {
+		}
+
+		$this->assertTrue(FixedBitString::fromString('')->equals(
+			FixedBitString::fromString('1101001')->substring(2, 0)
+		));
+
+		$this->assertTrue(FixedBitString::fromString('1')->equals(
+			FixedBitString::fromString('1101001')->substring(-2, 4)
+		));
 	}
 
 	public function testArrayAccess()
 	{
 		$small = FixedBitString::fromString('1100101');
 		$big = FixedBitString::fromString('1111011000100111000110010');
-		$limited = FixedBitString::fromString('001100101', 10);
+		$padded = FixedBitString::fromString('001100101', 10);
 
 		$this->assertSame(1, $small[0]);
 		$this->assertSame(0, $small[1]);
 		$this->assertSame(1, $small[2]);
 		$this->assertSame(1, $small[6]);
 		$this->assertSame(1, $big[24]);
-		$this->assertSame(0, $limited[8]);
+		$this->assertSame(0, $padded[8]);
+		$this->assertSame(0, $padded[9]);
 		$this->assertNull($small[7]);
 		$this->assertNull($small[8]);
 		$this->assertNull($small[-1]);
 		$this->assertNull($small[-4]);
 		$this->assertNull($big[25]);
-		$this->assertNull($limited[9]);
+		$this->assertNull($padded[10]);
 
 		$this->assertTrue(isset($small[0]));
 		$this->assertTrue(isset($small[1]));
 		$this->assertTrue(isset($small[2]));
 		$this->assertTrue(isset($small[6]));
 		$this->assertTrue(isset($big[24]));
-		$this->assertTrue(isset($limited[8]));
+		$this->assertTrue(isset($padded[8]));
+		$this->assertTrue(isset($padded[9]));
 		$this->assertFalse(isset($small[7]));
 		$this->assertFalse(isset($small[8]));
 		$this->assertFalse(isset($small[-1]));
 		$this->assertFalse(isset($small[-4]));
 		$this->assertFalse(isset($big[25]));
-		$this->assertFalse(isset($limited[9]));
+		$this->assertFalse(isset($padded[10]));
 
 		try {
 			$small[2] = 0;

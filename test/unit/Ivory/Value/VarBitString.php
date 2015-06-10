@@ -10,8 +10,11 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 	{
 		$this->assertTrue(VarBitString::fromString('00101')->equals(VarBitString::fromString('00101')));
 		$this->assertTrue(VarBitString::fromString('1')->equals(VarBitString::fromString('1')));
+		$this->assertTrue(VarBitString::fromString('00101', 5)->equals(VarBitString::fromString('00101', 5)));
+
 		$this->assertFalse(VarBitString::fromString('101')->equals(VarBitString::fromString('1010')));
 		$this->assertFalse(VarBitString::fromString('1')->equals(VarBitString::fromString('0')));
+		$this->assertFalse(VarBitString::fromString('00101', 5)->equals(VarBitString::fromString('00101', 6)));
 	}
 
 	public function testFromString()
@@ -19,6 +22,7 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(VarBitString::fromString('10011000011011001')
 			->equals(VarBitString::fromString('10011000011011001'))
 		);
+		$this->assertTrue(VarBitString::fromString('')->equals(VarBitString::fromString('', 5)));
 		$this->assertTrue(VarBitString::fromString('001')->equals(VarBitString::fromString('001')));
 		$this->assertFalse(VarBitString::fromString('001', 3)->equals(VarBitString::fromString('001')));
 		$this->assertFalse(VarBitString::fromString('001', 4)->equals(VarBitString::fromString('001')));
@@ -50,6 +54,36 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 			$this->fail('InvalidArgumentException expected');
 		}
 		catch (\InvalidArgumentException $e) {
+		}
+
+		$vbs = null;
+		try {
+			$vbs = VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);
+			$this->fail('a warning is expected due to truncation');
+		}
+		catch (\PHPUnit_Framework_Error_Warning $e) {
+			$this->assertTrue(VarBitString::fromString('1010', 4)->equals($vbs));
+		}
+	}
+
+	public function testToString()
+	{
+		$this->assertSame('', VarBitString::fromString('', 4)->toString());
+		$this->assertSame('101', VarBitString::fromString('101', 4)->toString());
+		$this->assertSame('101', VarBitString::fromString(101, 4)->toString());
+		$this->assertSame('1010010110110100111010101011010111001101011010',
+			VarBitString::fromString('1010010110110100111010101011010111001101011010')->toString()
+		);
+
+		$this->assertSame('101', (string)VarBitString::fromString(101, 4));
+
+		$vbs = null;
+		try {
+			$vbs = VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);
+			$this->fail('a warning is expected due to truncation');
+		}
+		catch (\PHPUnit_Framework_Error_Warning $e) {
+			$this->assertSame('1010', $vbs->toString());
 		}
 	}
 
@@ -111,7 +145,7 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 			)
 		);
 
-		$this->assertTrue(
+		$this->assertFalse(
 			VarBitString::fromString('1111011000100111000110010', 25)->bitEquals(
 				VarBitString::fromString('1111011000110111000110010')
 			)
@@ -385,6 +419,10 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 
 	public function testBitRotateLeft()
 	{
+		$this->assertTrue(VarBitString::fromString('')->equals(
+			VarBitString::fromString('')->bitRotateLeft(1)
+		));
+
 		$this->assertTrue(VarBitString::fromString('00111')->equals(
 			VarBitString::fromString('10011')->bitRotateLeft(1)
 		));
@@ -420,6 +458,10 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 
 	public function testBitRotateRight()
 	{
+		$this->assertTrue(VarBitString::fromString('')->equals(
+			VarBitString::fromString('')->bitRotateRight(1)
+		));
+
 		$this->assertTrue(VarBitString::fromString('11001')->equals(
 			VarBitString::fromString('10011')->bitRotateRight(1)
 		));
@@ -470,7 +512,7 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 		catch (UndefinedOperationException $e) {
 		}
 
-		$this->assertTrue(VarBitString::fromString('0')->equals(
+		$this->assertTrue(VarBitString::fromString('')->equals(
 			VarBitString::fromString('1101001')->substring(2, 0)
 		));
 

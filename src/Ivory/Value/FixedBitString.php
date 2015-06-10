@@ -5,7 +5,7 @@ namespace Ivory\Value;
  * Fixed-length bit string - a string of 1's and 0's.
  *
  * The objects are immutable, i.e., operations always produce a new object.
- * The representation and operations resemble the specification for bit string types in PostgreSQL.
+ * The representation and operations resemble the specification of the <tt>BIT</tt> type in PostgreSQL.
  *
  * It is possible to access individual bits using the array indices (readonly). The leftmost bit is at offset 0. Testing
  * whether the bit string has a bit at a given offset may be performed using <tt>isset($this[$offset])</tt>. Note that,
@@ -22,7 +22,8 @@ class FixedBitString extends BitString
 	 * @param int|null $length length of the bit string in bits;
 	 *                         <tt>null</tt> for taking the length of <tt>$bits</tt>;
 	 *                         if less or greater than <tt>strlen($bits)</tt>, the bits get zero-padded or truncated on
-	 *                           the right to be exactly <tt>$length</tt> bits and a warning is issued
+	 *                           the right to be exactly <tt>$length</tt> bits (and a warning is issued is case of
+	 *                           truncation)
 	 * @return FixedBitString
 	 * @throws \InvalidArgumentException if <tt>$length</tt> is a non-positive number (PostgreSQL forbids it)
 	 */
@@ -49,6 +50,23 @@ class FixedBitString extends BitString
 		}
 	}
 
+	/**
+	 * Creates a bit string as the two's complement of a given integer represented on a given number of bits.
+	 *
+	 * The least significant bit is the rightmost one in the resulting bit string.
+	 *
+	 * Overflows are not detected - if <tt>$length</tt> is not sufficient for representing the whole <tt>$int</tt>, only
+	 * the <tt>$length</tt> least significant bits of the representation are used quietly, without any notice.
+	 *
+	 * @param int $int integer to represent
+	 * @param int $length number of bits
+	 * @return FixedBitString
+	 * @throws \InvalidArgumentException if <tt>$length</tt> is a non-positive number
+	 */
+	public static function fromInt($int, $length)
+	{
+
+	}
 
 	/**
 	 * Returns a non-negative integer encoded by the bits in the bit string.
@@ -60,11 +78,20 @@ class FixedBitString extends BitString
 	 *
 	 * For getting an arbitrary-length integer instead of the truncated <tt>int</tt>, use {@link toNumber()}.
 	 *
+	 * Note that, unlike {@link fromInt()}, this method does NOT work with the two's complement, but rather with the
+	 * standard binary encoding, and thus never returns any negative number. This is to resemble the PostgreSQL
+	 * behaviour.
+	 *
 	 * @return int
 	 */
 	public function toInt()
 	{
 		// TODO
+	}
+
+	public static function fromNumber($number)
+	{
+		// TODO: make up an object of the class for representing arbitrary-length integers, and fix the interface (method name) and phpdoc
 	}
 
 	/**
@@ -80,21 +107,4 @@ class FixedBitString extends BitString
 	{
 		// TODO: make up an object of the class for representing arbitrary-length integers, and fix the interface (method name) and phpdoc
 	}
-
-	/**
-	 * Returns an array of octets made up from the bits of this bit string.
-	 *
-	 * The first octet is made from the 8 rightmost bits, the second octet from the next 8 bits, etc.
-	 * Each octet is represented by an integer. The standard binary encoding is used, i.e., the rightmost bit in the
-	 * substring is the least significant bit in the integer.
-	 *
-	 * E.g., bit string <tt>10011001111001</tt> results in <tt>[0b1111001, 0b100110]</tt>, which is <tt>[121, 38]</tt>.
-	 *
-	 * @return int[]
-	 */
-	public function toOctetArray()
-	{
-		// TODO
-	}
-
 }
