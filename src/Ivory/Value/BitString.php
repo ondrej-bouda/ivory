@@ -93,7 +93,7 @@ abstract class BitString implements \ArrayAccess
 	 */
 	public function bitEquals(BitString $other)
 	{
-
+		return ($this->bits === $other->bits); // ===: PHP would otherwise convert both strings to integers
 	}
 
 	/**
@@ -106,7 +106,13 @@ abstract class BitString implements \ArrayAccess
 	 */
 	public function intersects(BitString $other)
 	{
+		for ($i = min($this->len, $other->len) - 1; $i >= 0; $i--) {
+			if ($this->bits[$i] == '1' && $other->bits[$i] == '1') {
+				return true;
+			}
+		}
 
+		return false;
 	}
 
 	/**
@@ -122,7 +128,7 @@ abstract class BitString implements \ArrayAccess
 	 * - <tt>substring(-2, 4) on <tt>'1101001'</tt> yields <tt>'1'</tt>
 	 *
 	 * @param int $from position to start at;
-	 *                  one-based - e.g., <tt>$start = 2</tt> omits the first character;
+	 *                  one-based - e.g., <tt>$from = 2</tt> omits the first character;
 	 *                  if less than one, it yields the start of the string, but counting from the given (negative or
 	 *                    zero) position, effectively decreasing the <tt>$for</tt> argument, if given
 	 * @param int|null $for number of characters to take; must be non-negative;
@@ -132,21 +138,26 @@ abstract class BitString implements \ArrayAccess
 	 */
 	public function substring($from, $for = null)
 	{
-		$offset = min(0, $from - 1);
-		if ($for === null) {
-			$length = null;
-		}
-		elseif ($for < 0) {
-			throw new UndefinedOperationException('negative substring length not allowed');
-		}
-		elseif ($from < 1) {
-			$length = max(0, $for + $from);
-		}
-		else {
-			$length = $for;
+		if ($for < 0) {
+			throw new UndefinedOperationException('negative number of bits to take');
 		}
 
-		return new static(substr($this->bits, $offset, $length));
+		$offset = max(0, $from - 1);
+		if ($offset >= $this->len) {
+			return FixedBitString::fromString('');
+		}
+
+		if ($for === null) {
+			$len = $this->len;
+		}
+		elseif ($from >= 0) {
+			$len = $for;
+		}
+		else {
+			$len = max(0, $for + $from - 1);
+		}
+
+		return FixedBitString::fromString(substr($this->bits, $offset, $len));
 	}
 
 	/**
@@ -161,7 +172,10 @@ abstract class BitString implements \ArrayAccess
 	 * @param BitString $concatenated
 	 * @return VarBitString bit string made up by concatenating the <tt>$concatenated</tt> after this bit string
 	 */
-	abstract public function concat(BitString $concatenated);
+	public function concat(BitString $concatenated)
+	{
+		return VarBitString::fromString($this->bits . $concatenated->bits);
+	}
 
 	/**
 	 * Bitwise AND operation. Only legal for operands of equal bit lengths.
@@ -170,7 +184,21 @@ abstract class BitString implements \ArrayAccess
 	 * @return FixedBitString new bit string: <tt>$this & $other</tt>
 	 * @throws UndefinedOperationException if the operands are of different bit lengths
 	 */
-	abstract public function bitAnd(BitString $other);
+	public function bitAnd(BitString $other)
+	{
+		if ($this->len != $other->len) {
+			throw new UndefinedOperationException('operands are of different bit lengths');
+		}
+
+		$res = str_repeat('0', $this->len);
+		for ($i = 0; $i < $this->len; $i++) {
+			if ($this->bits[$i] == '1' && $other->bits[$i] == '1') {
+				$res[$i] = '1';
+			}
+		}
+
+		return FixedBitString::fromString($res);
+	}
 
 	/**
 	 * Bitwise OR operation. Only legal for operands of equal bit lengths.
@@ -179,7 +207,21 @@ abstract class BitString implements \ArrayAccess
 	 * @return FixedBitString new bit string: <tt>$this | $other</tt>
 	 * @throws UndefinedOperationException if the operands are of different bit lengths
 	 */
-	abstract public function bitOr(BitString $other);
+	public function bitOr(BitString $other)
+	{
+		if ($this->len != $other->len) {
+			throw new UndefinedOperationException('operands are of different bit lengths');
+		}
+
+		$res = str_repeat('1', $this->len);
+		for ($i = 0; $i < $this->len; $i++) {
+			if ($this->bits[$i] == '0' && $other->bits[$i] == '0') {
+				$res[$i] = '0';
+			}
+		}
+
+		return FixedBitString::fromString($res);
+	}
 
 	/**
 	 * Bitwise exclusive OR operation. Only legal for operands of equal bit lengths.
@@ -188,14 +230,31 @@ abstract class BitString implements \ArrayAccess
 	 * @return FixedBitString new bit string: <tt>$this ^ $other</tt>
 	 * @throws UndefinedOperationException if the operands are of different bit lengths
 	 */
-	abstract public function bitXor(BitString $other);
+	public function bitXor(BitString $other)
+	{
+		if ($this->len != $other->len) {
+			throw new UndefinedOperationException('operands are of different bit lengths');
+		}
+
+		$res = str_repeat('0', $this->len);
+		for ($i = 0; $i < $this->len; $i++) {
+			if ($this->bits[$i] != $other->bits[$i]) {
+				$res[$i] = '1';
+			}
+		}
+
+		return FixedBitString::fromString($res);
+	}
 
 	/**
 	 * Bitwise negation, i.e., reverses all bits of the bit string.
 	 *
 	 * @return FixedBitString new bit string: <tt>~$this</tt>
 	 */
-	abstract public function bitNot();
+	public function bitNot()
+	{
+		return FixedBitString::fromString(strtr($this->bits, '01', '10'));
+	}
 
 	/**
 	 * Shifts the bits to the left.
@@ -209,7 +268,13 @@ abstract class BitString implements \ArrayAccess
 	 */
 	public function bitShiftLeft($shift)
 	{
+		if ($shift < 0) {
+			return $this->bitShiftRight(-$shift);
+		}
 
+		$pad = min($this->len, $shift);
+		$prefix = ($pad == $this->len ? '' : substr($this->bits, $pad));
+		return FixedBitString::fromString($prefix . str_repeat('0', $pad));
 	}
 
 	/**
@@ -224,18 +289,33 @@ abstract class BitString implements \ArrayAccess
 	 */
 	public function bitShiftRight($shift)
 	{
+		if ($shift < 0) {
+			return $this->bitShiftLeft(-$shift);
+		}
 
+		$pad = min($this->len, $shift);
+		$postfix = substr($this->bits, 0, $this->len - $pad);
+		return FixedBitString::fromString(str_repeat('0', $pad) . $postfix);
 	}
 
 	/**
 	 * Rotates the bits to the left.
 	 *
 	 * @param int $rot the length of the rotation
-	 * @return FixedBitString a bit string with <tt>$rot</tt> (mod length) leftmost bits moved to the back of the bit string
+	 * @return FixedBitString a bit string with <tt>$rot</tt> (mod length) leftmost bits moved to the back of the bit
+	 *                          string
 	 */
 	public function bitRotateLeft($rot)
 	{
+		if ($rot < 0) {
+			return $this->bitRotateRight(-$rot);
+		}
+		if ($this->len == 0) {
+			return FixedBitString::fromString('');
+		}
 
+		$pos = $rot % $this->len;
+		return FixedBitString::fromString(substr($this->bits, $pos) . substr($this->bits, 0, $pos));
 	}
 
 	/**
@@ -243,11 +323,19 @@ abstract class BitString implements \ArrayAccess
 	 *
 	 * @param int $rot the length of the rotation
 	 * @return FixedBitString a bit string with <tt>$rot</tt> (mod length) rightmost bits moved to the front of the bit
-	 *                     string
+	 *                          string
 	 */
 	public function bitRotateRight($rot)
 	{
+		if ($rot < 0) {
+			return $this->bitRotateLeft(-$rot);
+		}
+		if ($this->len == 0) {
+			return FixedBitString::fromString('');
+		}
 
+		$pos = $this->len - ($rot % $this->len);
+		return FixedBitString::fromString(substr($this->bits, $pos) . substr($this->bits, 0, $pos));
 	}
 
 
@@ -275,7 +363,7 @@ abstract class BitString implements \ArrayAccess
 	public function offsetGet($offset)
 	{
 		if (isset($this->bits[$offset])) {
-			return $this->bits[$offset];
+			return (int)$this->bits[$offset];
 		}
 		else {
 			return null;

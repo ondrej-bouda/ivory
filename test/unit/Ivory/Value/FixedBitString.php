@@ -11,11 +11,12 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(FixedBitString::fromString('00101')->equals(FixedBitString::fromString('00101')));
 		$this->assertTrue(FixedBitString::fromString('1')->equals(FixedBitString::fromString('1')));
 		$this->assertTrue(FixedBitString::fromString('00101', 5)->equals(FixedBitString::fromString('00101', 5)));
+		$this->assertTrue(FixedBitString::fromString('001010')->equals(FixedBitString::fromString('00101', 6)));
 
 		$this->assertFalse(FixedBitString::fromString('101')->equals(FixedBitString::fromString('1010')));
 		$this->assertFalse(FixedBitString::fromString('1')->equals(FixedBitString::fromString('0')));
 		$this->assertFalse(FixedBitString::fromString('00101', 5)->equals(FixedBitString::fromString('00101', 6)));
-		$this->assertFalse(FixedBitString::fromString('001010')->equals(FixedBitString::fromString('00101', 6)));
+		$this->assertFalse(FixedBitString::fromString('000101')->equals(FixedBitString::fromString('00101', 6)));
 	}
 
 	public function testFromString()
@@ -55,14 +56,14 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 		}
 		catch (\InvalidArgumentException $e) { }
 
-		$fbs = null;
 		try {
-			$fbs = FixedBitString::fromString('1010010110110100111010101011010111001101011010', 4);
+			FixedBitString::fromString('1010010110110100111010101011010111001101011010', 4);
 			$this->fail('a warning is expected due to truncation');
 		}
 		catch (\PHPUnit_Framework_Error_Warning $e) {
-			$this->assertTrue(FixedBitString::fromString('1010')->equals($fbs));
 		}
+		$fbs = @FixedBitString::fromString('1010010110110100111010101011010111001101011010', 4);
+		$this->assertTrue(FixedBitString::fromString('1010')->equals($fbs));
 	}
 
 	public function testToString()
@@ -76,14 +77,14 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertSame('1010', (string)FixedBitString::fromString('101', 4));
 
-		$fbs = null;
 		try {
-			$fbs = FixedBitString::fromString('1010010110110100111010101011010111001101011010', 4);
+			FixedBitString::fromString('1010010110110100111010101011010111001101011010', 4);
 			$this->fail('a warning is expected due to truncation');
 		}
 		catch (\PHPUnit_Framework_Error_Warning $e) {
-			$this->assertSame('1010', $fbs->toString());
 		}
+		$fbs = @FixedBitString::fromString('1010010110110100111010101011010111001101011010', 4);
+		$this->assertSame('1010', $fbs->toString());
 	}
 
 	public function testFromInt()
@@ -362,8 +363,8 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(FixedBitString::fromString('0')
 			->equals(FixedBitString::fromString('0')->bitShiftLeft(4))
 		);
-		$this->assertTrue(FixedBitString::fromString('001000')
-			->equals(FixedBitString::fromString('110001')->bitShiftLeft(3))
+		$this->assertTrue(FixedBitString::fromString('000100')
+			->equals(FixedBitString::fromString('110001')->bitShiftLeft(2))
 		);
 		$this->assertTrue(FixedBitString::fromString('0100000000')
 			->equals(FixedBitString::fromString('11001', 10)->bitShiftLeft(3))
@@ -374,8 +375,8 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(FixedBitString::fromString('1111011000100111000110010')
 			->equals(FixedBitString::fromString('1111011000100111000110010')->bitShiftLeft(0))
 		);
-		$this->assertTrue(FixedBitString::fromString('000110')
-			->equals(FixedBitString::fromString('110110')->bitShiftLeft(-3))
+		$this->assertTrue(FixedBitString::fromString('001101')
+			->equals(FixedBitString::fromString('110110')->bitShiftLeft(-2))
 		);
 		$this->assertTrue(FixedBitString::fromString('000000')
 			->equals(FixedBitString::fromString('110110')->bitShiftLeft(123456789))
@@ -396,8 +397,8 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(FixedBitString::fromString('00001')
 			->equals(FixedBitString::fromString('11001')->bitShiftRight(4))
 		);
-		$this->assertTrue(FixedBitString::fromString('000110')
-			->equals(FixedBitString::fromString('110101')->bitShiftRight(3))
+		$this->assertTrue(FixedBitString::fromString('001101')
+			->equals(FixedBitString::fromString('110101')->bitShiftRight(2))
 		);
 		$this->assertTrue(FixedBitString::fromString('0000011110110001001110001')
 			->equals(FixedBitString::fromString('1111011000100111000110010')->bitShiftRight(5))
@@ -414,11 +415,11 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(FixedBitString::fromString('101100')
 			->equals(FixedBitString::fromString('110110')->bitShiftRight(-1))
 		);
-		$this->assertTrue(FixedBitString::fromString('101100')
-			->equals(FixedBitString::fromString('000000')->bitShiftRight(-123456789))
+		$this->assertTrue(FixedBitString::fromString('000000')
+			->equals(FixedBitString::fromString('101100')->bitShiftRight(-123456789))
 		);
-		$this->assertTrue(FixedBitString::fromString('101100')
-			->equals(FixedBitString::fromString('000000')->bitShiftRight(123456789))
+		$this->assertTrue(FixedBitString::fromString('000000')
+			->equals(FixedBitString::fromString('101100')->bitShiftRight(123456789))
 		);
 	}
 
@@ -505,11 +506,11 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 		$padded = FixedBitString::fromString('001100101', 10);
 
 		$this->assertSame(1, $small[0]);
-		$this->assertSame(0, $small[1]);
-		$this->assertSame(1, $small[2]);
+		$this->assertSame(1, $small[1]);
+		$this->assertSame(0, $small[2]);
 		$this->assertSame(1, $small[6]);
-		$this->assertSame(1, $big[24]);
-		$this->assertSame(0, $padded[8]);
+		$this->assertSame(0, $big[24]);
+		$this->assertSame(1, $padded[8]);
 		$this->assertSame(0, $padded[9]);
 		$this->assertNull($small[7]);
 		$this->assertNull($small[8]);

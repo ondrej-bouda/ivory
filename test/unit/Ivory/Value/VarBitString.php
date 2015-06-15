@@ -22,7 +22,7 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(VarBitString::fromString('10011000011011001')
 			->equals(VarBitString::fromString('10011000011011001'))
 		);
-		$this->assertTrue(VarBitString::fromString('')->equals(VarBitString::fromString('', 5)));
+		$this->assertTrue(VarBitString::fromString('')->equals(VarBitString::fromString('')));
 		$this->assertTrue(VarBitString::fromString('001')->equals(VarBitString::fromString('001')));
 		$this->assertFalse(VarBitString::fromString('001', 3)->equals(VarBitString::fromString('001')));
 		$this->assertFalse(VarBitString::fromString('001', 4)->equals(VarBitString::fromString('001')));
@@ -56,14 +56,14 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 		catch (\InvalidArgumentException $e) {
 		}
 
-		$vbs = null;
 		try {
-			$vbs = VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);
+			VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);
 			$this->fail('a warning is expected due to truncation');
 		}
 		catch (\PHPUnit_Framework_Error_Warning $e) {
-			$this->assertTrue(VarBitString::fromString('1010', 4)->equals($vbs));
 		}
+		$vbs = @VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);
+		$this->assertTrue(VarBitString::fromString('1010', 4)->equals($vbs));
 	}
 
 	public function testToString()
@@ -77,14 +77,14 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertSame('101', (string)VarBitString::fromString(101, 4));
 
-		$vbs = null;
 		try {
-			$vbs = VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);
+			VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);
 			$this->fail('a warning is expected due to truncation');
 		}
 		catch (\PHPUnit_Framework_Error_Warning $e) {
-			$this->assertSame('1010', $vbs->toString());
 		}
+		$vbs = @VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);
+		$this->assertSame('1010', $vbs->toString());
 	}
 
 	public function testGetLength()
@@ -94,10 +94,10 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 		$this->assertSame(5, VarBitString::fromString('10010')->getLength());
 		$this->assertSame(3, VarBitString::fromString('110')->getLength());
 		$this->assertSame(5, VarBitString::fromString('10010', 5)->getLength());
-		$this->assertSame(5, VarBitString::fromString('110', 5)->getLength());
+		$this->assertSame(3, VarBitString::fromString('110', 5)->getLength());
 		$this->assertSame(25, VarBitString::fromString('1111011000100111000110010', 25)->getLength());
-		$this->assertSame(24, VarBitString::fromString('111101100010011100011001', 25)->getMaxLength());
-		$this->assertSame(1, VarBitString::fromString('1', 1025)->getMaxLength());
+		$this->assertSame(24, VarBitString::fromString('111101100010011100011001', 25)->getLength());
+		$this->assertSame(1, VarBitString::fromString('1', 1025)->getLength());
 	}
 
 	public function testGetMaxLength()
@@ -430,31 +430,31 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 			VarBitString::fromString('10011')->bitRotateLeft(1)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('00111', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('00111')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(1)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('10011', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('10011')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(0)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('10011', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('10011')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(5)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('00111', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('00111')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(6)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('11001', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('11001')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(-1)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('11001', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('11001')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(-6)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('11001', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('11001')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateLeft(123456789)
 		));
 	}
@@ -469,31 +469,31 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 			VarBitString::fromString('10011')->bitRotateRight(1)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('11001', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('11001')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(1)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('10011', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('10011')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(0)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('10011', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('10011')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(5)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('11001', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('11001')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(6)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('00111', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('00111')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(-1)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('00111', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('00111')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(-6)
 		));
 
-		$this->assertTrue(FixedBitString::fromString('00111', 8)->equals(
+		$this->assertTrue(FixedBitString::fromString('00111')->equals(
 			VarBitString::fromString('10011', 8)->bitRotateRight(123456789)
 		));
 	}
@@ -535,11 +535,11 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 		$limited = VarBitString::fromString('001100101', 10);
 
 		$this->assertSame(1, $small[0]);
-		$this->assertSame(0, $small[1]);
-		$this->assertSame(1, $small[2]);
+		$this->assertSame(1, $small[1]);
+		$this->assertSame(0, $small[2]);
 		$this->assertSame(1, $small[6]);
-		$this->assertSame(1, $big[24]);
-		$this->assertSame(0, $limited[8]);
+		$this->assertSame(0, $big[24]);
+		$this->assertSame(1, $limited[8]);
 		$this->assertNull($small[7]);
 		$this->assertNull($small[8]);
 		$this->assertNull($small[-1]);
