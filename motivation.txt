@@ -1,5 +1,6 @@
 * SQL is the best way for specification what data to retrieve
 * switching from one DBMS to another in an existing project is unrealistic even if a database abstraction layer is used
+* using an abstraction layer leads to using an abstract syntax of queries - which is then more difficult to move the query to the database level, e.g., for testing or just as a result of a refactoring (e.g., Dibi allows specifying identifiers in brackets, which causes troubles when one wants an array literal, or it allows to specify string literals in double quotes, which is not legal in plain PostgreSQL, though)
 * it is natural to use the full feature set of the DBMS being used, not just CRUD or standardized SQL
 * relations shall be the first-class citizens of a good database layer
 ** data retrieved from a relational database are always relations, no matter if they were selected from a table or view, a join, a set-returning function or write queries using the RETURNING clause
