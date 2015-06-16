@@ -122,6 +122,7 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 	{
 		$this->assertSame(13, FixedBitString::fromString('1101')->toInt());
 		$this->assertSame(208, FixedBitString::fromString('1101', 8)->toInt());
+		$this->assertSame(13, FixedBitString::fromString('0001101')->toInt());
 		$this->assertSame(0, FixedBitString::fromString('0')->toInt());
 		$this->assertSame(2147483647, FixedBitString::fromString('1111111111111111111111111111111')->toInt());
 		if (PHP_INT_SIZE == 4) {

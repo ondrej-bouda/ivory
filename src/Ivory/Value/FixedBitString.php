@@ -67,7 +67,17 @@ class FixedBitString extends BitString
 	 */
 	public static function fromInt($int, $length)
 	{
+		if ($length <= 0) {
+			throw new \InvalidArgumentException('length <= 0');
+		}
 
+		$bin = decbin($int);
+
+		$padBit = ($int >= 0 ? '0' : '1');
+		$padded = str_pad($bin, $length, $padBit, STR_PAD_LEFT);
+
+		$truncated = substr($padded, -$length);
+		return self::fromString($truncated);
 	}
 
 	/**
@@ -88,7 +98,7 @@ class FixedBitString extends BitString
 	 */
 	public function toInt()
 	{
-		// TODO
+		return bindec(substr($this->bits, -(PHP_INT_SIZE * 8 - 1)));
 	}
 
 	public static function fromNumber($number)
