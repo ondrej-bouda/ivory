@@ -8,7 +8,7 @@ namespace Ivory\Type\Std;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-character.html
  */
-class String extends \Ivory\Type\BaseType
+class StringType extends \Ivory\Type\BaseType
 {
 	public function parseValue($str)
 	{

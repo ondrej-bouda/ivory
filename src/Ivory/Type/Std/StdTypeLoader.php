@@ -17,15 +17,15 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'INT4':
 			case 'SMALLINT':
 			case 'INT2':
-				return new Integer($typeName, $schemaName);
+				return new IntegerType($typeName, $schemaName);
 
 			case 'BIGINT':
 			case 'INT8':
-				return new BigInt($typeName, $schemaName);
+				return new BigIntType($typeName, $schemaName);
 
 			case 'BOOLEAN':
 			case 'BOOL':
-				return new Boolean($typeName, $schemaName);
+				return new BooleanType($typeName, $schemaName);
 
 			case 'TEXT':
 			case 'CHARACTER':
@@ -33,17 +33,17 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'CHARACTER VARYING':
 			case 'VARCHAR':
 			case 'BPCHAR':
-				return new String($typeName, $schemaName);
+				return new StringType($typeName, $schemaName);
 
 			case 'BYTEA':
-				return new Binary($typeName, $schemaName);
+				return new BinaryType($typeName, $schemaName);
 
 			case 'BIT':
-				return new FixedBitString($typeName, $schemaName);
+				return new FixedBitStringType($typeName, $schemaName);
 
 			case 'BIT VARYING':
 			case 'VARBIT':
-				return new VarBitString($typeName, $schemaName);
+				return new VarBitStringType($typeName, $schemaName);
 
 			default:
 				return null;
