@@ -12,16 +12,20 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 		}
 
 		switch (strtoupper(trim($typeName))) {
+			case 'SMALLINT':
+			case 'INT2':
 			case 'INTEGER':
 			case 'INT':
 			case 'INT4':
-			case 'SMALLINT':
-			case 'INT2':
 				return new IntegerType($typeName, $schemaName);
 
 			case 'BIGINT':
 			case 'INT8':
 				return new BigIntType($typeName, $schemaName);
+
+			case 'NUMERIC':
+			case 'DECIMAL':
+				return new DecimalType($typeName, $schemaName);
 
 			case 'BOOLEAN':
 			case 'BOOL':
