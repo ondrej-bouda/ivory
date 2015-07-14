@@ -27,6 +27,12 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'DECIMAL':
 				return new DecimalType($typeName, $schemaName);
 
+			case 'REAL':
+			case 'FLOAT4':
+			case 'DOUBLE PRECISION':
+			case 'FLOAT8':
+				return new FloatType($typeName, $schemaName);
+
 			case 'BOOLEAN':
 			case 'BOOL':
 				return new BooleanType($typeName, $schemaName);

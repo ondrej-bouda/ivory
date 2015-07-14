@@ -9,8 +9,10 @@ boolean	                    bool	            logical Boolean (true/false)
 bytea	 	                                    binary data ("byte array")
 character [ (n) ]	        char [ (n) ]	    fixed-length character string
 character varying [ (n) ]	varchar [ (n) ]	    variable-length character string
+double precision	        float8	            double precision floating-point number (8 bytes)
 integer                     int, int4	        signed four-byte integer
 numeric [ (p, s) ]	        decimal [ (p, s) ]	exact numeric of selectable precision
+real	                    float4	            single precision floating-point number (4 bytes)
 smallint	                int2	            signed two-byte integer
 smallserial	                serial2	            autoincrementing two-byte integer
 serial	                    serial4	            autoincrementing four-byte integer
@@ -25,7 +27,6 @@ box	 	                                        rectangular box on a plane
 cidr	 	                                    IPv4 or IPv6 network address
 circle	 	                                    circle on a plane
 date	 	                                    calendar date (year, month, day)
-double precision	        float8	            double precision floating-point number (8 bytes)
 inet	 	                                    IPv4 or IPv6 host address
 interval [ fields ] [ (p) ]	 	                time span
 json	 	                                    textual JSON data
@@ -38,7 +39,6 @@ path	 	                                    geometric path on a plane
 pg_lsn	 	                                    PostgreSQL Log Sequence Number
 point	 	                                    geometric point on a plane
 polygon	 	                                    closed geometric path on a plane
-real	                    float4	            single precision floating-point number (4 bytes)
 time [ (p) ] [ without time zone ]	            time of day (no time zone)
 time [ (p) ] with time zone	timetz	            time of day, including time zone
 timestamp [ (p) ] [ without time zone ]         date and time (no time zone)
