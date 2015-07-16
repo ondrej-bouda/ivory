@@ -11,6 +11,8 @@ character [ (n) ]	        char [ (n) ]	    fixed-length character string
 character varying [ (n) ]	varchar [ (n) ]	    variable-length character string
 double precision	        float8	            double precision floating-point number (8 bytes)
 integer                     int, int4	        signed four-byte integer
+json	 	                                    textual JSON data
+jsonb	 	                                    binary JSON data, decomposed
 numeric [ (p, s) ]	        decimal [ (p, s) ]	exact numeric of selectable precision
 real	                    float4	            single precision floating-point number (4 bytes)
 smallint	                int2	            signed two-byte integer
@@ -29,8 +31,6 @@ circle	 	                                    circle on a plane
 date	 	                                    calendar date (year, month, day)
 inet	 	                                    IPv4 or IPv6 host address
 interval [ fields ] [ (p) ]	 	                time span
-json	 	                                    textual JSON data
-jsonb	 	                                    binary JSON data, decomposed
 line	 	                                    infinite line on a plane
 lseg	 	                                    line segment on a plane
 macaddr	 	                                    MAC (Media Access Control) address
