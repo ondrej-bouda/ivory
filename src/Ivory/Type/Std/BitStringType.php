@@ -6,7 +6,7 @@ namespace Ivory\Type\Std;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-bit.html
  */
-abstract class BitString extends \Ivory\Type\BaseType
+abstract class BitStringType extends \Ivory\Type\BaseType
 {
 	public function serializeValue($val)
 	{

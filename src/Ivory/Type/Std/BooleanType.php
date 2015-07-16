@@ -8,7 +8,7 @@ namespace Ivory\Type\Std;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-boolean.html
  */
-class Boolean extends \Ivory\Type\BaseType
+class BooleanType extends \Ivory\Type\BaseType
 {
 	public function parseValue($str)
 	{

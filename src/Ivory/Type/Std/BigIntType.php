@@ -9,7 +9,7 @@ namespace Ivory\Type\Std;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html#DATATYPE-INT
  */
-class BigInt extends Integer
+class BigIntType extends IntegerType
 {
 	public function parseValue($str)
 	{

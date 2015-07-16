@@ -8,7 +8,7 @@ namespace Ivory\Type\Std;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html#DATATYPE-INT
  */
-class Integer extends \Ivory\Type\BaseType
+class IntegerType extends \Ivory\Type\BaseType
 {
 	public function parseValue($str)
 	{

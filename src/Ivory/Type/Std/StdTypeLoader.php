@@ -12,20 +12,30 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 		}
 
 		switch (strtoupper(trim($typeName))) {
+			case 'SMALLINT':
+			case 'INT2':
 			case 'INTEGER':
 			case 'INT':
 			case 'INT4':
-			case 'SMALLINT':
-			case 'INT2':
-				return new Integer($typeName, $schemaName);
+				return new IntegerType($typeName, $schemaName);
 
 			case 'BIGINT':
 			case 'INT8':
-				return new BigInt($typeName, $schemaName);
+				return new BigIntType($typeName, $schemaName);
+
+			case 'NUMERIC':
+			case 'DECIMAL':
+				return new DecimalType($typeName, $schemaName);
+
+			case 'REAL':
+			case 'FLOAT4':
+			case 'DOUBLE PRECISION':
+			case 'FLOAT8':
+				return new FloatType($typeName, $schemaName);
 
 			case 'BOOLEAN':
 			case 'BOOL':
-				return new Boolean($typeName, $schemaName);
+				return new BooleanType($typeName, $schemaName);
 
 			case 'TEXT':
 			case 'CHARACTER':
@@ -33,17 +43,21 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'CHARACTER VARYING':
 			case 'VARCHAR':
 			case 'BPCHAR':
-				return new String($typeName, $schemaName);
+				return new StringType($typeName, $schemaName);
 
 			case 'BYTEA':
-				return new Binary($typeName, $schemaName);
+				return new BinaryType($typeName, $schemaName);
 
 			case 'BIT':
-				return new FixedBitString($typeName, $schemaName);
+				return new FixedBitStringType($typeName, $schemaName);
 
 			case 'BIT VARYING':
 			case 'VARBIT':
-				return new VarBitString($typeName, $schemaName);
+				return new VarBitStringType($typeName, $schemaName);
+
+			case 'JSON':
+			case 'JSONB':
+				return new JsonType($typeName, $schemaName);
 
 			default:
 				return null;

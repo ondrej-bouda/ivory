@@ -2,13 +2,13 @@
 namespace Ivory\Type\Std;
 
 /**
- * Fixed-length bit string.
+ * Variable-length bit string.
  *
- * Represented as a {@link \Ivory\Value\FixedBitString} object.
+ * Represented as a {@link \Ivory\Value\VarBitString} object.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-bit.html
  */
-class FixedBitString extends BitString
+class VarBitStringType extends BitStringType
 {
 	public function parseValue($str)
 	{
@@ -16,7 +16,7 @@ class FixedBitString extends BitString
 			return null;
 		}
 		else {
-			return \Ivory\Value\FixedBitString::fromString($str);
+			return \Ivory\Value\VarBitString::fromString($str);
 		}
 	}
 }
