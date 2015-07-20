@@ -2,7 +2,7 @@
 namespace Ivory\Type\Std;
 
 /**
- * Base for bit string type.
+ * Base for bit string types.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-bit.html
  */

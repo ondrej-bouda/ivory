@@ -22,8 +22,9 @@ abstract class BaseType implements INamedType
 		return $this->schemaName;
 	}
 
-	protected function throwInvalidValue($str)
+	protected function throwInvalidValue($str, \Exception $cause = null)
 	{
-		throw new \InvalidArgumentException("Value '$str' is not valid for type {$this->schemaName}.{$this->name}");
+		$message = "Value '$str' is not valid for type {$this->schemaName}.{$this->name}";
+		throw new \InvalidArgumentException($message, 0, $cause);
 	}
 }

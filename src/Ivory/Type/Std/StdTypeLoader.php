@@ -56,8 +56,10 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 				return new VarBitStringType($typeName, $schemaName);
 
 			case 'JSON':
+				return new JsonExactType($typeName, $schemaName);
+
 			case 'JSONB':
-				return new JsonType($typeName, $schemaName);
+				return new JsonBType($typeName, $schemaName);
 
 			default:
 				return null;
