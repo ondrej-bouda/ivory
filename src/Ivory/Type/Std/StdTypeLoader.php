@@ -61,6 +61,9 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'JSONB':
 				return new JsonBType($typeName, $schemaName);
 
+			case 'XML':
+				return new XmlType($typeName, $schemaName);
+
 			default:
 				return null;
 		}
