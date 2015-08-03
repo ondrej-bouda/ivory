@@ -14,6 +14,7 @@ namespace Ivory\Type\Std;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-xml.html
  * @see http://www.postgresql.org/docs/9.4/static/functions-xml.html
+ * @todo instead of returning string, return a value object with conversion methods from/to XML types currently accepted by serializeValue(); either use one class with isXmlDocument() method, or use two classes - XmlContent and XmlDocument extending XmlContent
  */
 class XmlType extends \Ivory\Type\BaseType
 {
