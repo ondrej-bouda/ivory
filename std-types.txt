@@ -19,6 +19,7 @@ smallint	                int2	            signed two-byte integer
 smallserial	                serial2	            autoincrementing two-byte integer
 serial	                    serial4	            autoincrementing four-byte integer
 text	 	                                    variable-length character string
+xml	 	                                        XML data
 
 
 
@@ -47,4 +48,3 @@ tsquery	 	                                    text search query
 tsvector	 	                                text search document
 txid_snapshot	 	                            user-level transaction ID snapshot
 uuid	 	                                    universally unique identifier
-xml	 	                                        XML data
