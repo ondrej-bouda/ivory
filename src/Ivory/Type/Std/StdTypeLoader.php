@@ -64,6 +64,9 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'XML':
 				return new XmlType($typeName, $schemaName);
 
+			case 'UUID':
+				return new UuidType($typeName, $schemaName);
+
 			default:
 				return null;
 		}
