@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Type\Std;
 
+use Ivory\Value\LineSegment;
+
 class StdTypeLoader implements \Ivory\Type\ITypeLoader
 {
 	const PG_CATALOG = 'pg_catalog';
@@ -66,6 +68,21 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 
 			case 'UUID':
 				return new UuidType($typeName, $schemaName);
+
+			case 'POINT':
+				return new PointType($typeName, $schemaName);
+			case 'LINE':
+				return new LineType($typeName, $schemaName);
+			case 'LSEG':
+				return new LineSegmentType($typeName, $schemaName);
+			case 'BOX':
+				return new BoxType($typeName, $schemaName);
+			case 'PATH':
+				return new PathType($typeName, $schemaName);
+			case 'POLYGON':
+				return new PolygonType($typeName, $schemaName);
+			case 'CIRCLE':
+				return new CircleType($typeName, $schemaName);
 
 			default:
 				return null;
