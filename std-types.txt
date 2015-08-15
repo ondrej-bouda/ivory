@@ -17,6 +17,7 @@ json	 	                                    textual JSON data
 jsonb	 	                                    binary JSON data, decomposed
 line	 	                                    infinite line on a plane
 lseg	 	                                    line segment on a plane
+macaddr	 	                                    MAC (Media Access Control) address
 numeric [ (p, s) ]	        decimal [ (p, s) ]	exact numeric of selectable precision
 path	 	                                    geometric path on a plane
 point	 	                                    geometric point on a plane
@@ -38,7 +39,6 @@ cidr	 	                                    IPv4 or IPv6 network address
 date	 	                                    calendar date (year, month, day)
 inet	 	                                    IPv4 or IPv6 host address
 interval [ fields ] [ (p) ]	 	                time span
-macaddr	 	                                    MAC (Media Access Control) address
 money	 	                                    currency amount
 pg_lsn	 	                                    PostgreSQL Log Sequence Number
 time [ (p) ] [ without time zone ]	            time of day (no time zone)

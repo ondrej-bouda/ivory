@@ -84,6 +84,9 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'CIRCLE':
 				return new CircleType($typeName, $schemaName);
 
+			case 'MACADDR':
+				return new MacAddrType($typeName, $schemaName);
+
 			default:
 				return null;
 		}
