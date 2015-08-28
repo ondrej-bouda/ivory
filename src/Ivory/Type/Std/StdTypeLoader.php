@@ -1,8 +1,6 @@
 <?php
 namespace Ivory\Type\Std;
 
-use Ivory\Value\LineSegment;
-
 class StdTypeLoader implements \Ivory\Type\ITypeLoader
 {
 	const PG_CATALOG = 'pg_catalog';
@@ -59,7 +57,6 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 
 			case 'JSON':
 				return new JsonExactType($typeName, $schemaName);
-
 			case 'JSONB':
 				return new JsonBType($typeName, $schemaName);
 
@@ -84,6 +81,10 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'CIRCLE':
 				return new CircleType($typeName, $schemaName);
 
+			case 'INET':
+				return new InetType($typeName, $schemaName);
+			case 'CIDR':
+				return new CidrType($typeName, $schemaName);
 			case 'MACADDR':
 				return new MacAddrType($typeName, $schemaName);
 

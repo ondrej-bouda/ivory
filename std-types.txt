@@ -10,8 +10,10 @@ box	 	                                        rectangular box on a plane
 bytea	 	                                    binary data ("byte array")
 character [ (n) ]	        char [ (n) ]	    fixed-length character string
 character varying [ (n) ]	varchar [ (n) ]	    variable-length character string
+cidr	 	                                    IPv4 or IPv6 network address
 circle	 	                                    circle on a plane
 double precision	        float8	            double precision floating-point number (8 bytes)
+inet	 	                                    IPv4 or IPv6 host address
 integer                     int, int4	        signed four-byte integer
 json	 	                                    textual JSON data
 jsonb	 	                                    binary JSON data, decomposed
@@ -35,9 +37,7 @@ xml	 	                                        XML data
 PostgreSQL built-in types yet to be supported:
 
 Name                        Aliases             Description
-cidr	 	                                    IPv4 or IPv6 network address
 date	 	                                    calendar date (year, month, day)
-inet	 	                                    IPv4 or IPv6 host address
 interval [ fields ] [ (p) ]	 	                time span
 money	 	                                    currency amount
 pg_lsn	 	                                    PostgreSQL Log Sequence Number
