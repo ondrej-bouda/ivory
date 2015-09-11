@@ -88,6 +88,9 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'MACADDR':
 				return new MacAddrType($typeName, $schemaName, $connection);
 
+			case 'MONEY':
+				return new MoneyType($typeName, $schemaName, $connection);
+
 			default:
 				return null;
 		}

@@ -20,4 +20,16 @@ class System
     {
         return (PHP_INT_SIZE == 8);
     }
+
+    /**
+     * @return bool whether the GMP extension is available
+     */
+    public static function hasGMP()
+    {
+        static $installed = null;
+        if ($installed === null) {
+            $installed = extension_loaded('gmp');
+        }
+        return $installed;
+    }
 }

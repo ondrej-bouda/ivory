@@ -2,6 +2,7 @@
 namespace Ivory\Value;
 
 use Ivory\UndefinedOperationException;
+use Ivory\Utils\System;
 
 /**
  * A decimal number with fixed precision.
@@ -549,7 +550,7 @@ class Decimal
 			return new Decimal(1);
 		}
 
-		if (self::hasGMP()) {
+		if (System::hasGMP()) {
 			return new Decimal(gmp_strval(gmp_fact($this->toGMP())));
 		}
 
@@ -704,19 +705,6 @@ class Decimal
 		$str = ($decPoint === false ? $this->val : substr($this->val, 0, $decPoint - 1));
 		return gmp_init($str);
 	}
-
-	/**
-	 * @return bool whether the GMP extension is available
-	 */
-	private static function hasGMP()
-	{
-		static $installed = null;
-		if ($installed === null) {
-			$installed = extension_loaded('gmp');
-		}
-		return $installed;
-	}
-
 
 	public function __toString()
 	{

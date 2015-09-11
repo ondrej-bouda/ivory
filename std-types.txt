@@ -20,6 +20,7 @@ jsonb	 	                                    binary JSON data, decomposed
 line	 	                                    infinite line on a plane
 lseg	 	                                    line segment on a plane
 macaddr	 	                                    MAC (Media Access Control) address
+money	 	                                    currency amount
 numeric [ (p, s) ]	        decimal [ (p, s) ]	exact numeric of selectable precision
 path	 	                                    geometric path on a plane
 point	 	                                    geometric point on a plane
@@ -39,7 +40,6 @@ PostgreSQL built-in types yet to be supported:
 Name                        Aliases             Description
 date	 	                                    calendar date (year, month, day)
 interval [ fields ] [ (p) ]	 	                time span
-money	 	                                    currency amount
 pg_lsn	 	                                    PostgreSQL Log Sequence Number
 time [ (p) ] [ without time zone ]	            time of day (no time zone)
 time [ (p) ] with time zone	timetz	            time of day, including time zone
