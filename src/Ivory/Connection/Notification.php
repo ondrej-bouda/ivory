@@ -1,5 +1,5 @@
 <?php
-namespace Ivory;
+namespace Ivory\Connection;
 
 /**
  * Notification received from an IPC channel.

@@ -1,5 +1,5 @@
 <?php
-namespace Ivory;
+namespace Ivory\Connection;
 
 /**
  * Transaction configuration. To be used, e.g., for {@link Connection::startTransaction()}.

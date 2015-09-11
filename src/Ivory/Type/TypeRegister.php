@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Type;
 
-use Ivory\Connection;
+use Ivory\Connection\Connection;
 
 /**
  * Manages the correspondence between PostgreSQL types and PHP types.

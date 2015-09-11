@@ -1,5 +1,5 @@
 <?php
-namespace Ivory;
+namespace Ivory\Connection;
 
 use Ivory\Value\Quantity;
 

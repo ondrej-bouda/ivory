@@ -1,5 +1,5 @@
 <?php
-namespace Ivory;
+namespace Ivory\Connection;
 
 use Ivory\Exception\ConnectionException;
 use Ivory\Exception\InvalidStateException;
@@ -13,7 +13,6 @@ use Ivory\Exception\InvalidStateException;
  * interface should be avoided, though, because the <tt>IConnection</tt> object tracks the state of the connection and
  * would end up in an undefined state if it was not aware of some control queries.
  *
- * @todo move everything connection-related to the Ivory\Connection namespace
  * @todo consider splitting this big interface into smaller parts, each responsible for one area (SessionManager...); then, the big Connection class might still exist, but serve just as a facade
  */
 interface IConnection

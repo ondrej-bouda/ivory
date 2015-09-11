@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Type;
 
-use Ivory\IConnection;
+use Ivory\Connection\IConnection;
 
 abstract class BaseType implements INamedType
 {

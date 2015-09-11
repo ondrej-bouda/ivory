@@ -5,7 +5,7 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 {
 	const PG_CATALOG = 'pg_catalog';
 
-	public function loadType($typeName, $schemaName, \Ivory\IConnection $connection)
+	public function loadType($typeName, $schemaName, \Ivory\Connection\IConnection $connection)
 	{
 		if ($schemaName != self::PG_CATALOG) {
 			return null;

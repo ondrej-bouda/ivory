@@ -1,8 +1,7 @@
 <?php
+namespace Ivory\Connection;
 
-use Ivory\ConnectionParameters;
-
-class ConnectionParametersTest extends PHPUnit_Framework_TestCase
+class ConnectionParametersTest extends \PHPUnit_Framework_TestCase
 {
 	public function testFromConnectionString()
 	{
@@ -31,13 +30,13 @@ class ConnectionParametersTest extends PHPUnit_Framework_TestCase
 			ConnectionParameters::fromConnectionString('bagr=');
 			$this->fail('InvalidArgumentException expected');
 		}
-		catch (InvalidArgumentException $e) {}
+		catch (\InvalidArgumentException $e) {}
 
 		try {
 			ConnectionParameters::fromConnectionString("foo = 'incomplete");
 			$this->fail('InvalidArgumentException expected');
 		}
-		catch (InvalidArgumentException $e) {}
+		catch (\InvalidArgumentException $e) {}
 	}
 
 	public function testFromUri()
@@ -130,13 +129,13 @@ class ConnectionParametersTest extends PHPUnit_Framework_TestCase
 			ConnectionParameters::fromUri('localhost');
 			$this->fail('InvalidArgumentException expected');
 		}
-		catch (InvalidArgumentException $e) {}
+		catch (\InvalidArgumentException $e) {}
 
 		try {
 			ConnectionParameters::fromUri('1234');
 			$this->fail('InvalidArgumentException expected');
 		}
-		catch (InvalidArgumentException $e) {}
+		catch (\InvalidArgumentException $e) {}
 
 		try {
 			ConnectionParameters::fromUri('pgsql://localhost');
@@ -172,13 +171,13 @@ class ConnectionParametersTest extends PHPUnit_Framework_TestCase
 			ConnectionParameters::create('bagr=');
 			$this->fail('InvalidArgumentException expected');
 		}
-		catch (InvalidArgumentException $e) {}
+		catch (\InvalidArgumentException $e) {}
 
 		try {
 			ConnectionParameters::create("foo = 'incomplete");
 			$this->fail('InvalidArgumentException expected');
 		}
-		catch (InvalidArgumentException $e) {}
+		catch (\InvalidArgumentException $e) {}
 
 		$this->assertEquals(
 			[],
@@ -209,7 +208,7 @@ class ConnectionParametersTest extends PHPUnit_Framework_TestCase
 			ConnectionParameters::create(1);
 			$this->fail('InvalidArgumentException expected');
 		}
-		catch (InvalidArgumentException $e) {
+		catch (\InvalidArgumentException $e) {
 		}
 	}
 

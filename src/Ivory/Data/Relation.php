@@ -3,10 +3,10 @@ namespace Ivory\Data;
 
 class Relation
 {
-	/** @var \Ivory\IConnection */
+	/** @var \Ivory\Connection\IConnection */
 	private $connection = null;
 
-	public function setConnection(\Ivory\IConnection $connection)
+	public function setConnection(\Ivory\Connection\IConnection $connection)
 	{
 		$this->connection = $connection;
 	}
@@ -14,7 +14,7 @@ class Relation
 	public function getConnection()
 	{
 		if ($this->connection === null) {
-			$this->connection = \Ivory\Ivory::
+			$this->connection = \Ivory\Ivory::getConnection();
 		}
 
 		return $this->connection;

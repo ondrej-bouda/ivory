@@ -1,6 +1,9 @@
 <?php
 namespace Ivory;
 
+use Ivory\Connection\Connection;
+use Ivory\Connection\ConnectionParameters;
+use Ivory\Connection\IConnection;
 use Ivory\Exception\ConnectionException;
 
 class Ivory
