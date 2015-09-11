@@ -14,7 +14,7 @@
     "vendor-dir": "lib/composed"
   },
   "require-dev": {
-    "php": ">= 5.4",
+    "php": ">= 5.6",
     "phpunit/phpunit": "4.*"
   }
 }
