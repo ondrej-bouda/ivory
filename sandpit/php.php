@@ -10,3 +10,9 @@ echo "\n";
 
 echo "$* $1";
 echo "\n";
+
+
+
+$obj = new \stdClass();
+$obj->{'edoo.user'} = 4;
+var_dump((array)$obj);

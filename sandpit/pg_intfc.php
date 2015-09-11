@@ -7,7 +7,7 @@ echo "search_path: ";
 $result = pg_query($conn, 'select current_schemas(true)');
 var_dump(pg_fetch_result($result, null, 0));
 
-$result = pg_query($conn, "select *, B'101'::varbit(5), substring(B'1101'::varbit(4) for 3) from t");
+$result = pg_query($conn, "select 123456.789::money, *, B'101'::varbit(5), substring(B'1101'::varbit(4) for 3) from t");
 
 echo "Types: ";
 $fieldCnt = pg_num_fields($result);
