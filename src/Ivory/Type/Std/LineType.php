@@ -17,11 +17,11 @@ class LineType extends CompoundGeometricType
     private $lineSegType;
 
 
-    public function __construct($name, $schemaName)
+    public function __construct($name, $schemaName, $connection)
     {
-        parent::__construct($name, $schemaName);
+        parent::__construct($name, $schemaName, $connection);
 
-        $this->lineSegType = new LineSegmentType(null, null);
+        $this->lineSegType = new LineSegmentType(null, null, $connection);
     }
 
 

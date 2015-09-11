@@ -1,15 +1,19 @@
 <?php
 namespace Ivory\Type;
 
+use Ivory\IConnection;
+
 abstract class BaseType implements INamedType
 {
 	private $name;
 	private $schemaName;
+	private $connection;
 
-	public function __construct($name, $schemaName)
+	public function __construct($name, $schemaName, IConnection $connection)
 	{
 		$this->name = $name;
 		$this->schemaName = $schemaName;
+		$this->connection = $connection;
 	}
 
 	final public function getName()
@@ -20,6 +24,11 @@ abstract class BaseType implements INamedType
 	final public function getSchemaName()
 	{
 		return $this->schemaName;
+	}
+
+	final protected function getConnection()
+	{
+		return $this->connection;
 	}
 
 	protected function throwInvalidValue($str, \Exception $cause = null)
