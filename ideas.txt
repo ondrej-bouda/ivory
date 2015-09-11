@@ -4,6 +4,9 @@ To Do:
 ** pgTAP: http://pgtap.org
 * design the interface for write operations
 * design the interface for write operations combined with read operations (the application takes results from the database, modifies them somehow, and stores them back; that should also work for combinations of several relations; use the unique keys known for participating relations)
+* consider have the project checked by:
+** https://insight.sensiolabs.com
+** https://codeclimate.com/github/Bee-Lab/bowerphp
 
 
 
@@ -66,6 +69,7 @@ Supporting PostgreSQL features:
 * Writable views, not only tables.
 * Leveraging constraints info - e.g., unique keys are useful for intelligent UPSERTs.
 * Prepared statements.
+* Two-phase commits.
 
 
 
