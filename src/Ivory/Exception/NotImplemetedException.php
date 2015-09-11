@@ -1,5 +1,5 @@
 <?php
-namespace Ivory;
+namespace Ivory\Exception;
 
 /**
  * Exception thrown when the code uses a part of Ivory which has not been implemented (yet).

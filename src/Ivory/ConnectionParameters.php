@@ -1,6 +1,8 @@
 <?php
 namespace Ivory;
 
+use Ivory\Exception\UnsupportedException;
+
 /**
  * Parameters of a database connection.
  */

@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\UndefinedOperationException;
+use Ivory\Exception\UndefinedOperationException;
 
 class DecimalTest extends \PHPUnit_Framework_TestCase
 {

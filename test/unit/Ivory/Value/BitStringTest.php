@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\UndefinedOperationException;
+use Ivory\Exception\UndefinedOperationException;
 
 /**
  * Tests of operations combining objects of different BitString subclasses as operands.

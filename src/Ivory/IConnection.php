@@ -1,6 +1,9 @@
 <?php
 namespace Ivory;
 
+use Ivory\Exception\ConnectionException;
+use Ivory\Exception\InvalidStateException;
+
 /**
  * Connection to a database.
  *

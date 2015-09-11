@@ -1,6 +1,8 @@
 <?php
 namespace Ivory;
 
+use Ivory\Exception\ConnectionException;
+
 class Ivory
 {
 	/** @var IConnection[] map: name => connection */

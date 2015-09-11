@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\UndefinedOperationException;
+use Ivory\Exception\UndefinedOperationException;
 use Ivory\Utils\System;
 
 /**

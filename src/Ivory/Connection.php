@@ -1,6 +1,8 @@
 <?php
 namespace Ivory;
 
+use Ivory\Exception\ConnectionException;
+use Ivory\Exception\InvalidStateException;
 use Ivory\Utils\NotSerializable;
 
 class Connection implements IConnection

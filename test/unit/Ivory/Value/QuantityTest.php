@@ -1,8 +1,8 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\UndefinedOperationException;
-use Ivory\UnsupportedException;
+use Ivory\Exception\UndefinedOperationException;
+use Ivory\Exception\UnsupportedException;
 
 class QuantityTest extends \PHPUnit_Framework_TestCase
 {

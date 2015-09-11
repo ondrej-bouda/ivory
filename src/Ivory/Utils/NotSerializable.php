@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Utils;
 
-use Ivory\UnsupportedException;
+use Ivory\Exception\UnsupportedException;
 
 trait NotSerializable
 {

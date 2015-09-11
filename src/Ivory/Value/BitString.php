@@ -1,8 +1,8 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\ImmutableException;
-use Ivory\UndefinedOperationException;
+use Ivory\Exception\ImmutableException;
+use Ivory\Exception\UndefinedOperationException;
 
 /**
  * A common super type for bit string types - strings of 1's and 0's.

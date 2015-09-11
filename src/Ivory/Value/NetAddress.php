@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\NotImplementedException;
+use Ivory\Exception\NotImplementedException;
 
 /**
  * Representation of an IPv4 or IPv6 host or network address.

@@ -142,7 +142,7 @@ class ConnectionParametersTest extends PHPUnit_Framework_TestCase
 			ConnectionParameters::fromUri('pgsql://localhost');
 			$this->fail('\Ivory\UnsupportedException expected');
 		}
-		catch (\Ivory\UnsupportedException $e) {}
+		catch (\Ivory\Exception\UnsupportedException $e) {}
 	}
 
 	public function testCreate()

@@ -1,8 +1,8 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\ImmutableException;
-use Ivory\UndefinedOperationException;
+use Ivory\Exception\ImmutableException;
+use Ivory\Exception\UndefinedOperationException;
 
 class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,5 +1,5 @@
 <?php
-namespace Ivory;
+namespace Ivory\Exception;
 
 class UnsupportedException extends \LogicException
 {

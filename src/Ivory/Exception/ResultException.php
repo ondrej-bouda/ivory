@@ -1,12 +1,12 @@
 <?php
-namespace Ivory;
+namespace Ivory\Exception;
 
-use Exception;
+use RuntimeException;
 
 /**
  * Exception thrown upon errors on querying the database.
  *
- * The exception code contains the SQLSTATE code.
+ * The exception code, if provided contains the SQLSTATE code.
  */
 class ResultException extends \RuntimeException
 {
@@ -20,9 +20,9 @@ class ResultException extends \RuntimeException
 	 *                                   used as the exception message, and message detail and message hint get
 	 *                                   initialized, too (see {@link getMessageDetail()} and {@link getMessageHint()})
 	 * @param int $code the SQLSTATE code of the error; irrelevant if $message is a PostgreSQL query result resource
-	 * @param Exception $previous
+	 * @param \Exception $previous
 	 */
-	public function __construct($message = '', $code = 0, Exception $previous = null)
+	public function __construct($message = '', $code = 0, \Exception $previous = null)
 	{
 		if (is_resource($message)) {
 			$res = $message;

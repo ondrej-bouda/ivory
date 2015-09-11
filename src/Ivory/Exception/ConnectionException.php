@@ -1,7 +1,8 @@
 <?php
-namespace Ivory;
+namespace Ivory\Exception;
 
 use Exception;
+use RuntimeException;
 
 /**
  * An exception above a database connection.

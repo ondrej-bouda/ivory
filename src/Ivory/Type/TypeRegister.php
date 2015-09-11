@@ -32,7 +32,7 @@ class TypeRegister
 	 * @param Connection|string|null $connection (name of) connection for which to retrieve the type object;
 	 *                                  <tt>null</tt> to only search within global types
 	 * @return IType the requested type object
-	 * @throws \Ivory\UndefinedTypeException if no corresponding type is defined
+	 * @throws \Ivory\Exception\UndefinedTypeException if no corresponding type is defined
 	 */
 	public function getType($typeName, $schemaName, $connection)
 	{

@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\NotImplementedException;
+use Ivory\Exception\NotImplementedException;
 
 /**
  * Fixed-length bit string - a string of 1's and 0's.
