@@ -1,4 +1,23 @@
 PostgreSQL commands covered fully:
+ABORT -- abort the current transaction
+BEGIN -- start a transaction block
+COMMIT -- commit the current transaction
+COMMIT PREPARED -- commit a transaction that was earlier prepared for two-phase commit
+END -- commit the current transaction
+LISTEN -- listen for a notification
+NOTIFY -- generate a notification
+PREPARE TRANSACTION -- prepare the current transaction for two-phase commit
+RELEASE SAVEPOINT -- destroy a previously defined savepoint
+RESET -- restore the value of a run-time parameter to the default value
+ROLLBACK -- abort the current transaction
+ROLLBACK PREPARED -- cancel a transaction that was earlier prepared for two-phase commit
+ROLLBACK TO SAVEPOINT -- roll back to a savepoint
+SAVEPOINT -- define a new savepoint within the current transaction
+SET -- change a run-time parameter
+SET TRANSACTION -- set the characteristics of the current transaction
+SHOW -- show the value of a run-time parameter
+START TRANSACTION -- start a transaction block
+UNLISTEN -- stop listening for a notification
 
 
 
@@ -8,7 +27,6 @@ PostgreSQL commands covered partially:
 
 PostgreSQL commands not covered at all:
 
-ABORT -- abort the current transaction
 ALTER AGGREGATE -- change the definition of an aggregate function
 ALTER COLLATION -- change the definition of a collation
 ALTER CONVERSION -- change the definition of a conversion
@@ -46,13 +64,10 @@ ALTER USER -- change a database role
 ALTER USER MAPPING -- change the definition of a user mapping
 ALTER VIEW -- change the definition of a view
 ANALYZE -- collect statistics about a database
-BEGIN -- start a transaction block
 CHECKPOINT -- force a transaction log checkpoint
 CLOSE -- close a cursor
 CLUSTER -- cluster a table according to an index
 COMMENT -- define or change the comment of an object
-COMMIT -- commit the current transaction
-COMMIT PREPARED -- commit a transaction that was earlier prepared for two-phase commit
 COPY -- copy data between a file and a table
 CREATE AGGREGATE -- define a new aggregate function
 CREATE CAST -- define a new cast
@@ -129,41 +144,26 @@ DROP TYPE -- remove a data type
 DROP USER -- remove a database role
 DROP USER MAPPING -- remove a user mapping for a foreign server
 DROP VIEW -- remove a view
-END -- commit the current transaction
 EXECUTE -- execute a prepared statement
 EXPLAIN -- show the execution plan of a statement
 FETCH -- retrieve rows from a query using a cursor
 GRANT -- define access privileges
 INSERT -- create new rows in a table
-LISTEN -- listen for a notification
 LOAD -- load a shared library file
 LOCK -- lock a table
 MOVE -- position a cursor
-NOTIFY -- generate a notification
 PREPARE -- prepare a statement for execution
-PREPARE TRANSACTION -- prepare the current transaction for two-phase commit
 REASSIGN OWNED -- change the ownership of database objects owned by a database role
 REFRESH MATERIALIZED VIEW -- replace the contents of a materialized view
 REINDEX -- rebuild indexes
-RELEASE SAVEPOINT -- destroy a previously defined savepoint
-RESET -- restore the value of a run-time parameter to the default value
 REVOKE -- remove access privileges
-ROLLBACK -- abort the current transaction
-ROLLBACK PREPARED -- cancel a transaction that was earlier prepared for two-phase commit
-ROLLBACK TO SAVEPOINT -- roll back to a savepoint
-SAVEPOINT -- define a new savepoint within the current transaction
 SECURITY LABEL -- define or change a security label applied to an object
 SELECT -- retrieve rows from a table or view
 SELECT INTO -- define a new table from the results of a query
-SET -- change a run-time parameter
 SET CONSTRAINTS -- set constraint check timing for the current transaction
 SET ROLE -- set the current user identifier of the current session
 SET SESSION AUTHORIZATION -- set the session user identifier and the current user identifier of the current session
-SET TRANSACTION -- set the characteristics of the current transaction
-SHOW -- show the value of a run-time parameter
-START TRANSACTION -- start a transaction block
 TRUNCATE -- empty a table or set of tables
-UNLISTEN -- stop listening for a notification
 UPDATE -- update rows of a table
 VACUUM -- garbage-collect and optionally analyze a database
 VALUES -- compute a set of rows
