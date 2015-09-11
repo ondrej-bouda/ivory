@@ -14,7 +14,7 @@ before_install:
   - composer self-update
 
 install:
-  - composer install --dev
+  - composer install
 
 before_script:
   - psql -c 'create database ivory_test;' -U postgres
