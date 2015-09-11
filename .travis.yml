@@ -8,7 +8,7 @@ php:
   - nightly
 
 script:
-  - phpunit test/unit
+  - phpunit --bootstrap test/bootstrap.php test/unit
 
 addons:
   postgresql: 9.3
