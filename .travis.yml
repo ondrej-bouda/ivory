@@ -7,11 +7,18 @@ php:
   - hhvm
   - nightly
 
-script:
-  - phpunit --bootstrap test/bootstrap.php test/unit
-
 addons:
   postgresql: 9.3
 
+before_install:
+  - composer self-update
+
+install:
+  - composer install --dev
+
 before_script:
   - psql -c 'create database ivory_test;' -U postgres
+
+script:
+  - phpunit --bootstrap test/bootstrap.php test/unit
+
