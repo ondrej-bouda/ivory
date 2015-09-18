@@ -3,3 +3,5 @@
 ** But isn't it more expected for Ivory::connect() to return once it is really connected?
    Wouldn't Ivory::startConnecting() tell more what's going on? - Although, in case of asynchronous connecting, Ivory
    automatically waits until the connection is ready, so it is pretty transparent.
+
+* Connection::__destruct() calls disconnect()

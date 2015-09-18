@@ -5,6 +5,9 @@ use Ivory\Exception\UnsupportedException;
 
 /**
  * Parameters of a database connection.
+ *
+ * TODO: consider introducing constants for standard parameters (http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS)
+ * TODO: document usage of \ArrayAccess and \IteratorAggregate interfaces
  */
 class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
 {
@@ -137,11 +140,11 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
 	 *   <li><tt>connect_timeout (int></tt>: connection timeout (0 means to wait indefinitely),
 	 *   <li><tt>options (string)</tt>: the runtime options to send to the server.
 	 * </ul>
-	 * For details, see the PostgreSQL documentation (the link below).
+	 * For details, see the
+	 * {@link http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS PostgreSQL documentation}.
 	 * Any parameter may be omitted - the default is used then.
 	 *
 	 * @param array $params map: connection parameter keyword => value
-	 * @link http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS
 	 */
 	public function __construct($params)
 	{

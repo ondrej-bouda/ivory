@@ -72,7 +72,9 @@ interface IConnectionControl
     function connectWait();
 
     /**
-     * Closes the connection (if any). The current transaction (if any) is rolled back.
+     * Closes the connection (if any).
+     *
+     * Note that an uncommitted transaction (if any) will get rolled back by PostgreSQL.
      *
      * After disconnecting, it is possible to connect again using {@link connect()} or {@link connectWait()}.
      *
