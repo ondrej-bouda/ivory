@@ -3,6 +3,7 @@ namespace Ivory\Connection;
 
 use Ivory\Exception\ConnectionException;
 use Ivory\Exception\InvalidStateException;
+use Ivory\Exception\ResultException;
 use Ivory\Utils\NotSerializable;
 
 class Connection implements IConnection
@@ -13,10 +14,12 @@ class Connection implements IConnection
 	private $params;
 	private $config;
 
-	/** @var resource the connection handler */
+	/** @var resource|null the connection handler, or null if connection was not requested or already closed */
 	private $handler = null;
+	/** @var bool whether the asynchronous connecting was finished (<tt>true</tt> if synchronous connecting was used) */
+	private $finishedConnecting;
 
-	private $inTransaction = false;
+	private $inTransaction = false; // FIXME: rely on pg_transaction_status() instead of duplicating its logic here (it is reported not to talk to the server, so it shall be fast)
 
 	/**
 	 * @param string $name name for the connection
@@ -53,23 +56,100 @@ class Connection implements IConnection
 			return null;
 		}
 		else {
-			// NOTE: pg_connection_status() may also return null
+			return (pg_connection_status($this->handler) === PGSQL_CONNECTION_OK);
+		}
+	}
+
+	public function isConnectedWait()
+	{
+		if ($this->handler === null) {
+			return null;
+		}
+		else {
+			$this->waitForConnection();
 			return (pg_connection_status($this->handler) === PGSQL_CONNECTION_OK);
 		}
 	}
 
 	public function connect()
 	{
-		if ($this->handler !== null) {
+		if ($this->handler === null) {
+			$this->openConnection(PGSQL_CONNECT_ASYNC);
+			return true;
+		}
+		else {
 			return false;
 		}
+	}
 
-		$this->handler = pg_connect($this->params->buildConnectionString(), PGSQL_CONNECT_FORCE_NEW);
-		if ($this->handler === false) {
-			throw new ConnectionException('Error connecting to the database');
+	public function connectWait()
+	{
+		if ($this->handler === null) {
+			$this->openConnection();
+			return true;
+		}
+		else {
+			$this->waitForConnection();
+			return false;
+		}
+	}
+
+	private function openConnection($connectFlags = 0)
+	{
+		$connStr = $this->params->buildConnectionString();
+		$this->handler = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW | $connectFlags);
+		$this->finishedConnecting = !($connectFlags & PGSQL_CONNECT_ASYNC);
+		if ($this->handler === false || pg_connection_status($this->handler) === PGSQL_CONNECTION_BAD) {
+			$this->handler = null;
+			throw new ConnectionException('Error connecting to the database'); // TODO: try to squeeze the client to get some useful information; maybe trap errors issued by pg_connect()?
+		}
+	}
+
+	private function waitForConnection()
+	{
+		if ($this->finishedConnecting) {
+			return;
+		}
+		if ($this->handler === null) {
+			throw new InvalidStateException('Expected to be called only on a started connection.');
 		}
 
-		return true;
+		$pollStatus = pg_connect_poll($this->handler);
+		if ($pollStatus === PGSQL_POLLING_OK) {
+			$this->finishedConnecting = true;
+			return;
+		}
+
+		$socket = pg_socket($this->handler);
+		if (!$socket) {
+			throw new ConnectionException('Error retrieving the connection socket while trying to wait for connection');
+		}
+
+		while (true) {
+			switch ($pollStatus) {
+				case PGSQL_POLLING_OK:
+					$this->finishedConnecting = true;
+					return;
+				case PGSQL_POLLING_FAILED:
+					throw new ConnectionException('Failed waiting for connection');
+				case PGSQL_POLLING_READING:
+					while (!self::isStreamReadable($socket, 1)); // TODO: make the timeout configurable
+					break;
+				default:
+					usleep(10); // a micro sleep in other polling states seems better than a busy wait
+					// TODO: make the micro sleep duration configurable, allowing 0 to effectively force busy wait
+			}
+
+			$pollStatus = pg_connect_poll($this->handler);
+		}
+	}
+
+	private static function isStreamReadable($stream, $sec, $usec = null)
+	{
+		$r = [$stream];
+		$w = [];
+		$ex = [];
+		return (bool)stream_select($r, $w, $ex, $sec, $usec);
 	}
 
 	public function disconnect()
@@ -84,26 +164,35 @@ class Connection implements IConnection
 			$this->rollback();
 		}
 
-		$closed = pg_close($this->handler);
+		$closed = pg_close($this->handler); // NOTE: it seems correct to close a not yet established asynchronous connection
 		if (!$closed) {
 			throw new ConnectionException('Error closing the connection');
 		}
 		$this->handler = null;
+		$this->finishedConnecting = null;
 		return true;
 	}
 
 	/**
-	 * Connects to the database if not already connected.
+	 * Connects to the database if not already connected or if the connection has been lost.
+	 *
+	 * If an asynchronous connection has been requested, it waits until it is finished, and then returns.
+	 *
+	 * After returning, it guarantees that <tt>$this->handler</tt> is a valid resource on an established connection,
+	 * ready for executing queries.
+	 *
+	 * @throws ConnectionException on error connecting to the database
 	 */
-	private function autoConnect()
+	private function requireConnection()
 	{
-		$this->connect(); // it is a no-op if already connected
-		// NOTE: the meaning of this method is to later allow control whether the auto-connecting shall be enabled
+		$this->connectWait(); // it is a no-op if already connected
+		// NOTE: the meaning of this method is to later allow control whether the auto-connecting shall be enabled, and
+		//       to provide a possible entry-point for reconnecting upon a broken connection
 	}
 
 	public function startTransaction($transactionOptions = 0)
 	{
-		$this->autoConnect();
+		$this->requireConnection();
 		if ($this->inTransaction) {
 			trigger_error('A transaction is already active, cannot start a new one.', E_USER_WARNING);
 			return;
@@ -128,7 +217,7 @@ class Connection implements IConnection
 
 	public function commit()
 	{
-		$this->autoConnect();
+		$this->requireConnection();
 		if (!$this->inTransaction) {
 			trigger_error('No transaction is active, nothing to commit.', E_USER_WARNING);
 			return;
@@ -143,7 +232,7 @@ class Connection implements IConnection
 
 	public function rollback()
 	{
-		$this->autoConnect();
+		$this->requireConnection();
 		if (!$this->inTransaction) {
 			trigger_error('No transaction is active, nothing to roll back.', E_USER_WARNING);
 			return;
@@ -158,7 +247,7 @@ class Connection implements IConnection
 
 	public function savepoint($name)
 	{
-		$this->autoConnect();
+		$this->requireConnection();
 		if (!$this->inTransaction) {
 			throw new InvalidStateException('No transaction is active, cannot create any savepoint.');
 		}
@@ -170,7 +259,7 @@ class Connection implements IConnection
 
 	public function rollbackToSavepoint($name)
 	{
-		$this->autoConnect();
+		$this->requireConnection();
 		if (!$this->inTransaction) {
 			throw new InvalidStateException('No transaction is active, cannot roll back to any savepoint.');
 		}
@@ -182,7 +271,7 @@ class Connection implements IConnection
 
 	public function releaseSavepoint($name)
 	{
-		$this->autoConnect();
+		$this->requireConnection();
 		if (!$this->inTransaction) {
 			throw new InvalidStateException('No transaction is active, cannot release any savepoint.');
 		}
@@ -223,78 +312,50 @@ class Connection implements IConnection
 		// TODO: query pg_catalog.pg_prepared_xacts
 	}
 
-	/**
-	 * Returns ID of the database server process. This might be useful for comparison with PID of a notifying process.
-	 *
-	 * @return int
-	 */
-	function getBackendPID()
+	public function getBackendPID()
 	{
 		// TODO: Implement getBackendPID() method.
 	}
 
-	/**
-	 * Notifies all listeners of a given channel.
-	 *
-	 * See the {@see http://www.postgresql.org/docs/9.4/static/sql-notify.html PostgreSQL documentation} for details
-	 * regarding the asynchronous notifications, especially the behaviour regarding transactions.
-	 *
-	 * @param string $channel name of channel to send notification to
-	 * @param string|null $payload optional payload to send along with the notification;
-	 *                             note the maximal accepted length depends on the database configuration
-	 */
-	function notify($channel, $payload = null)
+	public function notify($channel, $payload = null)
 	{
 		// TODO: Implement notify() method.
 	}
 
-	/**
-	 * Starts listening to the specified channel.
-	 *
-	 * Calling this method merely enables the current session to receive notifications through the given channel. To
-	 * actually get some, use {@link pollNotification()}.
-	 *
-	 * @param string $channel name of channel to listen to
-	 */
-	function listen($channel)
+	public function listen($channel)
 	{
 		// TODO: Implement listen() method.
 	}
 
-	/**
-	 * Stops listening to the specified channel.
-	 *
-	 * Use {@link unlistenAll()} to stop listening from all channels currently listening to.
-	 *
-	 * @param string $channel name of channel to stop listening to
-	 */
-	function unlisten($channel)
+	public function unlisten($channel)
 	{
 		// TODO: Implement unlisten() method.
 	}
 
-	/**
-	 * Stops listening to any channel.
-	 *
-	 * Use {@link unlisten()} to stop listening only to a specified channel.
-	 */
-	function unlistenAll()
+	public function unlistenAll()
 	{
 		// TODO: Implement unlistenAll() method.
 	}
 
-	/**
-	 * Polls the queue of waiting IPC notifications on channels being listened to.
-	 *
-	 * @return Notification|null the next notification in the queue, or <tt>null</tt> if there is no notification there
-	 */
-	function pollNotification()
+	public function pollNotification()
 	{
-		$this->autoConnect();
+		$this->requireConnection();
+
 		$res = pg_get_notify($this->handler, PGSQL_ASSOC);
 		if ($res === false) {
 			return null;
 		}
 		return new Notification($res['message'], $res['pid'], $res['payload']);
+	}
+
+	public function query($sql)
+	{
+		$this->requireConnection();
+
+		// FIXME: use async query instead to get error details
+		$res = @pg_query($this->handler, $sql); // @: errors are expected; they are treated by throwing an exception
+		if ($res === false) {
+			throw new ResultException();
+		}
 	}
 }

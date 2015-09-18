@@ -7,6 +7,14 @@ use Ivory\Exception\InvalidStateException;
 /**
  * Connection to a database.
  *
+ * Note the default mode of connecting to the database, using {@link IConnection::connect()}, is asynchronous. It is
+ * thus recommended to start connecting as soon as the connection parameters are known. If synchronous connection is
+ * needed, use {@link IConnection::connectWait()} instead of {@link IConnection::connect()}.
+ *
+ * Note there is no option for using a persistent connection on the PHP side (i.e., those done be {@link pg_pconnect()})
+ * as this feature is known to be neither 100% correct nor especially effective. Use server-side connection pooling
+ * instead.
+ *
  * Apart from actually arranging the communication between the user code and a PostgreSQL database, the interface also
  * provides means of controlling various aspects of the session itself, especially the transaction control. These might
  * of course be also managed by custom SQL queries sent to the database; circumventing the designated methods of this
@@ -31,28 +39,70 @@ interface IConnection
 	function getParameters();
 
 	/**
-	 * @return bool|null <tt>true</tt> if the connection is working,
-	 *                   <tt>null</tt> if no connection is established (yet),
-	 *                   <tt>false</tt> if the connection is established, but broken
+	 * Finds out whether the connection is established in the moment.
+	 *
+	 * @return bool|null <tt>true</tt> if the connection is established,
+	 *                   <tt>null</tt> if no connection was requested to be established (yet),
+	 *                   <tt>false</tt> if the connection was tried to be established, but it is broken or still in
+	 *                     process of (asynchronous) connecting (use {@link isConnectedWait()} instead to distinguish
+	 *                     the latter)
 	 */
 	function isConnected();
 
 	/**
-	 * Establishes a connection with the database according to the current connection parameters, if it has not been
-	 * established yet for this connection object.
+	 * Finds out whether the connection is established. Waits for asynchronous connecting process to finish before
+	 * figuring out.
 	 *
-	 * The connection is not shared with any other <tt>IConnection</tt> objects.
+	 * @return bool|null <tt>true</tt> if the connection is established,
+	 *                   <tt>null</tt> if no connection was requested to be established (yet),
+	 *                   <tt>false</tt> if the connection is broken
+	 */
+	function isConnectedWait();
+
+	/**
+	 * Starts establishing a connection with the database according to the current connection parameters, if it has not
+	 * been established yet for this connection object.
 	 *
-	 * TODO: on PHP 5.6.0+, connect asynchronously, then poll upon the first command actually requiring the connection; introduce a connectWait() variant which connects synchronously
+	 * An asynchronous connection is used - the method merely starts connecting to the database and returns immediately.
+	 * Further operations on this connection, which really need the database, block until the connection is actually
+	 * established.
 	 *
-	 * @return bool <tt>true</tt> if the connection has actually been established,
-	 *              <tt>false</tt> if the connection has already been open and thus this was a no-op
+	 * If the connection has already been established, or started to being established, nothing is done and
+	 * <tt>false</tt> is returned.
+	 *
+	 * For a synchronous variant, see {@link connectWait()}.
+	 *
+	 * The connection is not shared with any other <tt>IConnection</tt> objects. A new connection is always established.
+	 *
+	 * @return bool <tt>true</tt> if the connection has actually started to being established,
+	 *              <tt>false</tt> if the connection has already been open or started opening and thus this was a no-op
 	 * @throws ConnectionException on error connecting to the database
 	 */
 	function connect();
 
 	/**
+	 * Establishes a connection with the database and waits for the connection to be established.
+	 *
+	 * The operation is almost the same as {@link connect()}, except this method does not return until the connection is
+	 * actually established. The current connection parameters are used for the connection.
+	 *
+	 * If the connection has already been established, nothing is done and <tt>false</tt> is returned.
+	 *
+	 * If the connection has been started asynchronously using {@link connect()} before, this method merely waits until
+	 * the connection is ready, and returns <tt>false</tt> then.
+	 *
+	 * The connection is not shared with any other <tt>IConnection</tt> objects. A new connection is always established.
+	 *
+	 * @return bool <tt>true</tt> if a new connection has just been opened,
+	 *              <tt>false</tt> if the connection has already been open and thus this was a no-op
+	 * @throws ConnectionException on error connecting to the database
+	 */
+	function connectWait();
+
+	/**
 	 * Closes the connection (if any). The current transaction (if any) is rolled back.
+	 *
+	 * After disconnecting, it is possible to connect again using {@link connect()} or {@link connectWait()}.
 	 *
 	 * @return bool <tt>true</tt> if the connection has actually been closed,
 	 *              <tt>false</tt> if no connection was established and thus this was a no-op
@@ -333,6 +383,19 @@ interface IConnection
 	 * @return Notification|null the next notification in the queue, or <tt>null</tt> if there is no notification there
 	 */
 	function pollNotification();
+
+	//endregion
+
+
+	//region Command execution
+
+	/**
+	 * Sends an SQL query to the database, waits for its execution and returns the result.
+	 *
+	 * @param string $sql
+	 * @return \Ivory\Command\IResult
+	 */
+	function query($sql);
 
 	//endregion
 }

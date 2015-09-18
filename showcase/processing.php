@@ -16,16 +16,17 @@ use Ivory\Data\StatementRelation;
 
 /*
  * The following statement queries the database for lessons and persons (teachers) assigned to them.
- * There are to states of lesson-person relation:
- * - "scheduled" means which teachers regularly teach in the lesson, i.e., reflect the normal state,
- * - "actual" means which teachers will actually be teaching the lesson; those may be different from the scheduled ones
+ * There are two states of lesson-person relation:
+ * - "scheduled" says which teachers regularly teach in the lesson, i.e., reflect the normal state,
+ * - "actual" says which teachers will actually be teaching the lesson; those may be different from the scheduled ones
  *   in case of supply teaching.
  * Hence the lessonperson.schedulingstatus attribute, holding enum values "scheduled" or "actual".
  */
 $rel = new StatementRelation(
 	'SELECT lesson.id AS lesson_id, lesson.name AS lesson_name,
             lp.schedulingstatus,
-	    p.id AS person_id, p.firstname AS person_firstname, p.lastname AS person_lastname, p.schedabbr AS person_schedabbr
+	        p.id AS person_id, p.firstname AS person_firstname, p.lastname AS person_lastname,
+	        p.schedabbr AS person_schedabbr
 	 FROM lesson
 	      JOIN lessonperson lp ON lp.lesson_id = lesson.id
 	      JOIN person p ON p.id = lp.person_id
