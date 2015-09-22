@@ -8,7 +8,7 @@ use RuntimeException;
  *
  * The exception code, if provided contains the SQLSTATE code.
  */
-class ResultException extends \RuntimeException
+class CommandException extends \RuntimeException
 {
 	private $messageDetail = null;
 	private $messageHint = null;

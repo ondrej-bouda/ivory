@@ -166,8 +166,8 @@ class ConnectionControl implements IConnectionControl
         $this->connectWait(); // it is a no-op if already connected
 
         /* TODO: Currently, this method implements the Ivory feature of auto-connection when neither connect() nor
-                 connectWait() was called explicitly or when the connection got broken.
-                 That shall be configurable, though.
+         *       connectWait() was called explicitly or when the connection got broken.
+         *       That shall be configurable, though.
          */
 
         return $this->handler;

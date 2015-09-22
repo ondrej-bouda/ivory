@@ -2,7 +2,6 @@
 namespace Ivory\Connection;
 
 use Ivory\Exception\InvalidStateException;
-use Ivory\Exception\ResultException;
 use Ivory\Utils\NotSerializable;
 
 class Connection implements IConnection
@@ -11,6 +10,7 @@ class Connection implements IConnection
 
 	private $name;
 	private $connCtl;
+	private $cmdExec;
 
 	private $config;
 
@@ -27,6 +27,7 @@ class Connection implements IConnection
 	{
 		$this->name = $name;
 		$this->connCtl = new ConnectionControl($params);
+		$this->cmdExec = new CommandExecution($this->connCtl);
 		$this->config = new ConnConfig($this);
 	}
 
@@ -198,17 +199,6 @@ class Connection implements IConnection
 		return new Notification($res['message'], $res['pid'], $res['payload']);
 	}
 
-	public function query($sql)
-	{
-		$handler = $this->connCtl->requireConnection();
-
-		// FIXME: use async query instead to get error details
-		$res = @pg_query($handler, $sql); // @: errors are expected; they are treated by throwing an exception
-		if ($res === false) {
-			throw new ResultException();
-		}
-	}
-
 
 	//region Connection Control
 
@@ -240,6 +230,25 @@ class Connection implements IConnection
 	public function disconnect()
 	{
 		return $this->connCtl->disconnect();
+	}
+
+	//endregion
+
+	//region Command Execution
+
+	public function rawQuery($sqlStatement)
+	{
+		return $this->cmdExec->rawQuery($sqlStatement);
+	}
+
+	public function rawMultiQuery($sqlStatements)
+	{
+		return $this->cmdExec->rawMultiQuery($sqlStatements);
+	}
+
+	public function runScript($sqlScript)
+	{
+		return $this->cmdExec->runScript($sqlScript);
 	}
 
 	//endregion

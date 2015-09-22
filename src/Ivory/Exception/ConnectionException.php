@@ -8,7 +8,7 @@ use RuntimeException;
  * An exception above a database connection.
  *
  * This class of exceptions gets thrown upon an error with the database connection itself. For errors on querying the
- * database, a {@link ResultException} is used.
+ * database, a {@link CommandException} is used.
  */
 class ConnectionException extends \RuntimeException
 {
