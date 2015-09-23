@@ -88,15 +88,23 @@ $res = $rel->filter(function ($row) { return $row['person_id'] % 2 == 1; })->map
 $res = $rel->project(['lesson_id', 'person_id']);
 var_dump($res[3]['lesson_id']); // prints, e.g., 142, which is the lesson ID of the fourth returned lesson-person row
 
+// CASE 14; map: person ID => TRUE; serves as a hash for fast presence tests
+$res = $rel->hash('person_id');
+var_dump(isset($res[142])); // prints TRUE iff there was at least one row with person of ID 142 within the results
+
+// CASE 15: map: lesson ID => map: scheduling status => map: person ID => TRUE
+$res = $rel->map('lesson_id')->map('schedulingstatus')->hash('person_id');
+var_dump(isset($res[12]['actual'][142])); // prints TRUE iff there was at least one row with lesson of ID 12 and person of ID 142 in the actual scheduling status
+
 // note all the above cases are called on a single $rel object; this should be possible - the relation shall create
-//   a new result object with each map()/list()/filter()/project() call
+//   a new result object with each map()/list()/hash()/filter()/project() call
 // each call on the result object might either:
 //   1) create a new result object with the additional setting - but that might degrade performance (although
 //      that might not be that bad if shortcut were used - see below; moreover, the result object would only
 //      refer to the relation and hold the settings specified so far, which might be cheap)
 //   2) modify the same result object - but that leads to a slightly less transparent API
 //   3) another solution would be to get the result object by calling $rel->getResult() - then, all
-//      calls to map()/list()/filter()/project() would modify the same object and it would be clear, but
+//      calls to map()/list()/hash()/filter()/project() would modify the same object and it would be clear, but
 //      leads to an extra getResult() call necessary for each relation results processing - and for
 //      the API to be consistent, simple iteration over the rows of relation results
 //      (foreach ($rel as $row)) shall also use the explicit $rel->getResult(), which is pretty redundant
@@ -113,3 +121,15 @@ $res = $rel->map('lesson_id')->map('person_id')->project(['schedulingstatus', 'p
 
 // shortcut for CASE 7; combination of mapping and projection - which is quite typical
 $res = $rel->map('lesson_id')->map('schedulingstatus')->assoc('person_id', 'person_lastname');
+
+// possibly more shortcut for CASE 7
+$res = $rel->assoc('lesson_id', 'schedulingstatus', 'person_id', 'person_lastname');
+
+// shortcut for CASE 15; combination of mapping and hashing
+$res = $rel->hash('lesson_id', 'schedulingstatus', 'person_id');
+
+
+
+// PROCESSING METHODS RETURN TYPE
+// Return type of map()/list()/hash()/filter()/project() is always an object which is iterable and possibly
+// array-accessible. Moreover, it provides a toArray() method which yields a plain array.
