@@ -12,6 +12,8 @@ class ConnectionControl implements IConnectionControl
     private $handler = null;
     /** @var bool whether the asynchronous connecting was finished (<tt>true</tt> if synchronous connecting was used) */
     private $finishedConnecting;
+    /** @var string|null last notice received on this connection */
+    private $lastNotice = null;
 
 
     public function __construct($params)
@@ -171,5 +173,25 @@ class ConnectionControl implements IConnectionControl
          */
 
         return $this->handler;
+    }
+
+    /**
+     * @internal Only for the purpose of Ivory itself.
+     *
+     * @return string|null last notice received on this connection
+     */
+    public function getLastNotice()
+    {
+        return $this->lastNotice;
+    }
+
+    /**
+     * @internal Only for the purpose of Ivory itself.
+     *
+     * @param string|null $notice last notice received on this connection
+     */
+    public function setLastNotice($notice)
+    {
+        $this->lastNotice = $notice;
     }
 }
