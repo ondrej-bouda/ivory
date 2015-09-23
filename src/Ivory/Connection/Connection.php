@@ -166,7 +166,7 @@ class Connection implements IConnection
 
 	public function getBackendPID()
 	{
-		// TODO: Implement getBackendPID() method.
+		return pg_get_pid($this->connCtl->requireConnection());
 	}
 
 	public function notify($channel, $payload = null)
