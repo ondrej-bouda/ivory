@@ -29,6 +29,9 @@ class CommandExecution implements ICommandExecution
         }
 
         $res = pg_get_result($connHandler);
+        if ($res === false) {
+            throw new ConnectionException('No results received from the database.');
+        }
         /* For erroneous queries, one must call pg_get_result() once again to update the structures at the client side.
          * Even worse, a loop might actually be needed according to
          * http://www.postgresql.org/message-id/flat/gtitqq$26l3$1@news.hub.org#gtitqq$26l3$1@news.hub.org,
@@ -38,11 +41,8 @@ class CommandExecution implements ICommandExecution
         while (pg_get_result($connHandler) !== false) {
             trigger_error('The database gave an unexpected result set.', E_USER_NOTICE);
         }
-        if ($res === false) { // NOTE: must read all the results from the connection, first, for them not to block the connection from accepting further queries
-            throw new ConnectionException('No results received from the database.');
-        }
 
-        return $this->processResult($res);
+        return $this->processResult($res, $sqlStatement);
     }
 
     public function rawMultiQuery($sqlStatements)
@@ -77,12 +77,12 @@ class CommandExecution implements ICommandExecution
         }
         $results = [];
         foreach ($resHandlers as $resHandler) {
-            $results[] = $this->processResult($resHandler);
+            $results[] = $this->processResult($resHandler, $sqlScript);
         }
         return $results;
     }
 
-    private function processResult($resHandler)
+    private function processResult($resHandler, $query)
     {
         $stat = pg_result_status($resHandler);
         switch ($stat) {
@@ -90,18 +90,26 @@ class CommandExecution implements ICommandExecution
             case PGSQL_TUPLES_OK:
             case PGSQL_COPY_IN: // TODO: is COPY IN/OUT blocking somehow? blocking the execution of further commands? keeping the connection busy (!) even after pg_get_result()?
             case PGSQL_COPY_OUT:
+                /* TODO: use pg_last_notice() to get the last notice.
+                         Unfortunately, it seems the client library is pretty limited:
+                         - there is no other way of getting notices of successful commands than using get_last_notice();
+                         - it only reports the last notice - thus, all but the last notice of a single successful
+                           statement cannot be caught by any means;
+                         - there is no clearing mechanism, thus, successful command emitting the same notice as the
+                           previous command is indistinguishable from a command emitting nothing; commands with no
+                           notice do not clear the notice returned by get_last_notice(); by the way, it is
+                           connection-wide, thus, notion of last received notice must be kept on the whole connection,
+                           and a notice found out by get_last_notice() should only be reported if different from the
+                           last one.
+                 */
                 return new Result($resHandler, $stat); // TODO: differentiate the result by the result status - for TUPLES OK, collect the result set column names and types etc.
 
             case PGSQL_EMPTY_QUERY:
-                throw new CommandException('Empty query'); // TODO: more detailed exception; use CommandException, but consider providing this exception message
-
             case PGSQL_BAD_RESPONSE:
-                throw new ConnectionException("The server's response was not understood."); // TODO: more detailed exception; use CommandException, but consider providing this exception message
-
             case PGSQL_NONFATAL_ERROR:
                 // non-fatal errors are supposedly not possible to be received by the PHP client library, but anyway...
             case PGSQL_FATAL_ERROR:
-                throw new CommandException($resHandler);
+                throw new CommandException($resHandler, $query);
 
             default:
                 throw new \UnexpectedValueException("Unexpected PostgreSQL command result status: $stat", $stat);

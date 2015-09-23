@@ -16,7 +16,7 @@ if ($conn === false) {
     exit(1);
 }
 
-pg_query("CREATE TABLE tempt (t TEXT); INSERT INTO tempt (t) VALUES ('');");
+pg_query("CREATE TEMPORARY TABLE tempt (t TEXT); INSERT INTO tempt (t) VALUES ('');");
 pg_query("UPDATE tempt SET t = t || 'a'");
 printTxStatus($conn); // idle
 pg_query("UPDATE tempt SET t = t || 'b'; BEGIN; UPDATE tempt SET t = t || 'c'; ROLLBACK; UPDATE tempt SET t = t || 'd'"); // BEGIN has no effect - transaction is already started, ROLLBACK cancels the entire batch
@@ -57,7 +57,7 @@ echo "$actual\n"; // adfjmnopq
 pg_query('DROP TABLE tempt');
 
 
-pg_query("CREATE TABLE tempt (t TEXT); INSERT INTO tempt (t) VALUES (''); UPDATE tempt SET t = t || 'a'; ROLLBACK; UPDATE tempt SET t = t || 'b';");
+pg_query("CREATE TEMPORARY TABLE tempt (t TEXT); INSERT INTO tempt (t) VALUES (''); UPDATE tempt SET t = t || 'a'; ROLLBACK; UPDATE tempt SET t = t || 'b';");
 
 
 

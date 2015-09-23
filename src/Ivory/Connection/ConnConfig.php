@@ -76,6 +76,7 @@ class ConnConfig
     public function __get($propertyName)
     {
         // TODO
+        // NOTE: pg_parameter_status() might come in handy
     }
 
     /**
