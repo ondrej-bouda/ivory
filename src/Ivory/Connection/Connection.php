@@ -4,6 +4,7 @@ namespace Ivory\Connection;
 use Ivory\Exception\InvalidStateException;
 use Ivory\Utils\NotSerializable;
 
+// TODO: consider renaming to Database or Session or... - to reflect it is mere a facade, the single entry point
 class Connection implements IConnection
 {
 	use NotSerializable; // TODO: implement connection serialization instead of giving up
