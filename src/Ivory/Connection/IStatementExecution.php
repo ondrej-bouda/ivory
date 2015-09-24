@@ -1,11 +1,11 @@
 <?php
 namespace Ivory\Connection;
 
-use Ivory\Command\IResult;
-use Ivory\Exception\CommandException;
+use Ivory\Result\IResult;
+use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
 
-interface ICommandExecution // TODO: support prepared statements
+interface IStatementExecution // TODO: support prepared statements
 {
     /**
      * Sends a raw SQL statement, as is, to the database, waits for its execution and returns the result.
@@ -15,10 +15,11 @@ interface ICommandExecution // TODO: support prepared statements
      *
      * @param string $sqlStatement an SQL statement
      * @return IResult the result of the statement
-     * @throws CommandException when the command is erroneous and PostgreSQL returns an error, or if
+     * @throws StatementException when the statement is erroneous and PostgreSQL returns an error, or if
      *                            <tt>$sqlStatement</tt> actually contains multiple statements (e.g., separated by a
      *                            semicolon)
-     * @throws ConnectionException when an error occurred while sending the command or processing the database response
+     * @throws ConnectionException when an error occurred while sending the statement or processing the database
+     *                             response
      */
     function rawQuery($sqlStatement);
 
@@ -38,9 +39,10 @@ interface ICommandExecution // TODO: support prepared statements
      *                   if <tt>$sqlStatements</tt> is actually an associative array or a {@link \Traversable} object,
      *                     an associative array of results is returned, with each result stored under the same key and
      *                     in the same order as the corresponding statement from <tt>$sqlStatements</tt>
-     * @throws CommandException when some of the statements are erroneous and PostgreSQL returns an error, or if there
+     * @throws StatementException when some of the statements are erroneous and PostgreSQL returns an error, or if there
      *                            are multiple statements in a single list item
-     * @throws ConnectionException when an error occurred while sending the commands or processing the database response
+     * @throws ConnectionException when an error occurred while sending the statements or processing the database
+     *                             response
      */
     function rawMultiQuery($sqlStatements);
 
@@ -56,8 +58,9 @@ interface ICommandExecution // TODO: support prepared statements
      *
      * @param string $sqlScript a string containing one or more semicolon-separated statements
      * @return IResult[] list of results, one for each statement
-     * @throws CommandException when some of the statements are erroneous and PostgreSQL returns an error
-     * @throws ConnectionException when an error occurred while sending the commands or processing the database response
+     * @throws StatementException when some of the statements are erroneous and PostgreSQL returns an error
+     * @throws ConnectionException when an error occurred while sending the statements or processing the database
+     *                             response
      */
     function runScript($sqlScript);
 }

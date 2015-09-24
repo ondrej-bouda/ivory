@@ -1,11 +1,11 @@
 <?php
 namespace Ivory\Connection;
 
-use Ivory\Command\Result;
-use Ivory\Exception\CommandException;
+use Ivory\Result\Result;
+use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
 
-class CommandExecution implements ICommandExecution
+class StatementExecution implements IStatementExecution
 {
     private $connCtl;
 
@@ -103,10 +103,10 @@ class CommandExecution implements ICommandExecution
             case PGSQL_NONFATAL_ERROR:
                 // non-fatal errors are supposedly not possible to be received by the PHP client library, but anyway...
             case PGSQL_FATAL_ERROR:
-                throw new CommandException($resHandler, $query);
+                throw new StatementException($resHandler, $query);
 
             default:
-                throw new \UnexpectedValueException("Unexpected PostgreSQL command result status: $stat", $stat);
+                throw new \UnexpectedValueException("Unexpected PostgreSQL statement result status: $stat", $stat);
         }
     }
 
@@ -117,14 +117,14 @@ class CommandExecution implements ICommandExecution
      * sure it was emitted for the last query result.
      *
      * Unfortunately, on PHP 5.6, it seems the client library is pretty limited:
-     * - there is no other way of getting notices of successful commands than using pg_last_notice();
+     * - there is no other way of getting notices of successful statements than using pg_last_notice();
      * - yet, it only reports the last notice - thus, none but the last notice of a single successful statement can be
      *   caught by any means;
-     * - there is no clearing mechanism, thus, successful command emitting the same notice as the previous command is
-     *   indistinguishable from a command emitting nothing; moreover, commands with no notice do not clear the notice
-     *   returned by pg_last_notice(); last but not least, it is connection-wide, thus, notion of last received notice
-     *   must be kept on the whole connection, and a notice found out by get_last_notice() should only be reported if
-     *   different from the last one.
+     * - there is no clearing mechanism, thus, successful statement emitting the same notice as the previous statement
+     *   is indistinguishable from a statement emitting nothing; moreover, statements with no notice do not clear the
+     *   notice returned by pg_last_notice(); last but not least, it is connection-wide, thus, notion of last received
+     *   notice must be kept on the whole connection, and a notice found out by get_last_notice() should only be
+     *   reported if different from the last one.
      *
      * @return string|null notice emitted for the last query result, or <tt>null</tt> if no notice was emitted or it was
      *                       indistinguishable from previous notices

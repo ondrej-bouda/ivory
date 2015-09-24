@@ -1,5 +1,5 @@
 <?php
-namespace Ivory\Command;
+namespace Ivory\Result;
 
 class SqlState
 {

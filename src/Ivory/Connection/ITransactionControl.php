@@ -115,9 +115,9 @@ interface ITransactionControl
     function savepoint($name);
 
     /**
-     * Rolls back all commands executed after the given savepoint.
+     * Rolls back all statements executed after the given savepoint.
      *
-     * All commands are rolled back, including creation of new savepoints. That is, all savepoints established after the
+     * All statements are rolled back, including creation of new savepoints. That is, all savepoints established after the
      * given savepoint are destroyed. The given savepoint itself remains valid, allowing to roll back to it multiple
      * times.
      *
@@ -141,8 +141,8 @@ interface ITransactionControl
      * Destroys the given savepoint, and all savepoints established after it. Thus, it is not possible to roll back to
      * those savepoints anymore.
      *
-     * Note the operation does not undo the effects of commands executed after the given savepoint was established.
-     * It merely frees some database system resources. Use {@link rollbackToSavepoint()} to undo the commands.
+     * Note the operation does not undo the effects of statements executed after the given savepoint was established.
+     * It merely frees some database system resources. Use {@link rollbackToSavepoint()} to undo the statements.
      *
      * @param string $name name of the savepoint to release;
      *                     if there are multiple savepoints of such name, the most recent is chosen

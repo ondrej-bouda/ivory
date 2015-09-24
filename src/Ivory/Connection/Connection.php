@@ -28,7 +28,7 @@ class Connection implements IConnection
 	{
 		$this->name = $name;
 		$this->connCtl = new ConnectionControl($params);
-		$this->cmdExec = new CommandExecution($this->connCtl);
+		$this->cmdExec = new StatementExecution($this->connCtl);
 		$this->config = new ConnConfig($this);
 	}
 
@@ -235,7 +235,7 @@ class Connection implements IConnection
 
 	//endregion
 
-	//region Command Execution
+	//region Statement Execution
 
 	public function rawQuery($sqlStatement)
 	{

@@ -7,13 +7,13 @@ use RuntimeException;
  * Exception thrown upon errors on querying the database.
  *
  * The exception message and code contain the primary error message and the SQLSTATE code, respectively. To recognize
- * SQLSTATE codes, {@link \Ivory\Command\SqlState} constants might be helpful.
+ * SQLSTATE codes, {@link \Ivory\Result\SqlState} constants might be helpful.
  *
  * Besides the primary message and SQLSTATE code, the exception holds the error message detail, error hint, and all the
  * other error diagnostic fields except those referring to PostgreSQL source code (those referred to by the PHP
  * <tt>PGSQL_DIAG_SOURCE_*</tt> constants).
  */
-class CommandException extends \RuntimeException
+class StatementException extends \RuntimeException
 {
 	private $query;
 	private $errorFields = [];
