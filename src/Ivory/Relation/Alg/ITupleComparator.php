@@ -3,9 +3,6 @@ namespace Ivory\Relation\Alg;
 
 use Ivory\Relation\ITuple;
 
-/**
- * Compares two relation tuples.
- */
 interface ITupleComparator
 {
     /**

@@ -193,8 +193,8 @@ interface IRelation extends \Traversable, ICachingDataProcessor
      * @return array[] list of associative arrays, each representing one tuple of this relation (in the original order);
      *                 column names are used as the associative array keys;
      *                 in case there are multiple columns of the same name in this relation, only the first of them is
-     *                   exported to the result, the others are dropped ({@link rename()} or {@link project()} may be
-     *                   used to name colliding columns differently)
+     *                   exported to the result, the others are ignored ({@link rename()} may be used to name colliding
+     *                   columns differently)
      */
     function toArray();
 }

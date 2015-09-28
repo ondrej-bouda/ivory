@@ -139,7 +139,7 @@ $res = $rel->hash('lesson_id', 'schedulingstatus', 'person_id');
 
 // ESSENTIALLY, the operators are relation algebra operators
 
-// filter(): relation -> relation; column -> column; hash -> hash
+// filter(): relation -> relation; column -> column; TODO hash -> hash
 //   filter(function ($v) { return ...; }) only lets tuples/values which pass the filter; for relation and column, indexing is reset from 0
 // project(): relation -> relation
 //   project(['a', 'b']) narrows the relation only to columns "a" and "b"
@@ -157,7 +157,7 @@ $res = $rel->hash('lesson_id', 'schedulingstatus', 'person_id');
 // TODO hash(): relation -> hash
 // uniq(): relation -> relation
 //   uniq() drops duplicate rows, uniq(['a', 'b']) drops rows duplicate on column "a" and "b"; in both cases, only the first of the duplicate rows survive; indexing is reset from 0
-// TODO uniq(): column -> column
+// uniq(): column -> column
 //   uniq() drops duplicate values, only the first of the duplicate values survive; indexing is reset from 0
 // TODO except(): relation -> relation
 //   ??? is it useful? isn't the name misleading (compare with SQL EXCEPT doing ->uniq() afterwards)?
