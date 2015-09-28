@@ -81,18 +81,21 @@ var_dump($res[4][1]); // prints, e.g., 89, which is the ID of the second actual 
 $res = $rel->map('lesson_id')->list()->filter(function ($row) { return $row['person_id'] % 2 == 1; })->project('person_id');
 var_dump($res[4][1]); // prints, e.g., 97, which is the ID of the second teacher returned for lesson 4 who has their person ID odd
 
-// CASE 12; equivalent to CASE 11, but filtering sooner, yet on the application side
+// CASE 12; equivalent to CASE 11, but specifying the filter sooner, yet on the application side
 $res = $rel->filter(function ($row) { return $row['person_id'] % 2 == 1; })->map('lesson_id')->list()->project('person_id');
 
-// CASE 13; list: row only with the lesson_id and person_id attributes
+// CASE 13: equivalent to CASE 11, but with the filter applied to the single-column projection
+$res = $rel->map('lesson_id')->list()->project('person_id')->filter(function ($personId) { return $personId % 2 == 1; });
+
+// CASE 14; list: row only with the lesson_id and person_id attributes
 $res = $rel->project(['lesson_id', 'person_id']);
 var_dump($res[3]['lesson_id']); // prints, e.g., 142, which is the lesson ID of the fourth returned lesson-person row
 
-// CASE 14; map: person ID => TRUE; serves as a hash for fast presence tests
+// CASE 15; map: person ID => TRUE; serves as a hash for fast presence tests
 $res = $rel->hash('person_id');
 var_dump(isset($res[142])); // prints TRUE iff there was at least one row with person of ID 142 within the results
 
-// CASE 15: map: lesson ID => map: scheduling status => map: person ID => TRUE
+// CASE 16: map: lesson ID => map: scheduling status => map: person ID => TRUE
 $res = $rel->map('lesson_id')->map('schedulingstatus')->hash('person_id');
 var_dump(isset($res[12]['actual'][142])); // prints TRUE iff there was at least one row with lesson of ID 12 and person of ID 142 in the actual scheduling status
 
@@ -125,7 +128,7 @@ $res = $rel->map('lesson_id')->map('schedulingstatus')->assoc('person_id', 'pers
 // possibly more shortcut for CASE 7
 $res = $rel->assoc('lesson_id', 'schedulingstatus', 'person_id', 'person_lastname');
 
-// shortcut for CASE 15; combination of mapping and hashing
+// shortcut for CASE 16; combination of mapping and hashing
 $res = $rel->hash('lesson_id', 'schedulingstatus', 'person_id');
 
 
@@ -133,3 +136,32 @@ $res = $rel->hash('lesson_id', 'schedulingstatus', 'person_id');
 // PROCESSING METHODS RETURN TYPE
 // Return type of map()/list()/hash()/filter()/project() is always an object which is iterable and possibly
 // array-accessible. Moreover, it provides a toArray() method which yields a plain array.
+
+// ESSENTIALLY, the operators are relation algebra operators
+
+// filter(): relation -> relation; column -> column; hash -> hash
+//   filter(function ($v) { return ...; }) only lets tuples/values which pass the filter; for relation and column, indexing is reset from 0
+// hash(): relation -> hash
+// assoc(): relation -> column
+// project(): relation -> relation
+//   project('a', 'b') narrows the relation only to columns "a" and "b"
+//   TODO: not only narrow, but also allow adding columns using a closure or a given interface, which is given the whole row; a reason to use array rather than varargs (or combine both?), another reason for array would be forward compatibility with some switches or extra attributes, and also consistent interface with rename()
+// col(): relation -> column
+//   col('a') returns the list of values from column "a"
+//   TODO: also allow making up a user-defined column
+// map(): relation -> relation
+// multimap(): relation -> relation
+//   multimap('a') maps the relation rows by distinct values in column "a"; there is a relation (i.e., list of tuples) under each key from "a"
+// rename(): relation -> relation
+//   rename(['a' => 'newA', 'b' => 'newB']) renames column "a" to "newA" and "b" to "newB" (other columns untouched) and returns the resulting relation
+//   TODO: maybe redundant - in favor of project()?
+// uniq(): relation -> relation
+//   uniq() drops duplicate rows, uniq(['a', 'b']) drops rows duplicate on column "a" and "b"; in both cases, only the first of the duplicate rows survive; indexing is reset from 0
+// uniq(): column -> column
+//   uniq() drops duplicate values, only the first of the duplicate values survive; indexing is reset from 0
+// except(): relation -> relation
+//   ??? is it useful? isn't the name misleading (compare with SQL EXCEPT doing ->uniq() afterwards)?
+// union():
+//   ??? is it useful?
+
+// TODO: examine dibi, Nette Database, and other db layers for examples of other useful processing methods; e.g., what about combining a tuple with some artificial values (i.e., extend the tuple with user-defined column
