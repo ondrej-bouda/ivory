@@ -40,7 +40,7 @@ var_dump($res[4]['lesson_name']); // prints, e.g., "Geometry", which is the name
 var_dump($res[4]['person_lastname']); // prints, e.g., "Brezina", which is the lastname of the last teacher returned for lesson 4
 
 // CASE 2; map: lesson ID => map: person ID => person lastname
-$res = $rel->map('lesson_id')->map('person_id')->project('person_lastname');
+$res = $rel->map('lesson_id')->map('person_id')->col('person_lastname');
 var_dump($res[4][7]); // prints, e.g., "Brezina", which is the lastname of person 7, who teaches in lesson 4
 
 // CASE 3; map: lesson ID => map: person ID => row only with the scheduling status and person attributes
@@ -48,7 +48,7 @@ $res = $rel->map('lesson_id')->map('person_id')->project(['schedulingstatus', 'p
 var_dump($res[4][7]['person_lastname']); // prints, e.g., "Brezina", which is the lastname of person 7, who teaches in lesson 4
 
 // CASE 4; map: lesson ID => map: person ID => user function result
-$res = $rel->map('lesson_id')->map('person_id')->project(function ($row) {
+$res = $rel->map('lesson_id')->map('person_id')->col(function ($row) {
 	return ($row['person_schedabbr'] ? : mb_substr($row['person_lastname'], 0, 4));
 });
 var_dump($res[4][7]); // prints, e.g., "Brez", which is the scheduling abbreviation of person 7, who teaches in lesson 4
@@ -58,15 +58,15 @@ $res = $rel->map('lesson_id')->list();
 var_dump($res[4][2]['person_lastname']); // prints, e.g., "Novak", which is the lastname of the third teacher returned for lesson 4
 
 // CASE 6; map: lesson ID => list: person lastname
-$res = $rel->map('lesson_id')->list()->project('person_lastname');
+$res = $rel->map('lesson_id')->list()->col('person_lastname');
 var_dump($res[4][2]); // prints, e.g., "Novak", which is the lastname of the third teacher returned for lesson 4
 
 // CASE 7; map: lesson ID => map: scheduling status => map: person ID => person lastname
-$res = $rel->map('lesson_id')->map('schedulingstatus')->map('person_id')->project('person_lastname');
+$res = $rel->map('lesson_id')->map('schedulingstatus')->map('person_id')->col('person_lastname');
 var_dump($res[4]['actual'][7]); // prints, e.g., "Brezina", which is the lastname of person 7, who is the actual teacher of lesson 4
 
 // CASE 8; map: lesson ID => map: scheduling status => list: person ID
-$res = $rel->map('lesson_id')->map('schedulingstatus')->list()->project('person_id');
+$res = $rel->map('lesson_id')->map('schedulingstatus')->list()->col('person_id');
 var_dump($res[4]['actual'][1]); // prints, e.g., 89, which is the ID of the second actual teacher returned for lesson 4
 
 // CASE 9; map: lesson ID parity => list: row only with the lesson ID and person ID
@@ -74,18 +74,18 @@ $res = $rel->map(function ($row) { return $row['lesson_id'] % 2; })->list()->pro
 var_dump($res[1][5]['lesson_id']); // prints, e.g., 631, which is the ID of the sixth returned lesson with odd ID
 
 // CASE 10; map: lesson ID => list of rows with the "actual" scheduling status: person ID
-$res = $rel->map('lesson_id')->list()->filter(['schedulingstatus' => 'actual'])->project('person_id');
+$res = $rel->map('lesson_id')->list()->filter(['schedulingstatus' => 'actual'])->col('person_id');
 var_dump($res[4][1]); // prints, e.g., 89, which is the ID of the second actual teacher returned for lesson 4
 
 // CASE 11; map: lesson ID => list of rows with odd person ID: person ID
-$res = $rel->map('lesson_id')->list()->filter(function ($row) { return $row['person_id'] % 2 == 1; })->project('person_id');
+$res = $rel->map('lesson_id')->list()->filter(function ($row) { return $row['person_id'] % 2 == 1; })->col('person_id');
 var_dump($res[4][1]); // prints, e.g., 97, which is the ID of the second teacher returned for lesson 4 who has their person ID odd
 
 // CASE 12; equivalent to CASE 11, but specifying the filter sooner, yet on the application side
-$res = $rel->filter(function ($row) { return $row['person_id'] % 2 == 1; })->map('lesson_id')->list()->project('person_id');
+$res = $rel->filter(function ($row) { return $row['person_id'] % 2 == 1; })->map('lesson_id')->list()->col('person_id');
 
 // CASE 13: equivalent to CASE 11, but with the filter applied to the single-column projection
-$res = $rel->map('lesson_id')->list()->project('person_id')->filter(function ($personId) { return $personId % 2 == 1; });
+$res = $rel->map('lesson_id')->list()->col('person_id')->filter(function ($personId) { return $personId % 2 == 1; });
 
 // CASE 14; list: row only with the lesson_id and person_id attributes
 $res = $rel->project(['lesson_id', 'person_id']);
@@ -117,7 +117,7 @@ var_dump(isset($res[12]['actual'][142])); // prints TRUE iff there was at least 
 // SHORTCUT PROPOSITIONS
 
 // shortcut for CASE 2; consecutive operands of the same processing operation merged into a single operation call (only relevant to map() - other operations are not applicable or appropriate)
-$res = $rel->map('lesson_id', 'person_id')->project('person_lastname');
+$res = $rel->map('lesson_id', 'person_id')->col('person_lastname');
 
 // shortcut for CASE 3; projecting all columns with a given prefix using a star - covers the typical naming of columns from multiple tables
 $res = $rel->map('lesson_id')->map('person_id')->project(['schedulingstatus', 'person_*']);
@@ -141,27 +141,27 @@ $res = $rel->hash('lesson_id', 'schedulingstatus', 'person_id');
 
 // filter(): relation -> relation; column -> column; hash -> hash
 //   filter(function ($v) { return ...; }) only lets tuples/values which pass the filter; for relation and column, indexing is reset from 0
-// hash(): relation -> hash
-// assoc(): relation -> column
 // project(): relation -> relation
-//   project('a', 'b') narrows the relation only to columns "a" and "b"
-//   TODO: not only narrow, but also allow adding columns using a closure or a given interface, which is given the whole row; a reason to use array rather than varargs (or combine both?), another reason for array would be forward compatibility with some switches or extra attributes, and also consistent interface with rename()
-// col(): relation -> column
-//   col('a') returns the list of values from column "a"
-//   TODO: also allow making up a user-defined column
-// map(): relation -> relation
-// multimap(): relation -> relation
-//   multimap('a') maps the relation rows by distinct values in column "a"; there is a relation (i.e., list of tuples) under each key from "a"
+//   project(['a', 'b']) narrows the relation only to columns "a" and "b"
+//   project(['a' => 'b', 'b' => 'a']) narrows the relation only to columns "a" and "b", but swaps the values between them
+//   project(['a', 'ext' => function (ITuple $tuple) { return ...; }]) narrows the relation only to column "a" and adds column "ext" with values computed from the whole tuples
 // rename(): relation -> relation
 //   rename(['a' => 'newA', 'b' => 'newB']) renames column "a" to "newA" and "b" to "newB" (other columns untouched) and returns the resulting relation
-//   TODO: maybe redundant - in favor of project()?
+// col(): relation -> column
+//   col('a') returns the list of values from column "a"
+//   col(function (ITuple $tuple) { return ...; }) returns the list of values made up by the evaluator
+// TODO map(): relation -> relation
+// TODO multimap(): relation -> relation
+//   multimap('a') maps the relation rows by distinct values in column "a"; there is a relation (i.e., list of tuples) under each key from "a"
+// TODO assoc(): relation -> column
+// TODO hash(): relation -> hash
 // uniq(): relation -> relation
 //   uniq() drops duplicate rows, uniq(['a', 'b']) drops rows duplicate on column "a" and "b"; in both cases, only the first of the duplicate rows survive; indexing is reset from 0
-// uniq(): column -> column
+// TODO uniq(): column -> column
 //   uniq() drops duplicate values, only the first of the duplicate values survive; indexing is reset from 0
-// except(): relation -> relation
+// TODO except(): relation -> relation
 //   ??? is it useful? isn't the name misleading (compare with SQL EXCEPT doing ->uniq() afterwards)?
-// union():
+// TODO union():
 //   ??? is it useful?
 
 // TODO: examine dibi, Nette Database, and other db layers for examples of other useful processing methods; e.g., what about combining a tuple with some artificial values (i.e., extend the tuple with user-defined column
