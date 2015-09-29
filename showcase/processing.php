@@ -139,7 +139,7 @@ $res = $rel->hash('lesson_id', 'schedulingstatus', 'person_id');
 
 // ESSENTIALLY, the operators are relation algebra operators
 
-// filter(): relation -> relation; column -> column; TODO hash -> hash
+// filter(): relation -> relation; column -> column
 //   filter(function ($v) { return ...; }) only lets tuples/values which pass the filter; for relation and column, indexing is reset from 0
 // project(): relation -> relation
 //   project(['a', 'b']) narrows the relation only to columns "a" and "b"
@@ -150,11 +150,11 @@ $res = $rel->hash('lesson_id', 'schedulingstatus', 'person_id');
 // col(): relation -> column
 //   col('a') returns the list of values from column "a"
 //   col(function (ITuple $tuple) { return ...; }) returns the list of values made up by the evaluator
-// TODO map(): relation -> mapped relation
-// TODO multimap(): relation -> multimapped relation
+// map(): relation -> mapped relation
+// multimap(): relation -> multimapped relation
 //   multimap('a') maps the relation rows by distinct values in column "a"; there is a relation (i.e., list of tuples) under each key from "a"
-// TODO assoc(): relation -> column
-// TODO hash(): relation -> hash
+// assoc(): relation -> column
+// hash(): relation -> hash
 // uniq(): relation -> relation
 //   uniq() drops duplicate rows, uniq(['a', 'b']) drops rows duplicate on column "a" and "b"; in both cases, only the first of the duplicate rows survive; indexing is reset from 0
 // uniq(): column -> column

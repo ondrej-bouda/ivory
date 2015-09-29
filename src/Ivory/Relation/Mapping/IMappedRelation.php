@@ -1,5 +1,7 @@
 <?php
-namespace Ivory\Relation;
+namespace Ivory\Relation\Mapping;
+
+use Ivory\Relation\IRelation;
 
 /**
  * Relation mapped by custom keys, usually by values of one of the columns of the originating relation.
@@ -15,6 +17,6 @@ namespace Ivory\Relation;
  * Moreover, a mapped relation behaves like a readonly-`ArrayAccess`ible object, allowing access to {@link ITuple}s
  * using the mapping keys as the `ArrayAccess` offsets.
  */
-interface IMappedRelation extends IRelation, \ArrayAccess
+interface IMappedRelation extends IRelation, IMappedObject
 {
 }

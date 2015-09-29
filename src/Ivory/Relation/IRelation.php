@@ -5,6 +5,11 @@ use Ivory\Relation\Alg\ITupleComparator;
 use Ivory\Relation\Alg\ITupleEvaluator;
 use Ivory\Relation\Alg\ITupleFilter;
 use Ivory\Relation\Alg\ITupleHasher;
+use Ivory\Relation\Alg\IValueHasher;
+use Ivory\Relation\Mapping\IMappedRelation;
+use Ivory\Relation\Mapping\IMappedTuple;
+use Ivory\Relation\Mapping\IMappedValue;
+use Ivory\Result\IHash;
 
 /**
  * A client-side relation.
@@ -163,48 +168,33 @@ interface IRelation extends \Traversable, ICachingDataProcessor
      *                                  The mapping specification - one or more columns, each specifying values for one
      *                                    dimension of mapping.
      *                                  Specification of each mapping column is the same as for {@link col()}.
-     * @return ITupleMapping
+     * @return IMappedTuple
      */
     function map(...$mappingCols);
 
     /**
      * Divides this relation to several relations mapped by one or more keys.
      *
-     * The relation gets enclosed by one or more {@link IRelationMapping} boxes, each for one dimension of mapping. The
+     * The relation gets enclosed by one or more {@link IMappedRelation} boxes, each for one dimension of mapping. The
      * innermost box maps the individual {@link IRelation}s.
      *
-     * Note the box returned by this method still behaves as an {@link IRelation}. The semantics of further
-     * {@link IRelation} operations called on the returned box are redirected to the innermost box which holds the
-     * original relation being mapped - the operation is called on it and the result is stored to the innermost box
-     * instead of the original relation. TODO: Think of a type-safe variant: extract IRelation operations which return
-     * an IRelation to a separate IRelationManipulation interface, used both by IRelation and IRelationMapping. Then,
-     * IRelationMapping would be guaranteed to return either IRelationMapping or IRelationManipulation. In either case,
-     * the (interface) type would not depend on the operations called on the boxed IRelation, although it would lower
-     * the flexibility - i.e., ->col() would not be allowed to be called on the result of this operation, but only on
-     * the actual IRelation returned by the innermost box. However, the actual type of unreferencing a multi-boxed
-     * relation cannot be inferred at compile time, i.e., the compiler cannot decide at any level whether the
-     * unreferenced box is the innermost one and thus whether the returned object is a full-featured IRelation which
-     * cannot be further unreferenced, but which has other IRelation methods, not just IRelationManipulation. Processing
-     * the result would thus be too complicated and would need a type hint for the IDE to recognize the IRelation object
-     * properly and offer further processing methods on it. Nonetheless, even in the less type-safe boxing model, some
-     * type hints would be necessary. What about separating the IRelation methods by their return type, extracting them
-     * to individual interfaces, and introducing a special I*Mapping interface for each? E.g., multimap() would return
-     * an IRelationMapping object; calling ->col() on it would return an IColumnMapping object, or calling ->tuple() on
-     * the IRelationMapping object would return an ITupleMapping object... In other words, the return type would mark
-     * the type of the object (relation/tuple/value/column) held by the innermost box, restricting what is possible to
-     * call on the box - relation/tuple/value/column operations interface plus Traversable and ArrayAccess for unboxing
-     * the dimensions.
+     * Note the box returned by this method still behaves as an {@link IRelation}. Further {@link IRelation} operations
+     * called on the returned box are redirected to the innermost box which holds the original relation being mapped -
+     * the operation is called on it and the result is stored to the innermost box instead of the original relation.
      *
-     * @param $mappingCols
-     * @return IRelationMapping
+     * @param int|string|ITupleEvaluator|\Closure $mappingCols
+     *                                  The mapping specification - one or more columns, each specifying values for one
+     *                                    dimension of mapping.
+     *                                  Specification of each mapping column is the same as for {@link col()}.
+     * @return IMappedRelation
      */
-    function multimap(...$mappingCols); // TODO: consider renaming the method to by(); imagine the calls: by('person_id')...
+    function multimap(...$mappingCols);
 
     /**
      * Associates values of one column by (combinations of) values of one or more columns.
      *
-     * This is a mere shorthand for `$rel->multimap($leadArgs)->col($lastArg)`, where `$leadArgs` are all but the last
-     * argument and `$lastArg` is the last argument of this method call. See {@link multimap()} and {@link col()} for
+     * This is a mere shorthand for `$rel->multimap($leadArgs)->value($lastArg)`, where `$leadArgs` are all but the last
+     * argument and `$lastArg` is the last argument of this method call. See {@link multimap()} and {@link value()} for
      * complete specification.
      *
      * @param int|string|ITupleEvaluator|\Closure $cols
@@ -213,11 +203,28 @@ interface IRelation extends \Traversable, ICachingDataProcessor
      *                                  If not specified, all the relation columns are consecutively used as though they
      *                                    were arguments to this method call. E.g., <tt>$rel->assoc()</tt> on a relation
      *                                    consisting of 3 columns is equivalent to <tt>$rel->assoc(0, 1, 2)</tt>.
-     * @return IMappedRelation
+     * @return IMappedValue
      */
     function assoc(...$cols);
 
-    function hash(); // TODO
+    /**
+     * Hashes the tuples so that it is fast to tell whether there was at least one tuple of a given hash in this
+     * relation.
+     *
+     * Note the returned object only answers questions about presence of some data, it is unable to return the original
+     * data, however. Use {@link map()} instead for such a purpose.
+     *
+     * @param int|string|ITupleEvaluator|\Closure $colOffsetOrNameOrEvaluator
+     *                                  Specification of column the values of which to hash. See {@link col()} for more
+     *                                    details on the column specification.
+     * @param IValueHasher|\Closure $hasher hashes the values obtained from <tt>$colOffsetOrNameOrEvaluator</tt>;
+     *                                  an {@link IValueHasher} gets called its {@link IValueHasher::hash()} method;
+     *                                  a <tt>Closure</tt> is given a single value as its only argument and is expected
+     *                                    to return the value hash as a <tt>string</tt> or <tt>int</tt>;
+     *                                  if not given, the default hasher provided by the implementing class is used
+     * @return IHash
+     */
+    function hash($colOffsetOrNameOrEvaluator, $hasher = null);
 
     /**
      * Reduces the relation only to unique tuples.
@@ -269,12 +276,12 @@ interface IRelation extends \Traversable, ICachingDataProcessor
     function tuple($offset = 0);
 
     /**
-     * @param int $tupleOffset zero-based offset of the tuple to get
      * @param int|string|ITupleEvaluator|\Closure $colOffsetOrNameOrEvaluator
      *                                  Specification of column from which to get the value. See {@link col()} for more
      *                                    details on the column specification.
+     * @param int $tupleOffset zero-based offset of the tuple to get
      * @return mixed
      * @throws \OutOfBoundsException when this relation has fewer than `$tupleOffset+1` tuples
      */
-    function value($tupleOffset = 0, $colOffsetOrNameOrEvaluator = 0);
+    function value($colOffsetOrNameOrEvaluator = 0, $tupleOffset = 0);
 }
