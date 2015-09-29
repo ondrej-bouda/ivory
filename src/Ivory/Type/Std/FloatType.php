@@ -4,7 +4,7 @@ namespace Ivory\Type\Std;
 /**
  * Inexact, variable-precision numeric type.
  *
- * Represented as the PHP <tt>float</tt> type.
+ * Represented as the PHP `float` type.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html
  */

@@ -9,7 +9,7 @@ use Ivory\Value\Quantity;
  * Exposes the database configuration parameters as dynamic ("overloaded") properties. The value currently in effect is
  * always returned. For accessing properties with non-word characters in their names (e.g., when using
  * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-custom.html customized options}), the standard PHP
- * syntax <tt>$config->{'some.prop'}</tt> may be employed.
+ * syntax `$config->{'some.prop'}` may be employed.
  *
  * Apart from reading the values, it is also possible to write new values for some settings for the current transaction,
  * session, or as the defaults for a given role, database, or the whole DBMS. In fact, changing the current transaction
@@ -19,16 +19,16 @@ use Ivory\Value\Quantity;
  * {@link http://www.postgresql.org/docs/9.4/static/config-setting.html PostgreSQL manual} for more details.
  *
  * There are several types a PostgreSQL setting may take:
- * * boolean, represented by the PHP <tt>bool</tt> type,
- * * string, represented by the PHP <tt>string</tt> type,
- * * numeric, represented by the PHP <tt>int</tt> or <tt>float</tt> type,
+ * * boolean, represented by the PHP `bool` type,
+ * * string, represented by the PHP `string` type,
+ * * numeric, represented by the PHP `int` or `float` type,
  * * numeric with unit, represented by {@link \Ivory\Value\Quantity},
- * * enumerated, represented by the PHP <tt>string</tt> type.
+ * * enumerated, represented by the PHP `string` type.
  *
  * Generally, it is up to the user of this class to provide the correct type of value when writing a setting. There are
  * no checks performed by this class - everything is simply passed to the database system. Note that
  * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-custom.html customized options} are treated as of
- * type <tt>string</tt> by PostgreSQL.
+ * type `string` by PostgreSQL.
  *
  * The implementation of read operations is lazy - no database query is used until actually needed.
  *
@@ -105,7 +105,7 @@ class ConnConfig
      * ends (either committed or not), the option retains its original value (if not overwritten by a later session-wide
      * write on the same option).
      *
-     * It corresponds to the SQL <tt>SET LOCAL</tt> command.
+     * It corresponds to the SQL `SET LOCAL` command.
      *
      * @param string $propertyName
      * @param bool|string|int|float|Quantity $value the new value, or {@link ConnConfig::DEFAULT_VALUE} to use the
@@ -123,7 +123,7 @@ class ConnConfig
     /**
      * Sets the specified option to the given value with validity until the connection is closed.
      *
-     * It corresponds to the SQL <tt>SET [SESSION]</tt> command.
+     * It corresponds to the SQL `SET [SESSION]` command.
      *
      * @param string $propertyName
      * @param bool|string|int|float|Quantity $value the new value, or {@link ConnConfig::DEFAULT_VALUE} to use the
@@ -241,8 +241,8 @@ class ConnConfig
      * Enables caching of configuration parameter values again, after it has been disabled by {@link disableCaching()}.
      *
      * Note that, if caching was disabled altogether using {@link disableCaching()}, this method will only turn caching
-     * on for the requested parameters. Others will remain non-cached. To turn caching generally on, use <tt>null</tt>
-     * as the argument (which is the default).
+     * on for the requested parameters. Others will remain non-cached. To turn caching generally on, use `null` as the
+     * argument (which is the default).
      *
      * @param string|string[] $paramName
      */

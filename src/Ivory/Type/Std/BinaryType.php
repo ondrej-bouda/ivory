@@ -4,7 +4,7 @@ namespace Ivory\Type\Std;
 /**
  * Binary data.
  *
- * Represented as the PHP <tt>string</tt> type.
+ * Represented as the PHP `string` type.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-binary.html
  */

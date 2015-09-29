@@ -15,7 +15,7 @@ class Line
 
 
     /**
-     * Creates a new line according to the coefficients in the <tt>Ax + By + C = 0</tt> describing it.
+     * Creates a new line according to the coefficients in the `Ax + By + C = 0` describing it.
      *
      * @param float $a the coefficient A
      * @param float $b the coefficient B
@@ -64,7 +64,7 @@ class Line
     }
 
     /**
-     * Returns coefficients A, B, and C in the linear equation <tt>Ax + By + C = 0</tt> describing this line.
+     * Returns coefficients A, B, and C in the linear equation `Ax + By + C = 0` describing this line.
      *
      * @return float[] the triple of A, B, and C under indices 0, 1, and 2, and also under indices 'a', 'b', and 'c'
      */

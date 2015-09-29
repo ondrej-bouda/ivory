@@ -6,8 +6,8 @@ namespace Ivory\Value;
  *
  * The meaning of this class is to represent JSON-encoded data including the semantically insignificant whitespace among
  * tokens, as well as the order of object keys and multiple occurrences of the same key (the last of which is actually
- * used when working with the actual value). This reflects the PostgreSQL <tt>JSON</tt> data type. In order to do that,
- * both the value and its JSON encoding are kept in the object.
+ * used when working with the actual value). This reflects the PostgreSQL `JSON` data type. In order to do that, both
+ * the value and its JSON encoding are kept in the object.
  *
  * The objects are immutable, i.e., operations always produce a new object.
  */

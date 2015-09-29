@@ -11,7 +11,7 @@ use RuntimeException;
  *
  * Besides the primary message and SQLSTATE code, the exception holds the error message detail, error hint, and all the
  * other error diagnostic fields except those referring to PostgreSQL source code (those referred to by the PHP
- * <tt>PGSQL_DIAG_SOURCE_*</tt> constants).
+ * `PGSQL_DIAG_SOURCE_*` constants).
  */
 class StatementException extends \RuntimeException
 {

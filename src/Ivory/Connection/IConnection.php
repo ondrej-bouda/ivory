@@ -15,8 +15,8 @@ namespace Ivory\Connection;
  * Apart from actually arranging the communication between the user code and a PostgreSQL database, the interface also
  * provides means of controlling various aspects of the session itself, especially the transaction control. These might
  * of course be also managed by custom SQL queries sent to the database; circumventing the designated methods of this
- * interface should be avoided, though, because the <tt>IConnection</tt> object tracks the state of the connection and
- * would end up in an undefined state if it was not aware of some control queries.
+ * interface should be avoided, though, because the `IConnection` object tracks the state of the connection and would
+ * end up in an undefined state if it was not aware of some control queries.
  */
 interface IConnection extends IConnectionControl, ISessionControl, ITransactionControl, IIPCControl, IStatementExecution
 {

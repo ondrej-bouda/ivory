@@ -49,12 +49,12 @@ interface IStatementExecution // TODO: support prepared statements
     /**
      * Sends a script of one or more statements to the database, waits for their execution, and returns the results.
      *
-     * Note a somewhat counter-intuitive semantics, induced by the semantics of <tt>pg_send_query()</tt>:
-     * - an implicit <tt>BEGIN</tt> is issued before the script (if already in a transaction, it has no effect, though);
-     * - an implicit <tt>BEGIN</tt> is issued after each explicit <tt>COMMIT</tt> or <tt>ROLLBACK</tt>;
-     * - an implicit <tt>COMMIT</tt> is issued after the script unless there was an explicit <tt>BEGIN</tt> in this
-     *   script with no following explicit <tt>COMMIT</tt> or <tt>ROLLBACK</tt>, and unless a transaction was already
-     *   active before running this script and the script contains neither <tt>COMMIT</tt> nor <tt>ROLLBACK</tt>
+     * Note a somewhat counter-intuitive semantics, induced by the semantics of `pg_send_query()`:
+     * - an implicit `BEGIN` is issued before the script (if already in a transaction, it has no effect, though);
+     * - an implicit `BEGIN` is issued after each explicit `COMMIT` or `ROLLBACK`;
+     * - an implicit `COMMIT` is issued after the script unless there was an explicit `BEGIN` in this script with no
+     *   following explicit `COMMIT` or `ROLLBACK`, and unless a transaction was already active before running this
+     *   script and the script contains neither `COMMIT` nor `ROLLBACK`
      *
      * @param string $sqlScript a string containing one or more semicolon-separated statements
      * @return IResult[] list of results, one for each statement

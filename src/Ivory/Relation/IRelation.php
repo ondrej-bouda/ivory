@@ -9,8 +9,8 @@ use Ivory\Relation\Alg\ITupleHasher;
 /**
  * A client-side relation.
  *
- * A relation is essentially a <tt>Traversable</tt> list of {@link ITuple}s, each conforming to the same scheme - the
- * relation columns.
+ * A relation is essentially a `Traversable` list of {@link ITuple}s, each conforming to the same scheme - the relation
+ * columns.
  *
  * The relation itself might not actually hold the data (and for performance reasons, it usually will not). Instead, it
  * may be derived from another relation. From this point of view, a relation is an {@link ICachingDataProcessor}.
@@ -23,7 +23,7 @@ interface IRelation extends \Traversable, ICachingDataProcessor
      * @param ITupleFilter|\Closure $decider
      *                                  the decider which, given a tuple, tells whether it is passed to the result;
      *                                  an {@link ITupleFilter} gets called its {@link ITupleFilter::accept()} method;
-     *                                  a <tt>Closure}</tt> is given one {@link ITuple} argument and is expected to
+     *                                  a <tt>Closure</tt> is given one {@link ITuple} argument and is expected to
      *                                    return <tt>true</tt> or <tt>false</tt> telling whether the tuple is allowed
      * @return IRelation relation containing only those tuples from this relation, in their original order, which are
      *                   accepted by <tt>$decider</tt>
@@ -35,35 +35,34 @@ interface IRelation extends \Traversable, ICachingDataProcessor
      *
      * # Examples
      *
-     * - <tt>$rel->project(['a', 'b'])</tt> narrows <tt>$rel</tt> only to columns <tt>a</tt> and <tt>b</tt>.
-     * - <tt>$rel->project(['a' => 'b', 'b' => 'a'])</tt> narrows <tt>$rel</tt> only to columns <tt>a</tt> and
-     *   <tt>b</tt>, swapping the values between them.
-     * - <tt>$rel->project(['sum' => function (ITuple $t) { return $t['a'] + $t['b']; }])</tt> computes a relation
-     *   containing <tt>sum</tt> as its only column, values of which are the sums from <tt>$rel</tt>'s columns
-     *   <tt>a</tt> and <tt>b</tt>.
-     * - <tt>$rel->project(['p_*' => 'person_*'])</tt> narrows <tt>$rel</tt> only to columns the names of which start
-     *   with the prefix <tt>person_</tt>, and shortens the prefix to <tt>p_</tt> in the result relation.
-     * - <tt>$rel->project(['*', 'copy' => 'a')</tt> extends <tt>$rel</tt> with column <tt>copy</tt> containing the same
-     *   values as column <tt>a</tt>; the {@link extend()} method may be used for such a special case.
-     * - <tt>$rel->project(['a', '/_.*_/', '\1' => '/(.*)name$/i'])</tt> narrows <tt>$rel</tt> to column <tt>a</tt>,
-     *   columns the name of which contains at least two underscores, and columns the name of which ends with "name"
-     *   (case insensitive) - omitting the "name" suffix.
+     * - `$rel->project(['a', 'b'])` narrows `$rel` only to columns `a` and `b`.
+     * - `$rel->project(['a' => 'b', 'b' => 'a'])` narrows `$rel` only to columns `a` and `b`, swapping the values
+     *   between them.
+     * - `$rel->project(['sum' => function (ITuple $t) { return $t['a'] + $t['b']; }])` computes a relation containing
+     *   `sum` as its only column, values of which are the sums from `$rel`'s columns `a` and `b`.
+     * - `$rel->project(['p_*' => 'person_*'])` narrows `$rel` only to columns the names of which start with the prefix
+     *   `person_`, and shortens the prefix to `p_` in the result relation.
+     * - `$rel->project(['*', 'copy' => 'a')` extends `$rel` with column `copy` containing the same values as column
+     *   `a`; the {@link extend()} method may be used for such a special case.
+     * - `$rel->project(['a', '/_.*_/', '\1' => '/(.*)name$/i'])` narrows `$rel` to column `a`, columns the name of
+     *   which contains at least two underscores, and columns the name of which ends with "name" (case insensitive) -
+     *   omitting the "name" suffix.
      *
      * # Specification
      *
-     * A completely new relation is composed on the base of this relation and the <tt>$columns</tt> definition. Each
-     * <tt>$columns</tt> item either defines one column or, using a macro, multiple columns at once.
+     * A completely new relation is composed on the base of this relation and the `$columns` definition. Each `$columns`
+     * item either defines one column or, using a macro, multiple columns at once.
      *
      * ## Definition of a single column
      *
      * There are two forms of specifying a single column:
      * - The short form merely names an existing column from this relation. It is then copied to the result relation.
-     * - The full form specifies both the array key and value of the <tt>$columns</tt> item - key specifying the name of
-     *   the new column, value specifying its value. The value may either be a plain string, taking the values from an
+     * - The full form specifies both the array key and value of the `$columns` item - key specifying the name of the
+     *   new column, value specifying its value. The value may either be a plain string, taking the values from an
      *   existing column of this relation, or a dynamic tuple evaluator, computing the value from the whole tuple. The
      *   tuple evaluator may either be a {@link ITupleEvaluator} object which gets called its
-     *   {@link ITupleEvaluator::evaluate()} method, or a <tt>Closure</tt> which is given one {@link ITuple} argument
-     *   holding the current tuple and is expected to return the value computed from the tuple for the column.
+     *   {@link ITupleEvaluator::evaluate()} method, or a `Closure` which is given one {@link ITuple} argument holding
+     *   the current tuple and is expected to return the value computed from the tuple for the column.
      *
      * Note the short and full form might collide. In such a case, i.e., if the item key is numeric and the item value
      * is a string, the short form is preferred.
@@ -74,18 +73,18 @@ interface IRelation extends \Traversable, ICachingDataProcessor
      * ## Defining multiple columns using a macro
      *
      * Macros may be used for defining multiple columns at once by matching the column names to a pattern. Each of the
-     * original columns matching the pattern is added to the result relation. If both the <tt>$columns</tt> item key and
-     * value is specified, and if the key is not an integer, value is taken as the macro pattern while the key is taken
-     * as the new column names pattern - called the "replacement pattern" in the following description. Note that, if
-     * not treated properly, multiple original column names might lead to the same new column name. In such a case, the
+     * original columns matching the pattern is added to the result relation. If both the `$columns` item key and value
+     * is specified, and if the key is not an integer, value is taken as the macro pattern while the key is taken as the
+     * new column names pattern - called the "replacement pattern" in the following description. Note that, if not
+     * treated properly, multiple original column names might lead to the same new column name. In such a case, the
      * result relation will contain all of them in their original order.
      *
-     * There are two flavors of macros - the simple and the PCRE macros. A macro starting with a <tt>/</tt> (slash) is
+     * There are two flavors of macros - the simple and the PCRE macros. A macro starting with a `/` (slash) is
      * considered as a PCRE macro, otherwise, it is assumed to be a simple macro.
      *
      * ### Simple macros
      *
-     * A simple macro uses <tt>*</tt> (star) as the general wildcard symbol, standing for any (even an empty) substring.
+     * A simple macro uses `*` (star) as the general wildcard symbol, standing for any (even an empty) substring.
      * A backslash may be used to write a star, a backslash, or a starting slash literally. Other characters are mere
      * literals. Multiple stars may be used in a single macro.
      *
@@ -95,8 +94,8 @@ interface IRelation extends \Traversable, ICachingDataProcessor
      * ### PCRE macros
      *
      * PCRE macros use PCREs for both the matching pattern and the replacement pattern. They are the same as for the
-     * {@link preg_replace()} function. The only restriction is that they must use <tt>/</tt> (slash) as the PCRE
-     * pattern separator.
+     * {@link preg_replace()} function. The only restriction is that they must use `/` (slash) as the PCRE pattern
+     * separator.
      *
      * @param (string|ITupleEvaluator|\Closure)[]|\Traversable $columns
      *                                  the specification of new columns;
@@ -112,8 +111,7 @@ interface IRelation extends \Traversable, ICachingDataProcessor
      * All columns from this relation are preserved, the extra columns added after them.
      *
      * The specification of the extra columns follows the same rules as for the {@link project()} method. In fact,
-     * calling <tt>$rel->extend($extraColumns)</tt> is a mere shorthand for
-     * <tt>$rel->project(array_merge(['*'], $extraColumns))</tt>.
+     * calling `$rel->extend($extraColumns)` is a mere shorthand for `$rel->project(array_merge(['*'], $extraColumns))`.
      *
      * @param (string|ITupleEvaluator|\Closure)[]|\Traversable $extraColumns
      *                                  the specification of the extra columns;
@@ -226,11 +224,11 @@ interface IRelation extends \Traversable, ICachingDataProcessor
      *
      * The first of the group of equivalent tuples is always passed to the result, the others are dropped.
      *
-     * Each tuple is hashed, first, using <tt>$hasher</tt>. In case of collision, i.e., if the tuple hashes to the same
-     * value as any of the previous tuples, <tt>$comparator</tt> is used for deciding the equivalence precisely.
+     * Each tuple is hashed, first, using `$hasher`. In case of collision, i.e., if the tuple hashes to the same value
+     * as any of the previous tuples, `$comparator` is used for deciding the equivalence precisely.
      *
-     * Note the <tt>$hasher</tt> and <tt>$comparator</tt> must be consistent, i.e., tuples equal according to the
-     * comparator must be hashed to the same value.
+     * Note the `$hasher` and `$comparator` must be consistent, i.e., tuples equal according to the comparator must be
+     * hashed to the same value.
      *
      * {@internal The implementing method should document behaviour of the default tuple hasher and comparator.}
      *

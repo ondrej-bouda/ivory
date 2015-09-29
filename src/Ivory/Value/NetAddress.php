@@ -6,8 +6,8 @@ use Ivory\Exception\NotImplementedException;
 /**
  * Representation of an IPv4 or IPv6 host or network address.
  *
- * Both a host address and, optionally, its subnet may be represented in a single <tt>NetAddress</tt> object.
- * Besides from representing host addresses, <tt>NetAddress</tt> may also represent a network address.
+ * Both a host address and, optionally, its subnet may be represented in a single `NetAddress` object. Besides from
+ * representing host addresses, `NetAddress` may also represent a network address.
  *
  * The objects are immutable.
  */
@@ -20,8 +20,8 @@ class NetAddress
     /**
      * Creates a host or network address from its string representation, optionally accompanied by the netmask length.
      *
-     * The CIDR (<tt>address/y</tt>) notation is automatically recognized in <tt>$addr</tt> and, if detected, the
-     * <tt>$netmaskLengthOrNetmask</tt> argument gets ignored (a user warning is emitted if explicitly given anyway).
+     * The CIDR (`address/y`) notation is automatically recognized in `$addr` and, if detected, the
+     * `$netmaskLengthOrNetmask` argument gets ignored (a user warning is emitted if explicitly given anyway).
      *
      * @param string $addr the address, e.g., <tt>192.168.0.1</tt> or <tt>2001:4f8:3:ba::</tt>
      * @param int|string $netmaskLengthOrNetmask number of bits to take from <tt>$addr</tt> as the network prefix, or an
@@ -69,7 +69,7 @@ class NetAddress
     /**
      * Creates a host or network address from a binary string, also referred to as the "packed in_addr representation".
      *
-     * E.g., the four-byte <tt>"\x7f\x00\x00\x01"</tt> binary string results in the address <tt>127.0.0.1</tt>.
+     * E.g., the four-byte `"\x7f\x00\x00\x01"` binary string results in the address `127.0.0.1`.
      *
      * @param string $bytes binary string
      * @param int|string $netmaskLengthOrNetmask number of bits to take from <tt>$addr</tt> as the network prefix, or an
@@ -365,11 +365,11 @@ class NetAddress
     /**
      * Finds out whether this network contains a host address or a whole given network as a subnetwork.
      *
-     * Note that, in conformance with the standard PostgreSQL <tt>>></tt> operator, equal networks are not considered as
+     * Note that, in conformance with the standard PostgreSQL `>>` operator, equal networks are not considered as
      * containing each other, i.e., this method is a test for strict containment. To also permit equality, use
      * {@link NetAddress::containsOrEquals()}.
      *
-     * For addresses of different IP version, <tt>false</tt> is always returned.
+     * For addresses of different IP version, `false` is always returned.
      *
      * @param NetAddress|string $address a {@link NetAddress} or anything {@link NetAddress::fromString()} accepts as
      *                                     its first argument
@@ -449,7 +449,7 @@ class NetAddress
     /**
      * Packs the address to a binary string, also referred to as the "packed in_addr representation".
      *
-     * E.g., the address <tt>127.0.0.1</tt> results in the four-byte <tt>"\x7f\x00\x00\x01"</tt> binary string.
+     * E.g., the address `127.0.0.1` results in the four-byte `"\x7f\x00\x00\x01"` binary string.
      *
      * @return string the address packed to a binary string
      */

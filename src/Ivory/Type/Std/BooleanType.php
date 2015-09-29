@@ -4,7 +4,7 @@ namespace Ivory\Type\Std;
 /**
  * Logical boolean (true/false).
  *
- * Represented as the PHP <tt>bool</tt> type.
+ * Represented as the PHP `bool` type.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-boolean.html
  */

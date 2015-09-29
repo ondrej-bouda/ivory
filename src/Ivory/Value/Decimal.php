@@ -261,8 +261,8 @@ class Decimal
 	/**
 	 * Compare this number numerically with another number.
 	 *
-	 * Note that using the <tt>==</tt> operator checks that the two {@link Decimal} objects are of the same value and
-	 * scale, which might or might not be desired. Such a difference only arises in the trailing fractional zero digits,
+	 * Note that using the `==` operator checks that the two {@link Decimal} objects are of the same value and scale,
+	 * which might or might not be desired. Such a difference only arises in the trailing fractional zero digits,
 	 * though.
 	 *
 	 * @param string|int|float|Decimal|object $number number to compare this number with
@@ -691,7 +691,7 @@ class Decimal
 	/**
 	 * Converts the value to a {@link \GMP} object.
 	 *
-	 * Requires the <tt>gmp</tt> PHP extension.
+	 * Requires the `gmp` PHP extension.
 	 *
 	 * @return \GMP a {@link \GMP} object representing the same integer as this number
 	 * @throws UndefinedOperationException if this number is not an integer, i.e., has some non-zero fractional digits

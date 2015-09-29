@@ -8,7 +8,7 @@ use Ivory\Relation\Alg\IValueHasher;
 /**
  * Column of a relation.
  *
- * A column is essentially a <tt>Traversable</tt> list of values of the same type.
+ * A column is essentially a `Traversable` list of values of the same type.
  *
  * The column itself might not actually hold the data (and for performance reasons, it usually will not). Instead, it
  * may be derived from its originating relation. From this point of view, a column is an {@link ICachingDataProcessor}.
@@ -40,11 +40,11 @@ interface IColumn extends \Traversable, ICachingDataProcessor
 	 *
 	 * The first of the group of equivalent values is always passed to the result, the others are dropped.
 	 *
-	 * Each value is hashed, first, using <tt>$hasher</tt>. In case of collision, i.e., if the value hashes to the same
-	 * hash as any of the previous values, <tt>$comparator</tt> is used for deciding the equivalence precisely.
+	 * Each value is hashed, first, using `$hasher`. In case of collision, i.e., if the value hashes to the same hash as
+	 * any of the previous values, `$comparator` is used for deciding the equivalence precisely.
 	 *
-	 * Note the <tt>$hasher</tt> and <tt>$comparator</tt> must be consistent, i.e., values equal according to the
-	 * comparator must be hashed to the same hash.
+	 * Note the `$hasher` and `$comparator` must be consistent, i.e., values equal according to the comparator must be
+	 * hashed to the same hash.
 	 *
 	 * {@internal The implementing method should document behaviour of the default value hasher and comparator.}
 	 *

@@ -11,9 +11,9 @@ use Ivory\Exception\UndefinedOperationException;
  * The representation and operations resemble the specification for bit string types in PostgreSQL.
  *
  * It is possible to access individual bits using the array indices (readonly). The leftmost bit is at offset 0. Testing
- * whether the bit string has a bit at a given offset may be performed using <tt>isset($this[$offset])</tt>. Note that,
- * apart from reading out of such a call, it does not test whether the given bit is <em>set</em> (i.e., whether it
- * is 1) - it merely tests whether it is legal to access it.
+ * whether the bit string has a bit at a given offset may be performed using `isset($this[$offset])`. Note that, apart
+ * from reading out of such a call, it does not test whether the given bit is *set* (i.e., whether it is 1) - it merely
+ * tests whether it is legal to access it.
  *
  * @see http://www.postgresql.org/docs/current/static/datatype-bit.html PostgreSQL Bit String Types
  * @see http://www.postgresql.org/docs/current/static/functions-bitstring.html PostgreSQL Bit String Functions and Operators
@@ -119,13 +119,13 @@ abstract class BitString implements \ArrayAccess
 	 * Extracts a bit substring from this bit string.
 	 *
 	 * Note the semantics are according to the SQL standard, which PostgreSQL implements. That is, the arguments do NOT
-	 * work the same as for PHP <tt>substr()</tt> function.
+	 * work the same as for PHP {@link substr()} function.
 	 *
 	 * Examples:
-	 * - <tt>substring(2) on <tt>'1101001'</tt> yields <tt>'101001'</tt>
-	 * - <tt>substring(2, 4) on <tt>'1101001'</tt> yields <tt>'1010'</tt>
-	 * - <tt>substring(2, 0) on <tt>'1101001'</tt> yields <tt>''</tt>
-	 * - <tt>substring(-2, 4) on <tt>'1101001'</tt> yields <tt>'1'</tt>
+	 * - `substring(2)` on `'1101001'` yields `'101001'`
+	 * - `substring(2, 4)` on `'1101001'` yields `'1010'`
+	 * - `substring(2, 0)` on `'1101001'` yields `''`
+	 * - `substring(-2, 4)` on `'1101001'` yields `'1'`
 	 *
 	 * @param int $from position to start at;
 	 *                  one-based - e.g., <tt>$from = 2</tt> omits the first character;
@@ -163,11 +163,10 @@ abstract class BitString implements \ArrayAccess
 	/**
 	 * Concatenates this bit string with another one.
 	 *
-	 * The result is a bit string with bits of this bit string followed by the bits from the <tt>$concatenated</tt> bit
-	 * string.
+	 * The result is a bit string with bits of this bit string followed by the bits from the `$concatenated` bit string.
 	 *
-	 * If both the operands are fixed-length of length <tt>A</tt> and <tt>B</tt>, the result is a fixed-length bit
-	 * string of length <tt>A+B</tt>. Otherwise, the result is a variable-length bit string.
+	 * If both the operands are fixed-length of length `A` and `B`, the result is a fixed-length bit string of length
+	 * `A+B`. Otherwise, the result is a variable-length bit string.
 	 *
 	 * @param BitString $concatenated
 	 * @return VarBitString bit string made up by concatenating the <tt>$concatenated</tt> after this bit string
@@ -259,8 +258,8 @@ abstract class BitString implements \ArrayAccess
 	/**
 	 * Shifts the bits to the left.
 	 *
-	 * The length of the bit string is preserved, thus, the <tt>$shift</tt> left trailing bits are discarded.
-	 * The shifted bit positions are filled with 0's.
+	 * The length of the bit string is preserved, thus, the `$shift` left trailing bits are discarded. The shifted bit
+	 * positions are filled with 0's.
 	 *
 	 * @param int $shift number of positions to shift the bits to the left;
 	 *                   might even be negative (results in shifting to the right by <tt>-$shift</tt>)
@@ -280,8 +279,8 @@ abstract class BitString implements \ArrayAccess
 	/**
 	 * Shifts the bits to the right.
 	 *
-	 * The length of the bit string is preserved, thus, the <tt>$shift</tt> right trailing bits are discarded.
-	 * The shifted bit positions are filled with 0's.
+	 * The length of the bit string is preserved, thus, the `$shift` right trailing bits are discarded. The shifted bit
+	 * positions are filled with 0's.
 	 *
 	 * @param int $shift number of positions to shift the bits to the right;
 	 *                   might even be negative (results in shifting to the left by <tt>-$shift</tt>)

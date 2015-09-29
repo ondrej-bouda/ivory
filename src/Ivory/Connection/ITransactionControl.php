@@ -9,8 +9,7 @@ interface ITransactionControl
      * Begins a new transaction.
      *
      * Note that transactions cannot be nested in PostgreSQL (use {@link savepoint()} instead). Thus, if not called
-     * inside an active transaction, just a warning is issued, nothing is actually performed, and <tt>false</tt> is
-     * returned.
+     * inside an active transaction, just a warning is issued, nothing is actually performed, and `false` is returned.
      *
      * Transaction options may be specified, overriding the defaults set up by {@link setupSubsequentTransactions()}.
      *
@@ -46,12 +45,11 @@ interface ITransactionControl
      * beginning of the importing transaction, it only makes sense for the {@link TxConfig::SERIALIZABLE} or the
      * {@link TxConfig::REPEATABLE_READ} isolation level of the importing transaction, and it merely synchronizes the
      * transactions with respect to pre-existing data. See the PostgreSQL documentation on
-     * {@link http://www.postgresql.org/docs/9.4/static/sql-set-transaction.html <tt>SQL SET TRANSACTION</tt>} and
+     * {@link http://www.postgresql.org/docs/9.4/static/sql-set-transaction.html `SQL SET TRANSACTION`} and
      * {@link http://www.postgresql.org/docs/9.4/static/functions-admin.html#FUNCTIONS-SNAPSHOT-SYNCHRONIZATION Snapshot Synchronization Functions}
      * for detailed information.
      *
-     * If no transaction is actually active, just a warning is issued, nothing is performed, and <tt>false</tt> is
-     * returned.
+     * If no transaction is actually active, just a warning is issued, nothing is performed, and `false` is returned.
      *
      * @param string $snapshotId a snapshot identifier exported by another existing transaction using
      *                             {@link exportTransactionSnapshot()} (or just using a custom call to the
@@ -77,8 +75,7 @@ interface ITransactionControl
     /**
      * Commits the active transaction.
      *
-     * If no transaction is actually active, just a warning is issued, nothing is performed, and <tt>false</tt> is
-     * returned.
+     * If no transaction is actually active, just a warning is issued, nothing is performed, and `false` is returned.
      *
      * @return bool <tt>true</tt> if the transaction has actually been committed,
      *              <tt>false</tt> if no transaction was active and thus this was a no-op
@@ -88,8 +85,7 @@ interface ITransactionControl
     /**
      * Rolls back the active transaction.
      *
-     * If no transaction is actually active, just a warning is issued, nothing is performed, and <tt>false</tt> is
-     * returned.
+     * If no transaction is actually active, just a warning is issued, nothing is performed, and `false` is returned.
      *
      * @return bool <tt>true</tt> if the transaction has actually been rolled back,
      *              <tt>false</tt> if no transaction was active and thus this was a no-op
@@ -105,7 +101,7 @@ interface ITransactionControl
      * In PostgreSQL, the same name may be used for multiple savepoints within a transaction at a time. The operations
      * on the savepoints always work with the most recent savepoint of a given name.
      *
-     * If no transaction is active, an <tt>InvalidStateException</tt> is thrown. Note this is different from operations
+     * If no transaction is active, an `InvalidStateException` is thrown. Note this is different from operations
      * controlling the whole transaction, which issue just a warning. This mimics the PostgreSQL behaviour, and is
      * generally safer for savepoints.
      *
@@ -121,12 +117,12 @@ interface ITransactionControl
      * given savepoint are destroyed. The given savepoint itself remains valid, allowing to roll back to it multiple
      * times.
      *
-     * If no transaction is active, an <tt>InvalidStateException</tt> is thrown. Note this is different from operations
+     * If no transaction is active, an `InvalidStateException` is thrown. Note this is different from operations
      * controlling the whole transaction, which issue just a warning. This mimics the PostgreSQL behaviour, and is
      * generally safer for savepoints.
      *
      * Database error on trying to roll back to an undefined savepoint is handled and thrown as an
-     * <tt>InvalidStateException</tt>, too.
+     * `InvalidStateException`, too.
      *
      * @see http://www.postgresql.org/docs/9.4/static/sql-rollback-to.html PostgreSQL docs on details regarding cursors
      *

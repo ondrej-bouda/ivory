@@ -13,14 +13,14 @@ class MacAddr
     /**
      * Creates a MAC address from its string representation.
      *
-     * The same input formats as by PostgreSQL are accepted. They are the following, where <tt>X</tt> stands for an
+     * The same input formats as by PostgreSQL are accepted. They are the following, where `X` stands for an
      * upper- or lowercase hexadecimal digit:
-     * * <tt>'XX:XX:XX:XX:XX:XX'</tt>
-     * * <tt>'XX-XX-XX-XX-XX-XX'</tt>
-     * * <tt>'XXXXXX:XXXXXX'</tt>
-     * * <tt>'XXXXXX-XXXXXX'</tt>
-     * * <tt>'XXXX.XXXX.XXXX'</tt>
-     * * <tt>'XXXXXXXXXXXX'</tt>
+     * - `'XX:XX:XX:XX:XX:XX'`
+     * - `'XX-XX-XX-XX-XX-XX'`
+     * - `'XXXXXX:XXXXXX'`
+     * - `'XXXXXX-XXXXXX'`
+     * - `'XXXX.XXXX.XXXX'`
+     * - `'XXXXXXXXXXXX'`
      *
      * @param string $addr the string representation of the MAC address in one of the formats mentioned above;
      *                     other formats are rejected by an <tt>\InvalidArgumentException</tt>
