@@ -163,5 +163,3 @@ $res = $rel->hash('lesson_id', 'schedulingstatus', 'person_id');
 //   ??? is it useful? isn't the name misleading (compare with SQL EXCEPT doing ->uniq() afterwards)?
 // TODO union():
 //   ??? is it useful?
-
-// TODO: examine Nette Database and other db layers for examples of other useful processing methods

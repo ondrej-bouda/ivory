@@ -8,14 +8,14 @@ use Ivory\Relation\Alg\IValueHasher;
 /**
  * Column of a relation.
  *
- * A column is essentially a `Traversable` list of values of the same type.
+ * A column is essentially a `Countable` `Traversable` list of values of the same type.
  *
  * The column itself might not actually hold the data (and for performance reasons, it usually will not). Instead, it
  * may be derived from its originating relation. From this point of view, a column is an {@link ICachingDataProcessor}.
  *
  * Unless computed by a client-side evaluator, a column is characterized by its name and data type of its values.
  */
-interface IColumn extends \Traversable, ICachingDataProcessor
+interface IColumn extends \Traversable, \Countable, ICachingDataProcessor
 {
 	/**
 	 * @return string|null name of the column, if defined
@@ -70,4 +70,11 @@ interface IColumn extends \Traversable, ICachingDataProcessor
 	 * @return array list of values of this column, in their original order
 	 */
 	function toArray();
+
+	/**
+	 * @param int $valueOffset zero-based offset of the value to get
+	 * @return mixed
+	 * @throws \OutOfBoundsException when this column has fewer than <tt>$valueOffset+1</tt> values
+	 */
+	function value($valueOffset = 0);
 }

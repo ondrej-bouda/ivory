@@ -14,13 +14,13 @@ use Ivory\Result\IHash;
 /**
  * A client-side relation.
  *
- * A relation is essentially a `Traversable` list of {@link ITuple}s, each conforming to the same scheme - the relation
- * columns.
+ * A relation is essentially a `Countable` `Traversable` list of {@link ITuple}s, each conforming to the same scheme -
+ * the relation columns.
  *
  * The relation itself might not actually hold the data (and for performance reasons, it usually will not). Instead, it
  * may be derived from another relation. From this point of view, a relation is an {@link ICachingDataProcessor}.
  */
-interface IRelation extends \Traversable, ICachingDataProcessor
+interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
 {
     /**
      * Reduces the relation only to tuples satisfying a given filter.
@@ -281,7 +281,7 @@ interface IRelation extends \Traversable, ICachingDataProcessor
      *                                    details on the column specification.
      * @param int $tupleOffset zero-based offset of the tuple to get
      * @return mixed
-     * @throws \OutOfBoundsException when this relation has fewer than `$tupleOffset+1` tuples
+     * @throws \OutOfBoundsException when this relation has fewer than <tt>$tupleOffset+1</tt> tuples
      */
     function value($colOffsetOrNameOrEvaluator = 0, $tupleOffset = 0);
 }
