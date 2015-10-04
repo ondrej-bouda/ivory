@@ -14,7 +14,7 @@ use Ivory\Value\Quantity;
  * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-custom.html customized options}), the standard PHP
  * syntax `$config->{'some.prop'}` may be employed, or the {@link get()} method may simply be called.
  *
- * Moreover, the implementation of read operations is lazy - no database query is made until actually needed.
+ * The implementation of read operations is lazy - no database query is made until actually needed.
  */
 class ConnConfig implements IConnConfig
 {
