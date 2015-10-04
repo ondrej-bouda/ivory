@@ -1,5 +1,6 @@
 <?php
 namespace Ivory\Result;
+
 use Ivory\Relation\Alg\IValueHasher;
 
 /**
@@ -22,5 +23,5 @@ interface IHash
      *                                  if not given, the default hasher provided by the implementing class is used
 	 * @return bool <tt>true</tt> iff this hash contains the hash of <tt>$value</tt>, hashed by the given hasher
 	 */
-	function containsHashOf($value, $hasher = null);
+	function contains($value, $hasher = null);
 }
