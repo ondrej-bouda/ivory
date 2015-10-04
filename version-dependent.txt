@@ -1,0 +1,4 @@
+# Version-Dependent Aspects
+
+- keywords
+- ... any feature newly introduced - see the PostgreSQL changelog

@@ -1,0 +1,2 @@
+XML:
+* always use XMLPARSE and XMLSERIALIZE for converting from/to text - the proprietary option (casting to/from xml type) is 1) SQL-nonstandard, 2) session option dependend
