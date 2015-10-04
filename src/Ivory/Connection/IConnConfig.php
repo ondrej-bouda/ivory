@@ -26,9 +26,6 @@ use Ivory\Value\Quantity;
  * type `string` by PostgreSQL.
  *
  * @todo provide a way to get all configuration options; maybe as Iterable?
- * @todo consider offering another interface for writing session-non-local settings; if this interface was extended,
- *       limit the feature of forward-cached settings written on not-yet-established connections, offered by the
- *       extending ICachingConnConfig, only on writing session-local settings
  * @see http://www.postgresql.org/docs/9.4/static/config-setting.html
  */
 interface IConnConfig
