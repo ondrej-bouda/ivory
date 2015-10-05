@@ -1,7 +1,15 @@
 <?php
 namespace Ivory\Result;
 
-class CommandResult
+class CommandResult extends Result implements ICommandResult
 {
+	public function __construct($handler, $lastNotice = null)
+	{
+		parent::__construct($handler, $lastNotice);
+	}
 
+	public function getAffectedRows()
+	{
+		// TODO: Implement getAffectedRows() method.
+	}
 }

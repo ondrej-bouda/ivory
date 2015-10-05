@@ -23,6 +23,11 @@ use Ivory\Result\IHash;
 interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
 {
     /**
+     * @return IColumn[] list of columns constituting this relation
+     */
+    function getColumns();
+
+    /**
      * Reduces the relation only to tuples satisfying a given filter.
      *
      * @param ITupleFilter|\Closure $decider

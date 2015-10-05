@@ -1,13 +1,12 @@
 <?php
 namespace Ivory\Result;
 
-interface IQueryResult
+use Ivory\Relation\IRelation;
+
+/**
+ * Result of a successful query, returning a relation.
+ */
+interface IQueryResult extends IResult, IRelation
 {
-    function filter();
 
-    function map();
-
-    function project();
-
-    function hash();
 }
