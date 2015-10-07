@@ -4,7 +4,8 @@ namespace Ivory\Connection;
 use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
 use Ivory\Result\CommandResult;
-use Ivory\Result\CopyResult;
+use Ivory\Result\CopyInResult;
+use Ivory\Result\CopyOutResult;
 use Ivory\Result\IResult;
 use Ivory\Result\QueryResult;
 
@@ -99,9 +100,10 @@ class StatementExecution implements IStatementExecution
                 return new CommandResult($resHandler, $notice);
             case PGSQL_TUPLES_OK:
                 return new QueryResult($resHandler, $notice);
-            case PGSQL_COPY_IN: // TODO: is COPY IN/OUT blocking somehow? blocking the execution of further commands? keeping the connection busy (!) even after pg_get_result()?
+            case PGSQL_COPY_IN:
+                return new CopyInResult($resHandler, $notice);
             case PGSQL_COPY_OUT:
-                return new CopyResult($resHandler, $notice); // TODO: differentiate COPY IN/OUT
+                return new CopyOutResult($resHandler, $notice);
 
             case PGSQL_EMPTY_QUERY:
             case PGSQL_BAD_RESPONSE:
