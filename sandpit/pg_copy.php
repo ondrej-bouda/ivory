@@ -31,7 +31,7 @@ pg_end_copy($conn);
 
 $res = pg_query($conn, 'SELECT COUNT(*) FROM bar');
 $cnt = pg_fetch_result($res, 0, 0);
-echo "bar COUNT(): "; var_dump($cnt);
+echo "bar COUNT(): "; var_dump($cnt); // prints 2
 
 
 echo "\n\n=== 2. COPY TO STDOUT ===\n";
@@ -45,7 +45,7 @@ var_dump($data);
 
 //echo "\n\n=== 2b. COPY TO STDOUT using pg_socket()\n"; // does not work
 //$stream = pg_socket($conn);
-//$res = pg_query($conn, 'COPY bar (a, b, c) TO STDOUT'); // result status: PGSQL_COPY_OUT
+//$res = pg_query($conn, 'COPY bar (a, b, c) TO STDOUT'); // result status: PGSQL_COPY_OUT; without being read, it would block the connection
 //processResult($res);
 //while (true) {
 //    $read = [$stream];
