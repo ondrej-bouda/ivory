@@ -43,7 +43,7 @@ echo "\n\n=== 2. COPY TO STDOUT ===\n";
 $data = pg_copy_to($conn, 'bar');
 var_dump($data);
 
-echo "\n\n=== 2b. COPY TO STDOUT using pg_socket()\n"; // does not work
+echo "\n\n=== 2b. COPY TO STDOUT using pg_socket()\n"; // cannot read the actual data
 //$stream = pg_socket($conn);
 $res = pg_query($conn, 'COPY bar (a, b, c) TO STDOUT'); // result status: PGSQL_COPY_OUT
 processResult($res);

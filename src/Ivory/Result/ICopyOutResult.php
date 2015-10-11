@@ -1,10 +1,12 @@
 <?php
 namespace Ivory\Result;
 
+use Ivory\Exception\ConnectionException;
+
 /**
  * Result of a successful `COPY TO STDOUT` statement, i.e., dump of a relation sent directly to the client.
  *
- * Note that until {@ICopyOutResult::end()} method is called, the connection is not usable.
+ * Note that until {@ICopyOutResult::end()} method is called, the connection is blocked for further statements.
  */
 interface ICopyOutResult extends IResult
 {
@@ -15,6 +17,8 @@ interface ICopyOutResult extends IResult
 
     /**
      * Finalizes copying data from the database.
+     *
+     * @throws ConnectionException if the connection got closed or broken
      */
     function end();
 }

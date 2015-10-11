@@ -46,7 +46,7 @@ class StatementExecution implements IStatementExecution
             trigger_error('The database gave an unexpected result set.', E_USER_NOTICE);
         }
 
-        return $this->processResult($res, $sqlStatement);
+        return $this->processResult($connHandler, $res, $sqlStatement);
     }
 
     public function rawMultiQuery($sqlStatements)
@@ -81,17 +81,18 @@ class StatementExecution implements IStatementExecution
         }
         $results = [];
         foreach ($resHandlers as $resHandler) {
-            $results[] = $this->processResult($resHandler, $sqlScript);
+            $results[] = $this->processResult($connHandler, $resHandler, $sqlScript);
         }
         return $results;
     }
 
     /**
+     * @param resource $connHandler
      * @param resource $resHandler
      * @param string $query
      * @return IResult
      */
-    private function processResult($resHandler, $query)
+    private function processResult($connHandler, $resHandler, $query)
     {
         $notice = $this->getLastResultNotice();
         $stat = pg_result_status($resHandler);
@@ -101,9 +102,9 @@ class StatementExecution implements IStatementExecution
             case PGSQL_TUPLES_OK:
                 return new QueryResult($resHandler, $notice);
             case PGSQL_COPY_IN:
-                return new CopyInResult($resHandler, $notice);
+                return new CopyInResult($this->connCtl, $resHandler, $notice);
             case PGSQL_COPY_OUT:
-                return new CopyOutResult($resHandler, $notice);
+                return new CopyOutResult($this->connCtl, $resHandler, $notice);
 
             case PGSQL_EMPTY_QUERY:
             case PGSQL_BAD_RESPONSE:

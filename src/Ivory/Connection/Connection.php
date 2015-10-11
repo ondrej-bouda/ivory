@@ -11,7 +11,8 @@ class Connection implements IConnection
 
 	private $name;
 	private $connCtl;
-	private $cmdExec;
+	private $stmtExec;
+	private $copyCtl;
 
 	private $config;
 
@@ -28,7 +29,8 @@ class Connection implements IConnection
 	{
 		$this->name = $name;
 		$this->connCtl = new ConnectionControl($params);
-		$this->cmdExec = new StatementExecution($this->connCtl);
+		$this->stmtExec = new StatementExecution($this->connCtl);
+		$this->copyCtl = new CopyControl();
 		$this->config = new ConnConfig($this);
 	}
 
@@ -239,17 +241,51 @@ class Connection implements IConnection
 
 	public function rawQuery($sqlStatement)
 	{
-		return $this->cmdExec->rawQuery($sqlStatement);
+		return $this->stmtExec->rawQuery($sqlStatement);
 	}
 
 	public function rawMultiQuery($sqlStatements)
 	{
-		return $this->cmdExec->rawMultiQuery($sqlStatements);
+		return $this->stmtExec->rawMultiQuery($sqlStatements);
 	}
 
 	public function runScript($sqlScript)
 	{
-		return $this->cmdExec->runScript($sqlScript);
+		return $this->stmtExec->runScript($sqlScript);
+	}
+
+	//endregion
+
+	//region Copy Control
+
+	public function copyFromFile($file, $table, $columns = null, $options = [])
+	{
+		return $this->copyCtl->copyFromFile($file, $table, $columns, $options);
+	}
+
+	public function copyFromProgram($program, $table, $columns = null, $options = [])
+	{
+		return $this->copyCtl->copyFromProgram($program, $table, $columns, $options);
+	}
+
+	public function copyFromInput($table, $columns = null, $options = [])
+	{
+		return $this->copyCtl->copyFromInput($table, $columns, $options);
+	}
+
+	public function copyToFile($file, $tableOrQuery, $columns = null, $options = [])
+	{
+		return $this->copyCtl->copyToFile($file, $tableOrQuery, $columns, $options);
+	}
+
+	public function copyToProgram($program, $tableOrQuery, $columns = null, $options = [])
+	{
+		return $this->copyCtl->copyToProgram($program, $tableOrQuery, $columns, $options);
+	}
+
+	public function copyToArray($table, $options = [])
+	{
+		return $this->copyCtl->copyToArray($table, $options);
 	}
 
 	//endregion

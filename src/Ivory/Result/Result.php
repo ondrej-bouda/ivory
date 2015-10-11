@@ -8,12 +8,12 @@ abstract class Result implements IResult
     /** @var string last PostgreSQL notice issued by when returning this result */
     private $lastNotice;
 
-    protected function __construct($handler, $lastNotice = null)
+    protected function __construct($resultHandler, $lastNotice = null)
     {
-        if (!is_resource($handler)) {
+        if (!is_resource($resultHandler)) {
             throw new \InvalidArgumentException('$handler');
         }
-        $this->handler = $handler;
+        $this->handler = $resultHandler;
         $this->lastNotice = $lastNotice;
     }
 
