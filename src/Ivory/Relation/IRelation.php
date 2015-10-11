@@ -31,7 +31,8 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * Reduces the relation only to tuples satisfying a given filter.
      *
      * @param ITupleFilter|\Closure $decider
-     *                                  the decider which, given a tuple, tells whether it is passed to the result;
+     *                                  the decider which, given a tuple, tells whether the tuple gets passed to the
+     *                                    result;
      *                                  an {@link ITupleFilter} gets called its {@link ITupleFilter::accept()} method;
      *                                  a <tt>Closure</tt> is given one {@link ITuple} argument and is expected to
      *                                    return <tt>true</tt> or <tt>false</tt> telling whether the tuple is allowed
