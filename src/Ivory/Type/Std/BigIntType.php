@@ -4,8 +4,8 @@ namespace Ivory\Type\Std;
 /**
  * Signed eight-byte integer.
  *
- * The PHP <tt>int</tt> representation is preferred. If, however, the value overflows <tt>int</tt> size, a string is
- * returned containing the decimal number.
+ * The PHP `int` representation is preferred. If, however, the value overflows `int` size, a string is returned
+ * containing the decimal number.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html#DATATYPE-INT
  */

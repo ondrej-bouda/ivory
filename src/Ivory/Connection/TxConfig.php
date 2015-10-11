@@ -6,29 +6,27 @@ namespace Ivory\Connection;
  *
  * There are several configurable parameters of transactions in PostgreSQL. For each of them, a group of constants,
  * representing the possible values for the respective parameter, is available. Constants from distinct groups may be
- * combined together using the binary <tt>|</tt> operator.
+ * combined together using the binary `|` operator.
  */
 class TxConfig
 {
-    /** The <tt>SERIALIZABLE</tt> isolation level. */
+    /** The `SERIALIZABLE` isolation level. */
     const ISOLATION_SERIALIZABLE = 1;
-    /** The <tt>REPEATABLE READ</tt> isolation level. */
+    /** The `REPEATABLE READ` isolation level. */
     const ISOLATION_REPEATABLE_READ = 2;
-    /** The <tt>READ COMMITTED</tt> isolation level. */
+    /** The `READ COMMITTED` isolation level. */
     const ISOLATION_READ_COMMITTED = 4;
-    /** The <tt>READ UNCOMMITTED</tt> isolation level. */
+    /** The `READ UNCOMMITTED` isolation level. */
     const ISOLATION_READ_UNCOMMITTED = 8;
 
-    /** The <tt>READ WRITE</tt> access mode. */
+    /** The `READ WRITE` access mode. */
     const ACCESS_READ_WRITE = 128;
-    /** The <tt>READ ONLY</tt> access mode. */
+    /** The `READ ONLY` access mode. */
     const ACCESS_READ_ONLY = 256;
 
-    /**
-     * The <tt>DEFERRABLE</tt> deferrable mode. Only effective in <tt>SERIALIZABLE</tt> <tt>READ ONLY</tt> transactions.
-     */
+    /** The `DEFERRABLE` deferrable mode. Only effective in `SERIALIZABLE` `READ ONLY` transactions. */
     const DEFERRABLE = 4096;
-    /** The <tt>NOT DEFERRABLE</tt> deferrable mode. */
+    /** The `NOT DEFERRABLE` deferrable mode. */
     const NOT_DEFERRABLE = 8192;
 
 

@@ -37,20 +37,18 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
 
 
 	/**
-	 * Creates a connection parameters object from a RFC 3986 URI, e.g., <tt>"postgresql://usr@localhost:5433/db"</tt>.
+	 * Creates a connection parameters object from a RFC 3986 URI, e.g., `"postgresql://usr@localhost:5433/db"`.
 	 *
 	 * The accepted URI is the same as for the libpq connect function, described in the
-	 * <a href="http://www.postgresql.org/docs/9.4/static/libpq-connect.html">PostgreSQL documentation</a>.
+	 * {@link http://www.postgresql.org/docs/9.4/static/libpq-connect.html PostgreSQL documentation}.
 	 *
 	 * The following holds for the accepted URIs:
-	 * <ul>
-	 *   <li>the URI scheme designator must either be <tt>"postgresql"</tt> or <tt>"postgres"</tt>,
-	 *   <li>any part of the URI is optional,
-	 *   <li>username and password are used as credentials when connecting,
-	 *   <li>server and port specify the server and port to connect to,
-	 *   <li>the path specifies the name of the database to connect to,
-	 *   <li>URI parameters are also supported, e.g., <tt>"postgresql:///mydb?host=localhost&port=5433"</tt>.
-	 * </ul>
+	 * - the URI scheme designator must either be `"postgresql"` or `"postgres"`,
+	 * - any part of the URI is optional,
+	 * - username and password are used as credentials when connecting,
+	 * - server and port specify the server and port to connect to,
+	 * - the path specifies the name of the database to connect to,
+	 * - URI parameters are also supported, e.g., `"postgresql:///mydb?host=localhost&port=5433"`.
 	 *
 	 * @param string $uri
 	 * @return ConnectionParameters
@@ -98,8 +96,8 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
 	/**
 	 * Creates a connection parameters object from a PostgreSQL connection string (see {@link pg_connect()}).
 	 *
-	 * A connection string is a set of <tt>keyword = value</tt> pairs, separated by space. Spaces around the equal sign
-	 * are optional. To contain special characters, the value may be enclosed in single quotes, using backslash as the
+	 * A connection string is a set of `keyword = value` pairs, separated by space. Spaces around the equal sign are
+	 * optional. To contain special characters, the value may be enclosed in single quotes, using backslash as the
 	 * escape character.
 	 *
 	 * For details about the connection parameter keywords and values, see {@link __construct()}.
@@ -131,15 +129,14 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
 	 * Initializes the connection parameters from an associative array of keywords to values.
 	 *
 	 * The most important are the following parameters:
-	 * <ul>
-	 *   <li><tt>host (string)</tt>: the database server to connect to,
-	 *   <li><tt>port (int)</tt>: the port to connect to,
-	 *   <li><tt>username (string)</tt>: username to authenticate as,
-	 *   <li><tt>password (string)</tt>: password for the given username,
-	 *   <li><tt>database (string)</tt>: name of the database to connect to,
-	 *   <li><tt>connect_timeout (int></tt>: connection timeout (0 means to wait indefinitely),
-	 *   <li><tt>options (string)</tt>: the runtime options to send to the server.
-	 * </ul>
+	 * - `host (string)`: the database server to connect to,
+	 * - `port (int)`: the port to connect to,
+	 * - `username (string)`: username to authenticate as,
+	 * - `password (string)`: password for the given username,
+	 * - `database (string)`: name of the database to connect to,
+	 * - `connect_timeout (int)`: connection timeout (0 means to wait indefinitely),
+	 * - `options (string)`: the runtime options to send to the server.
+	 *
 	 * For details, see the
 	 * {@link http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS PostgreSQL documentation}.
 	 * Any parameter may be omitted - the default is used then.

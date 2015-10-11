@@ -1,19 +1,21 @@
 <?php
 namespace Ivory\Exception;
 
+use Ivory\Result\SqlState;
 use RuntimeException;
 
 /**
  * Exception thrown upon errors on querying the database.
  *
  * The exception message and code contain the primary error message and the SQLSTATE code, respectively. To recognize
- * SQLSTATE codes, {@link \Ivory\Command\SqlState} constants might be helpful.
+ * SQLSTATE codes, {@link \Ivory\Result\SqlState} constants might be helpful. Alternatively,
+ * {@link StatementException::getSqlState()} may be used to get an {@link SqlState} object.
  *
  * Besides the primary message and SQLSTATE code, the exception holds the error message detail, error hint, and all the
  * other error diagnostic fields except those referring to PostgreSQL source code (those referred to by the PHP
- * <tt>PGSQL_DIAG_SOURCE_*</tt> constants).
+ * `PGSQL_DIAG_SOURCE_*` constants).
  */
-class CommandException extends \RuntimeException
+class StatementException extends \RuntimeException
 {
 	private $query;
 	private $errorFields = [];
@@ -65,6 +67,11 @@ class CommandException extends \RuntimeException
 			default:
 				return 'Unknown error';
 		}
+	}
+
+	final public function getSqlState()
+	{
+		return SqlState::fromCode($this->getCode());
 	}
 
 	/**

@@ -5,12 +5,12 @@ namespace Ivory\Value;
  * Variable-length bit string - a string of 1's and 0's.
  *
  * The objects are immutable, i.e., operations always produce a new object.
- * The representation and operations resemble the specification of the <tt>BIT VARYING</tt> type in PostgreSQL.
+ * The representation and operations resemble the specification of the `BIT VARYING` type in PostgreSQL.
  *
  * It is possible to access individual bits using the array indices (readonly). The leftmost bit is at offset 0. Testing
- * whether the bit string has a bit at a given offset may be performed using <tt>isset($this[$offset])</tt>. Note that,
- * apart from reading out of such a call, it does not test whether the given bit is <em>set</em> (i.e., whether it
- * is 1) - it merely tests whether it is legal to access it.
+ * whether the bit string has a bit at a given offset may be performed using `isset($this[$offset])`. Note that, apart
+ * from reading out of such a call, it does not test whether the given bit is *set* (i.e., whether it is 1) - it merely
+ * tests whether it is legal to access it.
  *
  * @see http://www.postgresql.org/docs/current/static/datatype-bit.html PostgreSQL Bit String Types
  * @see http://www.postgresql.org/docs/current/static/functions-bitstring.html PostgreSQL Bit String Functions and Operators

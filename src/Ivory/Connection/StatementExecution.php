@@ -1,11 +1,15 @@
 <?php
 namespace Ivory\Connection;
 
-use Ivory\Command\Result;
-use Ivory\Exception\CommandException;
+use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
+use Ivory\Result\CommandResult;
+use Ivory\Result\CopyInResult;
+use Ivory\Result\CopyOutResult;
+use Ivory\Result\IResult;
+use Ivory\Result\QueryResult;
 
-class CommandExecution implements ICommandExecution
+class StatementExecution implements IStatementExecution
 {
     private $connCtl;
 
@@ -42,7 +46,7 @@ class CommandExecution implements ICommandExecution
             trigger_error('The database gave an unexpected result set.', E_USER_NOTICE);
         }
 
-        return $this->processResult($res, $sqlStatement);
+        return $this->processResult($connHandler, $res, $sqlStatement);
     }
 
     public function rawMultiQuery($sqlStatements)
@@ -77,58 +81,43 @@ class CommandExecution implements ICommandExecution
         }
         $results = [];
         foreach ($resHandlers as $resHandler) {
-            $results[] = $this->processResult($resHandler, $sqlScript);
+            $results[] = $this->processResult($connHandler, $resHandler, $sqlScript);
         }
         return $results;
     }
 
     /**
+     * @param resource $connHandler
      * @param resource $resHandler
      * @param string $query
-     * @return Result
+     * @return IResult
      */
-    private function processResult($resHandler, $query)
+    private function processResult($connHandler, $resHandler, $query)
     {
         $notice = $this->getLastResultNotice();
         $stat = pg_result_status($resHandler);
         switch ($stat) {
             case PGSQL_COMMAND_OK:
+                return new CommandResult($resHandler, $notice);
             case PGSQL_TUPLES_OK:
-            case PGSQL_COPY_IN: // TODO: is COPY IN/OUT blocking somehow? blocking the execution of further commands? keeping the connection busy (!) even after pg_get_result()?
+                return new QueryResult($resHandler, $notice);
+            case PGSQL_COPY_IN:
+                return new CopyInResult($connHandler, $resHandler, $notice);
             case PGSQL_COPY_OUT:
-                return new Result($resHandler, $stat, $notice); // TODO: differentiate the result by the result status - for TUPLES OK, collect the result set column names and types etc.
+                return new CopyOutResult($connHandler, $resHandler, $notice);
 
             case PGSQL_EMPTY_QUERY:
             case PGSQL_BAD_RESPONSE:
             case PGSQL_NONFATAL_ERROR:
                 // non-fatal errors are supposedly not possible to be received by the PHP client library, but anyway...
             case PGSQL_FATAL_ERROR:
-                throw new CommandException($resHandler, $query);
+                throw new StatementException($resHandler, $query);
 
             default:
-                throw new \UnexpectedValueException("Unexpected PostgreSQL command result status: $stat", $stat);
+                throw new \UnexpectedValueException("Unexpected PostgreSQL statement result status: $stat", $stat);
         }
     }
 
-    /**
-     * Returns the notice emitted for the last query result.
-     *
-     * Note some notices might be swallowed - see the notes below. A notice is returned by this method only if it is
-     * sure it was emitted for the last query result.
-     *
-     * Unfortunately, on PHP 5.6, it seems the client library is pretty limited:
-     * - there is no other way of getting notices of successful commands than using pg_last_notice();
-     * - yet, it only reports the last notice - thus, none but the last notice of a single successful statement can be
-     *   caught by any means;
-     * - there is no clearing mechanism, thus, successful command emitting the same notice as the previous command is
-     *   indistinguishable from a command emitting nothing; moreover, commands with no notice do not clear the notice
-     *   returned by pg_last_notice(); last but not least, it is connection-wide, thus, notion of last received notice
-     *   must be kept on the whole connection, and a notice found out by get_last_notice() should only be reported if
-     *   different from the last one.
-     *
-     * @return string|null notice emitted for the last query result, or <tt>null</tt> if no notice was emitted or it was
-     *                       indistinguishable from previous notices
-     */
     private function getLastResultNotice()
     {
         $resNotice = pg_last_notice($this->connCtl->requireConnection());

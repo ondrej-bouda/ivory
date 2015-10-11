@@ -7,7 +7,7 @@ use Ivory\Exception\UnsupportedException;
 /**
  * A quantity with a unit.
  *
- * Stores the quantity as an <tt>int</tt> or <tt>float</tt> and the unit as a mere string.
+ * Stores the quantity as an `int` or `float` and the unit as a mere string.
  *
  * Several units are recognized and conversion to some of its related units is offered. See the class constants.
  * Note that the memory and time units are compatible with those used by PostgreSQL for configuration settings.

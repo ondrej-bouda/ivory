@@ -4,7 +4,7 @@ namespace Ivory\Type\Std;
 /**
  * Signed integer.
  *
- * Represented as the PHP <tt>int</tt> type.
+ * Represented as the PHP `int` type.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html#DATATYPE-INT
  */

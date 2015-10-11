@@ -40,11 +40,11 @@ interface IConnectionControl
      * established.
      *
      * If the connection has already been established, or started to being established, nothing is done and
-     * <tt>false</tt> is returned.
+     * `false` is returned.
      *
      * For a synchronous variant, see {@link connectWait()}.
      *
-     * The connection is not shared with any other <tt>IConnection</tt> objects. A new connection is always established.
+     * The connection is not shared with any other `IConnection` objects. A new connection is always established.
      *
      * @return bool <tt>true</tt> if the connection has actually started to being established,
      *              <tt>false</tt> if the connection has already been open or started opening and thus this was a no-op
@@ -58,12 +58,12 @@ interface IConnectionControl
      * The operation is almost the same as {@link connect()}, except this method does not return until the connection is
      * actually established. The current connection parameters are used for the connection.
      *
-     * If the connection has already been established, nothing is done and <tt>false</tt> is returned.
+     * If the connection has already been established, nothing is done and `false` is returned.
      *
      * If the connection has been started asynchronously using {@link connect()} before, this method merely waits until
-     * the connection is ready, and returns <tt>false</tt> then.
+     * the connection is ready, and returns `false` then.
      *
-     * The connection is not shared with any other <tt>IConnection</tt> objects. A new connection is always established.
+     * The connection is not shared with any other {@link IConnection} objects. A new connection is always established.
      *
      * @return bool <tt>true</tt> if a new connection has just been opened,
      *              <tt>false</tt> if the connection has already been open and thus this was a no-op

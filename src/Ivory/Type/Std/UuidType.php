@@ -6,7 +6,7 @@ use Ivory\Type\BaseType;
 /**
  * The UUID data type.
  *
- * Represented as the PHP <tt>string</tt> type.
+ * Represented as the PHP `string` type.
  *
  * As defined by PostgreSQL, valid input is a sequence of 32 upper- or lowercase hexadecimal digits, where each group
  * four digits may be separated by a hyphen from the rest of the string, and the whole string may be surrounded by
