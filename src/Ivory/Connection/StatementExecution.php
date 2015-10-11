@@ -102,9 +102,9 @@ class StatementExecution implements IStatementExecution
             case PGSQL_TUPLES_OK:
                 return new QueryResult($resHandler, $notice);
             case PGSQL_COPY_IN:
-                return new CopyInResult($this->connCtl, $resHandler, $notice);
+                return new CopyInResult($connHandler, $resHandler, $notice);
             case PGSQL_COPY_OUT:
-                return new CopyOutResult($this->connCtl, $resHandler, $notice);
+                return new CopyOutResult($connHandler, $resHandler, $notice);
 
             case PGSQL_EMPTY_QUERY:
             case PGSQL_BAD_RESPONSE:
