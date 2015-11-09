@@ -29,6 +29,7 @@ Type System:
 ** table (set-returning) functions are also relations, like tables or views; corresponding classes should also be auto-generated for them (also support function aliases)
 * see the PostgreSQL object types sketch from the DVN project to get the notion of all data types
 ** the sketch only reflects the static types, i.e., those recognized or stored permanently by the database; dynamic runtime types shall be addressed, too
+* shortcut for infering relation data types for expanding further filter conditions: execute the query with FALSE condition, grab the column data types, then use the columns name and type information for serializing input variables correctly as filter conditions; cache the result
 
 
 
