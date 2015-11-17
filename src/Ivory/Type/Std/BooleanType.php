@@ -16,7 +16,7 @@ class BooleanType extends \Ivory\Type\BaseType
 			return null;
 		}
 
-		switch (strtoupper(trim($str))) {
+		switch (strtoupper($str)) {
 			case 'T':
 			case 'TRUE':
 			case 'Y':
