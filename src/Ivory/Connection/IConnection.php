@@ -1,8 +1,6 @@
 <?php
 namespace Ivory\Connection;
 
-use Ivory\Type\TypeRegister;
-
 /**
  * Connection to a database.
  *
@@ -21,15 +19,13 @@ use Ivory\Type\TypeRegister;
  * end up in an undefined state if it was not aware of some control queries.
  */
 interface IConnection
-    extends IConnectionControl, ISessionControl, ITransactionControl, IIPCControl, IStatementExecution, ICopyControl
+    extends IConnectionControl, ITypeControl, ISessionControl, ITransactionControl, IIPCControl, IStatementExecution,
+            ICopyControl
 {
     /**
      * @return string name of the connection
      */
     function getName();
-
-    /**
-     * @return TypeRegister the type register local to this connection
-     */
-    function getTypeRegister();
 }
+
+// TODO: do not extend the whole interfaces - some methods shall are unnecessary to the public, e.g., getTypeDictionary()

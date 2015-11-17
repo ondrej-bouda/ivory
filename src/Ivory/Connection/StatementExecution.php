@@ -12,10 +12,12 @@ use Ivory\Result\QueryResult;
 class StatementExecution implements IStatementExecution
 {
     private $connCtl;
+    private $typeCtl;
 
-    public function __construct(ConnectionControl $connCtl)
+    public function __construct(ConnectionControl $connCtl, ITypeControl $typeCtl)
     {
         $this->connCtl = $connCtl;
+        $this->typeCtl = $typeCtl;
     }
 
     public function rawQuery($sqlStatement)
@@ -100,7 +102,8 @@ class StatementExecution implements IStatementExecution
             case PGSQL_COMMAND_OK:
                 return new CommandResult($resHandler, $notice);
             case PGSQL_TUPLES_OK:
-                return new QueryResult($resHandler, $notice);
+                $typeDict = $this->typeCtl->getTypeDictionary();
+                return new QueryResult($resHandler, $typeDict, $notice);
             case PGSQL_COPY_IN:
                 return new CopyInResult($connHandler, $resHandler, $notice);
             case PGSQL_COPY_OUT:

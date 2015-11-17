@@ -2,7 +2,6 @@
 namespace Ivory\Connection;
 
 use Ivory\Exception\InvalidStateException;
-use Ivory\Type\TypeRegister;
 use Ivory\Utils\NotSerializable;
 
 // TODO: consider renaming to Database or Session or... - to reflect it is mere a facade, the single entry point
@@ -11,9 +10,9 @@ class Connection implements IConnection
 {
 	use NotSerializable; // TODO: implement connection serialization instead of giving up
 
-	private $typeRegister;
 	private $name;
 	private $connCtl;
+	private $typeCtl;
 	private $stmtExec;
 	private $copyCtl;
 
@@ -30,17 +29,12 @@ class Connection implements IConnection
 	 */
 	public function __construct($name, $params)
 	{
-		$this->typeRegister = new TypeRegister();
 		$this->name = $name;
 		$this->connCtl = new ConnectionControl($params);
-		$this->stmtExec = new StatementExecution($this->connCtl);
+		$this->typeCtl = new TypeControl($this);
+		$this->stmtExec = new StatementExecution($this->connCtl, $this->typeCtl);
 		$this->copyCtl = new CopyControl();
 		$this->config = new ConnConfig($this);
-	}
-
-	final public function getTypeRegister()
-	{
-		return $this->typeRegister;
 	}
 
 	final public function getName()
@@ -242,6 +236,25 @@ class Connection implements IConnection
 	public function disconnect()
 	{
 		return $this->connCtl->disconnect();
+	}
+
+	//endregion
+
+	//region Type Control
+
+	public function getTypeRegister()
+	{
+		return $this->typeCtl->getTypeRegister();
+	}
+
+	public function getTypeDictionary()
+	{
+		return $this->typeCtl->getTypeDictionary();
+	}
+
+	public function flushTypeDictionary()
+	{
+		$this->typeCtl->flushTypeDictionary();
 	}
 
 	//endregion
