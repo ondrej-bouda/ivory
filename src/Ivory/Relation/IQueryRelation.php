@@ -20,8 +20,8 @@ interface IQueryRelation extends IRelation
      * In contrast to the generic {@link IRelation::filter()} method, this method applies the condition at the database
      * server.
      *
-     * @param ISqlPredicate|string $cond SQL condition, as an {@link ISqlPredicate} or a <tt>string</tt>
-     * @param array $args list of <tt>$cond</tt> arguments if passed as a <tt>string</tt>
+     * @param ISqlPredicate|string $cond SQL condition
+     * @param array $args list of arguments to <tt>$cond</tt> if passed as a <tt>string</tt>
      * @return IQueryRelation relation containing only those tuples from this relation satisfying <tt>$cond</tt>
      */
     function where($cond, ...$args);
