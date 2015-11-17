@@ -5,14 +5,30 @@ use Ivory\Connection\Connection;
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\ConnectionException;
+use Ivory\Type\Std\StdTypeLoader;
+use Ivory\Type\TypeRegister;
 
 class Ivory
 {
+	/** @var TypeRegister */
+	private static $typeRegister = null;
 	/** @var IConnection[] map: name => connection */
 	private static $connections = [];
 	/** @var IConnection */
 	private static $defaultConn = null;
 
+
+	/**
+	 * @return TypeRegister the global type register, use for getting types not defined locally for a connection
+	 */
+	public static function getTypeRegister()
+	{
+		if (self::$typeRegister === null) {
+			self::$typeRegister = new TypeRegister();
+			self::$typeRegister->registerTypeLoader(new StdTypeLoader());
+		}
+		return self::$typeRegister;
+	}
 
 	/**
 	 * Sets up a new database connection.

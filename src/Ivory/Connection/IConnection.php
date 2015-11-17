@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Connection;
 
+use Ivory\Type\TypeRegister;
+
 /**
  * Connection to a database.
  *
@@ -25,4 +27,9 @@ interface IConnection
      * @return string name of the connection
      */
     function getName();
+
+    /**
+     * @return TypeRegister the type register local to this connection
+     */
+    function getTypeRegister();
 }

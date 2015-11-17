@@ -1,170 +1,174 @@
 <?php
 namespace Ivory\Type;
 
-use Ivory\Connection\Connection;
+use Ivory\Connection\IConnection;
 
 /**
- * Manages the correspondence between PostgreSQL types and PHP types.
+ * Collection of PHP type converters for recognized PostgreSQL base types.
  *
- * The types are managed per-connection, as types of same names might exist in different databases Ivory is
- * simultaneously connected to. Besides connection-specific types, there are global types, which get used for any
- * connection for which there is no overriding connection-specific type.
+ * There are two levels of type registers: at the Ivory class and at a connection to a concrete database. At either
+ * level, specific types and type loaders may be registered. Whenever a type converter is requested for a PostgreSQL
+ * type, it is retrieved from the connection type register, then from the global register. If neither of them already
+ * knows the requested type, type loaders registered at both the registers are consecutively tried to load the type
+ * converter.
+ *
+ * For Ivory to recognize a new base type globally or locally for a given connection, the new type converter, or a whole
+ * type loader may be registered at the corresponding type register, using {@link TypeRegister::registerType()} or
+ * {@link TypeRegister::registerTypeLoader()}, respectively.
+ *
+ * The purpose of the type register is only to collect all the types and type loaders. Once any of the types is
+ * requested by a connection, it may be cached for the whole script lifetime so that later type or type loader
+ * registration changes are not reflected.
  */
 class TypeRegister
 {
-	use \Ivory\Utils\Singleton; // TODO: consider implementing the singleton using static methods to be consistent with the Ivory class; or even better, let the type register be 1) attribute of the Connection, holding connection-specific types, and 2) static attribute of Ivory, holding global types
+    /** @var IType[][] already known types; map: schema name => map: type name => type converter object */
+    private $types = [];
+    /** @var ITypeLoader[] list of registered type loaders, in the definition order */
+    private $typeLoaders = [];
 
+    /**
+     * Registers a type converter for a PostgreSQL base data type.
+     *
+     * If a type converter has already been registered for the given type, it gets dropped in favor of the new one.
+     *
+     * @param string $schemaName name of the PostgreSQL schema the type is defined in
+     * @param string $typeName name of the PostgreSQL type
+     * @param IType $type the type converter to register
+     */
+    public function registerType($schemaName, $typeName, IType $type)
+    {
+        if (!isset($this->types[$schemaName])) {
+            $this->types[$schemaName] = [];
+        }
+        $this->types[$schemaName][$typeName] = $type;
+    }
 
-	/** @var IType[][][] map: connection name => map: schema name => map: type name => type object */
-	private $types;
+    /**
+     * Unregisters a type converter, previously registered by {@link registerType()}.
+     *
+     * Either the name of the PostgreSQL schema and type name is given, in which case the converter for this concrete
+     * type will get unregistered, or a type converter object is given, then any registrations of this type converter
+     * will be dropped.
+     *
+     * @param string|IType $schemaNameOrTypeConverter
+     *                                  name of the PostgreSQL schema the type to unregister is defined in, or type
+     *                                    converter to unregister
+     * @param string|null $typeName name of the PostgreSQL type to unregister, or <tt>null</tt> if an <tt>IType</tt>
+     *                                object is provided in the first argument
+     * @return bool whether the type has actually been unregistered (<tt>false</tt> if it was not registered)
+     */
+    public function unregisterType($schemaNameOrTypeConverter, $typeName = null)
+    {
+        if ($schemaNameOrTypeConverter instanceof IType) {
+            if ($typeName !== null) {
+                $msg = sprintf(
+                    '$typeName is irrelevant when an %s object is given in the first argument',
+                    IType::class
+                );
+                trigger_error($msg, E_USER_NOTICE);
+            }
 
-	/** @var ITypeLoader[][] map: connection name => list: registered type loaders, in the definition order */
-	private $typeLoaders;
+            $typeConverter = $schemaNameOrTypeConverter;
+            $existed = false;
+            foreach ($this->types as $sn => $types) {
+                foreach ($types as $tn => $tc) {
+                    if ($tc === $typeConverter) {
+                        $existed = true;
+                        unset($this->types[$sn][$tn]);
+                    }
+                }
+                if (!$this->types[$sn]) {
+                    unset($this->types[$sn]);
+                }
+            }
+            return $existed;
+        }
+        else {
+            $schemaName = $schemaNameOrTypeConverter;
+            $existed = isset($this->types[$schemaName][$typeName]);
+            unset($this->types[$schemaName][$typeName]);
+            return $existed;
+        }
+    }
 
+    /**
+     * Registers a type loader, if not already registered.
+     *
+     * @param ITypeLoader $typeLoader type loader to register
+     * @return bool whether the type loader has actually been registered (<tt>false</tt> if it was already registered
+     *                before and thus this was a no-op)
+     */
+    public function registerTypeLoader(ITypeLoader $typeLoader)
+    {
+        $pos = array_search($typeLoader, $this->typeLoaders, true);
+        if ($pos === false) {
+            $this->typeLoaders[] = $typeLoader;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
-	/**
-	 * Returns a type object corresponding to the requested PostgreSQL type.
-	 *
-	 * If the type has not already been registered, it is loaded using the registered type loaders.
-	 *
-	 * @param string $typeName name of the type; e.g., <tt>"VARCHAR"</tt>
-	 * @param string $schemaName name of schema the type is defined in
-	 * @param Connection|string|null $connection (name of) connection for which to retrieve the type object;
-	 *                                  <tt>null</tt> to only search within global types
-	 * @return IType the requested type object
-	 * @throws \Ivory\Exception\UndefinedTypeException if no corresponding type is defined
-	 */
-	public function getType($typeName, $schemaName, $connection)
-	{
+    /**
+     * Unregisters a previously registered type loader.
+     *
+     * @param ITypeLoader $typeLoader type loader to unregister
+     * @return bool whether the type loader has actually been unregistered (<tt>false</tt> if it was not registered)
+     */
+    public function unregisterTypeLoader(ITypeLoader $typeLoader)
+    {
+        $pos = array_search($typeLoader, $this->typeLoaders, true);
+        if ($pos !== false) {
+            array_splice($this->typeLoaders, $pos, 1);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
-	}
+    /**
+     * Retrieves all the registered type loaders.
+     *
+     * @return ITypeLoader[] list of the registered type loaders, in the registration order
+     */
+    public function getTypeLoaders()
+    {
+        return $this->typeLoaders;
+    }
 
-	/**
-	 * @param string $typeName name of the type; e.g., <tt>"VARCHAR"</tt>
-	 * @param string $schemaName name of schema the type is defined in
-	 * @param Connection|string|null $connection (name of) connection for which to load the type object;
-	 *                                           <tt>null</tt> to load in the global scope
-	 */
-	public function loadType($typeName, $schemaName, $connection)
-	{
+    /**
+     * Returns the type converter explicitly registered using {@link TypeRegister::registerType()}.
+     *
+     * @param string $schemaName name of the PostgreSQL schema to get the converter for
+     * @param string $typeName name of the PostgreSQL type to get the converter for
+     * @return IType|null converter for the requested type, or <tt>null</tt> if no converter was registered for the type
+     */
+    public function getType($schemaName, $typeName)
+    {
+        return (isset($this->types[$schemaName][$typeName]) ? $this->types[$schemaName][$typeName] : null);
+        // PHP 7:
+//        return ($this->types[$schemaName][$typeName] ?? null);
+    }
 
-	}
-
-	/**
-	 * Finds out whether a type has been registered (using {@link registerType()}) or loaded (using {@link loadType()}).
-	 *
-	 * This method does not try to load the type. It merely finds out whether it is already loaded or registered
-	 * explicitly.
-	 *
-	 * @param string $typeName name of the type; e.g., <tt>"VARCHAR"</tt>
-	 * @param string $schemaName name of schema the type is defined in
-	 * @param Connection|string|null $connection (name of) connection for which to retrieve the type object;
-	 *                                  <tt>null</tt> to only search within global types
-	 * @return bool
-	 */
-	public function hasType($typeName, $schemaName, $connection)
-	{
-
-	}
-
-	/**
-	 * Registers a data type object for representing a PostgreSQL data type.
-	 *
-	 * If a data type object has already been registered, it gets overwritten with the
-	 *
-	 * @param INamedType $type the type object to register
-	 * @param Connection|string|null $connection (name of) the connection to register the data type object for;
-	 *                                  if <tt>null</tt>, the type is registered globally, i.e., will be used for all
-	 *                                    connections which do not themselves define a type of the same name
-	 */
-	public function registerType(INamedType $type, $connection = null)
-	{
-
-	}
-
-	/**
-	 * Unregisters a data type object, previously registered by {@link registerType()} or loaded by a data type loader.
-	 *
-	 * @param INamedType|string $typeOrName (name of) the type to unregister
-	 * @param string|null $schemaName name of schema the type is defined in - relevant only if <tt>$typeOrName</tt> is a
-	 *                                  <tt>string</tt> (and thus contains a name); skip with <tt>null</tt>
-	 * @param Connection|string|null $connection (name of) connection to unregister the data type object for;
-	 *                                  if <tt>null</tt>, a global registered type is unregistered
-	 * @return bool whether the type has actually been unregistered (<tt>false</tt> if it was not registered)
-	 */
-	public function unregisterType($typeOrName, $schemaName = null, $connection = null)
-	{
-
-	}
-
-	/**
-	 * Registers a data type loader.
-	 *
-	 * @param ITypeLoader $typeLoader type loader to register
-	 * @param Connection|string|null $connection (name of) the connection to register the data type loader for;
-	 *                                  if <tt>null</tt>, the type loader is registered globally, i.e., will be used for
-	 *                                    all connections;
-	 *                                  when loading a type object, the connection-specific type loaders are tried in
-	 *                                    the same order as they were registered, then the global type loaders are tried
-	 *                                    (again, in the registration order);
-	 */
-	public function registerTypeLoader(ITypeLoader $typeLoader, $connection = null)
-	{
-
-	}
-
-	/**
-	 * Unregisters a previously registered data type loader.
-	 *
-	 * @param ITypeLoader $typeLoader type loader to unregister
-	 * @param Connection|string|null $connection (name of) the connection to unregister the data type loader for;
-	 *                                  <tt>null</tt> to unregister a global data type loader
-	 * @return bool whether the type loader has actually been unregistered (<tt>false</tt> if it was not registered)
-	 */
-	public function unregisterTypeLoader(ITypeLoader $typeLoader, $connection = null)
-	{
-
-	}
-
-	/**
-	 * Retrieves all the registered type loaders for a given connection, or the global ones.
-	 *
-	 * @param Connection|string|null $connection (name of) the connection to get the data type loaders for;
-	 *                                  <tt>null</tt> to get the global data type loaders
-	 * @return ITypeLoader[] the list of the registered data type loaders, in the registration order
-	 */
-	public function getTypeLoaders($connection = null)
-	{
-
-	}
-
-
-	// TODO: standard type loaders:
-	//       - interface-based: recognizes all types implementing a specific marking interface;
-	//                          especially, all types generated by the type generator are tagged by this interface
-	//       - built-in types: recognize all built-in types; might actually be tagged by the same interface as mentioned
-	//                         above
-	//       - introspector: generates the type on-the-fly by querying the database for the type metadata;
-	//                       this might serve the ones who do not use the type generator, or as the last resort;
-	//                       some caching shall be provided, e.g., using a shared memcache
-	// TODO: support type aliases
-	// TODO: allow to cover multiple PostgreSQL types by a single Ivory type;
-	//       remember the PostgreSQL type, though; that leads to type constructors;
-	//       aliases might be treated the same - Ivory does not have to know what is alias and what is a type covered by
-	//       the same Ivory type class
-	// TODO: embed arrays support; see http://www.postgresql.org/docs/9.4/static/arrays.html - especially:
-	//       - array dimensions or size is not a restriction, it is merely a documentation (it is possible to find out
-	//         whether a column is of type "text", "text[]" or, e.g., "text[][][]")
-	//       - arrays may only be of a single subtype
-	//       - the string representation of arrays uses pg_type.delim as item delimiters according to the subtype (find
-	//         out what the delimiter might be)
-	//       - to pass arrays to PostgreSQL, do not use the string representation, but rather the ARRAY[] construct
-	//         which is much simpler to use (no escaping of naughty characters or the NULL value)
-
-
-	// define mapping for native types
-	// define mapping built-in types, recognized in the standard Postgres database
-	// recognize the structured types associated with database tables; thus, process e.g. attributes of type "person[]"
-	// also recognize anonymous RECORDs, e.g., from query:   WITH a (k,l,m) AS (VALUES (1, 'a', true)) SELECT a FROM a
-	// allow the user to define their own types, or even redefine the above ones
+    /**
+     * Loads a type converter from the first registered type loader recognizing the type.
+     *
+     * @param string $schemaName name of the PostgreSQL schema to get the converter for
+     * @param string $typeName name of the PostgreSQL type to get the converter for
+     * @param IConnection $connection connection above which the type is to be loaded
+     * @return IType|null converter for the requested type, or <tt>null</tt> if no loader recognizes the type
+     */
+    public function loadType($schemaName, $typeName, IConnection $connection)
+    {
+        foreach ($this->typeLoaders as $loader) {
+            $tc = $loader->loadType($schemaName, $typeName, $connection);
+            if ($tc !== null) {
+                return $tc;
+            }
+        }
+        return null;
+    }
 }

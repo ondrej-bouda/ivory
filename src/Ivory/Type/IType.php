@@ -2,7 +2,9 @@
 namespace Ivory\Type;
 
 /**
- * A data type object representing a PostgreSQL type.
+ * Converter between PostgreSQL and PHP values of the corresponding types.
+ *
+ * The converter must be stateless as it may be used repetitively, even for distinct PostgreSQL types.
  */
 interface IType
 {
