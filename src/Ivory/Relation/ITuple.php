@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Relation;
 
+use Ivory\Relation\Alg\ITupleEvaluator;
+
 /**
  * Represents one relation row.
  *
@@ -37,4 +39,12 @@ interface ITuple extends \ArrayAccess, \Traversable
      * @return array list of values of this tuple
      */
     function toList();
+
+    /**
+     * @param int|string|ITupleEvaluator|\Closure $colOffsetOrNameOrEvaluator
+     *                                  Specification of column from which to get the value. See
+     *                                    {@link IRelation::col()} for more details on the column specification.
+     * @return mixed
+     */
+    function value($colOffsetOrNameOrEvaluator = 0);
 }

@@ -2,7 +2,6 @@
 namespace Ivory\Exception;
 
 use Ivory\Result\SqlState;
-use RuntimeException;
 
 /**
  * Exception thrown upon errors on querying the database.

@@ -12,24 +12,19 @@ interface IQueryRelation extends IRelation
     /**
      * @return string the SQL query to be executed for this relation
      */
-    function getQuery();
+    function getSql();
 
     /**
-     * Reduces the relation only to tuples satisfying a given filter.
+     * Returns this relation reduced only to tuple satisfying a given condition.
      *
-     * On top of argument types accepted by the base {@link IRelation::filter()} method, it also accepts an SQL
-     * condition applied to the query at the database server.
+     * In contrast to the generic {@link IRelation::filter()} method, this method applies the condition at the database
+     * server.
      *
-     * @param ISqlPredicate|string|ITupleFilter|\Closure $condOrDecider
-     *                                  either an SQL condition (as an {@link ISqlPredicate} or a `string`), or decider
-     *                                    which, given a tuple, tells whether the tuple gets passed to the result;
-     *                                  an {@link ITupleFilter} gets called its {@link ITupleFilter::accept()} method;
-     *                                  a <tt>Closure</tt> is given one {@link ITuple} argument and is expected to
-     *                                    return <tt>true</tt> or <tt>false</tt> telling whether the tuple is allowed
-     * @return IRelation relation containing only those tuples from this relation, in their original order, which
-     *                   satisfy the, or which are accepted by, the <tt>$condOrDecider</tt>
+     * @param ISqlPredicate|string $cond SQL condition, as an {@link ISqlPredicate} or a <tt>string</tt>
+     * @param array $args list of <tt>$cond</tt> arguments if passed as a <tt>string</tt>
+     * @return IQueryRelation relation containing only those tuples from this relation satisfying <tt>$cond</tt>
      */
-    function filter($condOrDecider);
+    function where($cond, ...$args);
 
     /**
      * Returns this relation sorted by one or more sort expressions.

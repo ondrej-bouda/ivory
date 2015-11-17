@@ -4,6 +4,7 @@ namespace Ivory\Relation;
 use Ivory\Relation\Alg\IValueComparator;
 use Ivory\Relation\Alg\IValueFilter;
 use Ivory\Relation\Alg\IValueHasher;
+use Ivory\Type\IType;
 
 /**
  * Column of a relation.
@@ -21,6 +22,11 @@ interface IColumn extends \Traversable, \Countable, ICachingDataProcessor
 	 * @return string|null name of the column, if defined
 	 */
 	function getName();
+
+	/**
+	 * @return IType type of the column
+	 */
+	function getType();
 
 	/**
 	 * Reduces the column data only to values satisfying a given filter.

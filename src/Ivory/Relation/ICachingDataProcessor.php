@@ -7,15 +7,7 @@ namespace Ivory\Relation;
 interface ICachingDataProcessor extends IDataProcessor
 {
     /**
-     * Flushes any data already taken and cached from the source, as well as any auxiliary caches used by this object.
-     *
-     * This method is useful, e.g., for re-issuing a database query, or re-evaluating volatile parts of
-     * {@link IRelation relation} definitions, such as filters or dynamically projected columns.
-     */
-    function flush();
-
-    /**
-     * Reads all data from the source and caches them.
+     * Reads all data from the source and caches them, if not cached already.
      *
      * After populating this processor, the data source is no longer needed (unless {@link flush()}ed).
      *
@@ -23,4 +15,11 @@ interface ICachingDataProcessor extends IDataProcessor
      * serving the requests for them.
      */
     function populate();
+    /**
+     * Flushes any data already taken and cached from the source, as well as any auxiliary caches used by this object.
+     *
+     * This method is useful, e.g., for re-issuing a database query, or re-evaluating volatile parts of
+     * {@link IRelation relation} definitions, such as filters or dynamically projected columns.
+     */
+    function flush();
 }

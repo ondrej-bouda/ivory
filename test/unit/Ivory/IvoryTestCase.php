@@ -1,25 +1,55 @@
 <?php
 namespace Ivory;
 
+use Ivory\Connection\Connection;
+use Ivory\Connection\ConnectionParameters;
+use Ivory\Connection\IConnection;
+
 abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
 {
     /** @var \PDO only instantiated once for test clean-up/fixture load */
     private static $pdo = null;
 
     /** @var \PHPUnit_Extensions_Database_DB_IDatabaseConnection instantiated once per test */
-    private $conn = null;
+    private $phpUnitConn = null;
+
+    /** @var IConnection */
+    private $ivoryConn = null;
+
 
     final protected function getConnection()
     {
-        if ($this->conn === null) {
+        if ($this->phpUnitConn === null) {
             if (self::$pdo === null) {
-                self::$pdo = new \PDO($GLOBALS['DB_DSN'], $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
+                $dsn = sprintf(
+                    'pgsql:host=%s;dbname=%s',
+                    $GLOBALS['DB_HOST'], $GLOBALS['DB_DBNAME']
+                );
+                if ($GLOBALS['DB_PORT']) {
+                    $dsn .= ';port=' . $GLOBALS['DB_PORT'];
+                }
+                self::$pdo = new \PDO($dsn, $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
             }
-            $this->conn = $this->createDefaultDBConnection(self::$pdo, $GLOBALS['DB_DBNAME']);
+            $this->phpUnitConn = $this->createDefaultDBConnection(self::$pdo, $GLOBALS['DB_DBNAME']);
             $this->initDbSchema();
         }
 
-        return $this->conn;
+        return $this->phpUnitConn;
+    }
+
+    protected function getIvoryConnection()
+    {
+        if ($this->ivoryConn === null) {
+            $this->ivoryConn = new Connection('default', new ConnectionParameters([
+                'host' => $GLOBALS['DB_HOST'],
+                'port' => $GLOBALS['DB_PORT'],
+                'user' => $GLOBALS['DB_USER'],
+                'password' => $GLOBALS['DB_PASSWD'],
+                'dbname' => $GLOBALS['DB_DBNAME'],
+            ]));
+        }
+
+        return $this->ivoryConn;
     }
 
     protected function newDatabaseTester()
@@ -29,22 +59,25 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
 
     private function initDbSchema()
     {
-        $this->conn->getConnection()->exec(<<<SQL
-CREATE TABLE IF NOT EXISTS artist (
+        $this->phpUnitConn->getConnection()->exec(<<<SQL
+DROP TABLE IF EXISTS artist, album, album_artist, album_track;
+
+CREATE TABLE artist (
   id BIGSERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL
+  name VARCHAR(100) NOT NULL,
+  is_active BOOL
 );
-CREATE TABLE IF NOT EXISTS album (
+CREATE TABLE album (
   id BIGSERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
   year SMALLINT
 );
-CREATE TABLE IF NOT EXISTS album_artist (
+CREATE TABLE album_artist (
   album_id BIGINT NOT NULL REFERENCES album,
   artist_id BIGINT NOT NULL REFERENCES artist,
   PRIMARY KEY (album_id, artist_id)
 );
-CREATE TABLE IF NOT EXISTS album_track (
+CREATE TABLE album_track (
   album_id BIGINT NOT NULL,
   disc_no SMALLINT NOT NULL DEFAULT 1,
   track_no SMALLINT NOT NULL,
@@ -59,9 +92,9 @@ SQL
     {
         return new ArrayDataSet([
             'artist' => [
-                ['id' => 1, 'name' => 'The Piano Guys'],
-                ['id' => 2, 'name' => 'Metallica'],
-                ['id' => 3, 'name' => 'Tommy Emmanuel'],
+                ['id' => 1, 'name' => 'The Piano Guys', 'is_active' => 't'],
+                ['id' => 2, 'name' => 'Metallica', 'is_active' => 'f'],
+                ['id' => 3, 'name' => 'Tommy Emmanuel', 'is_active' => null],
             ],
             'album' => [
                 ['id' => 1, 'name' => 'The Piano Guys', 'year' => 2012],
