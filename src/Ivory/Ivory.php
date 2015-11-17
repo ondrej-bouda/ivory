@@ -35,7 +35,7 @@ class Ivory
 	 *                              if not given, the database name is considered if it is given within <tt>$params</tt>
 	 *                                or the fallback name <tt>'conn'</tt> is used;
 	 *                              if not given and if the auto-generated name is already taken, it is appended with a
-	 *                                numeric prefix, e.g., <tt>'conn1'</tt>, <tt>'conn2'</tt>, etc.
+	 *                                numeric suffix, e.g., <tt>'conn1'</tt>, <tt>'conn2'</tt>, etc.
 	 * @return Connection
 	 * @throws ConnectionException if connection name is explicitly specified but a connection with the same name
 	 *                               already exists
@@ -48,11 +48,15 @@ class Ivory
 
 		if ($connName === null) {
 			$connName = (isset($params['dbname']) ? $params['dbname'] : 'conn');
-			for ($i = 1; $i < 10000; $i++) {
+			$safetyBreak = 10000;
+			for ($i = 1; $i < $safetyBreak; $i++) {
 				if (!isset(self::$connections[$connName . $i])) {
 					$connName .= $i;
 					break;
 				}
+			}
+			if ($i >= $safetyBreak) {
+				throw new \RuntimeException('Error auto-generating name for the new connection: all suffixes taken');
 			}
 		}
 
