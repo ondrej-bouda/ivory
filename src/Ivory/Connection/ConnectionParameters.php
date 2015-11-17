@@ -131,9 +131,9 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
 	 * The most important are the following parameters:
 	 * - `host (string)`: the database server to connect to,
 	 * - `port (int)`: the port to connect to,
-	 * - `username (string)`: username to authenticate as,
+	 * - `user (string)`: username to authenticate as,
 	 * - `password (string)`: password for the given username,
-	 * - `database (string)`: name of the database to connect to,
+	 * - `dbname (string)`: name of the database to connect to,
 	 * - `connect_timeout (int)`: connection timeout (0 means to wait indefinitely),
 	 * - `options (string)`: the runtime options to send to the server.
 	 *
