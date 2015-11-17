@@ -3,92 +3,90 @@ namespace Ivory\Type\Std;
 
 class StdTypeLoader implements \Ivory\Type\ITypeLoader
 {
-	const PG_CATALOG = 'pg_catalog';
-
-	public function loadType($typeName, $schemaName, \Ivory\Connection\IConnection $connection)
+	public function loadType($schemaName, $typeName, \Ivory\Connection\IConnection $connection)
 	{
-		if ($schemaName != self::PG_CATALOG) {
+		if ($schemaName != 'pg_catalog') {
 			return null;
 		}
 
-		switch (strtoupper(trim($typeName))) {
-			case 'SMALLINT':
-			case 'INT2':
-			case 'INTEGER':
-			case 'INT':
-			case 'INT4':
+		switch ($typeName) {
+			case 'smallint':
+			case 'int2':
+			case 'integer':
+			case 'int':
+			case 'int4':
 				return new IntegerType($typeName, $schemaName, $connection);
 
-			case 'BIGINT':
-			case 'INT8':
+			case 'bigint':
+			case 'int8':
 				return new BigIntType($typeName, $schemaName, $connection);
 
-			case 'NUMERIC':
-			case 'DECIMAL':
+			case 'numeric':
+			case 'decimal':
 				return new DecimalType($typeName, $schemaName, $connection);
 
-			case 'REAL':
-			case 'FLOAT4':
-			case 'DOUBLE PRECISION':
-			case 'FLOAT8':
+			case 'real':
+			case 'float4':
+			case 'double precision':
+			case 'float8':
 				return new FloatType($typeName, $schemaName, $connection);
 
-			case 'BOOLEAN':
-			case 'BOOL':
+			case 'boolean':
+			case 'bool':
 				return new BooleanType($typeName, $schemaName, $connection);
 
-			case 'TEXT':
-			case 'CHARACTER':
-			case 'CHAR':
-			case 'CHARACTER VARYING':
-			case 'VARCHAR':
-			case 'BPCHAR':
+			case 'text':
+			case 'character':
+			case 'char':
+			case 'character varying':
+			case 'varchar':
+			case 'bpchar':
 				return new StringType($typeName, $schemaName, $connection);
 
-			case 'BYTEA':
+			case 'bytea':
 				return new BinaryType($typeName, $schemaName, $connection);
 
-			case 'BIT':
+			case 'bit':
 				return new FixedBitStringType($typeName, $schemaName, $connection);
 
-			case 'BIT VARYING':
-			case 'VARBIT':
+			case 'bit varying':
+			case 'varbit':
 				return new VarBitStringType($typeName, $schemaName, $connection);
 
-			case 'JSON':
+			case 'json':
 				return new JsonExactType($typeName, $schemaName, $connection);
-			case 'JSONB':
+			case 'jsonb':
 				return new JsonBType($typeName, $schemaName, $connection);
 
-			case 'XML':
+			case 'xml':
 				return new XmlType($typeName, $schemaName, $connection);
 
-			case 'UUID':
+			case 'uuid':
 				return new UuidType($typeName, $schemaName, $connection);
 
-			case 'POINT':
+			case 'point':
 				return new PointType($typeName, $schemaName, $connection);
-			case 'LINE':
+			case 'line':
 				return new LineType($typeName, $schemaName, $connection);
-			case 'LSEG':
+			case 'lseg':
 				return new LineSegmentType($typeName, $schemaName, $connection);
-			case 'BOX':
+			case 'box':
 				return new BoxType($typeName, $schemaName, $connection);
-			case 'PATH':
+			case 'path':
 				return new PathType($typeName, $schemaName, $connection);
-			case 'POLYGON':
+			case 'polygon':
 				return new PolygonType($typeName, $schemaName, $connection);
-			case 'CIRCLE':
+			case 'circle':
 				return new CircleType($typeName, $schemaName, $connection);
 
-			case 'INET':
+			case 'inet':
 				return new InetType($typeName, $schemaName, $connection);
-			case 'CIDR':
+			case 'cidr':
 				return new CidrType($typeName, $schemaName, $connection);
-			case 'MACADDR':
+			case 'macaddr':
 				return new MacAddrType($typeName, $schemaName, $connection);
 
-			case 'MONEY':
+			case 'money':
 				return new MoneyType($typeName, $schemaName, $connection);
 
 			default:
