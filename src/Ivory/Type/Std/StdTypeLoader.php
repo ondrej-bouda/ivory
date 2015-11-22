@@ -15,25 +15,25 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'integer':
 			case 'int':
 			case 'int4':
-				return new IntegerType($typeName, $schemaName, $connection);
+				return new IntegerType($schemaName, $typeName, $connection);
 
 			case 'bigint':
 			case 'int8':
-				return new BigIntType($typeName, $schemaName, $connection);
+				return new BigIntType($schemaName, $typeName, $connection);
 
 			case 'numeric':
 			case 'decimal':
-				return new DecimalType($typeName, $schemaName, $connection);
+				return new DecimalType($schemaName, $typeName, $connection);
 
 			case 'real':
 			case 'float4':
 			case 'double precision':
 			case 'float8':
-				return new FloatType($typeName, $schemaName, $connection);
+				return new FloatType($schemaName, $typeName, $connection);
 
 			case 'boolean':
 			case 'bool':
-				return new BooleanType($typeName, $schemaName, $connection);
+				return new BooleanType($schemaName, $typeName, $connection);
 
 			case 'text':
 			case 'character':
@@ -41,53 +41,53 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'character varying':
 			case 'varchar':
 			case 'bpchar':
-				return new StringType($typeName, $schemaName, $connection);
+				return new StringType($schemaName, $typeName, $connection);
 
 			case 'bytea':
-				return new BinaryType($typeName, $schemaName, $connection);
+				return new BinaryType($schemaName, $typeName, $connection);
 
 			case 'bit':
-				return new FixedBitStringType($typeName, $schemaName, $connection);
+				return new FixedBitStringType($schemaName, $typeName, $connection);
 
 			case 'bit varying':
 			case 'varbit':
-				return new VarBitStringType($typeName, $schemaName, $connection);
+				return new VarBitStringType($schemaName, $typeName, $connection);
 
 			case 'json':
-				return new JsonExactType($typeName, $schemaName, $connection);
+				return new JsonExactType($schemaName, $typeName, $connection);
 			case 'jsonb':
-				return new JsonBType($typeName, $schemaName, $connection);
+				return new JsonBType($schemaName, $typeName, $connection);
 
 			case 'xml':
-				return new XmlType($typeName, $schemaName, $connection);
+				return new XmlType($schemaName, $typeName, $connection);
 
 			case 'uuid':
-				return new UuidType($typeName, $schemaName, $connection);
+				return new UuidType($schemaName, $typeName, $connection);
 
 			case 'point':
-				return new PointType($typeName, $schemaName, $connection);
+				return new PointType($schemaName, $typeName, $connection);
 			case 'line':
 				return new LineType($schemaName, $typeName, $connection);
 			case 'lseg':
-				return new LineSegmentType($typeName, $schemaName, $connection);
+				return new LineSegmentType($schemaName, $typeName, $connection);
 			case 'box':
-				return new BoxType($typeName, $schemaName, $connection);
+				return new BoxType($schemaName, $typeName, $connection);
 			case 'path':
-				return new PathType($typeName, $schemaName, $connection);
+				return new PathType($schemaName, $typeName, $connection);
 			case 'polygon':
-				return new PolygonType($typeName, $schemaName, $connection);
+				return new PolygonType($schemaName, $typeName, $connection);
 			case 'circle':
-				return new CircleType($typeName, $schemaName, $connection);
+				return new CircleType($schemaName, $typeName, $connection);
 
 			case 'inet':
-				return new InetType($typeName, $schemaName, $connection);
+				return new InetType($schemaName, $typeName, $connection);
 			case 'cidr':
-				return new CidrType($typeName, $schemaName, $connection);
+				return new CidrType($schemaName, $typeName, $connection);
 			case 'macaddr':
-				return new MacAddrType($typeName, $schemaName, $connection);
+				return new MacAddrType($schemaName, $typeName, $connection);
 
 			case 'money':
-				return new MoneyType($typeName, $schemaName, $connection);
+				return new MoneyType($schemaName, $typeName, $connection);
 
 			default:
 				return null;
