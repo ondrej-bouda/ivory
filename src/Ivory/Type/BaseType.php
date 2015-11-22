@@ -2,28 +2,18 @@
 namespace Ivory\Type;
 
 use Ivory\Connection\IConnection;
+use Ivory\NamedDbObject;
 
 abstract class BaseType implements INamedType
 {
-	private $name;
-	private $schemaName;
+	use NamedDbObject;
+
 	private $connection;
 
-	public function __construct($name, $schemaName, IConnection $connection)
+	public function __construct($schemaName, $name, IConnection $connection)
 	{
-		$this->name = $name;
-		$this->schemaName = $schemaName;
+		$this->setName($schemaName, $name);
 		$this->connection = $connection;
-	}
-
-	final public function getName()
-	{
-		return $this->name;
-	}
-
-	final public function getSchemaName()
-	{
-		return $this->schemaName;
 	}
 
 	final protected function getConnection()

@@ -6,7 +6,7 @@ namespace Ivory\Type;
  */
 class CompositeValue
 {
-	/** @var CompositeTypeBase type of the composite */
+	/** @var CompositeType type of the composite */
 	private $type;
 
 	/** @var mixed data holding the value */

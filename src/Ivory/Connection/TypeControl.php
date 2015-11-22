@@ -11,13 +11,15 @@ use Ivory\Type\TypeRegister;
 class TypeControl implements ITypeControl, ITypeProvider
 {
     private $connection;
+    private $connCtl;
     private $typeRegister;
     /** @var TypeDictionary|null */
     private $typeDictionary = null;
 
-    public function __construct(IConnection $connection)
+    public function __construct(IConnection $connection, ConnectionControl $connCtl)
     {
         $this->connection = $connection;
+        $this->connCtl = $connCtl;
         $this->typeRegister = new TypeRegister();
     }
 
@@ -41,7 +43,7 @@ class TypeControl implements ITypeControl, ITypeProvider
     private function initUndefinedTypeHandler()
     {
         $this->typeDictionary->setUndefinedTypeHandler(function ($oid) {
-            $compiler = new IntrospectingTypeDictionaryCompiler();
+            $compiler = new IntrospectingTypeDictionaryCompiler($this->connCtl->requireConnection());
             $dict = $compiler->compileTypeDictionary($this);
             $type = $dict->requireTypeFromOid($oid);
             $this->typeDictionary = $dict; // replacing the current dictionary only when the requested type is found in the new dictionary

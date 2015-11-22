@@ -67,7 +67,7 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'point':
 				return new PointType($typeName, $schemaName, $connection);
 			case 'line':
-				return new LineType($typeName, $schemaName, $connection);
+				return new LineType($schemaName, $typeName, $connection);
 			case 'lseg':
 				return new LineSegmentType($typeName, $schemaName, $connection);
 			case 'box':

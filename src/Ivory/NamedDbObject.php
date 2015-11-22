@@ -3,32 +3,32 @@ namespace Ivory;
 
 trait NamedDbObject
 {
-	private $name;
 	private $schemaName;
+	private $name;
 
 	/**
-	 * @param string $name
 	 * @param string $schemaName
+	 * @param string $name
 	 */
-	protected function setName($name, $schemaName)
+	protected function setName($schemaName, $name)
 	{
-		$this->name = $name;
 		$this->schemaName = $schemaName;
-	}
-
-	/**
-	 * @return string name of this object
-	 */
-	public function getName()
-	{
-		return $this->name;
+		$this->name = $name;
 	}
 
 	/**
 	 * @return string name of schema this object is defined in
 	 */
-	public function getSchemaName()
+	final public function getSchemaName()
 	{
 		return $this->schemaName;
+	}
+
+	/**
+	 * @return string name of this object
+	 */
+	final public function getName()
+	{
+		return $this->name;
 	}
 }

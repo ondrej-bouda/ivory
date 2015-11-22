@@ -31,7 +31,7 @@ class Connection implements IConnection
 	{
 		$this->name = $name;
 		$this->connCtl = new ConnectionControl($params);
-		$this->typeCtl = new TypeControl($this);
+		$this->typeCtl = new TypeControl($this, $this->connCtl);
 		$this->stmtExec = new StatementExecution($this->connCtl, $this->typeCtl);
 		$this->copyCtl = new CopyControl();
 		$this->config = new ConnConfig($this);
