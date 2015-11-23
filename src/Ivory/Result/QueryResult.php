@@ -7,7 +7,7 @@ use Ivory\Relation\Column;
 use Ivory\Relation\RelationMacros;
 use Ivory\Type\ITypeDictionary;
 
-class QueryResult extends Result implements IQueryResult
+class QueryResult extends Result implements \IteratorAggregate, IQueryResult
 {
 	use RelationMacros;
 
@@ -136,6 +136,15 @@ class QueryResult extends Result implements IQueryResult
 		else {
 			throw new ResultException('Error retrieving number of rows of the result.');
 		}
+	}
+
+	//endregion
+
+	//region \IteratorAggregate
+
+	public function getIterator()
+	{
+		throw new NotImplementedException();
 	}
 
 	//endregion

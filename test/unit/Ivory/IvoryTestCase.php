@@ -21,13 +21,16 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
     {
         if ($this->phpUnitConn === null) {
             if (self::$pdo === null) {
-                $dsn = sprintf(
-                    'pgsql:host=%s;dbname=%s',
-                    $GLOBALS['DB_HOST'], $GLOBALS['DB_DBNAME']
-                );
-                if ($GLOBALS['DB_PORT']) {
-                    $dsn .= ';port=' . $GLOBALS['DB_PORT'];
+                $dsnParts = [];
+                if (!empty($GLOBALS['DB_HOST'])) {
+                    $dsnParts[] = "host=$GLOBALS[DB_HOST]";
                 }
+                if (!empty($GLOBALS['DB_PORT'])) {
+                    $dsnParts[] = "port=$GLOBALS[DB_PORT]";
+                }
+                $dsnParts[] = "dbname=$GLOBALS[DB_DBNAME]";
+
+                $dsn = 'pgsql:' . implode(';', $dsnParts);
                 self::$pdo = new \PDO($dsn, $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
             }
             $this->phpUnitConn = $this->createDefaultDBConnection(self::$pdo, $GLOBALS['DB_DBNAME']);
@@ -41,8 +44,8 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
     {
         if ($this->ivoryConn === null) {
             $this->ivoryConn = new Connection('default', new ConnectionParameters([
-                'host' => $GLOBALS['DB_HOST'],
-                'port' => $GLOBALS['DB_PORT'],
+                'host' => ($GLOBALS['DB_HOST'] ? : null),
+                'port' => ($GLOBALS['DB_PORT'] ? : null),
                 'user' => $GLOBALS['DB_USER'],
                 'password' => $GLOBALS['DB_PASSWD'],
                 'dbname' => $GLOBALS['DB_DBNAME'],
