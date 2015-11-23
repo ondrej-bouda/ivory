@@ -15,7 +15,8 @@ install:
   - composer install
 
 before_script:
-  - psql -c "CREATE USER ivory PASSWORD 'ivoryivory'; CREATE DATABASE ivory_test OWNER ivory;" -U postgres
+  - psql -c "CREATE USER ivory PASSWORD 'ivoryivory'" -U postgres
+  - psql -c "CREATE DATABASE ivory_test OWNER ivory" -U postgres
   - cp test/phpunit.template.xml test/phpunit.xml
   - sed -e 's~\(name="DB_HOST" value="\).*\("\)~\1\2~' --in-place test/phpunit.xml
   - sed -e 's~\(name="DB_PORT" value="\).*\("\)~\1\2~' --in-place test/phpunit.xml
