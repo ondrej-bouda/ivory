@@ -7,10 +7,18 @@ use Ivory\Exception\NotImplementedException;
 /**
  * Converter for arrays.
  *
- * Note that in PHP, an array without explicit bounds is indexed from 0, while in PostgreSQL, arrays are 1-based by
- * default. The converter maintains the array as is, i.e., it does not try to convert 1-based arrays to 0-based, or vice
- * versa. Note that both PHP and PostgreSQL allow array literals to explicitly mention the array bounds, which this
- * converter takes use of.
+ * Note that arrays in PHP and PostgreSQL are completely different beasts. In PHP, "arrays" are in fact sorted hash maps
+ * with string or integer keys, or a mixture of both, having no restrictions on the elements. In PostgreSQL, arrays are
+ * much closer to other programming languages: all the elements must be of the same type and dimension (i.e.,
+ * multidimensional arrays must be "rectangular") and are indexed using a continuous sequence of integers. Thus:
+ * - an array converter always supports just one type of array elements - the one for which the converter was created;
+ * - when serializing a PHP array to PostgreSQL, the array is refused if it is invalid for PostgreSQL (i.e., if it uses
+ *   string keys or has gaps within the keys or the elements are of different types or dimensions);
+ * - when serializing a PHP array to PostgreSQL, the array gets sorted by its keys, i.e., the original order gets lost.
+ *
+ * Moreover, PHP arrays are zero-based by default, whereas PostgreSQL defaults to one-based arrays; in both, the bounds
+ * may be explicitly specified, however. The converter does not rebase the elements - the arrays are converted as is,
+ * including the bounds.
  *
  * @see http://www.postgresql.org/docs/9.4/static/arrays.html
  */
@@ -29,8 +37,7 @@ class ArrayType implements IType
 
     public function parseValue($str)
     {
-
-        throw new NotImplementedException();
+        throw new NotImplementedException(); // TODO
     }
 
     /**
