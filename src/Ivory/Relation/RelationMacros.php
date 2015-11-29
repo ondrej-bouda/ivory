@@ -29,7 +29,7 @@ trait RelationMacros
         $result = [];
         foreach ($this as $tuple) {
             /** @var ITuple $tuple */
-            $result[] = $tuple->toArray();
+            $result[] = $tuple->toMap();
         }
         return $result;
     }

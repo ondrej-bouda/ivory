@@ -10,9 +10,6 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
 
     public function testBasic()
     {
-        $this->markTestSkipped();
-        return;
-
         $conn = $this->getIvoryConnection();
         $qr = new QueryRelation($conn, 'SELECT id, name, is_active FROM artist ORDER BY name, id');
         /** @var ITuple[] $tuples */
@@ -27,9 +24,9 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         ];
         $this->assertEquals(count($expArray), count($qr));
         $this->assertEquals(count($expArray), count($tuples));
-        $this->assertSame($expArray[0], $tuples[0]->toArray());
-        $this->assertSame($expArray[1], $tuples[1]->toArray());
-        $this->assertSame($expArray[2], $tuples[2]->toArray());
+        $this->assertSame($expArray[0], $tuples[0]->toMap());
+        $this->assertSame($expArray[1], $tuples[1]->toMap());
+        $this->assertSame($expArray[2], $tuples[2]->toMap());
 
         $this->assertSame($expArray, $qr->toArray());
     }
