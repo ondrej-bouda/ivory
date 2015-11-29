@@ -81,7 +81,7 @@ STR
         }
     }
 
-    public function testCustomBounds()
+    public function testSerializeCustomBounds()
     {
         $this->assertSame(
             "'[0:1][-3:-1]={{1,2,3},{4,5,6}}'::pg_catalog.int4[]",
@@ -101,5 +101,44 @@ STR
         }
         catch (\InvalidArgumentException $e) {
         }
+    }
+
+    public function testParseSingleDimensional()
+    {
+        $this->assertNull($this->intArrayType->parseValue(null));
+
+        $this->assertSame([], $this->intArrayType->parseValue('{}'));
+        $this->assertSame([], $this->strArrayType->parseValue('{}'));
+
+        $this->assertSame(
+            [1 => 'a', 'b', 'c'],
+            $this->strArrayType->parseValue('{a,b,c}')
+        );
+
+        $this->assertSame(
+            [2 => 'a', 'b', 'c'],
+            $this->strArrayType->parseValue('[2:4]={a,b,c}')
+        );
+    }
+
+    public function testParseSpecialStrings()
+    {
+        $this->assertSame(
+            [1 => 'abc', null, 'NULL', 'NULLs', '', 'x,y', '{}', '1\\2', 'p q', '"r"', "'"],
+            $this->strArrayType->parseValue('{abc,NULL,"NULL",NULLs,"","x,y","{}","1\\\\2","p q","\\"r\\"",\'}')
+        );
+    }
+
+    public function testParseMultiDimensional()
+    {
+        $this->assertSame(
+            [1 => [1 => 'a', '1'], [1 => 'b', '2'], [1 => 'c', null]],
+            $this->strArrayType->parseValue('{{a,1},{b,2},{c,NULL}}')
+        );
+
+        $this->assertSame(
+            [2 => ['a', '1'], ['b', '2'], ['c', null]],
+            $this->strArrayType->parseValue('[2:4][0:1]={{a,1},{b,2},{c,NULL}}')
+        );
     }
 }

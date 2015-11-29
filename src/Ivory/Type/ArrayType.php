@@ -2,7 +2,7 @@
 namespace Ivory\Type;
 
 use Ivory\Exception\InternalException;
-use Ivory\Exception\NotImplementedException;
+use Ivory\Exception\ParseException;
 
 /**
  * Converter for arrays.
@@ -37,7 +37,95 @@ class ArrayType implements IType
 
     public function parseValue($str)
     {
-        throw new NotImplementedException(); // TODO
+        if ($str === null) {
+            return null;
+        }
+
+        if ($str[0] == '[') { // explicit bounds specification
+            $decorSepPos = strpos($str, '=');
+            $decoration = substr($str, 0, $decorSepPos);
+
+            preg_match_all('~\[(\d+):\d+\]~', $decoration, $m);
+            if ($decorSepPos === false || !$m) {
+                self::throwArrayParseException($str, 'Invalid array bounds decoration');
+            }
+            $strOffset = $decorSepPos + 1;
+            $lowerBounds = $m[1];
+            unset($m);
+        }
+        else {
+            if ($str == '{}') {
+                return [];
+            }
+            $strOffset = 0;
+            $dims = 0;
+            $len = strlen($str);
+            for ($i = 0; $i < $len && $str[$i] == '{'; $i++) {
+                $dims++;
+            }
+            if ($dims == 0) {
+                self::throwArrayParseException($str, "Expected '{'", 0);
+            }
+            $lowerBounds = array_fill(0, $dims, 1);
+        }
+
+        $result = [];
+        $elemRegex = '~
+                       "(?:[^"\\\\]|\\\\["\\\\])*"  # either a double-quoted string (backslashes used for escaping)
+                       |                            # or an unquoted string of characters which do not confuse the parser
+                       [^"{}' . preg_quote($this->delim, '~') . ']+
+                      ~x';
+        preg_match_all($elemRegex, $str, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE, $strOffset);
+        if (!$matches) {
+            $this->throwParseException($str, 'Invalid array syntax');
+        }
+
+        $strOffset++;
+        $dim = 0; // the current dimension of the input being processed
+        $keys = [$dim => $lowerBounds[$dim]]; // map: dimension => key under which to add the next element in the dimension
+        $refs = [$dim => &$result]; // map: dimension => reference to the array to add the next element to at the dimension
+
+        foreach ($matches[0] as list($elem, $elemOffset)) {
+            for (; $strOffset < $elemOffset; $strOffset++) {
+                $c = $str[$strOffset];
+                switch ($c) {
+                    case '{':
+                        $dim++;
+                        $keys[$dim] = $lowerBounds[$dim];
+                        $refs[$dim] = &$refs[$dim - 1][$keys[$dim-1]];
+                        $refs[$dim] = [];
+                        break;
+                    case '}':
+                        $dim--;
+                        break;
+                    case $this->delim:
+                        $keys[$dim]++;
+                        break;
+                    default:
+                        $this->throwParseException($str, "Unexpected array decoration character '$c'", $strOffset);
+                }
+            }
+
+            try {
+                $k = $keys[$dim];
+                if (strcasecmp($elem, 'NULL') == 0) {
+                    $refs[$dim][$k] = null;
+                }
+                elseif ($elem[0] == '"') {
+                    $s = strtr(substr($elem, 1, -1), ['\\\\' => '\\', '\\"' => '"']);
+                    $refs[$dim][$k] = $this->elemType->parseValue($s);
+                }
+                else {
+                    $refs[$dim][$k] = $this->elemType->parseValue($elem);
+                }
+            }
+            catch (ParseException $e) {
+                $this->throwParseException($str, 'Error parsing the element value', $strOffset, $e);
+            }
+            $strOffset += strlen($elem);
+        }
+
+        return $result;
     }
 
     /**
@@ -45,6 +133,8 @@ class ArrayType implements IType
      *
      * Note the `ARRAY[1,2,3]` syntax cannot be used as it does not allow for specifying custom array bounds. Instead,
      * the string representation (e.g., `'{1,2,3}'`) is employed.
+     *
+     * @todo eliminate recursion, process multidimensional arrays using iteration instead
      */
     public function serializeValue($val)
     {
@@ -158,5 +248,24 @@ class ArrayType implements IType
         }
 
         return $out;
+    }
+
+    private static function throwArrayParseException($str, $errMsg = null, $offset = null)
+    {
+        $msg = "Value '$str' is not valid for an array";
+        if (strlen($errMsg) > 0) {
+            $msg .= ": $errMsg";
+        }
+        throw new ParseException($msg, $offset);
+    }
+
+    private function throwParseException($str, $errMsg = null, $offset = null, $cause = null)
+    {
+        $elemTypeName = $this->elemType->getSchemaName() . '.' . $this->elemType->getName();
+        $msg = "Value '$str' is not valid for an array of type $elemTypeName";
+        if (strlen($errMsg) > 0) {
+            $msg .= ": $errMsg";
+        }
+        throw new ParseException($msg, $offset, 0, $cause);
     }
 }
