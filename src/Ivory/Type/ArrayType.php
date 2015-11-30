@@ -91,8 +91,11 @@ class ArrayType implements IType
                        "(?:[^"\\\\]|\\\\.)*"        # either a double-quoted string (backslashes used for escaping)
                        |                            # or an unquoted string of characters which do not confuse the
                                                     # parser or are backslash-escaped, leading and trailing whitespace
-                                                    # being ignored
-                       (?:[^"{}\s\\\\' . $d . ']|\\\\.)+(?:\s+(?:[^"{}\\\\' . $d . ']|\\\\.)*(?:[^"{}\s\\\\' . $d . ']|\\\\.)+)?
+                                                    # being ignored:
+                       (?:[^"{}\s\\\\' . $d . ']|\\\\.)+      # starting with non-special, non-whitespace characters,
+                       (?:\s+(?:[^"{}\\\\' . $d . ']|\\\\.)*  # optionally followed by non-special characters,
+                          (?:[^"{}\s\\\\' . $d . ']|\\\\.)+   # ending again with non-special, non-whitespace characters
+                       )?
                       ~x';
         preg_match_all($elemRegex, $str, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE, $strOffset);
         if (!$matches) {
