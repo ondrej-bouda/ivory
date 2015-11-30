@@ -124,8 +124,16 @@ STR
     public function testParseSpecialStrings()
     {
         $this->assertSame(
-            [1 => 'abc', null, 'NULL', 'NULLs', '', 'x,y', '{}', '1\\2', 'p q', '"r"', "'"],
-            $this->strArrayType->parseValue('{abc,NULL,"NULL",NULLs,"","x,y","{}","1\\\\2","p q","\\"r\\"",\'}')
+            [1 => 'abc', null, 'NULL', 'NULLs', '', 'x,y', '{}', '1\\2', 'ab', 'p q', '"r"', "'", '  , \\ " \''],
+            $this->strArrayType->parseValue(<<<'STR'
+{abc,NULL,"NULL",NULLs,"","x,y","{}","1\\2","a\b","p q",  "\"r\""  ,', \  \, \\ \" ' }
+STR
+            )
+        );
+
+        $this->assertSame(
+            [3 => [4 => ' ,\\ a ; a b']],
+            $this->strArrayType->parseValue('  [3:3] [4:4] =  { { \\ \\,\\\\ \\a ; a b } } ')
         );
     }
 
@@ -139,6 +147,37 @@ STR
         $this->assertSame(
             [2 => ['a', '1'], ['b', '2'], ['c', null]],
             $this->strArrayType->parseValue('[2:4][0:1]={{a,1},{b,2},{c,NULL}}')
+        );
+
+        $this->assertSame(
+            [3 => [4 => 'a b']],
+            $this->strArrayType->parseValue('[3:3][4:4]={{a b}}')
+        );
+    }
+
+    public function testParseWhitespace()
+    {
+        // "You can add whitespace before a left brace or after a right brace."
+        $this->assertSame(
+            [1 => [1 => 'a']],
+            $this->strArrayType->parseValue("{\t\n {a}  }")
+        );
+        $this->assertSame(
+            [],
+            $this->strArrayType->parseValue('  {} ')
+        );
+
+        // "You can also add whitespace before or after any individual item string."
+        $this->assertSame(
+            [1 => 'a  b', 'c'],
+            $this->strArrayType->parseValue('{  a  b   ,c}')
+        );
+
+        // Although not mentioned in the PostgreSQL manual, whitespace is also allowed (and ignored) in the array bounds
+        // decoration. It seems the only forbidden place for whitespace is a single bounds specification bracket.
+        $this->assertSame(
+            [3 => [4 => 'a b']],
+            $this->strArrayType->parseValue('  [3:3] [4:4] =  { { a b } } ')
         );
     }
 }

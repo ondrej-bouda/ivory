@@ -41,7 +41,16 @@ class ArrayType implements IType
             return null;
         }
 
-        if ($str[0] == '[') { // explicit bounds specification
+        // OPT: the parser processes any string which is legal for the PostgreSQL input; considering it would only be
+        //      used for processing output from PostgreSQL, only the more limited syntax might be accepted, which would
+        //      be simpler and faster; namely, in the output, there are neither whitespace nor backslash-escaped
+        //      characters outside of double-quoted strings
+
+        $strOffset = 0;
+
+        for (; isset($str[$strOffset]) && ctype_space($str[$strOffset]); $strOffset++);
+
+        if ($str[$strOffset] == '[') { // explicit bounds specification
             $decorSepPos = strpos($str, '=');
             $decoration = substr($str, 0, $decorSepPos);
 
@@ -49,19 +58,26 @@ class ArrayType implements IType
             if ($decorSepPos === false || !$m) {
                 self::throwArrayParseException($str, 'Invalid array bounds decoration');
             }
-            $strOffset = $decorSepPos + 1;
+            for ($strOffset = $decorSepPos + 1; isset($str[$strOffset]) && ctype_space($str[$strOffset]); $strOffset++);
             $lowerBounds = $m[1];
             unset($m);
         }
         else {
-            if ($str == '{}') {
+            if (trim($str) == '{}') {
                 return [];
             }
-            $strOffset = 0;
             $dims = 0;
             $len = strlen($str);
-            for ($i = 0; $i < $len && $str[$i] == '{'; $i++) {
-                $dims++;
+            for ($i = $strOffset; $i < $len; $i++) {
+                if (ctype_space($str[$i])) {
+                    continue;
+                }
+                elseif ($str[$i] == '{') {
+                    $dims++;
+                }
+                else {
+                    break;
+                }
             }
             if ($dims == 0) {
                 self::throwArrayParseException($str, "Expected '{'", 0);
@@ -70,10 +86,13 @@ class ArrayType implements IType
         }
 
         $result = [];
+        $d = preg_quote($this->delim, '~');
         $elemRegex = '~
-                       "(?:[^"\\\\]|\\\\["\\\\])*"  # either a double-quoted string (backslashes used for escaping)
-                       |                            # or an unquoted string of characters which do not confuse the parser
-                       [^"{}' . preg_quote($this->delim, '~') . ']+
+                       "(?:[^"\\\\]|\\\\.)*"        # either a double-quoted string (backslashes used for escaping)
+                       |                            # or an unquoted string of characters which do not confuse the
+                                                    # parser or are backslash-escaped, leading and trailing whitespace
+                                                    # being ignored
+                       (?:[^"{}\s\\\\' . $d . ']|\\\\.)+(?:\s+(?:[^"{}\\\\' . $d . ']|\\\\.)*(?:[^"{}\s\\\\' . $d . ']|\\\\.)+)?
                       ~x';
         preg_match_all($elemRegex, $str, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE, $strOffset);
         if (!$matches) {
@@ -88,6 +107,9 @@ class ArrayType implements IType
         foreach ($matches[0] as list($elem, $elemOffset)) {
             for (; $strOffset < $elemOffset; $strOffset++) {
                 $c = $str[$strOffset];
+                if (ctype_space($c)) {
+                    continue;
+                }
                 switch ($c) {
                     case '{':
                         $dim++;
@@ -111,12 +133,10 @@ class ArrayType implements IType
                 if (strcasecmp($elem, 'NULL') == 0) {
                     $refs[$dim][$k] = null;
                 }
-                elseif ($elem[0] == '"') {
-                    $s = strtr(substr($elem, 1, -1), ['\\\\' => '\\', '\\"' => '"']);
-                    $refs[$dim][$k] = $this->elemType->parseValue($s);
-                }
                 else {
-                    $refs[$dim][$k] = $this->elemType->parseValue($elem);
+                    $cont = ($elem[0] == '"' ? substr($elem, 1, -1) : $elem);
+                    $unEsc = preg_replace('~\\\\(.)~', '$1', $cont);
+                    $refs[$dim][$k] = $this->elemType->parseValue($unEsc);
                 }
             }
             catch (ParseException $e) {
