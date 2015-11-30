@@ -1,13 +1,24 @@
 <?php
 namespace Ivory\Type;
 
+use Ivory\NamedDbObject;
+
 /**
  * Represents an unnamed composite type.
  *
- * Unnamed composite types are typically returned from queries which construct the composition on-the-fly, such as any
- * `SELECT` queries - e.g., `SELECT 1 AS one` returns a value of ad-hoc composite type ("one": numeric).
+ * {@inheritdoc}
+ *
+ * Unnamed composite types are typically returned from `ROW()` expressions or from queries which construct the
+ * composition on-the-fly, such as `WITH t (foo,foo2) AS (VALUES ('bar','baz')) SELECT t FROM t`, which returns a value
+ * `('bar','baz')` of ad-hoc composite type `("foo"::text, "foo2"::text)`.
  */
 class AdHocCompositeType extends CompositeType
 {
+    use NamedDbObject;
 
+    public function __construct($schemaName, $typeName)
+    {
+        parent::__construct();
+        $this->setName($schemaName, $typeName);
+    }
 }
