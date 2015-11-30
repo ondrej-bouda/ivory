@@ -3,6 +3,7 @@ namespace Ivory\Value;
 
 use Ivory\Exception\UndefinedOperationException;
 use Ivory\Exception\UnsupportedException;
+use Ivory\Utils\IComparable;
 
 /**
  * A quantity with a unit.
@@ -14,7 +15,7 @@ use Ivory\Exception\UnsupportedException;
  *
  * The objects are immutable, i.e., operations always produce a new object.
  */
-class Quantity
+class Quantity implements IComparable
 {
     const BYTE = 'B';
     /** Memory unit of 1024 bytes. (For accordance with PostgreSQL, 1024 is used as the multiplier, not 1000.) */

@@ -3,6 +3,7 @@ namespace Ivory\Value;
 
 use Ivory\Exception\ImmutableException;
 use Ivory\Exception\UndefinedOperationException;
+use Ivory\Utils\IComparable;
 
 /**
  * A common super type for bit string types - strings of 1's and 0's.
@@ -20,7 +21,7 @@ use Ivory\Exception\UndefinedOperationException;
  *
  * @todo optimize the internal representation (unpack('c*', $value) might be handy for constructing from string)
  */
-abstract class BitString implements \ArrayAccess
+abstract class BitString implements IComparable, \ArrayAccess
 {
 	protected $bits;
 	protected $len;
@@ -82,7 +83,7 @@ abstract class BitString implements \ArrayAccess
 	 * @param BitString $other
 	 * @return bool whether this and the other bit string are of the same type, have the same bits and same length
 	 */
-	public function equals(BitString $other)
+	public function equals($other)
 	{
 		return (get_class($this) == get_class($other) && $this->bits == $other->bits);
 	}
