@@ -19,8 +19,8 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         }
         $expArray = [
             ['id' => 2, 'name' => 'Metallica', 'is_active' => false],
-            ['id' => 1, 'name' => 'Tommy Emanuel', 'is_active' => null],
-            ['id' => 3, 'name' => 'The Piano Guys', 'is_active' => true],
+            ['id' => 1, 'name' => 'The Piano Guys', 'is_active' => true],
+            ['id' => 3, 'name' => 'Tommy Emmanuel', 'is_active' => null],
         ];
         $this->assertEquals(count($expArray), count($qr));
         $this->assertEquals(count($expArray), count($tuples));
