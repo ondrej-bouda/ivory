@@ -24,7 +24,7 @@ interface IColumn extends \Traversable, \Countable, ICachingDataProcessor
 	function getName();
 
 	/**
-	 * @return IType type of the column
+	 * @return IType|null type of the column if known (it is unknown for columns on tuple evaluators)
 	 */
 	function getType();
 

@@ -49,7 +49,8 @@ class QueryRelation extends RelationBase implements IQueryRelation
 
     public function col($offsetOrNameOrEvaluator)
     {
-
+        $this->populate();
+        return $this->result->col($offsetOrNameOrEvaluator);
     }
 
     public function tuple($offset = 0)

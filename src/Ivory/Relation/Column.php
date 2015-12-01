@@ -8,7 +8,7 @@ use Ivory\Type\IType;
 class Column implements \Iterator, IColumn
 {
     private $queryResult;
-    private $colOffset;
+    private $colDef;
     private $name;
     private $type;
     private $pos = 0;
@@ -16,14 +16,14 @@ class Column implements \Iterator, IColumn
 
     /**
      * @param QueryResult $queryResult query result the column comes from
-     * @param int $colOffset offset of the column within the query result
+     * @param int $colDef offset or tuple evaluator of the column within the query result
      * @param string|null $name name of the column, or <tt>null</tt> if not named
-     * @param IType $type type of the column values
+     * @param IType|null $type type of the column values
      */
-    public function __construct(QueryResult $queryResult, $colOffset, $name, IType $type)
+    public function __construct(QueryResult $queryResult, $colDef, $name, $type)
     {
         $this->queryResult = $queryResult;
-        $this->colOffset = $colOffset;
+        $this->colDef = $colDef;
         $this->name = $name;
         $this->type = $type;
     }
@@ -60,7 +60,7 @@ class Column implements \Iterator, IColumn
 
     public function value($valueOffset = 0)
     {
-        $this->queryResult->value($this->colOffset, $valueOffset);
+        return $this->queryResult->value($this->colDef, $valueOffset);
     }
 
     //region ICachingDataProcessor

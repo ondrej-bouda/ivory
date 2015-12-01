@@ -127,21 +127,27 @@ class QueryResult extends Result implements \Iterator, IQueryResult
 	public function col($offsetOrNameOrEvaluator)
 	{
 		if (is_scalar($offsetOrNameOrEvaluator)) {
-			if (isset($this->columns[$offsetOrNameOrEvaluator])) {
-				return $this->columns[$offsetOrNameOrEvaluator];
-			}
-			elseif (isset($this->colNameMap[$offsetOrNameOrEvaluator])) {
-				return $this->columns[$this->colNameMap[$offsetOrNameOrEvaluator]];
+			if (filter_var($offsetOrNameOrEvaluator, FILTER_VALIDATE_INT) !== false) {
+				if (isset($this->columns[$offsetOrNameOrEvaluator])) {
+					return $this->columns[$offsetOrNameOrEvaluator];
+				}
+				else {
+					throw new UndefinedColumnException("No column at offset $offsetOrNameOrEvaluator");
+				}
 			}
 			else {
-				throw new UndefinedColumnException($offsetOrNameOrEvaluator);
+				if (isset($this->colNameMap[$offsetOrNameOrEvaluator])) {
+					return $this->columns[$this->colNameMap[$offsetOrNameOrEvaluator]];
+				}
+				else {
+					throw new UndefinedColumnException("No column named $offsetOrNameOrEvaluator");
+				}
 			}
 		}
-		elseif ($offsetOrNameOrEvaluator instanceof ITupleEvaluator) {
-			throw new NotImplementedException();
-		}
-		elseif ($offsetOrNameOrEvaluator instanceof \Closure) {
-			throw new NotImplementedException();
+		elseif ($offsetOrNameOrEvaluator instanceof ITupleEvaluator ||
+		  		$offsetOrNameOrEvaluator instanceof \Closure)
+		{
+			return new Column($this, $offsetOrNameOrEvaluator, null, null);
 		}
 		else {
 			throw new \InvalidArgumentException('$offsetOrNameOrEvaluator');

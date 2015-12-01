@@ -59,13 +59,20 @@ class Tuple implements \Iterator, ITuple
     {
         if (is_scalar($colOffsetOrNameOrEvaluator)) {
             if (filter_var($colOffsetOrNameOrEvaluator, FILTER_VALIDATE_INT) !== false) {
-                return $this->data[$colOffsetOrNameOrEvaluator];
-            }
-            elseif (isset($this->colNameMap[$colOffsetOrNameOrEvaluator])) {
-                return $this->data[$this->colNameMap[$colOffsetOrNameOrEvaluator]];
+                if (isset($this->data[$colOffsetOrNameOrEvaluator])) {
+                    return $this->data[$colOffsetOrNameOrEvaluator];
+                }
+                else {
+                    throw new UndefinedColumnException("No column at offset $colOffsetOrNameOrEvaluator");
+                }
             }
             else {
-                throw new UndefinedColumnException($colOffsetOrNameOrEvaluator);
+                if (isset($this->colNameMap[$colOffsetOrNameOrEvaluator])) {
+                    return $this->data[$this->colNameMap[$colOffsetOrNameOrEvaluator]];
+                }
+                else {
+                    throw new UndefinedColumnException("No column named $colOffsetOrNameOrEvaluator");
+                }
             }
         }
         elseif ($colOffsetOrNameOrEvaluator instanceof ITupleEvaluator) {
