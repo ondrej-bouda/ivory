@@ -43,7 +43,7 @@ abstract class CompositeType implements INamedType
 			throw new \RuntimeException("Attribute '$attName' already defined on composite type $typeName");
 		}
 		$this->attributes[$attName] = $attType;
-		$this->attNameMap[$attName] = count($this->attNameMap) + 1;
+		$this->attNameMap[$attName] = count($this->attNameMap);
 	}
 
 	/**
