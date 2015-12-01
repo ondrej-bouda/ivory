@@ -13,7 +13,7 @@ trait RelationMacros
      * @return ITuple the `$offset`-th tuple of this relation
      * @throws \OutOfBoundsException when this relation has fewer than `$offset+1` tuples
      */
-    abstract public function tuple($offset = 0); // TODO: instead of PHPDoc, declare returning ITuple if PHP 7 may be assumed
+    abstract public function tuple($offset = 0);
 
     final public function extend($extraColumns)
     {

@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Relation;
 
+use Ivory\Exception\UndefinedColumnException;
 use Ivory\Relation\Alg\ITupleComparator;
 use Ivory\Relation\Alg\ITupleEvaluator;
 use Ivory\Relation\Alg\ITupleFilter;
@@ -156,6 +157,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                    <tt>Closure</tt> may be used; the <tt>Closure</tt> is given one {@link ITuple}
      *                                    argument and is expected to return the value to use for the resulting column.
      * @return IColumn
+     * @throws UndefinedColumnException if no column matches the specification
      */
     function col($offsetOrNameOrEvaluator);
 
@@ -175,6 +177,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                    dimension of mapping.
      *                                  Specification of each mapping column is the same as for {@link col()}.
      * @return IMappedTuple
+     * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
     function map(...$mappingCols);
 
@@ -193,6 +196,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                    dimension of mapping.
      *                                  Specification of each mapping column is the same as for {@link col()}.
      * @return IMappedRelation
+     * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
     function multimap(...$mappingCols);
 
@@ -210,6 +214,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                    were arguments to this method call. E.g., <tt>$rel->assoc()</tt> on a relation
      *                                    consisting of 3 columns is equivalent to <tt>$rel->assoc(0, 1, 2)</tt>.
      * @return IMappedValue
+     * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
     function assoc(...$cols);
 
@@ -229,6 +234,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                    to return the value hash as a <tt>string</tt> or <tt>int</tt>;
      *                                  if not given, the default hasher provided by the implementing class is used
      * @return IHash
+     * @throws UndefinedColumnException if no column matches the specification
      */
     function hash($colOffsetOrNameOrEvaluator, $hasher = null);
 
@@ -288,6 +294,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @param int $tupleOffset zero-based offset of the tuple to get
      * @return mixed
      * @throws \OutOfBoundsException when this relation has fewer than <tt>$tupleOffset+1</tt> tuples
+     * @throws UndefinedColumnException if no column matches the specification
      */
     function value($colOffsetOrNameOrEvaluator = 0, $tupleOffset = 0);
 }

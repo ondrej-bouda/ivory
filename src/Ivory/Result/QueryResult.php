@@ -3,33 +3,59 @@ namespace Ivory\Result;
 
 use Ivory\Exception\NotImplementedException;
 use Ivory\Exception\ResultException;
+use Ivory\Exception\UndefinedColumnException;
+use Ivory\Relation\Alg\ITupleEvaluator;
 use Ivory\Relation\Column;
 use Ivory\Relation\RelationMacros;
+use Ivory\Relation\Tuple;
 use Ivory\Type\ITypeDictionary;
 
-class QueryResult extends Result implements \IteratorAggregate, IQueryResult
+class QueryResult extends Result implements \Iterator, IQueryResult
 {
 	use RelationMacros;
 
 	private $typeDictionary;
-	private $columns = null;
+	private $pos = 0;
+	private $numRows;
+	private $populated = false;
+	/** @var Column[] */
+	private $columns;
+	/** @var int[] map: column name => offset of the first column of the name */
+	private $colNameMap;
 
 
+	/**
+	 * @param resource $resultHandler the result, with the internal pointer at the beginning
+	 * @param ITypeDictionary $typeDictionary
+	 * @param string|null $lastNotice last notice captured on the connection
+	 */
 	public function __construct($resultHandler, ITypeDictionary $typeDictionary, $lastNotice = null)
 	{
 		parent::__construct($resultHandler, $lastNotice);
 
 		$this->typeDictionary = $typeDictionary;
 
-		// TODO: consider uncommenting this to increase performance: the subsequent methods might not always call populate(); on the other hand, explicit flush() would have to be forbidden then...
-//		$this->populate(); // not lazy - chances are, when the query was made, the caller will care about its results
+		$this->numRows = $this->fetchNumRows();
+		$this->populate(); // not lazy - chances are, when the query was made, the caller will care about its results
 	}
+
+	private function fetchNumRows()
+	{
+		$numRows = pg_num_rows($this->handler);
+		if ($numRows >= 0 && $numRows !== null) { // NOTE: besides -1, pg_num_rows() might return NULL on error
+			return $numRows;
+		}
+		else {
+			throw new ResultException('Error retrieving number of rows of the result.');
+		}
+	}
+
 
     //region ICachingDataProcessor
 
 	public function populate()
 	{
-		if ($this->columns !== null) {
+		if ($this->populated) {
 			return;
 		}
 
@@ -38,6 +64,7 @@ class QueryResult extends Result implements \IteratorAggregate, IQueryResult
 			throw new ResultException('Error retrieving number of fields of the result.');
 		}
 		$this->columns = [];
+		$this->colNameMap = [];
 		for ($i = 0; $i < $numFields; $i++) {
 			/* NOTE: pg_field_type() cannot be used for simplicity - multiple types of the same name might exist in
 			 *       different schemas. Thus, the only reasonable way to recognize the types is using their OIDs,
@@ -48,19 +75,29 @@ class QueryResult extends Result implements \IteratorAggregate, IQueryResult
 			if ($name === false || $name === null) { // NOTE: besides false, pg_field_name() might return NULL on error
 				throw new ResultException("Error retrieving name of result column $i.");
 			}
+			if ($name == '?column?') {
+				$name = null;
+			}
 			$typeOid = pg_field_type_oid($this->handler, $i);
 			if ($typeOid === false || $typeOid === null) { // NOTE: besides false, pg_field_type_oid() might return NULL on error
 				throw new ResultException("Error retrieving type OID of result column $i.");
 			}
 			$type = $this->typeDictionary->requireTypeFromOid($typeOid);
 
-			$this->columns[] = new Column($name, $type);
+			$this->columns[] = new Column($this, $i, $name, $type);
+
+			if ($name !== null && !isset($this->colNameMap[$name])) {
+				$this->colNameMap[$name] = $i;
+			}
 		}
+
+		$this->populated = true;
 	}
 
 	public function flush()
 	{
-		$this->columns = null;
+		$this->populated = false;
+		$this->populate(); // re-initialize the internal data right away for the other methods not to call populate() over and over again
 	}
 
 	//endregion
@@ -69,7 +106,6 @@ class QueryResult extends Result implements \IteratorAggregate, IQueryResult
 
 	public function getColumns()
 	{
-		$this->populate();
 		return $this->columns;
 	}
 
@@ -90,7 +126,26 @@ class QueryResult extends Result implements \IteratorAggregate, IQueryResult
 
 	public function col($offsetOrNameOrEvaluator)
 	{
-		throw new NotImplementedException();
+		if (is_scalar($offsetOrNameOrEvaluator)) {
+			if (isset($this->columns[$offsetOrNameOrEvaluator])) {
+				return $this->columns[$offsetOrNameOrEvaluator];
+			}
+			elseif (isset($this->colNameMap[$offsetOrNameOrEvaluator])) {
+				return $this->columns[$this->colNameMap[$offsetOrNameOrEvaluator]];
+			}
+			else {
+				throw new UndefinedColumnException($offsetOrNameOrEvaluator);
+			}
+		}
+		elseif ($offsetOrNameOrEvaluator instanceof ITupleEvaluator) {
+			throw new NotImplementedException();
+		}
+		elseif ($offsetOrNameOrEvaluator instanceof \Closure) {
+			throw new NotImplementedException();
+		}
+		else {
+			throw new \InvalidArgumentException('$offsetOrNameOrEvaluator');
+		}
 	}
 
 	public function map(...$mappingCols)
@@ -120,7 +175,21 @@ class QueryResult extends Result implements \IteratorAggregate, IQueryResult
 
 	public function tuple($offset = 0)
 	{
-		throw new NotImplementedException();
+		if ($offset >= $this->numRows) {
+			throw new \OutOfBoundsException("Offset $offset is out of the result bounds [0,{$this->numRows})");
+		}
+
+		$rawData = pg_fetch_row($this->handler, $offset);
+		if ($rawData === false || $rawData === null) {
+			throw new ResultException("Error fetching row at offset $offset");
+		}
+
+		$data = [];
+		foreach ($this->columns as $i => $col) {
+			$data[$i] = $col->getType()->parseValue($rawData[$i]);
+		}
+
+		return new Tuple($data, $this->columns, $this->colNameMap);
 	}
 
 	//endregion
@@ -129,22 +198,36 @@ class QueryResult extends Result implements \IteratorAggregate, IQueryResult
 
 	public function count()
 	{
-		$numRows = pg_num_rows($this->handler);
-		if ($numRows >= 0 && $numRows !== null) { // NOTE: besides -1, pg_num_rows() might return NULL on error
-			return $numRows;
-		}
-		else {
-			throw new ResultException('Error retrieving number of rows of the result.');
-		}
+		return $this->numRows;
 	}
 
 	//endregion
 
-	//region \IteratorAggregate
+	//region \Iterator
 
-	public function getIterator()
+	public function current()
 	{
-		throw new NotImplementedException();
+		return $this->tuple($this->pos);
+	}
+
+	public function next()
+	{
+		$this->pos++;
+	}
+
+	public function key()
+	{
+		return $this->pos;
+	}
+
+	public function valid()
+	{
+		return ($this->pos < $this->numRows);
+	}
+
+	public function rewind()
+	{
+		$this->pos = 0;
 	}
 
 	//endregion

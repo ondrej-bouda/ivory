@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Type\Std;
 
+use Ivory\Type\AdHocCompositeType;
+
 class StdTypeLoader implements \Ivory\Type\ITypeLoader
 {
 	public function loadType($schemaName, $typeName, \Ivory\Connection\IConnection $connection)
@@ -41,6 +43,8 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'character varying':
 			case 'varchar':
 			case 'bpchar':
+			case 'unknown':
+			case 'cstring':
 				return new StringType($schemaName, $typeName, $connection);
 
 			case 'bytea':
@@ -88,6 +92,20 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 
 			case 'money':
 				return new MoneyType($schemaName, $typeName, $connection);
+
+			case 'void':
+				return new VoidType($schemaName, $typeName, $connection);
+
+			case 'record':
+				return new AdHocCompositeType($schemaName, $typeName);
+
+			case 'any':
+			case 'anyelement':
+			case 'anyarray':
+			case 'anynonarray':
+			case 'anyenum':
+			case 'anyrange':
+				return new PolymorphicPseudoType($schemaName, $typeName, $connection);
 
 			default:
 				return null;

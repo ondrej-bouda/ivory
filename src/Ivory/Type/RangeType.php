@@ -18,11 +18,11 @@ class RangeType implements INamedType
 
     public function parseValue($str)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException(); // TODO
     }
 
     public function serializeValue($val)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException(); // TODO
     }
 }

@@ -80,6 +80,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                     // NOTE: typdelim of the array type itself seems irrelevant
                     break;
                 case 'b':
+                case 'p': // treating pseudo-types as base types - they must be recognized, not built up on another type
                     $type = $this->createBaseType($schemaName, $typeName, $typeProvider);
                     break;
                 case 'c':
@@ -92,9 +93,6 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                 case 'e':
                     $labels = (isset($enumLabels[$row['oid']]) ? $enumLabels[$row['oid']] : []);
                     $type = $this->createEnumType($schemaName, $typeName, $labels);
-                    break;
-                case 'p':
-                    $type = $this->createPseudoType($schemaName, $typeName);
                     break;
                 case 'r':
                     $subtype = $dict->requireTypeFromOid($row['parenttype']);
@@ -157,16 +155,6 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
     }
 
     /**
-     * @param INamedType $elemType
-     * @param string $delimiter
-     * @return IType
-     */
-    protected function createArrayType(INamedType $elemType, $delimiter)
-    {
-        return new ArrayType($elemType, $delimiter);
-    }
-
-    /**
      * @param string $schemaName
      * @param string $typeName
      * @param ITypeProvider $typeProvider
@@ -174,7 +162,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      */
     protected function createBaseType($schemaName, $typeName, ITypeProvider $typeProvider)
     {
-        return $typeProvider->requireBaseType($schemaName, $typeName);
+        return $typeProvider->provideBaseType($schemaName, $typeName);
     }
 
     /**
@@ -212,21 +200,21 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
     /**
      * @param string $schemaName
      * @param string $typeName
-     * @return IType
-     */
-    protected function createPseudoType($schemaName, $typeName)
-    {
-        return null; // FIXME
-    }
-
-    /**
-     * @param string $schemaName
-     * @param string $typeName
      * @param IType $subtype the range subtype
      * @return IType
      */
     protected function createRangeType($schemaName, $typeName, IType $subtype)
     {
         return new RangeType($schemaName, $typeName, $subtype);
+    }
+
+    /**
+     * @param INamedType $elemType
+     * @param string $delimiter
+     * @return IType
+     */
+    protected function createArrayType(INamedType $elemType, $delimiter)
+    {
+        return new ArrayType($elemType, $delimiter);
     }
 }

@@ -7,6 +7,7 @@ use Ivory\Type\ITypeProvider;
 use Ivory\Type\TypeDictionary;
 use Ivory\Type\IntrospectingTypeDictionaryCompiler;
 use Ivory\Type\TypeRegister;
+use Ivory\Type\UndefinedType;
 
 class TypeControl implements ITypeControl, ITypeProvider
 {
@@ -61,7 +62,7 @@ class TypeControl implements ITypeControl, ITypeProvider
 
     //region ITypeProvider
 
-    public function requireBaseType($schemaName, $typeName)
+    public function provideBaseType($schemaName, $typeName)
     {
         $localReg = $this->getTypeRegister();
         $globalReg = Ivory::getTypeRegister();
@@ -76,7 +77,7 @@ class TypeControl implements ITypeControl, ITypeProvider
                 return $type;
             }
         }
-        throw new UndefinedTypeException("$schemaName.$typeName on connection {$this->connection->getName()}");
+        return new UndefinedType($schemaName, $typeName, $this->connection);
     }
 
     //endregion

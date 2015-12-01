@@ -2,20 +2,28 @@
 namespace Ivory\Relation;
 
 use Ivory\Exception\NotImplementedException;
+use Ivory\Result\QueryResult;
 use Ivory\Type\IType;
 
-class Column implements IColumn
+class Column implements \Iterator, IColumn
 {
+    private $queryResult;
+    private $colOffset;
     private $name;
     private $type;
+    private $pos = 0;
 
 
     /**
+     * @param QueryResult $queryResult query result the column comes from
+     * @param int $colOffset offset of the column within the query result
      * @param string|null $name name of the column, or <tt>null</tt> if not named
      * @param IType $type type of the column values
      */
-    public function __construct($name, IType $type)
+    public function __construct(QueryResult $queryResult, $colOffset, $name, IType $type)
     {
+        $this->queryResult = $queryResult;
+        $this->colOffset = $colOffset;
         $this->name = $name;
         $this->type = $type;
     }
@@ -43,12 +51,16 @@ class Column implements IColumn
 
     public function toArray()
     {
-        throw new NotImplementedException();
+        $result = [];
+        foreach ($this as $value) {
+            $result[] = $value;
+        }
+        return $result;
     }
 
     public function value($valueOffset = 0)
     {
-        throw new NotImplementedException();
+        $this->queryResult->value($this->colOffset, $valueOffset);
     }
 
     //region ICachingDataProcessor
@@ -65,12 +77,40 @@ class Column implements IColumn
 
     //endregion
 
-
     //region Countable
 
     public function count()
     {
-        throw new NotImplementedException();
+        return $this->queryResult->count();
+    }
+
+    //endregion
+
+    //region Iterator
+
+    public function current()
+    {
+        return $this->value($this->pos);
+    }
+
+    public function next()
+    {
+        $this->pos++;
+    }
+
+    public function key()
+    {
+        return $this->pos;
+    }
+
+    public function valid()
+    {
+        return $this->pos < $this->count();
+    }
+
+    public function rewind()
+    {
+        $this->pos = 0;
     }
 
     //endregion
