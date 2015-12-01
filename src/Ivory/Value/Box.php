@@ -89,6 +89,35 @@ class Box
         return $this->lowerLeft;
     }
 
+    public function getLeftSide()
+    {
+        return LineSegment::fromEndpoints($this->getUpperLeft(), $this->lowerLeft);
+    }
+
+    public function getRightSide()
+    {
+        return LineSegment::fromEndpoints($this->getUpperRight(), $this->getLowerRight());
+    }
+
+    public function getUpperSide()
+    {
+        return LineSegment::fromEndpoints($this->getUpperLeft(), $this->getUpperRight());
+    }
+
+    public function getLowerSide()
+    {
+        return LineSegment::fromEndpoints($this->getLowerLeft(), $this->getLowerRight());
+    }
+
+    public function getArea()
+    {
+        return abs(
+            ($this->lowerLeft->getX() - $this->upperRight->getX())
+            *
+            ($this->lowerLeft->getY() - $this->upperRight->getY())
+        );
+    }
+
     public function __toString()
     {
         return "({$this->upperRight}, {$this->lowerLeft})";

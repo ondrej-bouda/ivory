@@ -8,7 +8,9 @@ namespace Ivory\Value;
  */
 class LineSegment
 {
+    /** @var Point */
     private $start;
+    /** @var Point */
     private $end;
 
 
@@ -59,6 +61,18 @@ class LineSegment
     public function getEnd()
     {
         return $this->end;
+    }
+
+    /**
+     * @return float length of the line segment
+     */
+    public function getLength()
+    {
+        return sqrt(
+            ($this->start->getX() - $this->end->getX())**2
+            +
+            ($this->start->getY() - $this->end->getY())**2
+        );
     }
 
     public function __toString()

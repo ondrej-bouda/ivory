@@ -2,6 +2,7 @@
 namespace Ivory\Relation;
 
 use Ivory\Type\CompositeValue;
+use Ivory\Value\Box;
 
 class QueryRelationTest extends \Ivory\IvoryTestCase
 {
@@ -132,5 +133,37 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         $this->assertSame('Live One', $qr->value('albums', 2)[1][1]);
         $this->assertSame('Live One', $qr->value('albums', 2)[1]['name']);
         $this->assertSame('Live One', $qr->value('albums', 2)[1]->name);
+    }
+
+    public function testRangeResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn,
+            "SELECT artist.name AS artist_name,
+                    (CASE WHEN COUNT(album.*) > 0
+                          THEN int4range(min(album.year), max(album.year), '[]')
+                          ELSE 'empty'
+                     END) AS active_years
+             FROM artist
+                  JOIN album_artist ON album_artist.artist_id = artist.id
+                  JOIN album ON album.id = album_artist.album_id
+             GROUP BY artist.id
+             ORDER BY artist.name"
+        );
+        // TODO: test according to range interface
+    }
+
+    public function testBoxArrayResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn,
+            "SELECT ARRAY[box(point(1,3),point(-3,5)), box(point(0,0),point(10,10)), box(point(1,2),point(3,4))]"
+        );
+        $areaSum = 0;
+        foreach ($qr->value() as $box) {
+            /** @var Box $box */
+            $areaSum += $box->getArea();
+        }
+        $this->assertEquals(112, $areaSum);
     }
 }
