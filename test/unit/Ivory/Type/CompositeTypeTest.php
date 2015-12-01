@@ -4,6 +4,7 @@ namespace Ivory\Type;
 use Ivory\IvoryTestCase;
 use Ivory\Type\Std\IntegerType;
 use Ivory\Type\Std\StringType;
+use Ivory\Value\Composite;
 
 class CompositeTypeTest extends IvoryTestCase
 {
@@ -88,6 +89,6 @@ STR
 
     private function val($values)
     {
-        return CompositeValue::fromList($this->adHocComposite, $values);
+        return Composite::fromList($this->adHocComposite, $values);
     }
 }

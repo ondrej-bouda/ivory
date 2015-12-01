@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Relation;
 
-use Ivory\Type\CompositeValue;
+use Ivory\Value\Composite;
 use Ivory\Value\Box;
 
 class QueryRelationTest extends \Ivory\IvoryTestCase
@@ -105,7 +105,7 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         foreach ($qr as $tuple) {
             $albums = [];
             foreach ($tuple['albums'] as $album) {
-                /** @var CompositeValue $album */
+                /** @var Composite $album */
                 $albums[] = $album->toMap();
             }
             $results[$tuple['artist_name']] = $albums;

@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Type;
 
+use Ivory\Value\Composite;
+
 /**
  * A composite type is basically a tuple of values.
  *
@@ -66,7 +68,7 @@ abstract class CompositeType implements INamedType
 	public function parseValue($str)
 	{
 		if ($str == '()' && !$this->attributes) {
-			return CompositeValue::fromList($this, []);
+			return Composite::fromList($this, []);
 		}
 
 		$strLen = strlen($str);
@@ -132,12 +134,12 @@ abstract class CompositeType implements INamedType
 			$values = $atts;
 		}
 
-		return CompositeValue::fromList($this, $values);
+		return Composite::fromList($this, $values);
 	}
 
 	public function serializeValue($val)
 	{
-		if ($val instanceof CompositeValue) {
+		if ($val instanceof Composite) {
 			/** @var IType[] $types */
 			$types = array_values($val->getType()->getAttributes());
 			if ($types) {

@@ -1,8 +1,10 @@
 <?php
-namespace Ivory\Type;
+namespace Ivory\Value;
 
 use Ivory\Exception\ImmutableException;
 use Ivory\Exception\UnsupportedException;
+use Ivory\Type\CompositeType;
+use Ivory\Type\NamedCompositeType;
 use Ivory\Utils\IComparable;
 
 /**
@@ -21,7 +23,7 @@ use Ivory\Utils\IComparable;
  * `ArrayAccess` write operations ({@link \ArrayAccess::offsetSet()} and {@link \ArrayAccess::offsetUnset()}) throw an
  * {@link \Ivory\Exception\UnsupportedException}.
  */
-class CompositeValue implements IComparable, \ArrayAccess, \IteratorAggregate
+class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
 {
 	/** @var CompositeType type of the composite */
 	private $type;
@@ -33,11 +35,11 @@ class CompositeValue implements IComparable, \ArrayAccess, \IteratorAggregate
 	 *
 	 * @param CompositeType $type the type of the value
 	 * @param array $values list of values of corresponding attributes
-	 * @return CompositeValue
+	 * @return Composite
 	 */
 	public static function fromList(CompositeType $type, $values)
 	{
-		return new CompositeValue($type, $values);
+		return new Composite($type, $values);
 	}
 
 	/**
@@ -47,7 +49,7 @@ class CompositeValue implements IComparable, \ArrayAccess, \IteratorAggregate
 	 *
 	 * @param NamedCompositeType $type the type of the value; must be a named composite type
 	 * @param array $map map: attribute name => value; unspecified attributes get a <tt>null</tt> value
-	 * @return CompositeValue
+	 * @return Composite
 	 */
 	public static function fromMap(NamedCompositeType $type, $map)
 	{
@@ -63,7 +65,7 @@ class CompositeValue implements IComparable, \ArrayAccess, \IteratorAggregate
 				throw new \InvalidArgumentException($msg);
 			}
 		}
-		return new CompositeValue($type, $values);
+		return new Composite($type, $values);
 	}
 
 	private function __construct(CompositeType $type, $values)
