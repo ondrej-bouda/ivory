@@ -58,11 +58,11 @@ class Tuple implements \Iterator, ITuple
     public function value($colOffsetOrNameOrEvaluator = 0)
     {
         if (is_scalar($colOffsetOrNameOrEvaluator)) {
-            if (isset($this->data[$colOffsetOrNameOrEvaluator])) {
+            if (filter_var($colOffsetOrNameOrEvaluator, FILTER_VALIDATE_INT) !== false) {
                 return $this->data[$colOffsetOrNameOrEvaluator];
             }
-            elseif (isset($colNameMap[$colOffsetOrNameOrEvaluator])) {
-                return $this->data[$colNameMap[$colOffsetOrNameOrEvaluator]];
+            elseif (isset($this->colNameMap[$colOffsetOrNameOrEvaluator])) {
+                return $this->data[$this->colNameMap[$colOffsetOrNameOrEvaluator]];
             }
             else {
                 throw new UndefinedColumnException($colOffsetOrNameOrEvaluator);

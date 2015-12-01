@@ -150,8 +150,8 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * Projects a single column from this relation.
      *
      * @param int|string|ITupleEvaluator|\Closure $offsetOrNameOrEvaluator
-     *                                  Zero-based offset or name of column to project from this relation, or an
-     *                                    evaluator which computes each value from the tuple.
+     *                                  Zero-based offset or (non-numeric) name of column to project from this relation,
+     *                                    or an evaluator which computes each value from the tuple.
      *                                  As an evaluator, either {@link ITupleEvaluator} (the
      *                                    {@link ITupleEvaluator::evaluate()} method of which is called) or
      *                                    <tt>Closure</tt> may be used; the <tt>Closure</tt> is given one {@link ITuple}
