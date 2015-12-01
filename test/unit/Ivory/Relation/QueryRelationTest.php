@@ -164,6 +164,6 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
             /** @var Box $box */
             $areaSum += $box->getArea();
         }
-        $this->assertEquals(112, $areaSum);
+        $this->assertEquals(112, $areaSum, '', 1e-9);
     }
 }
