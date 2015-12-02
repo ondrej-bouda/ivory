@@ -1,0 +1,5 @@
+* Ivory heavily relies on the type introspector, which looks up all data types defined on the database.
+** The type introspector is necessary to getting type OIDs, besides some other useful metadata (such as array item separators).
+** Type OIDs are necessary for identifying data types of relation result columns and processing their data correctly. The PHP pgSQL driver only allows recognizing by OID or by an unqualified name. Since there may be multiple data types of the same name in different schemas of the database, the latter is insufficient.
+
+

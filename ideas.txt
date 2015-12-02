@@ -98,3 +98,4 @@ Other Layers:
 Support both hackers and engineers:
 * on various places, accept both \Closure and a special interface as alternative ways of specifying the behaviour
 ** by the way, taking interfaces will become more useful with anonymous classes in PHP 7
+
