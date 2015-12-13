@@ -5,7 +5,7 @@ FROM   pg_catalog.pg_database d
 ;
 
 -- extensions
-SELECT oid, extname, extversion
+SELECT oid, extname, extversion, obj_description(oid) AS comment
 FROM pg_catalog.pg_extension;
 
 -- schemas
