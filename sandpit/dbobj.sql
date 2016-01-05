@@ -319,12 +319,21 @@ WHERE idx_class.relkind = 'i' AND idx_class.relpersistence IN ('p', 'u') AND
 SELECT rel_nsp.nspname, tbl_class.relkind, tbl_class.relname AS tbl_name,
        idx_class.relname AS idx_name, attname, attnum,
        coll_nsp.nspname AS coll_nspname, collname,
-       pg_catalog.pg_get_indexdef(attrelid, attnum, FALSE) AS defexpr
+       pg_catalog.pg_get_indexdef(attrelid, attnum, FALSE) AS defexpr,
+       (CASE WHEN amcanorder
+             THEN (CASE indoption[attnum-1] & 1 WHEN 1 THEN 'DESC' ELSE 'ASC' END)
+             ELSE NULL
+        END) AS asc_or_desc,
+       (CASE WHEN amcanorder
+             THEN (CASE indoption[attnum-1] & 2 WHEN 2 THEN 'NULLS FIRST' ELSE 'NULLS LAST' END)
+             ELSE NULL
+        END) AS nulls
 FROM pg_catalog.pg_attribute
      JOIN pg_catalog.pg_index ON indexrelid = attrelid
      JOIN pg_catalog.pg_class idx_class ON idx_class.oid = attrelid
      JOIN pg_catalog.pg_class tbl_class ON tbl_class.oid = indrelid
      JOIN pg_catalog.pg_namespace rel_nsp ON rel_nsp.oid = tbl_class.relnamespace
+     JOIN pg_catalog.pg_am am ON am.oid = idx_class.relam
      LEFT JOIN (pg_catalog.pg_collation
                 JOIN pg_catalog.pg_namespace coll_nsp ON coll_nsp.oid = collnamespace)
                ON pg_collation.oid = attcollation
@@ -338,8 +347,6 @@ ORDER BY idx_class.oid, attnum;
 -- attnum: 1-based number of the index part
 -- defexpr: part definition expression
 -- TODO: operator class for index
--- TODO: order (DESC)
--- TODO: NULL treatment (NULLS FIRST/LAST) - see http://stackoverflow.com/questions/18121103/how-to-get-the-index-column-orderasc-desc-nulls-first-from-postgresql
 
 -- constraints other than constraint triggers (either a table or a domain may be constrained, not both)
 SELECT c.conname, pg_catalog.obj_description(c.oid, 'pg_constraint') AS comment,
