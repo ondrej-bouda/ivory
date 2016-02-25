@@ -59,6 +59,14 @@ class Point
         return $this->y;
     }
 
+    /**
+     * @return float[] pair of the X- and Y-coordinate of the point
+     */
+    public function toCoords()
+    {
+        return [$this->x, $this->y];
+    }
+
     public function __toString()
     {
         return "({$this->x},{$this->y})";

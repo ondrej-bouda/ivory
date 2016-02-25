@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Type\Std;
 
+use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Decimal;
 
 /**
@@ -10,7 +11,7 @@ use Ivory\Value\Decimal;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html
  */
-class DecimalType extends \Ivory\Type\BaseType
+class DecimalType extends \Ivory\Type\BaseType implements ITotallyOrderedType
 {
 	public function parseValue($str)
 	{
@@ -41,5 +42,16 @@ class DecimalType extends \Ivory\Type\BaseType
 		else {
 			$this->throwInvalidValue($val);
 		}
+	}
+
+	public function compareValues($a, $b)
+	{
+		if ($a === null || $b === null) {
+			return null;
+		}
+		if (!$a instanceof Decimal) {
+			$a = Decimal::fromNumber($a);
+		}
+		return $a->compareTo($b);
 	}
 }

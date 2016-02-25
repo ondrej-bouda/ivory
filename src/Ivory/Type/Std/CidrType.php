@@ -10,6 +10,7 @@ use Ivory\Value\NetAddress;
  * Represented as a {@link \Ivory\Value\NetAddress} object.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-net-types.html
+ * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
 class CidrType extends BaseType
 {

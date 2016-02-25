@@ -1,9 +1,10 @@
 <?php
 namespace Ivory\Type;
 
+use Ivory\Exception\IncomparableException;
 use Ivory\NamedDbObject;
 
-class EnumType implements INamedType
+class EnumType implements INamedType, ITotallyOrderedType
 {
     use NamedDbObject;
 
@@ -37,5 +38,16 @@ class EnumType implements INamedType
             }
             return "'" . strtr($val, ["'" => "''"]) . "'";
         }
+    }
+
+    public function compareValues($a, $b)
+    {
+        if ($a === null || $b === null) {
+            return null;
+        }
+        if (!isset($this->labelSet[$a]) || !isset($this->labelSet[$b])) {
+            throw new IncomparableException('Incompatible enums');
+        }
+        return $this->labelSet[$a] - $this->labelSet[$b];
     }
 }

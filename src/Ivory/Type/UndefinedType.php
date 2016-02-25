@@ -24,5 +24,4 @@ class UndefinedType extends BaseType
             "{$this->getSchemaName()}.{$this->getName()} on connection {$this->getConnection()->getName()}"
         );
     }
-
 }

@@ -13,6 +13,8 @@ use Ivory\Value\Json;
  * when a {@link \Ivory\Value\Json} object is returned from the database. In other cases, the unpacked value, encoded by
  * the JSON, is returned. You can use `($value === \Ivory\Value\Json::null())` to distinguish the JSON-encoded `null`
  * value.
+ *
+ * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
 class JsonBType extends JsonType
 {

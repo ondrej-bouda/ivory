@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Type\Std;
 
+use Ivory\Type\ITotallyOrderedType;
+
 /**
  * Character string.
  *
@@ -8,7 +10,7 @@ namespace Ivory\Type\Std;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-character.html
  */
-class StringType extends \Ivory\Type\BaseType
+class StringType extends \Ivory\Type\BaseType implements ITotallyOrderedType
 {
 	public function parseValue($str)
 	{
@@ -28,5 +30,13 @@ class StringType extends \Ivory\Type\BaseType
 		else {
 			return "'" . strtr($val, ["'" => "''"]) . "'";
 		}
+	}
+
+	public function compareValues($a, $b)
+	{
+		if ($a === null || $b === null) {
+			return null;
+		}
+		return strcmp((string)$a, (string)$b); // FIXME: comparison according to a collation, or at least the client encoding, or at least using UTF-8
 	}
 }

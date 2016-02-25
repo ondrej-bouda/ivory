@@ -1,7 +1,9 @@
 <?php
 namespace Ivory\Type\Std;
 
+use Ivory\Exception\IncomparableException;
 use Ivory\Type\BaseType;
+use Ivory\Type\ITotallyOrderedType;
 
 /**
  * Representation of the PostgreSQL void type, i.e., nothing.
@@ -9,7 +11,7 @@ use Ivory\Type\BaseType;
  * There are just two possible values accepted or returned by this converter: `null` and {@link VoidType::void()}, which
  * is an empty singleton object.
  */
-class VoidType extends BaseType
+class VoidType extends BaseType implements ITotallyOrderedType
 {
     public static function void()
     {
@@ -41,5 +43,16 @@ class VoidType extends BaseType
         else {
             $this->throwInvalidValue($val);
         }
+    }
+
+    public function compareValues($a, $b)
+    {
+        if ($a === null || $b === null) {
+            return null;
+        }
+        if ($a === self::void() && $b === self::void()) {
+            return true;
+        }
+        throw new IncomparableException('Invalid values to compare as ' . VoidType::class);
     }
 }

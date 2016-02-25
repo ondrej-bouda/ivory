@@ -2,19 +2,20 @@
 namespace Ivory\Type\Std;
 
 use Ivory\Type\BaseType;
+use Ivory\Type\ITotallyOrderedType;
 
 /**
  * The UUID data type.
  *
  * Represented as the PHP `string` type.
  *
- * As defined by PostgreSQL, valid input is a sequence of 32 upper- or lowercase hexadecimal digits, where each group
+ * As defined by PostgreSQL, valid input is a sequence of 32 upper- or lowercase hexadecimal digits, where each group of
  * four digits may be separated by a hyphen from the rest of the string, and the whole string may be surrounded by
  * braces.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-uuid.html
  */
-class UuidType extends BaseType
+class UuidType extends BaseType implements ITotallyOrderedType
 {
     public function parseValue($str)
     {
@@ -36,5 +37,18 @@ class UuidType extends BaseType
             $this->throwInvalidValue($val);
         }
         return "'" . strtr($val, ["'" => "''"]) . "'";
+    }
+
+    public function compareValues($a, $b)
+    {
+        if ($a === null || $b === null) {
+            return null;
+        }
+        if ($a == $b) {
+            return 0;
+        }
+        $aCan = preg_replace('~\D~', '', (string)$a);
+        $bCan = preg_replace('~\D~', '', (string)$b);
+        return strcmp($aCan, $bCan);
     }
 }

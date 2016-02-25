@@ -21,7 +21,9 @@ use Ivory\Utils\IComparable;
  *
  * Note the composite value is immutable, i.e., once constructed, its values cannot be changed. Thus, both `__set()` and
  * `ArrayAccess` write operations ({@link \ArrayAccess::offsetSet()} and {@link \ArrayAccess::offsetUnset()}) throw an
- * {@link \Ivory\Exception\UnsupportedException}.
+ * {@link \Ivory\Exception\ImmutableException}.
+ *
+ * @see http://www.postgresql.org/docs/9.4/static/rowtypes.html
  */
 class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
 {

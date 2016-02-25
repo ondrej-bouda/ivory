@@ -3,6 +3,7 @@ namespace Ivory\Type;
 
 use Ivory\Exception\InternalException;
 use Ivory\Exception\ParseException;
+use Ivory\Exception\UnsupportedException;
 
 /**
  * Converter for arrays.
@@ -22,7 +23,7 @@ use Ivory\Exception\ParseException;
  *
  * @see http://www.postgresql.org/docs/9.4/static/arrays.html
  */
-class ArrayType implements IType
+class ArrayType implements ITotallyOrderedType
 {
     private $elemType;
     private $delim;
@@ -41,10 +42,10 @@ class ArrayType implements IType
             return null;
         }
 
-        // OPT: the parser processes any string which is legal for the PostgreSQL input; considering it would only be
-        //      used for processing output from PostgreSQL, only the more limited syntax might be accepted, which would
-        //      be simpler and faster; namely, in the output, there are neither whitespace nor backslash-escaped
-        //      characters outside of double-quoted strings
+        // OPT: The parser processes any string which is legal for the PostgreSQL input. Considering it would only be
+        //      used for processing output from PostgreSQL, more limited syntax might be accepted, which would be
+        //      simpler and faster; namely, in the output, there are neither whitespace nor backslash-escaped
+        //      characters outside of double-quoted strings.
 
         $strOffset = 0;
 
@@ -161,7 +162,7 @@ class ArrayType implements IType
      */
     public function serializeValue($val)
     {
-        return $this->performSerializeValue($val);
+        return $this->serializeValueImpl($val);
     }
 
     /**
@@ -171,7 +172,7 @@ class ArrayType implements IType
      * @param int[][] $bounds list: for each dimension, a pair of from-to subscripts is mentioned
      * @return string the PostgreSQL external representation of <tt>$val</tt>
      */
-    private function performSerializeValue($val, $curDim = 0, &$maxDim = -1, &$bounds = [])
+    private function serializeValueImpl($val, $curDim = 0, &$maxDim = -1, &$bounds = [])
     {
         if ($val === null) {
             return 'NULL';
@@ -213,7 +214,7 @@ class ArrayType implements IType
             }
 
             if (is_array($v)) {
-                $out .= $this->performSerializeValue($v, $curDim + 1, $maxDim, $bounds);
+                $out .= $this->serializeValueImpl($v, $curDim + 1, $maxDim, $bounds);
             }
             else {
                 if ($curDim != $maxDim) {
@@ -290,5 +291,96 @@ class ArrayType implements IType
             $msg .= ": $errMsg";
         }
         throw new ParseException($msg, $offset, 0, $cause);
+    }
+
+    public function compareValues($a, $b)
+    {
+        if (!$this->elemType instanceof ITotallyOrderedType) {
+            $elemTypeName = $this->elemType->getSchemaName() . '.' . $this->elemType->getName();
+            throw new UnsupportedException("The array element type $elemTypeName is not totally ordered.");
+        }
+
+        if ($a === null || $b === null) {
+            return null;
+        }
+
+        return $this->compareValuesImpl($a, $b);
+    }
+
+    private function compareValuesImpl($a, $b)
+    {
+        reset($b);
+        foreach ($a as $av) {
+            if (key($b) === null) {
+                return 1;
+            }
+            $bv = current($b);
+            next($b);
+            if ($av === null) {
+                if ($bv !== null) {
+                    return -1;
+                }
+            }
+            elseif ($bv === null) {
+                return 1;
+            }
+            elseif (is_array($av)) {
+                if (is_array($bv)) {
+                    $comp = $this->compareValuesImpl($av, $bv);
+                    if ($comp) {
+                        return $comp;
+                    }
+                }
+                else {
+                    return 1;
+                }
+            }
+            elseif (is_array($bv)) {
+                return -1;
+            }
+            else {
+                /** @var ITotallyOrderedType $et */
+                $et = $this->elemType;
+                $comp = $et->compareValues($av, $bv);
+                if ($comp) {
+                    return $comp;
+                }
+            }
+        }
+        if (key($b) !== null) {
+            return -1;
+        }
+
+        // ties broken by the subscripts of the first item
+        $aFst = $a;
+        $bFst = $b;
+        do {
+            $ak = key($aFst);
+            $bk = key($bFst);
+            if ($ak === null && $bk === null) {
+                return 0;
+            }
+            elseif ($ak === null) {
+                return -1;
+            }
+            elseif ($bk === null) {
+                return 1;
+            }
+            elseif (!is_numeric($ak) || !is_numeric($bk)) {
+                return 0;
+            }
+            else {
+                $d = $ak - $bk;
+                if ($d) {
+                    return $d;
+                }
+                else {
+                    $aFst = current($aFst);
+                    $bFst = current($bFst);
+                }
+            }
+        } while (is_array($aFst) && is_array($bFst));
+
+        return 0;
     }
 }

@@ -150,7 +150,7 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
              GROUP BY artist.id
              ORDER BY artist.name"
         );
-        // TODO: test according to range interface
+        $this->markTestSkipped('TODO: test according to range interface'); // TODO
     }
 
     public function testBoxArrayResult()

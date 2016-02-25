@@ -1,8 +1,8 @@
 <?php
 namespace Ivory\Connection;
 
-use Ivory\Exception\UndefinedTypeException;
 use Ivory\Ivory;
+use Ivory\Type\ITotallyOrderedType;
 use Ivory\Type\ITypeProvider;
 use Ivory\Type\TypeDictionary;
 use Ivory\Type\IntrospectingTypeDictionaryCompiler;
@@ -46,7 +46,7 @@ class TypeControl implements ITypeControl, ITypeProvider
         $this->typeDictionary->setUndefinedTypeHandler(function ($oid) {
             $compiler = new IntrospectingTypeDictionaryCompiler($this->connCtl->requireConnection());
             $dict = $compiler->compileTypeDictionary($this);
-            $type = $dict->requireTypeFromOid($oid);
+            $type = $dict->requireTypeByOid($oid);
             $this->typeDictionary = $dict; // replacing the current dictionary only when the requested type is found in the new dictionary
             $this->initUndefinedTypeHandler();
             return $type;
@@ -78,6 +78,24 @@ class TypeControl implements ITypeControl, ITypeProvider
             }
         }
         return new UndefinedType($schemaName, $typeName, $this->connection);
+    }
+
+    public function provideRangeCanonicalFunc($schemaName, $funcName, ITotallyOrderedType $subtype)
+    {
+        $localReg = $this->getTypeRegister();
+        $globalReg = Ivory::getTypeRegister();
+        foreach ([$localReg, $globalReg] as $reg) {
+            /** @var TypeRegister $reg */
+            $func = $reg->getRangeCanonicalFunc($schemaName, $funcName, $subtype);
+            if ($func !== null) {
+                return $func;
+            }
+            $func = $reg->provideRangeCanonicalFunc($schemaName, $funcName, $subtype);
+            if ($func !== null) {
+                return $func;
+            }
+        }
+        return null;
     }
 
     //endregion

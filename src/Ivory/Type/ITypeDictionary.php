@@ -10,5 +10,5 @@ interface ITypeDictionary
      * @return IType
      * @throws UndefinedTypeException
      */
-    function requireTypeFromOid($oid);
+    function requireTypeByOid($oid);
 }

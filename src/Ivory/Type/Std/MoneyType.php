@@ -12,6 +12,7 @@ use Ivory\Value\Money;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-money.html
  * @see http://www.postgresql.org/message-id/flat/20130328092819.237c0106@imp#20130328092819.237c0106@imp discussion on issues of the money type
+ * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
 class MoneyType extends BaseType
 {

@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Type;
 
+use Ivory\Exception\IncomparableException;
+use Ivory\Exception\UnsupportedException;
 use Ivory\Value\Composite;
 
 /**
@@ -15,7 +17,7 @@ use Ivory\Value\Composite;
  *
  * @todo throw ParseException on parse errors
  */
-abstract class CompositeType implements INamedType
+abstract class CompositeType implements INamedType, ITotallyOrderedType
 {
 	/** @var IType[] ordered map: attribute name => attribute type */
 	private $attributes = [];
@@ -182,5 +184,52 @@ abstract class CompositeType implements INamedType
 			$res = 'ROW' . $res;
 		}
 		return $res;
+	}
+
+	public function compareValues($a, $b)
+	{
+		if ($a === null || $b === null) {
+			return null;
+		}
+
+		if (!$a instanceof Composite) {
+			throw new IncomparableException('$a is not a ' . Composite::class);
+		}
+		if (!$b instanceof Composite) {
+			throw new IncomparableException('$b is not a ' . Composite::class);
+		}
+		if ($a->getType() !== $b->getType()) {
+			throw new IncomparableException('Different composite types');
+		}
+		$t = $a->getType();
+		if ($t->attributes) {
+			foreach ($t->attributes as $att => $type) {
+				if ($type instanceof ITotallyOrderedType) {
+					$xComp = $type->compareValues($a[$att], $b[$att]);
+					if ($xComp) {
+						return $xComp;
+					}
+				}
+				else {
+					throw new UnsupportedException("The composite {$this->getSchemaName()}.{$this->getName()} attribute $att type $type is not totally ordered.");
+				}
+			}
+			return 0;
+		}
+		else {
+			$al = $a->toList();
+			$bl = $b->toList();
+			if (count($al) != count($bl)) {
+				throw new IncomparableException('Unequal number of composite components');
+			}
+			foreach ($al as $i => $av) {
+				$bv = $bl[$i];
+				$xComp = strcmp((string)$av, (string)$bv);
+				if ($xComp) {
+					return $xComp;
+				}
+			}
+			return 0;
+		}
 	}
 }

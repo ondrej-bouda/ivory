@@ -9,6 +9,7 @@ use Ivory\Value\Json;
  * Represented as a {@link \Ivory\Value\Json} object.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-json.html
+ * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
 class JsonExactType extends JsonType
 {

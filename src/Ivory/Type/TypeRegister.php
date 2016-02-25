@@ -19,6 +19,9 @@ use Ivory\Connection\IConnection;
  * The purpose of the type register is only to collect all the types and type loaders. Once any of the types is
  * requested by a connection, it may be cached for the whole script lifetime so that later type or type loader
  * registration changes are not reflected.
+ *
+ * Besides types and type loaders, the type register also collects type supplements. As the only kind of supplements (so
+ * far), there are range canonical functions and their providers.
  */
 class TypeRegister
 {
@@ -26,6 +29,15 @@ class TypeRegister
     private $types = [];
     /** @var ITypeLoader[] list of registered type loaders, in the definition order */
     private $typeLoaders = [];
+    /**
+     * @var array already known range canonical functions;
+     *            map: schema name => map: function name => map: range subtype hash => function implementation
+     */
+    private $rangeCanonFuncs = [];
+    /**
+     * @var IRangeCanonicalFuncProvider[] list of registered range canonical function providers, in the definition order
+     */
+    private $rangeCanonFuncProviders = [];
 
     /**
      * Registers a type converter for a PostgreSQL base data type.
@@ -115,13 +127,147 @@ class TypeRegister
      * Unregisters a previously registered type loader.
      *
      * @param ITypeLoader $typeLoader type loader to unregister
-     * @return bool whether the type loader has actually been unregistered (<tt>false</tt> if it was not registered)
+     * @return bool whether the type loader has actually been unregistered (<tt>false</tt> if it was not registered and
+     *                thus this was a no-op)
      */
     public function unregisterTypeLoader(ITypeLoader $typeLoader)
     {
         $pos = array_search($typeLoader, $this->typeLoaders, true);
         if ($pos !== false) {
             array_splice($this->typeLoaders, $pos, 1);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    /**
+     * Registers a range canonical function.
+     *
+     * If a function has already been registered with the same name and argument type, it gets dropped in favor of the
+     * new one.
+     *
+     * @param string $schemaName name of the PostgreSQL schema the range canonical function is defined in
+     * @param string $funcName name of the range canonical function
+     * @param ITotallyOrderedType $subtype function argument type
+     * @param IRangeCanonicalFunc $func the function to register
+     */
+    public function registerRangeCanonicalFunc($schemaName, $funcName, ITotallyOrderedType $subtype, IRangeCanonicalFunc $func)
+    {
+        if (!isset($this->rangeCanonFuncs[$schemaName])) {
+            $this->rangeCanonFuncs[$schemaName] = [];
+        }
+        if (!isset($this->rangeCanonFuncs[$schemaName][$funcName])) {
+            $this->rangeCanonFuncs[$schemaName][$funcName] = [];
+        }
+        $this->rangeCanonFuncs[$schemaName][$funcName][spl_object_hash($subtype)] = $func;
+    }
+
+    /**
+     * Unregisters a range canonical function, previously registered by {@link registerRangeCanonicalFunc()}.
+     *
+     * Either the name of the PostgreSQL schema, function name, and argument type are given, in which case the
+     * implementation for this concrete function will get unregistered, or a function object is given, then any
+     * registrations of this function will be dropped.
+     *
+     * @param string|IRangeCanonicalFunc $schemaNameOrFunc
+     *                                  name of the PostgreSQL schema the function to unregister is defined in, or
+     *                                    function object to unregister
+     * @param string|null $funcName name of the PostgreSQL function to unregister, or <tt>null</tt> if an
+     *                                <tt>IRangeCanonicalFunc</tt> object is provided in the first argument
+     * @param ITotallyOrderedType|null $subtype
+     *                                  the argument type for the function to unregister;
+     *                                  <tt>null</tt> to unregister all overloaded functions of the given name;
+     *                                  <tt>null</tt> also skips this argument if an <tt>IRangeCanonicalFunc</tt> object
+     *                                    is provided in the first argument
+     * @return bool whether the function has actually been unregistered (<tt>false</tt> if it was not registered)
+     */
+    public function unregisterRangeCanonicalFunc($schemaNameOrFunc, $funcName = null, ITotallyOrderedType $subtype = null)
+    {
+        if ($schemaNameOrFunc instanceof IRangeCanonicalFunc) {
+            if ($funcName !== null) {
+                $msg = sprintf(
+                    '$funcName is irrelevant when an %s object is given in the first argument',
+                    IRangeCanonicalFunc::class
+                );
+                trigger_error($msg, E_USER_NOTICE);
+            }
+            if ($subtype !== null) {
+                $msg = sprintf(
+                    '$subtype is irrelevant when an %s object is given in the first argument',
+                    IRangeCanonicalFunc::class
+                );
+                trigger_error($msg, E_USER_NOTICE);
+            }
+
+            $func = $schemaNameOrFunc;
+            $existed = false;
+            foreach ($this->rangeCanonFuncs as $sn => $funcs) {
+                foreach ($funcs as $fn => $overloads) {
+                    foreach ($overloads as $h => $f) {
+                        if ($f === $func) {
+                            $existed = true;
+                            unset($this->rangeCanonFuncs[$sn][$fn][$h]);
+                        }
+                    }
+                    if (!$this->rangeCanonFuncs[$sn][$fn]) {
+                        unset($this->rangeCanonFuncs[$sn][$fn]);
+                    }
+                }
+                if (!$this->rangeCanonFuncs[$sn]) {
+                    unset($this->rangeCanonFuncs[$sn]);
+                }
+            }
+            return $existed;
+        }
+        else {
+            $schemaName = $schemaNameOrFunc;
+            if ($subtype === null) {
+                $existed = isset($this->rangeCanonFuncs[$schemaName][$funcName]);
+                unset($this->rangeCanonFuncs[$schemaName][$funcName]);
+                return $existed;
+            }
+            else {
+                $h = spl_object_hash($subtype);
+                $existed = isset($this->rangeCanonFuncs[$schemaName][$funcName][$h]);
+                unset($this->rangeCanonFuncs[$schemaName][$funcName][$h]);
+                return $existed;
+            }
+        }
+    }
+
+    /**
+     * Registers a range canonical function provider, if not already registered.
+     *
+     * @param IRangeCanonicalFuncProvider $provider provider to register
+     * @return bool whether the provider has actually been registered (<tt>false</tt> if it was already registered
+     *                before and thus this was a no-op)
+     */
+    public function registerRangeCanonicalFuncProvider(IRangeCanonicalFuncProvider $provider)
+    {
+        $pos = array_search($provider, $this->rangeCanonFuncProviders, true);
+        if ($pos === false) {
+            $this->rangeCanonFuncProviders[] = $provider;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    /**
+     * Unregisters a previously registered range canonical function provider.
+     *
+     * @param IRangeCanonicalFuncProvider $provider provider to unregister
+     * @return bool whether the provider has actually been unregistered (<tt>false</tt> if it was not registered and
+     *                thus this was a no-op)
+     */
+    public function unregisterRangeCanonicalFuncProvider(IRangeCanonicalFuncProvider $provider)
+    {
+        $pos = array_search($provider, $this->rangeCanonFuncProviders, true);
+        if ($pos !== false) {
+            array_splice($this->rangeCanonFuncProviders, $pos, 1);
             return true;
         }
         else {
@@ -167,6 +313,54 @@ class TypeRegister
             $tc = $loader->loadType($schemaName, $typeName, $connection);
             if ($tc !== null) {
                 return $tc;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Retrieves all the registered range canonical function providers.
+     *
+     * @return IRangeCanonicalFuncProvider[] list of the registered range canonical function providers, in the
+     *                                         registration order
+     */
+    public function getRangeCanonicalFuncProviders()
+    {
+        return $this->rangeCanonFuncProviders;
+    }
+
+    /**
+     * Returns the range canonical function explicitly registered using
+     * {@link TypeRegister::registerRangeCanonicalFunc()}.
+     *
+     * @param string $schemaName name of the PostgreSQL schema to get the function from
+     * @param string $funcName name of the PostgreSQL function
+     * @param ITotallyOrderedType $subtype function argument type
+     * @return IRangeCanonicalFunc|null the requested function, or <tt>null</tt> if no such function was registered
+     */
+    public function getRangeCanonicalFunc($schemaName, $funcName, ITotallyOrderedType $subtype)
+    {
+        return (isset($this->rangeCanonFuncs[$schemaName][$funcName][spl_object_hash($subtype)]) ?
+            $this->rangeCanonFuncs[$schemaName][$funcName][spl_object_hash($subtype)] : null
+        );
+        // PHP 7:
+//        return ($this->rangeCanonFuncs[$schemaName][$funcName][spl_object_hash($subtype)] ?? null);
+    }
+
+    /**
+     * Provides a range canonical function by the first registered provider recognizing it.
+     *
+     * @param string $schemaName name of the PostgreSQL schema to get the function from
+     * @param string $funcName name of the PostgreSQL function to provide
+     * @param ITotallyOrderedType $subtype function argument type
+     * @return IRangeCanonicalFunc|null the requested function, or <tt>null</tt> if no provider recognizes the function
+     */
+    public function provideRangeCanonicalFunc($schemaName, $funcName, ITotallyOrderedType $subtype)
+    {
+        foreach ($this->rangeCanonFuncProviders as $provider) {
+            $func = $provider->provideCanonicalFunc($schemaName, $funcName, $subtype);
+            if ($func !== null) {
+                return $func;
             }
         }
         return null;

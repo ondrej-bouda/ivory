@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Type\Std;
 
+use Ivory\Type\ITotallyOrderedType;
+
 /**
  * Logical boolean (true/false).
  *
@@ -8,7 +10,7 @@ namespace Ivory\Type\Std;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-boolean.html
  */
-class BooleanType extends \Ivory\Type\BaseType
+class BooleanType extends \Ivory\Type\BaseType implements ITotallyOrderedType
 {
 	public function parseValue($str)
 	{
@@ -49,5 +51,13 @@ class BooleanType extends \Ivory\Type\BaseType
 		else {
 			return 'FALSE';
 		}
+	}
+
+	public function compareValues($a, $b)
+	{
+		if ($a === null || $b === null) {
+			return null;
+		}
+		return (bool)$a - (bool)$b;
 	}
 }

@@ -1,7 +1,9 @@
 <?php
 namespace Ivory\Type\Std;
 
+use Ivory\Exception\IncomparableException;
 use Ivory\Type\BaseType;
+use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Point;
 
 /**
@@ -11,7 +13,7 @@ use Ivory\Value\Point;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-geometric.html
  */
-class PointType extends BaseType
+class PointType extends BaseType implements ITotallyOrderedType
 {
     public function parseValue($str)
     {
@@ -33,11 +35,46 @@ class PointType extends BaseType
         if ($val === null) {
             return 'NULL';
         }
-        elseif ($val instanceof Point) {
-            return sprintf('point(%s,%s)', $val->getX(), $val->getY());
+
+        if (is_array($val)) {
+            $val = Point::fromCoords($val);
+        }
+        elseif (!$val instanceof Point) {
+            $this->throwInvalidValue($val);
+        }
+
+        return sprintf('point(%s,%s)', $val->getX(), $val->getY());
+    }
+
+    public function compareValues($a, $b)
+    {
+        if ($a === null || $b === null) {
+            return null;
+        }
+
+        if (is_array($a)) {
+            $a = Point::fromCoords($a);
+        }
+        elseif (!$a instanceof Point) {
+            throw new IncomparableException('$a is not a ' . Point::class);
+        }
+
+        if (is_array($b)) {
+            $b = Point::fromCoords($b);
+        }
+        elseif (!$b instanceof Point) {
+            throw new IncomparableException('$b is not a ' . Point::class);
+        }
+
+        $ac = $a->toCoords();
+        $bc = $b->toCoords();
+
+        $xComp = FloatType::compareFloats($ac[0], $bc[0]);
+        if ($xComp !== 0) {
+            return $xComp;
         }
         else {
-            $this->throwInvalidValue($val);
+            return FloatType::compareFloats($ac[1], $bc[1]);
         }
     }
 }

@@ -7,9 +7,9 @@ use Ivory\Type\Std\StringType;
 
 class ArrayTypeTest extends IvoryTestCase
 {
-    /** @var IType */
+    /** @var ArrayType */
     private $intArrayType;
-    /** @var IType */
+    /** @var ArrayType */
     private $strArrayType;
 
     protected function setUp()
@@ -179,5 +179,31 @@ STR
             [3 => [4 => 'a b']],
             $this->strArrayType->parseValue('  [3:3] [4:4] =  { { a b } } ')
         );
+    }
+
+    public function testCompareValues()
+    {
+        $this->assertNull($this->intArrayType->compareValues(null, [1, 2, 3]));
+        $this->assertNull($this->intArrayType->compareValues([1, 2, 3], null));
+        $this->assertNull($this->intArrayType->compareValues(null, null));
+        $this->assertNull($this->intArrayType->compareValues(null, []));
+        $this->assertNull($this->intArrayType->compareValues(null, [[1], [2], [3]]));
+
+        $this->assertTrue($this->intArrayType->compareValues([], [1]) < 0);
+        $this->assertTrue($this->intArrayType->compareValues([1], []) > 0);
+
+        $this->assertTrue($this->intArrayType->compareValues([1, 3], [1, 3]) === 0);
+        $this->assertTrue($this->intArrayType->compareValues([1, 2, 3], [1, 3]) < 0);
+        $this->assertTrue($this->intArrayType->compareValues([1, 3], [1, 2, 3]) > 0);
+        $this->assertTrue($this->intArrayType->compareValues([1, 3, 3], [1, 3]) > 0);
+        $this->assertTrue($this->intArrayType->compareValues([1, 3], [1, 3, 3]) < 0);
+
+        $this->assertTrue($this->intArrayType->compareValues([[1], [3]], [[1], [3]]) === 0);
+        $this->assertTrue($this->intArrayType->compareValues([[1], [2], [3]], [[1], [3], [2]]) < 0);
+        $this->assertTrue($this->intArrayType->compareValues([[2], [1], [3]], [[1], [3], [2]]) > 0);
+        $this->assertTrue($this->intArrayType->compareValues([[1], [3], [3]], [[1], [3], [2]]) > 0);
+        $this->assertTrue($this->intArrayType->compareValues([[1], [3], [2]], [[1], [3], [3]]) < 0);
+
+        $this->assertTrue($this->intArrayType->compareValues([1 => [1], [3]], [[1], [3]]) > 0);
     }
 }

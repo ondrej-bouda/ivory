@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Type\Std;
 
+use Ivory\Type\ITotallyOrderedType;
+
 /**
  * Inexact, variable-precision numeric type.
  *
@@ -8,7 +10,7 @@ namespace Ivory\Type\Std;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html
  */
-class FloatType extends \Ivory\Type\BaseType
+class FloatType extends \Ivory\Type\BaseType implements ITotallyOrderedType
 {
 	public function parseValue($str)
 	{
@@ -48,6 +50,36 @@ class FloatType extends \Ivory\Type\BaseType
 		}
 		else {
 			return "'Infinity'";
+		}
+	}
+
+	public function compareValues($a, $b)
+	{
+		return self::compareFloats($a, $b);
+	}
+
+	public static function compareFloats($a, $b)
+	{
+		if ($a === null || $b === null) {
+			return null;
+		}
+
+		if ($a === NAN) {
+			return ($b === NAN ? 0 : 1);
+		}
+		elseif ($b === NAN) {
+			return -1;
+		}
+
+		// TODO PHP 7: use the spaceship operator
+		if ((float)$a < (float)$b) {
+			return -1;
+		}
+		elseif ((float)$a == (float)$b) {
+			return 0;
+		}
+		else {
+			return 1;
 		}
 	}
 }

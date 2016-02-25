@@ -82,7 +82,7 @@ class QueryResult extends Result implements \Iterator, IQueryResult
 			if ($typeOid === false || $typeOid === null) { // NOTE: besides false, pg_field_type_oid() might return NULL on error
 				throw new ResultException("Error retrieving type OID of result column $i.");
 			}
-			$type = $this->typeDictionary->requireTypeFromOid($typeOid);
+			$type = $this->typeDictionary->requireTypeByOid($typeOid);
 
 			$this->columns[] = new Column($this, $i, $name, $type);
 

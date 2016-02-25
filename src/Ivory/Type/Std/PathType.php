@@ -12,6 +12,7 @@ use Ivory\Value\Polygon;
  * Represented as a {@link \Ivory\Value\Path} object.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-geometric.html
+ * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
 class PathType extends CompoundGeometricType
 {

@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Type;
 
+// TODO: try to load each data type, not just the basic types, from the type provider preferably, only generate a generic type object if no type is registered explicitly; that will allow to register custom type implementations, e.g., DateRange which would offer time-related methods
 class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
 {
     private $connHandler;
@@ -16,17 +17,20 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
 
         $enumLabels = $this->retrieveEnumLabels();
 
-        $query = "WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypdelim) AS (
-                    SELECT t.oid, nspname, t.typname,
+        $query = "WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypdelim, rngcfnspname, rngcfname) AS (
+                    SELECT t.oid, nsp.nspname, t.typname,
                            (CASE WHEN arrelemtype.oid IS NOT NULL THEN 'A' ELSE t.typtype END), -- marking array types as of typtype 'A'
                            (CASE WHEN arrelemtype.oid IS NOT NULL THEN arrelemtype.oid
                                  WHEN t.typtype = 'd' THEN t.typbasetype
                                  WHEN t.typtype = 'r' THEN rngsubtype
                             END),
-                           arrelemtype.typdelim
+                           arrelemtype.typdelim,
+                           rngcfnsp.nspname AS rngcfnspname, rngcf.proname AS rngcfname
                     FROM pg_catalog.pg_type t
                          JOIN pg_catalog.pg_namespace nsp ON nsp.oid = t.typnamespace
                          LEFT JOIN pg_catalog.pg_range rng ON rng.rngtypid = t.oid
+                         LEFT JOIN pg_catalog.pg_proc rngcf ON rngcf.oid = rng.rngcanonical
+                         LEFT JOIN pg_catalog.pg_namespace rngcfnsp ON rngcfnsp.oid = rngcf.pronamespace
                          LEFT JOIN pg_catalog.pg_type arrelemtype ON arrelemtype.typarray = t.oid
                   ),
                   typetree (oid, depth) AS (
@@ -42,7 +46,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                   ORDER BY tt.depth";
         /* NOTE: The query orders the types so that, when processing them one by one, there are no forward references.
                  This is achieved by constituting the types dependency tree, and ordering the types by the depth in the
-                 tree. For such method to be correct, we should prove the dependency graph among types is actually forms
+                 tree. For such method to be correct, we should prove the dependency graph among types actually forms
                  a tree, or more precisely, a forest. See the following points:
                  1) There are only four types of types which refer other types and thus might be involved in a cycle:
                     arrays, ranges, domains, and composites.
@@ -58,11 +62,11 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                       CREATE TYPE r AS RANGE (SUBTYPE = c);
                       ALTER TYPE c ADD ATTRIBUTE rng r;
                  That said, the dependency graph does not form a forest, but that's only due to attributes of composite
-                 types. However, the composite type in a circular dependency may only be referred as a whole.
+                 types. However, the composite type in a circular dependency may only be referred to as a whole.
                  Therefore, the solution to compiling a type dictionary is such that only empty composite types are
                  created at first, then their attributes are added to them. For such proceeding, (empty) composite types
                  are considered as having no dependencies. The rest of types form a dependency tree, as follows from
-                 point 3) and from the fact that no type (except composites) may depend no more than one other type.
+                 point 3) and from the fact that no type (except composites) may depend on more than one other type.
                  Moreover, to be correct, we should prove that ordering the dependency forest by the tree depth suffices
                  for the ordered result set not to contain any forward references. That's an easy induction, though:
                  i)  Types in the level 0 have no dependencies, and thus may all be processed first, in any order.
@@ -75,7 +79,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
             $typeName = $row['typname'];
             switch ($row['typtype']) {
                 case 'A':
-                    $elemType = $dict->requireTypeFromOid($row['parenttype']);
+                    $elemType = $dict->requireTypeByOid($row['parenttype']);
                     $type = $this->createArrayType($elemType, $row['arrelemtypdelim']);
                     // NOTE: typdelim of the array type itself seems irrelevant
                     break;
@@ -87,7 +91,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                     $type = $this->createCompositeType($schemaName, $typeName); // attributes added later
                     break;
                 case 'd':
-                    $baseType = $dict->requireTypeFromOid($row['parenttype']);
+                    $baseType = $dict->requireTypeByOid($row['parenttype']);
                     $type = $this->createDomainType($schemaName, $typeName, $baseType);
                     break;
                 case 'e':
@@ -95,8 +99,29 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                     $type = $this->createEnumType($schemaName, $typeName, $labels);
                     break;
                 case 'r':
-                    $subtype = $dict->requireTypeFromOid($row['parenttype']);
-                    $type = $this->createRangeType($schemaName, $typeName, $subtype);
+                    $subtype = $dict->requireTypeByOid($row['parenttype']);
+                    if (!$subtype instanceof ITotallyOrderedType) {
+                        $sc = get_class($subtype);
+                        $msg = "Cannot create range type $schemaName.$typeName: the subtype $sc is not totally ordered";
+                        trigger_error($msg, E_USER_WARNING);
+                        continue 2;
+                    }
+                    if ($row['rngcfname'] !== null) {
+                        $canonFunc = $typeProvider->provideRangeCanonicalFunc(
+                            $row['rngcfnspname'], $row['rngcfname'], $subtype
+                        );
+                        if ($canonFunc === null) {
+                            $msg = "Range $typeName has a canonical function $row[rngcfnspname].$row[rngcfname], " .
+                                "but there is no implementation of this function registered. Using the range " .
+                                "without any canonical function - the range will be treated as a continuous " .
+                                "range. That might lead to unexpected results, though.";
+                            trigger_error($msg, E_USER_WARNING);
+                        }
+                    }
+                    else {
+                        $canonFunc = null;
+                    }
+                    $type = $this->createRangeType($schemaName, $typeName, $subtype, $canonFunc);
                     break;
                 default:
                     throw new \RuntimeException("Error fetching types: unexpected typtype '$row[typtype]'");
@@ -137,8 +162,8 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
         $errorDesc = 'Error fetching composite type attributes';
         foreach ($this->query($query, $errorDesc) as $row) {
             /** @var CompositeType $compType */
-            $compType = $dict->requireTypeFromOid($row['oid']);
-            $attType = $dict->requireTypeFromOid($row['atttypid']);
+            $compType = $dict->requireTypeByOid($row['oid']);
+            $attType = $dict->requireTypeByOid($row['atttypid']);
             $compType->addAttribute($row['attname'], $attType);
         }
     }
@@ -200,12 +225,13 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
     /**
      * @param string $schemaName
      * @param string $typeName
-     * @param IType $subtype the range subtype
+     * @param ITotallyOrderedType $subtype the range subtype
+     * @param IRangeCanonicalFunc $canonicalFunc the range canonical function
      * @return IType
      */
-    protected function createRangeType($schemaName, $typeName, IType $subtype)
+    protected function createRangeType($schemaName, $typeName, ITotallyOrderedType $subtype, IRangeCanonicalFunc $canonicalFunc)
     {
-        return new RangeType($schemaName, $typeName, $subtype);
+        return new RangeType($schemaName, $typeName, $subtype, $canonicalFunc);
     }
 
     /**
