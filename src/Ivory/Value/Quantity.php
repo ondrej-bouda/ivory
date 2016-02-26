@@ -137,6 +137,9 @@ class Quantity implements IComparable
      */
     public function equals($quantity)
     {
+        if ($quantity === null) {
+            return null;
+        }
         if (!$quantity instanceof Quantity) {
             $quantity = self::fromString($quantity);
         }

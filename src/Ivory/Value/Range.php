@@ -319,6 +319,9 @@ class Range implements IComparable, \ArrayAccess
 
     public function equals($object)
     {
+        if ($object === null) {
+            return null;
+        }
         if (!$object instanceof Range) {
             return false;
         }

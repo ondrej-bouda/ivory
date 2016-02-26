@@ -271,6 +271,9 @@ class Decimal implements IComparable
 	 */
 	public function equals($number)
 	{
+		if ($number === null) {
+			return null;
+		}
 		return ($this->compareTo($number) == 0);
 	}
 

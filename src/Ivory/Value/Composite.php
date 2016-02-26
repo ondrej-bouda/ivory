@@ -87,6 +87,9 @@ class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
 	 */
 	public function equals($other)
 	{
+		if ($other === null) {
+			return null;
+		}
 		if (get_class($this) != get_class($other)) {
 			return false;
 		}

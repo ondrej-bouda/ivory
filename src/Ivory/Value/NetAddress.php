@@ -352,6 +352,9 @@ class NetAddress implements IComparable
      */
     public function equals($address)
     {
+        if ($address === null) {
+            return null;
+        }
         if (!$address instanceof NetAddress) {
             $address = NetAddress::fromString($address);
         }

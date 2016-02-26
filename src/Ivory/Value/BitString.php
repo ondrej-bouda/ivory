@@ -85,6 +85,9 @@ abstract class BitString implements IComparable, \ArrayAccess
 	 */
 	public function equals($other)
 	{
+		if ($other === null) {
+			return null;
+		}
 		return (get_class($this) == get_class($other) && $this->bits == $other->bits);
 	}
 
