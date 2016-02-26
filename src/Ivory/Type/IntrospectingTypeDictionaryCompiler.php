@@ -1,13 +1,16 @@
 <?php
 namespace Ivory\Type;
 
-// TODO: try to load each data type, not just the basic types, from the type provider preferably, only generate a generic type object if no type is registered explicitly; that will allow to register custom type implementations, e.g., DateRange which would offer time-related methods
+use Ivory\Connection\IConnection;
+
 class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
 {
+    private $connection;
     private $connHandler;
 
-    public function __construct($connHandler)
+    public function __construct(IConnection $connection, $connHandler)
     {
+        $this->connection = $connection;
         $this->connHandler = $connHandler;
     }
 
@@ -77,6 +80,16 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
         foreach ($this->query($query, $errorDesc) as $row) {
             $schemaName = $row['nspname'];
             $typeName = $row['typname'];
+
+            /* OPT: This leads to a great flexibility - any type may be registered explicitly, bypassing the generic
+             *      type constructors offered by Ivory. It may as well lead to a performance penalty, though.
+             */
+            $explicit = $typeProvider->provideType($schemaName, $typeName);
+            if ($explicit !== null) {
+                $dict->defineType($row['oid'], $explicit);
+                continue;
+            }
+
             switch ($row['typtype']) {
                 case 'A':
                     $elemType = $dict->requireTypeByOid($row['parenttype']);
@@ -86,6 +99,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                 case 'b':
                 case 'p': // treating pseudo-types as base types - they must be recognized, not built up on another type
                     $type = $this->createBaseType($schemaName, $typeName, $typeProvider);
+                    // OPT: types not recognized by the type provider are asked twice
                     break;
                 case 'c':
                     $type = $this->createCompositeType($schemaName, $typeName); // attributes added later
@@ -180,6 +194,11 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
     }
 
     /**
+     * Provides the {@link IType} object for the requested type.
+     *
+     * If the requested type is not recognized by the type provider, an {@link \Ivory\Type\UndefinedType} object is
+     * returned.
+     *
      * @param string $schemaName
      * @param string $typeName
      * @param ITypeProvider $typeProvider
@@ -187,7 +206,13 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      */
     protected function createBaseType($schemaName, $typeName, ITypeProvider $typeProvider)
     {
-        return $typeProvider->provideBaseType($schemaName, $typeName);
+        $type = $typeProvider->provideType($schemaName, $typeName);
+        if ($type !== null) {
+            return $type;
+        }
+        else {
+            return new UndefinedType($schemaName, $typeName, $this->connection);
+        }
     }
 
     /**

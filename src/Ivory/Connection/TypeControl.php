@@ -7,7 +7,6 @@ use Ivory\Type\ITypeProvider;
 use Ivory\Type\TypeDictionary;
 use Ivory\Type\IntrospectingTypeDictionaryCompiler;
 use Ivory\Type\TypeRegister;
-use Ivory\Type\UndefinedType;
 
 class TypeControl implements ITypeControl, ITypeProvider
 {
@@ -44,7 +43,7 @@ class TypeControl implements ITypeControl, ITypeProvider
     private function initUndefinedTypeHandler()
     {
         $this->typeDictionary->setUndefinedTypeHandler(function ($oid) {
-            $compiler = new IntrospectingTypeDictionaryCompiler($this->connCtl->requireConnection());
+            $compiler = new IntrospectingTypeDictionaryCompiler($this->connection, $this->connCtl->requireConnection());
             $dict = $compiler->compileTypeDictionary($this);
             $type = $dict->requireTypeByOid($oid);
             $this->typeDictionary = $dict; // replacing the current dictionary only when the requested type is found in the new dictionary
@@ -62,7 +61,7 @@ class TypeControl implements ITypeControl, ITypeProvider
 
     //region ITypeProvider
 
-    public function provideBaseType($schemaName, $typeName)
+    public function provideType($schemaName, $typeName)
     {
         $localReg = $this->getTypeRegister();
         $globalReg = Ivory::getTypeRegister();
@@ -77,7 +76,7 @@ class TypeControl implements ITypeControl, ITypeProvider
                 return $type;
             }
         }
-        return new UndefinedType($schemaName, $typeName, $this->connection);
+        return null;
     }
 
     public function provideRangeCanonicalFunc($schemaName, $funcName, ITotallyOrderedType $subtype)

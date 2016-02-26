@@ -8,10 +8,9 @@ interface ITypeProvider
      *
      * @param string $schemaName name of the PostgreSQL schema to get the converter for
      * @param string $typeName name of the PostgreSQL type to get the converter for
-     * @return IType converter for the requested type, or an {@link \Ivory\Type\UndefinedType} object if no
-     *                 corresponding type is registered
+     * @return IType converter for the requested type, or <tt>null</tt> if no corresponding type is registered
      */
-    function provideBaseType($schemaName, $typeName);
+    function provideType($schemaName, $typeName);
 
     /**
      * Provides the implementation of the range canonical function, using the local and the global type register.
