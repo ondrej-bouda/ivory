@@ -18,6 +18,7 @@ class CompositeTypeTest extends IvoryTestCase
 
     public function testParseSimpleUntyped()
     {
+        $this->assertNull($this->adHocComposite->parseValue(null));
         $this->assertSame([], $this->adHocComposite->parseValue('()')->toList());
         $this->assertSame(['1'], $this->adHocComposite->parseValue('(1)')->toList());
         $this->assertSame(['ab'], $this->adHocComposite->parseValue('(ab)')->toList());
@@ -54,6 +55,7 @@ STR
 
     public function testSerializeSimpleUntyped()
     {
+        $this->assertSame('NULL', $this->adHocComposite->serializeValue(null));
         $this->assertSame('ROW()', $this->adHocComposite->serializeValue($this->val([])));
         $this->assertSame('ROW(NULL)', $this->adHocComposite->serializeValue($this->val([null])));
         $this->assertSame("ROW('1')", $this->adHocComposite->serializeValue($this->val([1])));

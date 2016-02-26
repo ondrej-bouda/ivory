@@ -16,6 +16,7 @@ use Ivory\Value\Composite;
  *   As an untyped composite type cannot tell the original expression, it prefers `ROW()`.
  *
  * @todo throw ParseException on parse errors
+ * @see http://www.postgresql.org/docs/9.4/static/rowtypes.html
  */
 abstract class CompositeType implements INamedType, ITotallyOrderedType
 {
@@ -69,6 +70,9 @@ abstract class CompositeType implements INamedType, ITotallyOrderedType
 
 	public function parseValue($str)
 	{
+		if ($str === null) {
+			return null;
+		}
 		if ($str == '()' && !$this->attributes) {
 			return Composite::fromList($this, []);
 		}
@@ -81,7 +85,7 @@ abstract class CompositeType implements INamedType, ITotallyOrderedType
 
 		$attRegex = '~
 		              "(?:[^"\\\\]|""|\\\\.)*"      # either a double-quoted string (backslashes used for escaping, or
-		                                            # double quotes doubled for a single double-quote character)
+		                                            # double quotes doubled for a single double-quote character),
                       |                             # or an unquoted string of characters which do not confuse the
                       (?:[^"()\\\\,]|\\\\.)+        # parser or are backslash-escaped
 		             ~x';
@@ -141,7 +145,10 @@ abstract class CompositeType implements INamedType, ITotallyOrderedType
 
 	public function serializeValue($val)
 	{
-		if ($val instanceof Composite) {
+		if ($val === null) {
+			return 'NULL';
+		}
+		elseif ($val instanceof Composite) {
 			/** @var IType[] $types */
 			$types = array_values($val->getType()->getAttributes());
 			if ($types) {
