@@ -255,7 +255,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      * @param IRangeCanonicalFunc $canonicalFunc the range canonical function
      * @return IType
      */
-    protected function createRangeType($schemaName, $typeName, ITotallyOrderedType $subtype, IRangeCanonicalFunc $canonicalFunc)
+    protected function createRangeType($schemaName, $typeName, ITotallyOrderedType $subtype, IRangeCanonicalFunc $canonicalFunc = null)
     {
         return new RangeType($schemaName, $typeName, $subtype, $canonicalFunc);
     }
