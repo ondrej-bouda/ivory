@@ -2,7 +2,6 @@
 namespace Ivory\Type\Std;
 
 use Ivory\Type\IDiscreteType;
-use Ivory\Type\ITotallyOrderedType;
 
 /**
  * Signed eight-byte integer.
@@ -12,7 +11,7 @@ use Ivory\Type\ITotallyOrderedType;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html#DATATYPE-INT
  */
-class BigIntType extends IntegerType implements ITotallyOrderedType, IDiscreteType
+class BigIntType extends IntegerType implements IDiscreteType
 {
 	const _PHP_INT_MIN = (PHP_MAJOR_VERSION >= 7 ? PHP_INT_MIN : -PHP_INT_MAX); // PHP 7: refactor out
 

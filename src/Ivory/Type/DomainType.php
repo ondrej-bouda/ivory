@@ -4,7 +4,7 @@ namespace Ivory\Type;
 use Ivory\Exception\UnsupportedException;
 use Ivory\NamedDbObject;
 
-class DomainType implements INamedType, ITotallyOrderedType, IDiscreteType
+class DomainType implements INamedType, IDiscreteType
 {
     use NamedDbObject;
 

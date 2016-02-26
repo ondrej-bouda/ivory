@@ -2,7 +2,6 @@
 namespace Ivory\Type\Std;
 
 use Ivory\Type\IDiscreteType;
-use Ivory\Type\ITotallyOrderedType;
 
 /**
  * Signed integer.
@@ -11,7 +10,7 @@ use Ivory\Type\ITotallyOrderedType;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html#DATATYPE-INT
  */
-class IntegerType extends \Ivory\Type\BaseType implements ITotallyOrderedType, IDiscreteType
+class IntegerType extends \Ivory\Type\BaseType implements IDiscreteType
 {
 	public function parseValue($str)
 	{
