@@ -98,6 +98,7 @@ SQL
                 ['id' => 1, 'name' => 'The Piano Guys', 'is_active' => 't'],
                 ['id' => 2, 'name' => 'Metallica', 'is_active' => 'f'],
                 ['id' => 3, 'name' => 'Tommy Emmanuel', 'is_active' => null],
+                ['id' => 4, 'name' => 'B-Side Band', 'is_active' => null],
             ],
             'album' => [
                 ['id' => 1, 'name' => 'The Piano Guys', 'year' => 2012],

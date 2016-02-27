@@ -3,12 +3,13 @@ namespace Ivory\Relation;
 
 use Ivory\Value\Composite;
 use Ivory\Value\Box;
+use Ivory\Value\Range;
 
 class QueryRelationTest extends \Ivory\IvoryTestCase
 {
     public function testDummy()
     {
-        $this->assertEquals(3, $this->getConnection()->getRowCount('artist'));
+        $this->assertEquals(4, $this->getConnection()->getRowCount('artist'));
     }
 
     public function testBasic()
@@ -21,6 +22,7 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
             $tuples[] = $tuple;
         }
         $expArray = [
+            ['id' => 4, 'name' => 'B-Side Band', 'is_active' => null],
             ['id' => 2, 'name' => 'Metallica', 'is_active' => false],
             ['id' => 1, 'name' => 'The Piano Guys', 'is_active' => true],
             ['id' => 3, 'name' => 'Tommy Emmanuel', 'is_active' => null],
@@ -145,12 +147,27 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
                           ELSE 'empty'
                      END) AS active_years
              FROM artist
-                  JOIN album_artist ON album_artist.artist_id = artist.id
-                  JOIN album ON album.id = album_artist.album_id
+                  LEFT JOIN (album_artist
+                             JOIN album ON album.id = album_artist.album_id
+                            ) ON album_artist.artist_id = artist.id
              GROUP BY artist.id
              ORDER BY artist.name"
         );
-        $this->markTestSkipped('TODO: test according to range interface'); // TODO
+
+        /** @var Range[] $map */
+        $map = [];
+        foreach ($qr as $row) {
+            $map[$row['artist_name']] = $row['active_years'];
+        }
+        // TODO: refactor to the following code after implementing assoc()
+//        $map = $qr->assoc('artist_name', 'active_years');
+
+        $this->assertSame(['B-Side Band', 'Metallica', 'The Piano Guys', 'Tommy Emmanuel'], array_keys($map));
+
+        $this->assertTrue($map['B-Side Band']->isEmpty());
+        $this->assertSame([1991, 1999], $map['Metallica']->toBounds('[]'));
+        $this->assertSame([2012, 2012], $map['The Piano Guys']->toBounds('[]'));
+        $this->assertSame([2005, 2005], $map['Tommy Emmanuel']->toBounds('[]'));
     }
 
     public function testBoxArrayResult()
