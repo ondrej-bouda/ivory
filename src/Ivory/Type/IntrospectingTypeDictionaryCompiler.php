@@ -96,25 +96,35 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                     $type = $this->createArrayType($elemType, $row['arrelemtypdelim']);
                     // NOTE: typdelim of the array type itself seems irrelevant
                     break;
+
                 case 'b':
                 case 'p': // treating pseudo-types as base types - they must be recognized, not built up on another type
                     $type = $this->createBaseType($schemaName, $typeName, $typeProvider);
                     // OPT: types not recognized by the type provider are asked twice
                     break;
+
                 case 'c':
                     $type = $this->createCompositeType($schemaName, $typeName); // attributes added later
                     break;
+
                 case 'd':
                     $baseType = $dict->requireTypeByOid($row['parenttype']);
                     $type = $this->createDomainType($schemaName, $typeName, $baseType);
                     break;
+
                 case 'e':
                     $labels = (isset($enumLabels[$row['oid']]) ? $enumLabels[$row['oid']] : []);
                     $type = $this->createEnumType($schemaName, $typeName, $labels);
                     break;
+
                 case 'r':
                     $subtype = $dict->requireTypeByOid($row['parenttype']);
                     if (!$subtype instanceof ITotallyOrderedType) {
+                        if ($subtype instanceof UndefinedType) {
+                            $type = new UndefinedType($schemaName, $typeName, $this->connection);
+                            break;
+                        }
+
                         $sc = get_class($subtype);
                         $msg = "Cannot create range type $schemaName.$typeName: the subtype $sc is not totally ordered";
                         trigger_error($msg, E_USER_WARNING);
@@ -137,6 +147,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                     }
                     $type = $this->createRangeType($schemaName, $typeName, $subtype, $canonFunc);
                     break;
+
                 default:
                     throw new \RuntimeException("Error fetching types: unexpected typtype '$row[typtype]'");
             }
