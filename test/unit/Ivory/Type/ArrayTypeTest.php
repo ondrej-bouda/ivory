@@ -192,13 +192,13 @@ STR
         $this->assertTrue($this->intArrayType->compareValues([], [1]) < 0);
         $this->assertTrue($this->intArrayType->compareValues([1], []) > 0);
 
-        $this->assertTrue($this->intArrayType->compareValues([1, 3], [1, 3]) === 0);
+        $this->assertSame(0, $this->intArrayType->compareValues([1, 3], [1, 3]));
         $this->assertTrue($this->intArrayType->compareValues([1, 2, 3], [1, 3]) < 0);
         $this->assertTrue($this->intArrayType->compareValues([1, 3], [1, 2, 3]) > 0);
         $this->assertTrue($this->intArrayType->compareValues([1, 3, 3], [1, 3]) > 0);
         $this->assertTrue($this->intArrayType->compareValues([1, 3], [1, 3, 3]) < 0);
 
-        $this->assertTrue($this->intArrayType->compareValues([[1], [3]], [[1], [3]]) === 0);
+        $this->assertSame(0, $this->intArrayType->compareValues([[1], [3]], [[1], [3]]));
         $this->assertTrue($this->intArrayType->compareValues([[1], [2], [3]], [[1], [3], [2]]) < 0);
         $this->assertTrue($this->intArrayType->compareValues([[2], [1], [3]], [[1], [3], [2]]) > 0);
         $this->assertTrue($this->intArrayType->compareValues([[1], [3], [3]], [[1], [3], [2]]) > 0);
