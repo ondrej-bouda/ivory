@@ -11,6 +11,7 @@ interface IDiscreteType extends ITotallyOrderedType
      *               note that in some special cases, e.g., for the date infinity, the <tt>$value</tt> itself may be
      *                 returned;
      *               <tt>null</tt> iff <tt>$value</tt> is <tt>null</tt>
+     * @throws \InvalidArgumentException if <tt>$value</tt> is of a wrong type
      */
     function step($delta, $value);
 }

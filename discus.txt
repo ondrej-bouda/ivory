@@ -2,6 +2,7 @@
 ** Because why not?
 ** But isn't it more expected for Ivory::connect() to return once it is really connected?
    Wouldn't Ivory::startConnecting() tell more what's going on? - Although, in case of asynchronous connecting, Ivory
-   automatically waits until the connection is ready, so it is pretty transparent.
+   automatically waits until the connection is ready, so it is pretty transparent, and startConnecting() would, on the
+   other hand, suggest some extra work has to be done.
 
 * Connection::__destruct() calls disconnect()

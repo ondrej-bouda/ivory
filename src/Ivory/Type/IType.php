@@ -25,6 +25,7 @@ interface IType
 	 *
 	 * In case `null` is given, the `'NULL'` string is returned.
 	 *
+	 * @todo unify whether the result shall contain the typecast or not; whether it is necessary depends on the context, so the output of this method shall probably contain no typecasts - the caller should include it, if required
 	 * @param mixed $val
 	 * @return string
 	 */

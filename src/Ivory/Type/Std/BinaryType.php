@@ -18,8 +18,9 @@ class BinaryType extends \Ivory\Type\BaseType implements ITotallyOrderedType
 			return null;
 		}
 
-		// depending on the PostgreSQL bytea_output configuration parameter, data may be encoded either in the "hex" or
-		// "escape" format, which may be recognized by the '\x' prefix
+		/* Depending on the PostgreSQL bytea_output configuration parameter, data may be encoded either in the "hex" or
+		 * "escape" format, which may be recognized by the '\x' prefix.
+		 */
 		if (substr($str, 0, 2) == '\\x') {
 			return hex2bin(substr($str, 2));
 		}
