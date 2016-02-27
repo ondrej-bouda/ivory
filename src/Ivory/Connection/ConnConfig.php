@@ -100,10 +100,9 @@ class ConnConfig implements IConnConfig
     public function getDefaultTxConfig()
     {
         return self::createTxConfig(
-
-            $this->default_transaction_isolation,
-            $this->default_transaction_read_only,
-            $this->default_transaction_deferrable
+            $this->get(self::OPT_DEFAULT_TRANSACTION_ISOLATION),
+            $this->get(self::OPT_DEFAULT_TRANSACTION_READ_ONLY),
+            $this->get(self::OPT_DEFAULT_TRANSACTION_DEFERRABLE)
         );
     }
 
