@@ -3,6 +3,7 @@ namespace Ivory\Type\Std;
 
 use Ivory\Connection\DateStyle;
 use Ivory\Connection\IConnConfig;
+use Ivory\Type\BaseType;
 use Ivory\Type\IDiscreteType;
 use Ivory\Value\Date;
 
@@ -34,7 +35,7 @@ use Ivory\Value\Date;
  * @see http://www.postgresql.org/docs/9.4/static/datetime-units-history.html
  * @see http://www.postgresql.org/docs/9.4/static/runtime-config-client.html#GUC-DATESTYLE
  */
-class DateType extends \Ivory\Type\BaseType implements IDiscreteType
+class DateType extends BaseType implements IDiscreteType
 {
 	public function parseValue($str)
 	{
@@ -89,7 +90,7 @@ class DateType extends \Ivory\Type\BaseType implements IDiscreteType
 			}
 		}
 
-		return Date::fromComponentsStrict($yearSgn * $year, $mon, $day);
+		return Date::fromPartsStrict($yearSgn * $year, $mon, $day);
 	}
 
 	public function serializeValue($val)
@@ -99,7 +100,7 @@ class DateType extends \Ivory\Type\BaseType implements IDiscreteType
 		}
 
 		if (!$val instanceof Date) {
-			$val = (is_numeric($val) ? Date::fromTimestamp($val) : Date::fromString($val));
+			$val = (is_numeric($val) ? Date::fromTimestamp($val) : Date::fromISOString($val));
 		}
 
 		return sprintf(
