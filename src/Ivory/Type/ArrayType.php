@@ -355,6 +355,8 @@ class ArrayType implements ITotallyOrderedType
         $aFst = $a;
         $bFst = $b;
         do {
+            reset($aFst);
+            reset($bFst);
             $ak = key($aFst);
             $bk = key($bFst);
             if ($ak === null && $bk === null) {
