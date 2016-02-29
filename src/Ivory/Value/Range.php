@@ -15,18 +15,12 @@ use Ivory\Utils\IComparable;
  * - the range is defined above a type of values, called "subtype" (see {@link Range::getSubtype()});
  * - the subtype must have a total order;
  * - a range may be empty, meaning it contains nothing (see {@link Range::isEmpty()} for distinguishing it)
- *   (TODO: decide whether to represent empty ranges by a special value, or noting that in a special attribute of just
- *          any range, which will happen to be empty; note that even an empty range shall behave like a range;
- *          idea: introduce an IRange interface specifying the interface, then implement two distinct classes -
- *          EmptyRange and NonEmptyRange - each of which implements the operations on its own; also include the
- *          isEmpty() method for distinguishing them);
  * - a non-empty range has the lower and the upper bounds, either of which may either be inclusive or exclusive (see
  *   {@link Range::getLower()} and {@link Range::getUpper()} for getting the boundaries; also see
  *   {@link Range::isLowerInc()} and {@link Range::isUpperInc()} for finding out whichever boundary is inclusive);
  * - a range may be unbounded in either direction, covering all subtype values from the range towards minus infinity or
  *   towards infinity, respectively;
- * - a range might even cover just a single point, in which case it is called a "singleton". (TODO: consider renaming
- *   "singleton" to something else which would not resemble the Singleton design pattern).
+ * - a range might even cover just a single point ({@link Range::isSinglePoint()} may be used for checking out).
  *
  * Ranges of some types may have a canonical function, the purpose of which is to convert semantically equivalent ranges
  * on {@link \Ivory\Type\IDiscreteType discrete types} to syntactically equivalent ranges. E.g., one such function might
@@ -51,6 +45,8 @@ class Range implements IComparable, \ArrayAccess
 {
     /** @var ITotallyOrderedType */
     private $subtype;
+    /** @var IRangeCanonicalFunc */
+    private $canonicalFunc;
     /** @var bool */
     private $empty;
     /** @var mixed */
@@ -61,6 +57,9 @@ class Range implements IComparable, \ArrayAccess
     private $lowerInc;
     /** @var bool */
     private $upperInc;
+
+
+    //region construction
 
     /**
      * Creates a new range with given lower and upper bounds.
@@ -153,12 +152,18 @@ class Range implements IComparable, \ArrayAccess
             }
         }
 
-        return new Range($subtype, false, $lower, $upper, $loInc, $upInc);
+        return new Range($subtype, $canonicalFunc, false, $lower, $upper, $loInc, $upInc);
     }
 
+    /**
+     * Creates a new empty range.
+     *
+     * @param ITotallyOrderedType $subtype the range subtype
+     * @return Range
+     */
     public static function createEmpty(ITotallyOrderedType $subtype)
     {
-        return new Range($subtype, true, null, null, null, null);
+        return new Range($subtype, null, true, null, null, null, null);
     }
 
     private static function processBoundSpec($boundsOrLowerInc = '[)', $upperInc = null)
@@ -176,20 +181,22 @@ class Range implements IComparable, \ArrayAccess
                 throw new \InvalidArgumentException($msg);
             }
 
-            $lowerInc = ($boundsOrLowerInc[0] == '[');
-            $upperInc = ($boundsOrLowerInc[1] == ']');
+            $loInc = ($boundsOrLowerInc[0] == '[');
+            $upInc = ($boundsOrLowerInc[1] == ']');
         }
         else {
-            $lowerInc = (bool)$boundsOrLowerInc;
-            $upperInc = (bool)$upperInc;
+            $loInc = (bool)$boundsOrLowerInc;
+            $upInc = (bool)$upperInc;
         }
 
-        return [$lowerInc, $upperInc];
+        return [$loInc, $upInc];
     }
 
-    private function __construct(ITotallyOrderedType $subtype, $empty, $lower, $upper, $lowerInc, $upperInc)
+
+    private function __construct(ITotallyOrderedType $subtype, $canonicalFunc, $empty, $lower, $upper, $lowerInc, $upperInc)
     {
         $this->subtype = $subtype;
+        $this->canonicalFunc = $canonicalFunc;
         $this->empty = $empty;
         $this->lower = $lower;
         $this->upper = $upper;
@@ -197,7 +204,11 @@ class Range implements IComparable, \ArrayAccess
         $this->upperInc = $upperInc;
     }
 
-    public function getSubtype()
+    //endregion
+
+    //region getters
+
+    final public function getSubtype()
     {
         return $this->subtype;
     }
@@ -205,7 +216,7 @@ class Range implements IComparable, \ArrayAccess
     /**
      * @return bool whether the range is empty
      */
-    public function isEmpty()
+    final public function isEmpty()
     {
         return $this->empty;
     }
@@ -213,7 +224,7 @@ class Range implements IComparable, \ArrayAccess
     /**
      * @return mixed lower bound, or <tt>null</tt> if the range is lower-unbounded or empty
      */
-    public function getLower()
+    final public function getLower()
     {
         return $this->lower;
     }
@@ -221,7 +232,7 @@ class Range implements IComparable, \ArrayAccess
     /**
      * @return mixed upper bound, or <tt>null</tt> if the range is upper-unbounded or empty
      */
-    public function getUpper()
+    final public function getUpper()
     {
         return $this->upper;
     }
@@ -230,7 +241,7 @@ class Range implements IComparable, \ArrayAccess
      * @return bool|null whether the range includes its lower bound, or <tt>null</tt> if the range is empty;
      *                   for lower-unbounded ranges, <tt>false</tt> is returned by definition
      */
-    public function isLowerInc()
+    final public function isLowerInc()
     {
         return $this->lowerInc;
     }
@@ -239,7 +250,7 @@ class Range implements IComparable, \ArrayAccess
      * @return bool|null whether the range includes its upper bound, or <tt>null</tt> if the range is empty;
      *                   for upper-unbounded ranges, <tt>false</tt> is returned by definition
      */
-    public function isUpperInc()
+    final public function isUpperInc()
     {
         return $this->upperInc;
     }
@@ -248,13 +259,39 @@ class Range implements IComparable, \ArrayAccess
      * @return string|null the bounds inclusive/exclusive specification, as accepted by {@link createFromBounds()}, or
      *                     <tt>null</tt> if the range is empty
      */
-    public function getBoundsSpec()
+    final public function getBoundsSpec()
     {
         if ($this->empty) {
             return null;
         }
         else {
             return ($this->lowerInc ? '[' : '(') . ($this->upperInc ? ']' : ')');
+        }
+    }
+
+    /**
+     * @return bool whether the range is just a single point
+     */
+    final public function isSinglePoint()
+    {
+        if ($this->empty || $this->lower === null || $this->upper === null) {
+            return false;
+        }
+
+        $cmp = $this->subtype->compareValues($this->lower, $this->upper);
+        if ($cmp == 0) {
+            return ($this->lowerInc && $this->upperInc);
+        }
+        if ($this->lowerInc && $this->upperInc) { // optimization
+            return false;
+        }
+        if ($this->subtype instanceof IDiscreteType) {
+            $lo = ($this->lowerInc ? $this->lower : $this->subtype->step(1, $this->lower));
+            $up = ($this->upperInc ? $this->upper : $this->subtype->step(-1, $this->upper));
+            return ($this->subtype->compareValues($lo, $up) == 0);
+        }
+        else {
+            return false;
         }
     }
 
@@ -314,6 +351,332 @@ class Range implements IComparable, \ArrayAccess
         return [$lo, $up];
     }
 
+    final public function __toString()
+    {
+        if ($this->empty) {
+            return 'empty';
+        }
+
+        $bounds = $this->getBoundsSpec();
+        return sprintf('%s%s,%s%s',
+            $bounds[0],
+            ($this->lower === null ? '-infinity' : $this->lower),
+            ($this->upper === null ? 'infinity' : $this->upper),
+            $bounds[1]
+        );
+    }
+
+    //endregion
+
+    //region range operations
+
+    /**
+     * @param mixed $element a value of the range subtype
+     * @return bool whether this range contains the given element;
+     *              <tt>null</tt> on <tt>null</tt> input
+     */
+    public function containsElement($element)
+    {
+        if ($element === null) {
+            return null;
+        }
+        if ($this->empty) {
+            return false;
+        }
+
+        if ($this->lower !== null) {
+            $cmp = $this->subtype->compareValues($element, $this->lower);
+            if ($cmp < 0 || ($cmp == 0 && !$this->lowerInc)) {
+                return false;
+            }
+        }
+
+        if ($this->upper !== null) {
+            $cmp = $this->subtype->compareValues($element, $this->upper);
+            if ($cmp > 0 || ($cmp == 0 && !$this->upperInc)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param mixed $element value of the range subtype
+     * @return bool <tt>true</tt> iff this range is left of the given element - value of the range subtype;
+     *              <tt>false</tt> otherwise, especially if this range is empty;
+     *              <tt>null</tt> on <tt>null</tt> input
+     */
+    public function leftOfElement($element)
+    {
+        if ($element === null) {
+            return null;
+        }
+        if ($this->empty) {
+            return false;
+        }
+
+        if ($this->upper === null) {
+            return false;
+        }
+        $cmp = $this->subtype->compareValues($element, $this->upper);
+        return ($cmp > 0 || ($cmp == 0 && !$this->upperInc));
+    }
+
+    /**
+     * @param mixed $element value of the range subtype
+     * @return bool <tt>true</tt> iff this range is right of the given element - value of the range subtype;
+     *              <tt>false</tt> otherwise, especially if this range is empty;
+     *              <tt>null</tt> on <tt>null</tt> input
+     */
+    public function rightOfElement($element)
+    {
+        if ($element === null) {
+            return null;
+        }
+        if ($this->empty) {
+            return false;
+        }
+
+        if ($this->lower === null) {
+            return false;
+        }
+        $cmp = $this->subtype->compareValues($element, $this->lower);
+        return ($cmp < 0 || ($cmp == 0 && !$this->lowerInc));
+    }
+
+    /**
+     * @param Range $other a range of the same subtype as this range
+     * @return bool whether this range entirely contains the other range;
+     *              an empty range is considered to be contained in any range, even an empty one;
+     *              <tt>null</tt> on <tt>null</tt> input
+     */
+    public function containsRange($other)
+    {
+        if ($other === null) {
+            return null;
+        }
+        if (!$other instanceof Range) {
+            throw new \InvalidArgumentException('$other');
+        }
+        if ($other->empty) {
+            return true;
+        }
+        if ($this->empty) {
+            return false;
+        }
+
+        if ($this->lower !== null) {
+            if ($other->lower === null) {
+                return false;
+            }
+            else {
+                $cmp = $this->subtype->compareValues($this->lower, $other->lower);
+                if ($cmp > 0 || ($cmp == 0 && !$this->lowerInc && $other->lowerInc)) {
+                    return false;
+                }
+            }
+        }
+
+        if ($this->upper !== null) {
+            if ($other->upper === null) {
+                return false;
+            }
+            else {
+                $cmp = $this->subtype->compareValues($this->upper, $other->upper);
+                if ($cmp < 0 || ($cmp == 0 && !$this->upperInc && $other->upperInc)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param Range $other a range of the same subtype as this range
+     * @return bool whether this range is entirely contained in the other range;
+     *              an empty range is considered to be contained in any range, even an empty one;
+     *              <tt>null</tt> on <tt>null</tt> input
+     */
+    public function containedInRange($other)
+    {
+        if ($other === null) {
+            return null;
+        }
+        if (!$other instanceof Range) {
+            throw new \InvalidArgumentException('$other');
+        }
+        return $other->containsRange($this);
+    }
+
+    /**
+     * @param Range $other a range of the same subtype as this range
+     * @return bool whether this and the other range overlap, i.e., have a non-empty intersection;
+     *              <tt>null</tt> on <tt>null</tt> input
+     */
+    public function overlaps($other)
+    {
+        if ($other === null) {
+            return null;
+        }
+        if (!$other instanceof Range) {
+            throw new \InvalidArgumentException('$other');
+        }
+        if ($this->empty || $other->empty) {
+            return false;
+        }
+
+        if ($this->lower !== null && $other->upper !== null) {
+            $cmp = $this->subtype->compareValues($this->lower, $other->upper);
+            if ($cmp > 0 || ($cmp == 0 && (!$this->lowerInc || !$other->upperInc))) {
+                return false;
+            }
+        }
+        if ($other->lower !== null && $this->upper !== null) {
+            $cmp = $this->subtype->compareValues($other->lower, $this->upper);
+            if ($cmp > 0 || ($cmp == 0 && (!$other->lowerInc || !$this->upperInc))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Computes the intersection of this range with another range.
+     *
+     * @param Range $other a range of the same subtype as this range
+     * @return Range intersection of this and the other range
+     *               <tt>null</tt> on <tt>null</tt> input
+     */
+    public function intersect($other)
+    {
+        if ($other === null) {
+            return null;
+        }
+        if (!$other instanceof Range) {
+            throw new \InvalidArgumentException('$other');
+        }
+        if ($this->empty) {
+            return $this;
+        }
+        if ($other->empty) {
+            return $other;
+        }
+
+        if ($this->lower === null) {
+            $lo = $other->lower;
+            $loInc = $other->lowerInc;
+        }
+        elseif ($other->lower === null) {
+            $lo = $this->lower;
+            $loInc = $this->lowerInc;
+        }
+        else {
+            $cmp = $this->subtype->compareValues($this->lower, $other->lower);
+            if ($cmp < 0) {
+                $lo = $other->lower;
+                $loInc = $other->lowerInc;
+            }
+            elseif ($cmp > 0) {
+                $lo = $this->lower;
+                $loInc = $this->lowerInc;
+            }
+            else {
+                $lo = $this->lower;
+                $loInc = ($this->lowerInc && $other->lowerInc);
+            }
+        }
+
+        if ($this->upper === null) {
+            $up = $other->upper;
+            $upInc = $other->upperInc;
+        }
+        elseif ($other->upper === null) {
+            $up = $this->upper;
+            $upInc = $this->upperInc;
+        }
+        else {
+            $cmp = $this->subtype->compareValues($this->upper, $other->upper);
+            if ($cmp < 0) {
+                $up = $this->upper;
+                $upInc = $this->upperInc;
+            }
+            elseif ($cmp > 0) {
+                $up = $other->upper;
+                $upInc = $other->upperInc;
+            }
+            else {
+                $up = $this->upper;
+                $upInc = ($this->upperInc && $other->upperInc);
+            }
+        }
+
+        return self::createFromBounds($this->subtype, $this->canonicalFunc, $lo, $up, $loInc, $upInc);
+    }
+
+    /**
+     * @return bool whether the range is finite, i.e., neither starts nor ends in the infinity;
+     *              note that an empty range is considered as finite
+     */
+    final public function isFinite()
+    {
+        return ($this->empty || ($this->lower !== null && $this->upper !== null));
+    }
+
+    /**
+     * @param Range|null $other a range of the same subtype as this range
+     * @return bool <tt>true</tt> iff this range is strictly left of the other range, i.e., it ends before the other
+     *                starts;
+     *              <tt>false</tt> otherwise, especially if either range is empty;
+     *              <tt>null</tt> on <tt>null</tt> input
+     */
+    public function strictlyLeftOf($other)
+    {
+        if ($other === null) {
+            return null;
+        }
+        if (!$other instanceof Range) {
+            throw new \InvalidArgumentException('$other');
+        }
+        if ($this->empty || $other->empty) {
+            return false;
+        }
+
+        if ($this->upper === null || $other->lower === null) {
+            return false;
+        }
+        $cmp = $this->subtype->compareValues($this->upper, $other->lower);
+        return ($cmp < 0 || ($cmp == 0 && (!$this->upperInc || !$other->lowerInc)));
+    }
+
+    /**
+     * @param Range|null $other a range of the same subtype as this range
+     * @return bool <tt>true</tt> iff this range is strictly left of the other range, i.e., it ends before the other
+     *                starts;
+     *              <tt>false</tt> otherwise, especially if either range is empty;;
+     *              <tt>null</tt> on <tt>null</tt> input
+     */
+    public function strictlyRightOf($other)
+    {
+        if ($other === null) {
+            return null;
+        }
+        if (!$other instanceof Range) {
+            throw new \InvalidArgumentException('$other');
+        }
+        if ($this->empty || $other->empty) {
+            return false;
+        }
+
+        if ($other->upper === null || $this->lower === null) {
+            return false;
+        }
+        $cmp = $this->subtype->compareValues($other->upper, $this->lower);
+        return ($cmp < 0 || ($cmp == 0 && (!$other->upperInc || !$this->lowerInc)));
+    }
+
+    //endregion
 
     //region IComparable
 
