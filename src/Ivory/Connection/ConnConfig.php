@@ -94,12 +94,10 @@ class ConnConfig implements IConnConfig
             }
             $res = @pg_query_params($this->connHandler, 'SELECT pg_catalog.current_setting($1)', [$propertyName]);
             if ($sp) {
-                if ($res !== false) {
-                    $this->connection->releaseSavepoint($sp);
-                }
-                else {
+                if ($res === false) {
                     $this->connection->rollbackToSavepoint($sp);
                 }
+                $this->connection->releaseSavepoint($sp);
             }
             if ($res !== false) {
                 return pg_fetch_result($res, 0, 0);
