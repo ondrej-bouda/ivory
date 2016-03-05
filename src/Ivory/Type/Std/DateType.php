@@ -1,8 +1,8 @@
 <?php
 namespace Ivory\Type\Std;
 
+use Ivory\Connection\ConfigParam;
 use Ivory\Connection\DateStyle;
-use Ivory\Connection\IConnConfig;
 use Ivory\Type\BaseType;
 use Ivory\Type\IDiscreteType;
 use Ivory\Value\Date;
@@ -18,7 +18,7 @@ use Ivory\Value\Date;
  * setting:
  * - `ISO`, e.g., `1997-12-17`
  * - `SQL`, e.g., `12/17/1997`
- * - `Postgres`, e.g., `1997-12-17` (formatted the same as `ISO` for `date`-only values), or
+ * - `Postgres`, e.g., `12-17-1997`, or
  * - `German`, e.g., `17.12.1997`.
  *
  * Apart from that, the order of the day, month, and year in dates parsed from PostgreSQL by
@@ -52,8 +52,8 @@ class DateType extends BaseType implements IDiscreteType
 		}
 
 		$p = [];
-		list(, $p[0], $sep, $p[1], $p[2], $bc) = $m;
-		$yearSgn = ($bc ? -1 : 1);
+		list(, $p[0], $sep, $p[1], $p[2]) = $m;
+		$yearSgn = (isset($m[5]) ? -1 : 1);
 
 		if ($sep == '.') {
 			list($day, $mon, $year) = $p; // German style, no need to look up the settings
@@ -69,7 +69,7 @@ class DateType extends BaseType implements IDiscreteType
 			 *       could rely on a subset of permitted PostgreSQL syntax - the one actually used by PostgreSQL for
 			 *       outputting the values, e.g., ArrayType.
 			 */
-			$dateStyleStr = $this->getConnection()->getConfig()->get(IConnConfig::OPT_DATE_STYLE);
+			$dateStyleStr = $this->getConnection()->getConfig()->get(ConfigParam::DATE_STYLE);
 			$dateStyle = DateStyle::fromString($dateStyleStr);
 			switch ($dateStyle->getOrder()) {
 				case DateStyle::ORDER_DMY:

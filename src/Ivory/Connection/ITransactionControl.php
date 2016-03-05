@@ -6,6 +6,13 @@ use Ivory\Exception\InvalidStateException;
 interface ITransactionControl
 {
     /**
+     * Finds out whether a transaction is currently active.
+     *
+     * @return bool <tt>true</tt> iff a transaction is active
+     */
+    function inTransaction();
+
+    /**
      * Begins a new transaction.
      *
      * Note that transactions cannot be nested in PostgreSQL (use {@link savepoint()} instead). Thus, if not called

@@ -31,48 +31,17 @@ use Ivory\Value\Quantity;
  *
  * @todo provide a way to get all configuration options; maybe as Iterable?
  * @see http://www.postgresql.org/docs/9.4/static/config-setting.html Description of Configuration Settings
- * @see http://www.postgresql.org/docs/9.4/static/runtime-config-client.html List of Standard Configuration Settings
+ * @see http://www.postgresql.org/docs/9.4/static/runtime-config-client.html List of Standard Client Configuration Settings
  */
 interface IConnConfig
 {
     const DEFAULT_VALUE = null;
 
-    const OPT_SEARCH_PATH = 'search_path';
-    const OPT_ROW_SECURITY = 'row_security';
-    const OPT_DEFAULT_TABLESPACE = 'default_tablespace';
-    const OPT_TEMP_TABLESPACES = 'temp_tablespaces';
-    const OPT_CHECK_FUNCTION_BODIES = 'check_function_bodies';
-    const OPT_DEFAULT_TRANSACTION_ISOLATION = 'default_transaction_isolation';
-    const OPT_DEFAULT_TRANSACTION_READ_ONLY = 'default_transaction_read_only';
-    const OPT_DEFAULT_TRANSACTION_DEFERRABLE = 'default_transaction_deferrable';
-    const OPT_SESSION_REPLICATION_ROLE = 'session_replication_role';
-    const OPT_STATEMENT_TIMEOUT = 'statement_timeout';
-    const OPT_LOCK_TIMEOUT = 'lock_timeout';
-    const OPT_VACUUM_FREEZE_TABLE_AGE = 'vacuum_freeze_table_age';
-    const OPT_VACUUM_FREEZE_MIN_AGE = 'vacuum_freeze_min_age';
-    const OPT_VACUUM_MULTIXACT_FREEZE_TABLE_AGE = 'vacuum_multixact_freeze_table_age';
-    const OPT_VACUUM_MULTIXACT_FREEZE_MIN_AGE = 'vacuum_multixact_freeze_min_age';
-    const OPT_BYTEA_OUTPUT = 'bytea_output';
-    const OPT_XMLBINARY = 'xmlbinary';
-    const OPT_XMLOPTION = 'xmloption';
-    const OPT_GIN_PENDING_LIST_LIMIT = 'gin_pending_list_limit';
-    const OPT_DATE_STYLE = 'DateStyle';
-    const OPT_INTERVAL_STYLE = 'IntervalStyle';
-    const OPT_TIME_ZONE = 'TimeZone';
-    const OPT_TIMEZONE_ABBREVIATIONS = 'timezone_abbreviations';
-    const OPT_EXTRA_FLOAT_DIGITS = 'extra_float_digits';
-    const OPT_CLIENT_ENCODING = 'client_encoding';
-    const OPT_LC_MESSAGES = 'lc_messages';
-    const OPT_LC_MONETARY = 'lc_monetary';
-    const OPT_LC_NUMERIC = 'lc_numeric';
-    const OPT_LC_TIME = 'lc_time';
-    const OPT_DEFAULT_TEXT_SEARCH_CONFIG = 'default_text_search_config';
-    const OPT_LOCAL_PRELOAD_LIBRARIES = 'local_preload_libraries';
-    const OPT_SESSION_PRELOAD_LIBRARIES = 'session_preload_libraries';
-    const OPT_SHARED_PRELOAD_LIBRARIES = 'shared_preload_libraries';
-    const OPT_DYNAMIC_LIBRARY_PATH = 'dynamic_library_path';
-    const OPT_GIN_FUZZY_SEARCH_LIMIT = 'gin_fuzzy_search_limit';
 
+    /**
+     * Flushes any cached information.
+     */
+    function flushCache();
 
     /**
      * @param string $propertyName name of a configuration option

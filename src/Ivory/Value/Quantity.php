@@ -13,6 +13,10 @@ use Ivory\Utils\IComparable;
  * Several units are recognized and conversion to some of its related units is offered. See the class constants.
  * Note that the memory and time units are compatible with those used by PostgreSQL for configuration settings.
  *
+ * The PHP operator `==` may be used to compare two `Quantity` objects whether they are of the same value and unit.
+ * For comparison of effective values (e.g., `15s == 15000ms`), taking into account units convertibility, use the
+ * {@link Quantity::equals()} method.
+ *
  * The objects are immutable, i.e., operations always produce a new object.
  */
 class Quantity implements IComparable
@@ -177,7 +181,12 @@ class Quantity implements IComparable
     public function convert($destUnit)
     {
         if (!$this->unit || !$destUnit) {
-            throw new UndefinedOperationException('Conversion from/to dimensionless quantity is undefined.');
+            if ($this->value == 0) {
+                return new Quantity($this->value, $destUnit);
+            }
+            else {
+                throw new UndefinedOperationException('Conversion from/to dimensionless quantity is undefined.');
+            }
         }
         if (!isset(self::$conversion[$this->unit])) {
             throw new UnsupportedException("Conversion from an unsupported unit '$this->unit'");

@@ -14,17 +14,31 @@ use Ivory\Value\Quantity;
  * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-custom.html customized options}), the standard PHP
  * syntax `$config->{'some.prop'}` may be employed, or the {@link get()} method may simply be called.
  *
- * The implementation of read operations is lazy - no database query is made until actually needed.
+ * The implementation of read operations is lazy - no database query is made until actually needed. Some values are
+ * gathered using the {@link pg_parameter_status()} function (these get cached internally by the PHP driver). Others are
+ * directly queried and are not cached. For caching these, see the {@link CachingConnConfig} implementation.
+ *
+ * Data types of non-standard settings are fetched once and cached for the whole {@link ConnConfig} object lifetime
+ * ({@link ConnConfig::flushCache()} may, of course, be used for flushing it in any case). Note that
+ * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-custom.html customized options} are always of type
+ * `text`.
  */
 class ConnConfig implements IConnConfig
 {
     const OPT_MONEY_DEC_SEP = '__' . __NAMESPACE__ . '_OPT_MONEY_DEC_SEP__';
 
     private $connection;
+    private $connHandler;
+    private $typeCache = null;
 
-    public function __construct(Connection $connection)
+    /**
+     * @param Connection $connection Ivory Connection
+     * @param resource $connHandler
+     */
+    public function __construct(Connection $connection, $connHandler)
     {
         $this->connection = $connection;
+        $this->connHandler = $connHandler;
     }
 
     /**
@@ -62,15 +76,121 @@ class ConnConfig implements IConnConfig
         $this->setForSession($propertyName, $value);
     }
 
+    public function flushCache()
+    {
+        $this->typeCache = null;
+    }
+
     public function get($propertyName)
     {
-        // pg_parameter_status() might be used, only if it returned typed result
-        // TODO: query
+        if (self::isCustomOption($propertyName)) {
+            /* Custom options are always of type string, no need to even worry about the type.
+             * The custom option might not be recognized by PostgreSQL yet and an exception might be thrown, which would
+             * break the current transaction (if any). Hence the safe-point.
+             */
+            $sp = ($this->connection->inTransaction() ? 'customized_option' : null);
+            if ($sp) {
+                $this->connection->savepoint($sp);
+            }
+            $res = @pg_query_params($this->connHandler, 'SELECT pg_catalog.current_setting($1)', [$propertyName]);
+            if ($sp) {
+                if ($res !== false) {
+                    $this->connection->releaseSavepoint($sp);
+                }
+                else {
+                    $this->connection->rollbackToSavepoint($sp);
+                }
+            }
+            if ($res !== false) {
+                return pg_fetch_result($res, 0, 0);
+            }
+            else {
+                return null;
+            }
+        }
+
+        static $pgParStatusRecognized = [
+            ConfigParam::IS_SUPERUSER => true,
+            ConfigParam::SESSION_AUTHORIZATION => true,
+            ConfigParam::APPLICATION_NAME => true,
+            ConfigParam::DATE_STYLE => true,
+            ConfigParam::INTERVAL_STYLE => true,
+            ConfigParam::TIME_ZONE => true,
+            ConfigParam::CLIENT_ENCODING => true,
+            ConfigParam::STANDARD_CONFORMING_STRINGS => true,
+            ConfigParam::INTEGER_DATETIMES => true,
+            ConfigParam::SERVER_ENCODING => true,
+            ConfigParam::SERVER_VERSION => true,
+        ];
+        if (isset($pgParStatusRecognized[$propertyName])) {
+            $val = pg_parameter_status($this->connHandler, $propertyName);
+            if ($val !== false) {
+                $type = ConfigParam::TYPEMAP[$propertyName];
+                assert($type !== null);
+                return ConfigParamType::createValue($type, $val);
+            }
+        }
+
+        // determine the type
+        $type = null;
+        // try exact match first, for performance reasons; hopefully, indexing the type map will not be needed
+        if (array_key_exists($propertyName, ConfigParam::TYPEMAP)) {
+            $type = ConfigParam::TYPEMAP[$propertyName];
+        }
+        else {
+            // okay, try to search for case-insensitive matches
+            if ($this->typeCache === null) {
+                $this->typeCache = array_change_key_case(ConfigParam::TYPEMAP, CASE_LOWER);
+            }
+            $lowerPropertyName = strtolower($propertyName);
+            if (isset($this->typeCache[$lowerPropertyName])) {
+                $type = $this->typeCache[$lowerPropertyName];
+            }
+        }
+
+        if ($type === null) { // type unknown, try to look in the catalog for server configuration
+            $query = 'SELECT setting, vartype, unit FROM pg_catalog.pg_settings WHERE name ILIKE $1';
+            $res = pg_query_params($this->connHandler, $query, [$propertyName]);
+            if ($res !== false || pg_num_rows($res) > 0) {
+                $row = pg_fetch_assoc($res);
+                $type = ConfigParamType::detectType($row['vartype'], $row['setting'], $row['unit']);
+                $this->typeCache[$propertyName] = $type;
+                $this->typeCache[strtolower($propertyName)] = $type;
+                return ConfigParamType::createValue($type, $row['setting'], $row['unit']);
+            }
+        }
+
+        if ($type === null) {
+            /* As the last resort, treat the value as a string. Note that the pg_settings view might not contain all,
+             * e.g., "session_authorization" - which is recognized by pg_parameter_status() and is probably just an
+             * exception which gets created automatically for the connection, but who knows...
+             */
+            $type = ConfigParamType::STRING;
+        }
+
+        $res = pg_query_params($this->connHandler, 'SELECT pg_catalog.current_setting($1)', [$propertyName]);
+        if ($res !== false) {
+            $val = pg_fetch_result($res, 0, 0);
+            return ConfigParamType::createValue($type, $val);
+        }
+        else {
+            return null;
+        }
+    }
+
+    /**
+     * @param string $propertyName
+     * @return bool whether the requested property is a custom option
+     */
+    private static function isCustomOption($propertyName)
+    {
+        // see http://www.postgresql.org/docs/9.4/static/runtime-config-custom.html
+        return (strpos($propertyName, '.') !== false);
     }
 
     public function defined($propertyName)
     {
-        // TODO
+        return ($this->get($propertyName) !== null);
     }
 
     public function setForTransaction($propertyName, $value)
@@ -79,14 +199,13 @@ class ConnConfig implements IConnConfig
             return; // setting the option would have no effect as the implicit transaction would end immediately
         }
 
-        // TODO
+        pg_query_params($this->connHandler, 'SELECT pg_catalog.set_config($1, $2, TRUE)', [$propertyName, $value]);
     }
 
     public function setForSession($propertyName, $value)
     {
-        // TODO
+        pg_query_params($this->connHandler, 'SELECT pg_catalog.set_config($1, $2, FALSE)', [$propertyName, $value]);
     }
-
 
     public function getTxConfig()
     {
@@ -100,9 +219,9 @@ class ConnConfig implements IConnConfig
     public function getDefaultTxConfig()
     {
         return self::createTxConfig(
-            $this->get(self::OPT_DEFAULT_TRANSACTION_ISOLATION),
-            $this->get(self::OPT_DEFAULT_TRANSACTION_READ_ONLY),
-            $this->get(self::OPT_DEFAULT_TRANSACTION_DEFERRABLE)
+            $this->get(ConfigParam::DEFAULT_TRANSACTION_ISOLATION),
+            $this->get(ConfigParam::DEFAULT_TRANSACTION_READ_ONLY),
+            $this->get(ConfigParam::DEFAULT_TRANSACTION_DEFERRABLE)
         );
     }
 

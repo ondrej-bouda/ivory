@@ -18,7 +18,7 @@ class Connection implements IConnection
 
 	private $config;
 
-	private $inTransaction = false; // FIXME: rely on pg_transaction_status() instead of duplicating its logic here (it is reported not to talk to the server, so it shall be fast)
+	private $inTrans = false; // FIXME: rely on pg_transaction_status() instead of duplicating its logic here (it is reported not to talk to the server, so it shall be fast)
 
 	/**
 	 * @param string $name name for the connection
@@ -34,7 +34,7 @@ class Connection implements IConnection
 		$this->typeCtl = new TypeControl($this, $this->connCtl);
 		$this->stmtExec = new StatementExecution($this->connCtl, $this->typeCtl);
 		$this->copyCtl = new CopyControl();
-		$this->config = new ConnConfig($this);
+		$this->config = new ConnConfig($this, $this->connCtl->requireConnection());
 	}
 
 	final public function getName()
@@ -47,19 +47,25 @@ class Connection implements IConnection
 		return $this->config;
 	}
 
+	public function inTransaction()
+	{
+		return $this->inTrans;
+	}
+
 	public function startTransaction($transactionOptions = 0)
 	{
-		$this->connCtl->requireConnection();
-		if ($this->inTransaction) {
+		$connHandler = $this->connCtl->requireConnection();
+		if ($this->inTrans) {
 			trigger_error('A transaction is already active, cannot start a new one.', E_USER_WARNING);
 			return;
 		}
 
 		// TODO: issue START TRANSACTION
+		pg_query($connHandler, 'START TRANSACTION'); // TODO: handle errors
 		// TODO: adjust the savepoint info
 		// TODO: issue an event in case someone is listening
 
-		$this->inTransaction = true;
+		$this->inTrans = true;
 	}
 
 	public function setupTransaction($transactionOptions)
@@ -74,66 +80,76 @@ class Connection implements IConnection
 
 	public function commit()
 	{
-		$this->connCtl->requireConnection();
-		if (!$this->inTransaction) {
+		$connHandler = $this->connCtl->requireConnection();
+		if (!$this->inTrans) {
 			trigger_error('No transaction is active, nothing to commit.', E_USER_WARNING);
 			return;
 		}
 
 		// TODO: issue COMMIT
+		pg_query($connHandler, 'COMMIT'); // TODO: handle errors
 		// TODO: adjust the savepoint info
 		// TODO: issue an event in case someone is listening
 
-		$this->inTransaction = false;
+		$this->inTrans = false;
 	}
 
 	public function rollback()
 	{
-		$this->connCtl->requireConnection();
-		if (!$this->inTransaction) {
+		$connHandler = $this->connCtl->requireConnection();
+		if (!$this->inTrans) {
 			trigger_error('No transaction is active, nothing to roll back.', E_USER_WARNING);
 			return;
 		}
 
 		// TODO: issue ROLLBACK
+		pg_query($connHandler, 'ROLLBACK'); // TODO: handle errors
 		// TODO: adjust the savepoints info
 		// TODO: issue an event in case someone is listening
 
-		$this->inTransaction = false;
+		$this->inTrans = false;
+	}
+
+	private function ident($ident)
+	{
+		return '"' . strtr($ident, ['"' => '""']) . '"'; // FIXME: revise; move where appropriate
 	}
 
 	public function savepoint($name)
 	{
-		$this->connCtl->requireConnection();
-		if (!$this->inTransaction) {
+		$connHandler = $this->connCtl->requireConnection();
+		if (!$this->inTrans) {
 			throw new InvalidStateException('No transaction is active, cannot create any savepoint.');
 		}
 
 		// TODO: issue SAVEPOINT "$name"
+		pg_query($connHandler, sprintf('SAVEPOINT %s', $this->ident($name))); // TODO: handle errors
 		// TODO: adjust the savepoints info
 		// TODO: issue an event in case someone is listening
 	}
 
 	public function rollbackToSavepoint($name)
 	{
-		$this->connCtl->requireConnection();
-		if (!$this->inTransaction) {
+		$connHandler = $this->connCtl->requireConnection();
+		if (!$this->inTrans) {
 			throw new InvalidStateException('No transaction is active, cannot roll back to any savepoint.');
 		}
 
 		// TODO: issue ROLLBACK TO SAVEPOINT "$name"
+		pg_query($connHandler, sprintf('ROLLBACK TO SAVEPOINT %s', $this->ident($name))); // TODO: handle errors
 		// TODO: adjust the savepoints info
 		// TODO: issue an event in case someone is listening
 	}
 
 	public function releaseSavepoint($name)
 	{
-		$this->connCtl->requireConnection();
-		if (!$this->inTransaction) {
+		$connHandler = $this->connCtl->requireConnection();
+		if (!$this->inTrans) {
 			throw new InvalidStateException('No transaction is active, cannot release any savepoint.');
 		}
 
 		// TODO: issue RELEASE SAVEPOINT "$name"
+		pg_query($connHandler, sprintf('RELEASE SAVEPOINT %s', $this->ident($name))); // TODO: handle errors
 		// TODO: adjust the savepoints info
 		// TODO: issue an event in case someone is listening
 	}

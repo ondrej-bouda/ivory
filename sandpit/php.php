@@ -16,3 +16,11 @@ echo "\n";
 $obj = new \stdClass();
 $obj->{'edoo.user'} = 4;
 var_dump((array)$obj);
+
+
+
+class Bar {
+    const ARR = [1,2,3];
+}
+
+//var_dump(isset(Bar::ARR[1])); // isset() cannot be used on expressions

@@ -3,6 +3,7 @@ namespace Ivory\Relation;
 
 use Ivory\Value\Composite;
 use Ivory\Value\Box;
+use Ivory\Value\Date;
 use Ivory\Value\Range;
 
 class QueryRelationTest extends \Ivory\IvoryTestCase
@@ -112,24 +113,24 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
             }
             $results[$tuple['artist_name']] = $albums;
         }
-        $this->assertSame(
+        $this->assertEquals(
             [
                 'Metallica' => [
-                    ['id' => 2, 'name' => 'Black Album', 'year' => 1991],
-                    ['id' => 3, 'name' => 'S & M', 'year' => 1999],
+                    ['id' => 2, 'name' => 'Black Album', 'year' => 1991, 'released' => Date::fromISOString('1991-08-12')],
+                    ['id' => 3, 'name' => 'S & M', 'year' => 1999, 'released' => Date::fromISOString('1999-11-23')],
                 ],
                 'The Piano Guys' => [
-                    ['id' => 1, 'name' => 'The Piano Guys', 'year' => 2012],
+                    ['id' => 1, 'name' => 'The Piano Guys', 'year' => 2012, 'released' => Date::fromISOString('2012-10-02')],
                 ],
                 'Tommy Emmanuel' => [
-                    ['id' => 4, 'name' => 'Live One', 'year' => 2005],
+                    ['id' => 4, 'name' => 'Live One', 'year' => 2005, 'released' => Date::fromISOString('2005-01-01')],
                 ],
             ],
             $results
         );
 
-        $this->assertSame(
-            ['id' => 4, 'name' => 'Live One', 'year' => 2005],
+        $this->assertEquals(
+            ['id' => 4, 'name' => 'Live One', 'year' => 2005, 'released' => Date::fromISOString('2005-01-01')],
             $qr->value('albums', 2)[1]->toMap()
         );
         $this->assertSame('Live One', $qr->value('albums', 2)[1][1]);
@@ -182,5 +183,51 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
             $areaSum += $box->getArea();
         }
         $this->assertEquals(112, $areaSum, '', 1e-9);
+    }
+
+    public function testDateResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn,
+            "SELECT name, released
+             FROM album
+             ORDER BY released, name"
+        );
+
+        $list = $qr->toArray();
+        $this->assertEquals(['name' => 'Black Album', 'released' => Date::fromParts(1991, 8, 12)], $list[0]);
+        $this->assertEquals(['name' => 'S & M', 'released' => Date::fromParts(1999, 11, 23)], $list[1]);
+        $this->assertEquals(['name' => 'Live One', 'released' => Date::fromParts(2005, 1, 1)], $list[2]);
+        $this->assertEquals(['name' => 'The Piano Guys', 'released' => Date::fromParts(2012, 10, 2)], $list[3]);
+    }
+
+    public function testDateRangeResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn,
+            "SELECT artist.name, daterange(MIN(album.released), MAX(album.released), '[]') AS activerng
+             FROM artist
+                  JOIN album_artist aa ON aa.artist_id = artist.id
+                  JOIN album ON album.id = aa.album_id
+             GROUP BY artist.id
+             ORDER BY artist.name"
+        );
+
+        $this->assertSame(['Metallica', 'The Piano Guys', 'Tommy Emmanuel'], $qr->col('name')->toArray());
+
+        $this->assertEquals(
+            [Date::fromParts(1991, 8, 12), Date::fromParts(1999, 11, 23)],
+            $qr->value('activerng', 0)->toBounds('[]')
+        );
+
+        $this->assertEquals(
+            [Date::fromParts(2012, 10, 2), Date::fromParts(2012, 10, 2)],
+            $qr->value('activerng', 1)->toBounds('[]')
+        );
+
+        $this->assertEquals(
+            [Date::fromParts(2005, 1, 1), Date::fromParts(2005, 1, 1)],
+            $qr->value('activerng', 2)->toBounds('[]')
+        );
     }
 }

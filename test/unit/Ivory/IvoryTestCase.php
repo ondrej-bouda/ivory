@@ -73,7 +73,8 @@ CREATE TABLE artist (
 CREATE TABLE album (
   id BIGSERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
-  year SMALLINT
+  year SMALLINT,
+  released DATE
 );
 CREATE TABLE album_artist (
   album_id BIGINT NOT NULL REFERENCES album,
@@ -101,10 +102,10 @@ SQL
                 ['id' => 4, 'name' => 'B-Side Band', 'is_active' => null],
             ],
             'album' => [
-                ['id' => 1, 'name' => 'The Piano Guys', 'year' => 2012],
-                ['id' => 2, 'name' => 'Black Album', 'year' => 1991],
-                ['id' => 3, 'name' => 'S & M', 'year' => 1999],
-                ['id' => 4, 'name' => 'Live One', 'year' => 2005],
+                ['id' => 1, 'name' => 'The Piano Guys', 'year' => 2012, 'released' => '2012-10-02'],
+                ['id' => 2, 'name' => 'Black Album', 'year' => 1991, 'released' => '1991-08-12'],
+                ['id' => 3, 'name' => 'S & M', 'year' => 1999, 'released' => '1999-11-23'],
+                ['id' => 4, 'name' => 'Live One', 'year' => 2005, 'released' => '2005-01-01'],
             ],
             'album_artist' => [
                 ['album_id' => 1, 'artist_id' => 1],
