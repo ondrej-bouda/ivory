@@ -27,19 +27,18 @@ class ConnConfig implements IConnConfig
 {
     const OPT_MONEY_DEC_SEP = '__' . __NAMESPACE__ . '_OPT_MONEY_DEC_SEP__';
 
-    private $connection;
-    private $connHandler;
+    private $connCtl;
+    private $txCtl;
+
     private $typeCache = null;
 
-    /**
-     * @param Connection $connection Ivory Connection
-     * @param resource $connHandler
-     */
-    public function __construct(Connection $connection, $connHandler)
+
+    public function __construct(ConnectionControl $connCtl, ITransactionControl $txCtl)
     {
-        $this->connection = $connection;
-        $this->connHandler = $connHandler;
+        $this->connCtl = $connCtl;
+        $this->txCtl = $txCtl;
     }
+
 
     /**
      * Alias for {@link ConnConfig::get().
@@ -88,16 +87,17 @@ class ConnConfig implements IConnConfig
              * The custom option might not be recognized by PostgreSQL yet and an exception might be thrown, which would
              * break the current transaction (if any). Hence the safe-point.
              */
-            $sp = ($this->connection->inTransaction() ? 'customized_option' : null);
+            $sp = ($this->txCtl->inTransaction() ? 'customized_option' : null);
             if ($sp) {
-                $this->connection->savepoint($sp);
+                $this->txCtl->savepoint($sp);
             }
-            $res = @pg_query_params($this->connHandler, 'SELECT pg_catalog.current_setting($1)', [$propertyName]);
+            $connHandler = $this->connCtl->requireConnection();
+            $res = @pg_query_params($connHandler, 'SELECT pg_catalog.current_setting($1)', [$propertyName]);
             if ($sp) {
                 if ($res === false) {
-                    $this->connection->rollbackToSavepoint($sp);
+                    $this->txCtl->rollbackToSavepoint($sp);
                 }
-                $this->connection->releaseSavepoint($sp);
+                $this->txCtl->releaseSavepoint($sp);
             }
             if ($res !== false) {
                 return pg_fetch_result($res, 0, 0);
@@ -121,7 +121,8 @@ class ConnConfig implements IConnConfig
             ConfigParam::SERVER_VERSION => true,
         ];
         if (isset($pgParStatusRecognized[$propertyName])) {
-            $val = pg_parameter_status($this->connHandler, $propertyName);
+            $connHandler = $this->connCtl->requireConnection();
+            $val = pg_parameter_status($connHandler, $propertyName);
             if ($val !== false) {
                 $type = ConfigParam::TYPEMAP[$propertyName];
                 assert($type !== null);
@@ -146,9 +147,11 @@ class ConnConfig implements IConnConfig
             }
         }
 
+        $connHandler = $this->connCtl->requireConnection();
+
         if ($type === null) { // type unknown, try to look in the catalog for server configuration
             $query = 'SELECT setting, vartype, unit FROM pg_catalog.pg_settings WHERE name ILIKE $1';
-            $res = pg_query_params($this->connHandler, $query, [$propertyName]);
+            $res = pg_query_params($connHandler, $query, [$propertyName]);
             if ($res !== false || pg_num_rows($res) > 0) {
                 $row = pg_fetch_assoc($res);
                 $type = ConfigParamType::detectType($row['vartype'], $row['setting'], $row['unit']);
@@ -166,7 +169,7 @@ class ConnConfig implements IConnConfig
             $type = ConfigParamType::STRING;
         }
 
-        $res = pg_query_params($this->connHandler, 'SELECT pg_catalog.current_setting($1)', [$propertyName]);
+        $res = pg_query_params($connHandler, 'SELECT pg_catalog.current_setting($1)', [$propertyName]);
         if ($res !== false) {
             $val = pg_fetch_result($res, 0, 0);
             return ConfigParamType::createValue($type, $val);
@@ -193,16 +196,18 @@ class ConnConfig implements IConnConfig
 
     public function setForTransaction($propertyName, $value)
     {
-        if (!$this->connection->inTransaction()) {
+        if (!$this->txCtl->inTransaction()) {
             return; // setting the option would have no effect as the implicit transaction would end immediately
         }
 
-        pg_query_params($this->connHandler, 'SELECT pg_catalog.set_config($1, $2, TRUE)', [$propertyName, $value]);
+        $connHandler = $this->connCtl->requireConnection();
+        pg_query_params($connHandler, 'SELECT pg_catalog.set_config($1, $2, TRUE)', [$propertyName, $value]);
     }
 
     public function setForSession($propertyName, $value)
     {
-        pg_query_params($this->connHandler, 'SELECT pg_catalog.set_config($1, $2, FALSE)', [$propertyName, $value]);
+        $connHandler = $this->connCtl->requireConnection();
+        pg_query_params($connHandler, 'SELECT pg_catalog.set_config($1, $2, FALSE)', [$propertyName, $value]);
     }
 
     public function getTxConfig()

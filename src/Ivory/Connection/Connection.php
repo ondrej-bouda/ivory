@@ -15,10 +15,11 @@ class Connection implements IConnection
 	private $typeCtl;
 	private $stmtExec;
 	private $copyCtl;
+	private $txCtl;
+	private $ipcCtl;
 
 	private $config;
 
-	private $inTrans = false; // FIXME: rely on pg_transaction_status() instead of duplicating its logic here (it is reported not to talk to the server, so it shall be fast)
 
 	/**
 	 * @param string $name name for the connection
@@ -30,11 +31,13 @@ class Connection implements IConnection
 	public function __construct($name, $params)
 	{
 		$this->name = $name;
-		$this->connCtl = new ConnectionControl($params);
+		$this->connCtl = new ConnectionControl($params); // TODO: extract all usages of ConnectionControl::requireConnection() - consider introducing an interface specifying the method, named like PGSQLDriver or ConnectionManager or ConnectionPool
 		$this->typeCtl = new TypeControl($this, $this->connCtl);
 		$this->stmtExec = new StatementExecution($this->connCtl, $this->typeCtl);
 		$this->copyCtl = new CopyControl();
-		$this->config = new ConnConfig($this, $this->connCtl->requireConnection());
+		$this->txCtl = new TransactionControl($this->connCtl, $this->stmtExec);
+		$this->ipcCtl = new IPCControl($this->connCtl);
+		$this->config = new ConnConfig($this->connCtl, $this->txCtl);
 	}
 
 	final public function getName()
@@ -45,180 +48,6 @@ class Connection implements IConnection
 	final public function getConfig()
 	{
 		return $this->config;
-	}
-
-	public function inTransaction()
-	{
-		return $this->inTrans;
-	}
-
-	public function startTransaction($transactionOptions = 0)
-	{
-		$connHandler = $this->connCtl->requireConnection();
-		if ($this->inTrans) {
-			trigger_error('A transaction is already active, cannot start a new one.', E_USER_WARNING);
-			return;
-		}
-
-		// TODO: issue START TRANSACTION
-		pg_query($connHandler, 'START TRANSACTION'); // TODO: handle errors
-		// TODO: adjust the savepoint info
-		// TODO: issue an event in case someone is listening
-
-		$this->inTrans = true;
-	}
-
-	public function setupTransaction($transactionOptions)
-	{
-		// TODO: Implement setupTransaction() method.
-	}
-
-	public function setupSubsequentTransactions($transactionOptions)
-	{
-		// TODO: Implement setupSubsequentTransactions() method.
-	}
-
-	public function commit()
-	{
-		$connHandler = $this->connCtl->requireConnection();
-		if (!$this->inTrans) {
-			trigger_error('No transaction is active, nothing to commit.', E_USER_WARNING);
-			return;
-		}
-
-		// TODO: issue COMMIT
-		pg_query($connHandler, 'COMMIT'); // TODO: handle errors
-		// TODO: adjust the savepoint info
-		// TODO: issue an event in case someone is listening
-
-		$this->inTrans = false;
-	}
-
-	public function rollback()
-	{
-		$connHandler = $this->connCtl->requireConnection();
-		if (!$this->inTrans) {
-			trigger_error('No transaction is active, nothing to roll back.', E_USER_WARNING);
-			return;
-		}
-
-		// TODO: issue ROLLBACK
-		pg_query($connHandler, 'ROLLBACK'); // TODO: handle errors
-		// TODO: adjust the savepoints info
-		// TODO: issue an event in case someone is listening
-
-		$this->inTrans = false;
-	}
-
-	private function ident($ident)
-	{
-		return '"' . strtr($ident, ['"' => '""']) . '"'; // FIXME: revise; move where appropriate
-	}
-
-	public function savepoint($name)
-	{
-		$connHandler = $this->connCtl->requireConnection();
-		if (!$this->inTrans) {
-			throw new InvalidStateException('No transaction is active, cannot create any savepoint.');
-		}
-
-		// TODO: issue SAVEPOINT "$name"
-		pg_query($connHandler, sprintf('SAVEPOINT %s', $this->ident($name))); // TODO: handle errors
-		// TODO: adjust the savepoints info
-		// TODO: issue an event in case someone is listening
-	}
-
-	public function rollbackToSavepoint($name)
-	{
-		$connHandler = $this->connCtl->requireConnection();
-		if (!$this->inTrans) {
-			throw new InvalidStateException('No transaction is active, cannot roll back to any savepoint.');
-		}
-
-		// TODO: issue ROLLBACK TO SAVEPOINT "$name"
-		pg_query($connHandler, sprintf('ROLLBACK TO SAVEPOINT %s', $this->ident($name))); // TODO: handle errors
-		// TODO: adjust the savepoints info
-		// TODO: issue an event in case someone is listening
-	}
-
-	public function releaseSavepoint($name)
-	{
-		$connHandler = $this->connCtl->requireConnection();
-		if (!$this->inTrans) {
-			throw new InvalidStateException('No transaction is active, cannot release any savepoint.');
-		}
-
-		// TODO: issue RELEASE SAVEPOINT "$name"
-		pg_query($connHandler, sprintf('RELEASE SAVEPOINT %s', $this->ident($name))); // TODO: handle errors
-		// TODO: adjust the savepoints info
-		// TODO: issue an event in case someone is listening
-	}
-
-	public function setTransactionSnapshot($snapshotId)
-	{
-		// TODO: Implement setTransactionSnapshot() method.
-	}
-
-	public function exportTransactionSnapshot()
-	{
-		// TODO: Implement exportTransactionSnapshot() method.
-	}
-
-	public function prepareTransaction($name)
-	{
-		// TODO: Implement prepareTransaction() method.
-	}
-
-	public function commitPreparedTransaction($name)
-	{
-		// TODO: Implement commitPreparedTransaction() method.
-	}
-
-	public function rollbackPreparedTransaction($name)
-	{
-		// TODO: Implement rollbackPreparedTransaction() method.
-	}
-
-	public function listPreparedTransactions()
-	{
-		// TODO: fix the return type of this method, specified by the interface
-		// TODO: query pg_catalog.pg_prepared_xacts
-	}
-
-	public function getBackendPID()
-	{
-		return pg_get_pid($this->connCtl->requireConnection());
-	}
-
-	public function notify($channel, $payload = null)
-	{
-		// TODO: Implement notify() method.
-	}
-
-	public function listen($channel)
-	{
-		// TODO: Implement listen() method.
-	}
-
-	public function unlisten($channel)
-	{
-		// TODO: Implement unlisten() method.
-	}
-
-	public function unlistenAll()
-	{
-		// TODO: Implement unlistenAll() method.
-	}
-
-	public function pollNotification()
-	{
-		$handler = $this->connCtl->requireConnection();
-
-		$res = pg_get_notify($handler, PGSQL_ASSOC);
-		if ($res === false) {
-			return null;
-		}
-		return new Notification($res['message'], $res['pid'], $res['payload']);
 	}
 
 
@@ -324,6 +153,119 @@ class Connection implements IConnection
 	public function copyToArray($table, $options = [])
 	{
 		return $this->copyCtl->copyToArray($table, $options);
+	}
+
+	//endregion
+
+	//region Transaction Control
+
+	public function inTransaction()
+	{
+		return $this->txCtl->inTransaction();
+	}
+
+	public function startTransaction($transactionOptions = 0)
+	{
+		return $this->txCtl->startTransaction($transactionOptions);
+	}
+
+	public function setupTransaction($transactionOptions)
+	{
+		$this->txCtl->setupTransaction($transactionOptions);
+	}
+
+	public function setupSubsequentTransactions($transactionOptions)
+	{
+		$this->txCtl->setupSubsequentTransactions($transactionOptions);
+	}
+
+	public function commit()
+	{
+		return $this->txCtl->commit();
+	}
+
+	public function rollback()
+	{
+		return $this->txCtl->rollback();
+	}
+
+	public function savepoint($name)
+	{
+		$this->txCtl->savepoint($name);
+	}
+
+	public function rollbackToSavepoint($name)
+	{
+		$this->txCtl->rollbackToSavepoint($name);
+	}
+
+	public function releaseSavepoint($name)
+	{
+		$this->txCtl->releaseSavepoint($name);
+	}
+
+	public function setTransactionSnapshot($snapshotId)
+	{
+		return $this->txCtl->setTransactionSnapshot($snapshotId);
+	}
+
+	public function exportTransactionSnapshot()
+	{
+		return $this->txCtl->exportTransactionSnapshot();
+	}
+
+	public function prepareTransaction($name)
+	{
+		return $this->txCtl->prepareTransaction($name);
+	}
+
+	public function commitPreparedTransaction($name)
+	{
+		$this->txCtl->commitPreparedTransaction($name);
+	}
+
+	public function rollbackPreparedTransaction($name)
+	{
+		$this->txCtl->rollbackPreparedTransaction($name);
+	}
+
+	public function listPreparedTransactions()
+	{
+		return $this->txCtl->listPreparedTransactions();
+	}
+
+	//endregion
+
+	//region IPC Control
+
+	public function getBackendPID()
+	{
+		return $this->ipcCtl->getBackendPID();
+	}
+
+	public function notify($channel, $payload = null)
+	{
+		$this->ipcCtl->notify($channel, $payload);
+	}
+
+	public function listen($channel)
+	{
+		$this->ipcCtl->listen($channel);
+	}
+
+	public function unlisten($channel)
+	{
+		$this->ipcCtl->unlisten($channel);
+	}
+
+	public function unlistenAll()
+	{
+		$this->ipcCtl->unlistenAll();
+	}
+
+	public function pollNotification()
+	{
+		return $this->ipcCtl->pollNotification();
 	}
 
 	//endregion

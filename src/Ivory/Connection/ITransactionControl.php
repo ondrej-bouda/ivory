@@ -2,6 +2,7 @@
 namespace Ivory\Connection;
 
 use Ivory\Exception\InvalidStateException;
+use Ivory\Result\IQueryResult;
 
 interface ITransactionControl
 {
@@ -206,7 +207,8 @@ interface ITransactionControl
      *
      * See {@link prepareTransaction()} for more details on preparing a transaction.
      *
-     * @todo specify the return type - the standard result of a query
+     * @return IQueryResult result of query to all columns of
+     *                        {@link http://www.postgresql.org/docs/9.4/static/view-pg-prepared-xacts.html <tt>pg_catalog.pg_prepared_xacts</tt>}
      */
     function listPreparedTransactions();
 }
