@@ -4,6 +4,14 @@ namespace Ivory\Connection;
 use Ivory\Exception\InvalidStateException;
 use Ivory\Result\IQueryResult;
 
+/**
+ * Transaction control.
+ *
+ * Note that some methods, when called in an invalid context, only issue a warning
+ * (e.g. {@link ITransactionControl::rollback()} while others (like {@link ITransactionControl::releaseSavepoint()})
+ * throw an exception. This mimics the PostgreSQL behaviour, which also raises notices or exceptions, depending on the
+ * concrete command used.
+ */
 interface ITransactionControl
 {
     /**
