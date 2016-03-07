@@ -33,9 +33,16 @@ class MoneyTypeTest extends IvoryTestCase
         $r = $conn->rawQuery('SELECT 12345.678::money'); // formatted as "$12,345.68"
         $this->assertEquals(Money::fromNumber(12345.68, '$'), $r->value());
 
-        $val = (System::isWindows() ? 'Japanese_Japan' : 'ja_JP.UTF-8');
-        $conn->getConfig()->setForTransaction('lc_monetary', $val);
+        if (System::isWindows()) {
+            $monet = 'Japanese_Japan.932';
+            $yenSign = '\\';
+        }
+        else {
+            $monet = 'ja_JP.UTF-8';
+            $yenSign = '￥';
+        }
+        $conn->getConfig()->setForTransaction('lc_monetary', $monet);
         $r = $conn->rawQuery('SELECT 12345.678::money'); // formatted as "\12,346"
-        $this->assertEquals(Money::fromNumber(12346, '\\'), $r->value());
+        $this->assertEquals(Money::fromNumber(12346, $yenSign), $r->value());
     }
 }
