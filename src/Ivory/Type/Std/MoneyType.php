@@ -1,7 +1,9 @@
 <?php
 namespace Ivory\Type\Std;
 
+use Ivory\Exception\IncomparableException;
 use Ivory\Type\BaseType;
+use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Decimal;
 use Ivory\Value\Money;
 
@@ -10,11 +12,17 @@ use Ivory\Value\Money;
  *
  * Represented as a {@link \Ivory\Value\Money} object.
  *
+ * Note the PostgreSQL `money` type has plenty of issues, the most serious one being that the output is locale-sensitive
+ * and thus restoring a database might import wrong values if the target database has a different setting of
+ * `lc_monetary`. Besides, the only correct way of parsing the values is getting the decimal separator used in the
+ * session and only then interpreting the value string.
+ *
+ * For a more thorough discussion of problems of the money type, see
+ * {@link http://www.postgresql.org/message-id/flat/20130328092819.237c0106@imp#20130328092819.237c0106@imp}.
+ *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-money.html
- * @see http://www.postgresql.org/message-id/flat/20130328092819.237c0106@imp#20130328092819.237c0106@imp discussion on issues of the money type
- * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
-class MoneyType extends BaseType
+class MoneyType extends BaseType implements ITotallyOrderedType
 {
     public function parseValue($str)
     {
@@ -54,5 +62,23 @@ class MoneyType extends BaseType
         }
 
         return $str . '::money';
+    }
+
+    public function compareValues($a, $b)
+    {
+        if ($a === null || $b === null) {
+            return null;
+        }
+        if (!$a instanceof Money) {
+            throw new IncomparableException('$a is not of class ' . Money::class);
+        }
+        if (!$b instanceof Money) {
+            throw new IncomparableException('$b is not of class ' . Money::class);
+        }
+        if (!$a->getUnit() != $b->getUnit()) {
+            throw new IncomparableException('$a and $b of not the same monetary unit');
+        }
+
+        return $a->getAmount()->compareTo($b->getAmount());
     }
 }

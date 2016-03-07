@@ -37,7 +37,7 @@ class Connection implements IConnection
 		$this->copyCtl = new CopyControl();
 		$this->txCtl = new TransactionControl($this->connCtl, $this->stmtExec);
 		$this->ipcCtl = new IPCControl($this->connCtl);
-		$this->config = new ConnConfig($this->connCtl, $this->txCtl);
+		$this->config = new ConnConfig($this->connCtl, $this->stmtExec, $this->txCtl);
 	}
 
 	final public function getName()

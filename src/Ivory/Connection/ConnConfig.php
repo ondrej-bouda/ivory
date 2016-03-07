@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Connection;
 
+use Ivory\Result\IQueryResult;
 use Ivory\Value\Quantity;
 
 /**
@@ -28,14 +29,16 @@ class ConnConfig implements IConnConfig
     const OPT_MONEY_DEC_SEP = '__' . __NAMESPACE__ . '_OPT_MONEY_DEC_SEP__';
 
     private $connCtl;
+    private $stmtExec;
     private $txCtl;
 
     private $typeCache = null;
 
 
-    public function __construct(ConnectionControl $connCtl, ITransactionControl $txCtl)
+    public function __construct(ConnectionControl $connCtl, IStatementExecution $stmtExec, ITransactionControl $txCtl)
     {
         $this->connCtl = $connCtl;
+        $this->stmtExec = $stmtExec;
         $this->txCtl = $txCtl;
     }
 
@@ -250,6 +253,14 @@ class ConnConfig implements IConnConfig
 
     public function getMoneyDecimalSeparator()
     {
-        // TODO
+        /** @var IQueryResult $r */
+        $r = $this->stmtExec->rawQuery('SELECT 1.2::money::text');
+        $v = $r->value();
+        if (preg_match('~1(\D*)2~', $v, $m)) {
+            return $m[1];
+        }
+        else {
+            return null;
+        }
     }
 }
