@@ -7,6 +7,9 @@ To Do:
 * consider have the project checked by:
 ** https://insight.sensiolabs.com
 ** https://codeclimate.com/github/Bee-Lab/bowerphp
+* once released publicly, follow existing standards regarding the project maintenance:
+** http://keepachangelog.com
+** http://semver.org/spec/v2.0.0.html
 
 
 
