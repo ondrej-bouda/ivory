@@ -9,7 +9,10 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install language-pack-cs language-pack-ja
   - sudo /etc/init.d/postgresql stop
-  - sudo /etc/init.d/postgresql start 9.3
+  - sudo /etc/init.d/postgresql start 9.4
+  - psql -c "ALTER SYSTEM SET max_prepared_transactions TO 1" -U postgres
+  - sudo /etc/init.d/postgresql stop
+  - sudo /etc/init.d/postgresql start 9.4
   - composer self-update
 
 install:
