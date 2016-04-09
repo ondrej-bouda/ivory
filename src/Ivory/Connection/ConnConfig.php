@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Connection;
 
+use Ivory\Exception\UnsupportedException;
 use Ivory\Result\IQueryResult;
 use Ivory\Value\Quantity;
 
@@ -23,23 +24,34 @@ use Ivory\Value\Quantity;
  * ({@link ConnConfig::flushCache()} may, of course, be used for flushing it in any case). Note that
  * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-custom.html customized options} are always of type
  * `text`.
+ *
+ * As for the {@link IObservableConnConfig} implementation, any changes of configuration parameters must be done through
+ * some of the methods offered by this class. Bypassing them (i.e., setting a parameter value in a raw query, or within
+ * a database function) prevents the observers from being notified about the parameter value changes. In such cases, the
+ * {@link ConnConfig::notifyPropertyChange()} or {@link ConnConfig::notifyPropertiesReset()} has to be called manually
+ * for the new parameter value to be retrieved again.
  */
-class ConnConfig implements IConnConfig
+class ConnConfig implements IObservableConnConfig
 {
-    const OPT_MONEY_DEC_SEP = '__' . __NAMESPACE__ . '_OPT_MONEY_DEC_SEP__';
-
     private $connCtl;
     private $stmtExec;
     private $txCtl;
+    private $watcher;
 
     private $typeCache = null;
+    /** @var IConfigObserver[][] map: parameter name or <tt>null</tt> => list of observers registered for changes of the
+     *                             parameter (or any parameter for <tt>null</tt> entry) */
+    private $observers = [];
 
 
-    public function __construct(ConnectionControl $connCtl, IStatementExecution $stmtExec, ITransactionControl $txCtl)
+    public function __construct(ConnectionControl $connCtl, IStatementExecution $stmtExec, IObservableTransactionControl $txCtl)
     {
         $this->connCtl = $connCtl;
         $this->stmtExec = $stmtExec;
         $this->txCtl = $txCtl;
+
+        $this->watcher = new ConnConfigTransactionWatcher($this);
+        $txCtl->addObserver($this->watcher);
     }
 
 
@@ -88,7 +100,7 @@ class ConnConfig implements IConnConfig
         if (self::isCustomOption($propertyName)) {
             /* Custom options are always of type string, no need to even worry about the type.
              * The custom option might not be recognized by PostgreSQL yet and an exception might be thrown, which would
-             * break the current transaction (if any). Hence the safe-point.
+             * break the current transaction (if any). Hence the savepoint.
              */
             $sp = ($this->txCtl->inTransaction() ? 'customized_option' : null);
             if ($sp) {
@@ -133,6 +145,10 @@ class ConnConfig implements IConnConfig
             }
         }
 
+        if ($propertyName == ConfigParam::MONEY_DEC_SEP) {
+            return $this->getMoneyDecimalSeparator();
+        }
+
         // determine the type
         $type = null;
         // try exact match first, for performance reasons; hopefully, indexing the type map will not be needed
@@ -157,10 +173,15 @@ class ConnConfig implements IConnConfig
             $res = pg_query_params($connHandler, $query, [$propertyName]);
             if ($res !== false || pg_num_rows($res) > 0) {
                 $row = pg_fetch_assoc($res);
-                $type = ConfigParamType::detectType($row['vartype'], $row['setting'], $row['unit']);
-                $this->typeCache[$propertyName] = $type;
-                $this->typeCache[strtolower($propertyName)] = $type;
-                return ConfigParamType::createValue($type, $row['setting'], $row['unit']);
+                try {
+                    $type = ConfigParamType::detectType($row['vartype'], $row['setting'], $row['unit']);
+                    $this->typeCache[$propertyName] = $type;
+                    $this->typeCache[strtolower($propertyName)] = $type;
+                    return ConfigParamType::createValue($type, $row['setting'], $row['unit']);
+                }
+                catch (UnsupportedException $e) {
+                    throw new UnsupportedException("Unsupported type of configuration parameter '$propertyName'");
+                }
             }
         }
 
@@ -205,12 +226,27 @@ class ConnConfig implements IConnConfig
 
         $connHandler = $this->connCtl->requireConnection();
         pg_query_params($connHandler, 'SELECT pg_catalog.set_config($1, $2, TRUE)', [$propertyName, $value]);
+
+        $this->watcher->handleSetForTransaction($propertyName);
+        $this->notifyPropertyChange($propertyName, $value);
     }
 
     public function setForSession($propertyName, $value)
     {
         $connHandler = $this->connCtl->requireConnection();
         pg_query_params($connHandler, 'SELECT pg_catalog.set_config($1, $2, FALSE)', [$propertyName, $value]);
+
+        $this->watcher->handleSetForSession($propertyName);
+        $this->notifyPropertyChange($propertyName, $value);
+    }
+
+    public function resetAll()
+    {
+        $connHandler = $this->connCtl->requireConnection();
+        pg_query($connHandler, 'RESET ALL');
+
+        $this->watcher->handleResetAll();
+        $this->notifyPropertiesReset();
     }
 
     public function getTxConfig()
@@ -263,4 +299,79 @@ class ConnConfig implements IConnConfig
             return null;
         }
     }
+
+
+    //region IObservableConnConfig
+
+    public function addObserver(IConfigObserver $observer, $parameterName = null)
+    {
+        if (is_array($parameterName)) {
+            foreach ($parameterName as $pn) {
+                $this->addObserverImpl($observer, $pn);
+            }
+        }
+        else {
+            $this->addObserverImpl($observer, $parameterName);
+        }
+    }
+
+    private function addObserverImpl(IConfigObserver $observer, $parameterName)
+    {
+        if (!isset($this->observers[$parameterName])) {
+            $this->observers[$parameterName] = [];
+        }
+
+        $this->observers[$parameterName][] = $observer;
+    }
+
+    public function removeObserver(IConfigObserver $observer)
+    {
+        foreach ($this->observers as $k => $obsList) {
+            foreach ($obsList as $i => $obs) {
+                if ($obs === $observer) {
+                    unset($this->observers[$k][$i]);
+                }
+            }
+        }
+    }
+
+    public function removeAllObservers()
+    {
+        $this->observers = [];
+    }
+
+    public function notifyPropertyChange($parameterName, $newValue = null)
+    {
+        if ($newValue === null) {
+            $newValue = $this->get($parameterName);
+        }
+
+        foreach ([$parameterName, null] as $k) {
+            if (isset($this->observers[$k])) {
+                foreach ($this->observers[$k] as $obs) {
+                    $obs->handlePropertyChange($parameterName, $newValue);
+                }
+            }
+        }
+
+        if ($parameterName == ConfigParam::LC_MONETARY) {
+            $this->notifyPropertyChange(ConfigParam::MONEY_DEC_SEP);
+        }
+    }
+
+    public function notifyPropertiesReset()
+    {
+        /** @var IConfigObserver[] $obsSet */
+        $obsSet = [];
+        foreach ($this->observers as $k => $obsList) {
+            foreach ($obsList as $obs) {
+                $obsSet[spl_object_hash($obs)] = $obs;
+            }
+        }
+        foreach ($obsSet as $obs) {
+            $obs->handlePropertiesReset($this);
+        }
+    }
+
+    //endregion
 }

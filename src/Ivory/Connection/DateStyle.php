@@ -27,7 +27,9 @@ class DateStyle
      */
     public static function fromString($dateStyleStr)
     {
-        list($fmt, $ord) = preg_split('~\W+~', $dateStyleStr, 2);
+        $parts = preg_split('~\W+~', $dateStyleStr, 2);
+        $fmt = $parts[0];
+        $ord = (isset($parts[1]) ? $parts[1] : null); // PHP 7: abbreviate using ??
 
         switch (strtoupper($fmt)) {
             case strtoupper(self::FORMAT_ISO):

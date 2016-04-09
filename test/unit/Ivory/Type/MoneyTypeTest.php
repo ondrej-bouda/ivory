@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Type;
 
+use Ivory\Connection\ConfigParam;
 use Ivory\IvoryTestCase;
 use Ivory\Result\IQueryResult;
 use Ivory\Utils\System;
@@ -12,7 +13,7 @@ class MoneyTypeTest extends IvoryTestCase
     {
         $this->getIvoryConnection()->startTransaction();
         $val = (System::isWindows() ? 'Czech_Czech Republic.1250' : 'cs_CZ.utf8');
-        $this->getIvoryConnection()->getConfig()->setForTransaction('lc_monetary', $val);
+        $this->getIvoryConnection()->getConfig()->setForTransaction(ConfigParam::LC_MONETARY, $val);
     }
 
     protected function tearDown()
@@ -29,7 +30,7 @@ class MoneyTypeTest extends IvoryTestCase
         $this->assertEquals(Money::fromNumber(12345.68, 'Kč'), $r->value());
 
         $val = (System::isWindows() ? 'English_US' : 'en_US.utf8');
-        $conn->getConfig()->setForTransaction('lc_monetary', $val);
+        $conn->getConfig()->setForTransaction(ConfigParam::LC_MONETARY, $val);
         $r = $conn->rawQuery('SELECT 12345.678::money'); // formatted as "$12,345.68"
         $this->assertEquals(Money::fromNumber(12345.68, '$'), $r->value());
 
@@ -41,7 +42,7 @@ class MoneyTypeTest extends IvoryTestCase
             $monet = 'ja_JP.UTF-8';
             $yenSign = '￥';
         }
-        $conn->getConfig()->setForTransaction('lc_monetary', $monet);
+        $conn->getConfig()->setForTransaction(ConfigParam::LC_MONETARY, $monet);
         $r = $conn->rawQuery('SELECT 12345.678::money'); // formatted as "\12,346"
         $this->assertEquals(Money::fromNumber(12346, $yenSign), $r->value());
     }

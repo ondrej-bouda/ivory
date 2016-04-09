@@ -2,7 +2,9 @@
 namespace Ivory\Type\Std;
 
 use Ivory\Connection\ConfigParam;
+use Ivory\Connection\ConnConfigValueRetriever;
 use Ivory\Connection\DateStyle;
+use Ivory\Connection\IConnection;
 use Ivory\Type\BaseType;
 use Ivory\Type\IDiscreteType;
 use Ivory\Value\Date;
@@ -37,6 +39,17 @@ use Ivory\Value\Date;
  */
 class DateType extends BaseType implements IDiscreteType
 {
+	private $dateStyleRetriever;
+
+	public function __construct($schemaName, $name, IConnection $connection)
+	{
+		parent::__construct($schemaName, $name, $connection);
+
+		$this->dateStyleRetriever = new ConnConfigValueRetriever(
+			$connection->getConfig(), ConfigParam::DATE_STYLE, [DateStyle::class, 'fromString']
+		);
+	}
+
 	public function parseValue($str)
 	{
 		if ($str === null) {
@@ -59,19 +72,10 @@ class DateType extends BaseType implements IDiscreteType
 			list($day, $mon, $year) = $p; // German style, no need to look up the settings
 		}
 		else {
-			/* TODO: Cache somehow! Serious performance penalty if performed for each and every date parsed from
-			 *       PostgreSQL. Introduce a common caching mechanism, which would flush caches which depend on a
-			 *       configuration setting upon detecting they were changed; or simply move the DateStyle-related code
-			 *       to the IConnConfig, which would handle the problem.
-			 *       Or, even, better, introduce specialized type classes pre-fabricated for the date style currently in
-			 *       use, and switch it upon a date style change. Use the same mechanism for this type converter as well
-			 *       as for any other - e.g., MoneyType. After all, some type converters might get optimized if they
-			 *       could rely on a subset of permitted PostgreSQL syntax - the one actually used by PostgreSQL for
-			 *       outputting the values, e.g., ArrayType.
-			 */
-			$dateStyleStr = $this->getConnection()->getConfig()->get(ConfigParam::DATE_STYLE);
-			$dateStyle = DateStyle::fromString($dateStyleStr);
-			switch ($dateStyle->getOrder()) {
+			/** @var DateStyle $dateStyle */
+			$dateStyle = $this->dateStyleRetriever->getValue();
+			$partsOrder = $dateStyle->getOrder();
+			switch ($partsOrder) {
 				case DateStyle::ORDER_DMY:
 					list($day, $mon, $year) = $p;
 					break;
@@ -82,7 +86,7 @@ class DateType extends BaseType implements IDiscreteType
 
 				default:
 					trigger_error(
-						"Unexpected year/month/day order '{$dateStyle->getOrder()}', assuming year-month-day",
+						"Unexpected year/month/day order '{$partsOrder}', assuming year-month-day",
 						E_USER_WARNING
 					);
 				case DateStyle::ORDER_YMD:

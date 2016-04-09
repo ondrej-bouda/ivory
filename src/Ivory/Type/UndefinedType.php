@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Type;
 
+use Ivory\Connection\IConnection;
 use Ivory\Exception\UndefinedTypeException;
 
 /**
@@ -11,17 +12,28 @@ use Ivory\Exception\UndefinedTypeException;
  */
 class UndefinedType extends BaseType
 {
+    private $connName;
+
+    /**
+     * @param string $schemaName name of database schema of data type instead of which this object is to be created
+     * @param string $name name of data type instead of which this object is to be created
+     * @param string $connName name of Ivory connection for which the object is to be created (for reporting purposes)
+     * @param IConnection $connection
+     */
+    public function __construct($schemaName, $name, $connName, IConnection $connection)
+    {
+        parent::__construct($schemaName, $name, $connection);
+        $this->connName = $connName;
+    }
+
+
     public function parseValue($str)
     {
-        throw new UndefinedTypeException(
-            "{$this->getSchemaName()}.{$this->getName()} on connection {$this->getConnection()->getName()}"
-        );
+        throw new UndefinedTypeException("{$this->getSchemaName()}.{$this->getName()} on connection {$this->connName}");
     }
 
     public function serializeValue($val)
     {
-        throw new UndefinedTypeException(
-            "{$this->getSchemaName()}.{$this->getName()} on connection {$this->getConnection()->getName()}"
-        );
+        throw new UndefinedTypeException("{$this->getSchemaName()}.{$this->getName()} on connection {$this->connName}");
     }
 }

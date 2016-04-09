@@ -1,6 +1,9 @@
 <?php
 namespace Ivory\Type\Std;
 
+use Ivory\Connection\ConfigParam;
+use Ivory\Connection\ConnConfigValueRetriever;
+use Ivory\Connection\IConnection;
 use Ivory\Exception\IncomparableException;
 use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
@@ -24,15 +27,24 @@ use Ivory\Value\Money;
  */
 class MoneyType extends BaseType implements ITotallyOrderedType
 {
+    private $decSepRetriever;
+
+    public function __construct($schemaName, $name, IConnection $connection)
+    {
+        parent::__construct($schemaName, $name, $connection);
+
+        $this->decSepRetriever = new ConnConfigValueRetriever($connection->getConfig(), ConfigParam::MONEY_DEC_SEP);
+    }
+
     public function parseValue($str)
     {
         if ($str === null) {
             return null;
         }
 
-        $decPoint = $this->getConnection()->getConfig()->getMoneyDecimalSeparator();
+        $decSep = $this->decSepRetriever->getValue();
         try {
-            return Money::fromString($str, $decPoint);
+            return Money::fromString($str, $decSep);
         }
         catch (\InvalidArgumentException $e) {
             $this->throwInvalidValue($str, $e);

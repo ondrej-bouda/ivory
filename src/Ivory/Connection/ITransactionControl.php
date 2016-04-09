@@ -167,7 +167,7 @@ interface ITransactionControl
     /**
      * Prepares the current transaction for a two-phase commit.
      *
-     * Store the state of the current transaction to disk and rolls it back for the current session. The only exception
+     * Stores the state of the current transaction to disk and rolls it back for the current session. The only exception
      * are configuration parameter changes, which are committed by this command, and are not part of the transaction
      * state stored to disk.
      *

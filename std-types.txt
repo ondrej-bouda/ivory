@@ -12,6 +12,7 @@ character [ (n) ]	        char [ (n) ]	    fixed-length character string
 character varying [ (n) ]	varchar [ (n) ]	    variable-length character string
 cidr	 	                                    IPv4 or IPv6 network address
 circle	 	                                    circle on a plane
+date	 	                                    calendar date (year, month, day)
 double precision	        float8	            double precision floating-point number (8 bytes)
 inet	 	                                    IPv4 or IPv6 host address
 integer                     int, int4	        signed four-byte integer
@@ -38,7 +39,6 @@ xml	 	                                        XML data
 PostgreSQL built-in types yet to be supported:
 
 Name                        Aliases             Description
-date	 	                                    calendar date (year, month, day)
 interval [ fields ] [ (p) ]	 	                time span
 pg_lsn	 	                                    PostgreSQL Log Sequence Number
 time [ (p) ] [ without time zone ]	            time of day (no time zone)

@@ -10,6 +10,10 @@ namespace Ivory\Connection;
  */
 class ConfigParam
 {
+    //region Ivory-specifics
+    /** Decimal separator used for <tt>money</tt> values. */
+    const MONEY_DEC_SEP = '__' . __NAMESPACE__ . '_OPT_MONEY_DEC_SEP__';
+    //endregion
     //region Specials
     const IS_SUPERUSER = 'is_superuser';
     const SESSION_AUTHORIZATION = 'session_authorization';
@@ -295,6 +299,8 @@ class ConfigParam
 
 
     const TYPEMAP = [
+        self::MONEY_DEC_SEP => ConfigParamType::STRING,
+
         self::IS_SUPERUSER => ConfigParamType::BOOL,
         self::SESSION_AUTHORIZATION => ConfigParamType::STRING,
 

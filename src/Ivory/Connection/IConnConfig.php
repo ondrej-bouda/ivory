@@ -81,6 +81,13 @@ interface IConnConfig
     function setForSession($propertyName, $value);
 
     /**
+     * Resets the values of all options to their current defaults.
+     *
+     * It corresponds to the SQL `RESET ALL` command. By definition, the effect is session-wide.
+     */
+    function resetAll();
+
+    /**
      * @return TxConfig transaction parameters of the current transaction
      */
     function getTxConfig();
