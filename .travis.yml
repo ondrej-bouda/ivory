@@ -5,14 +5,15 @@ php:
   - 7.0
 #  - hhvm
 
+addons:
+  postgresql: "9.3"
+
 before_install:
   - sudo apt-get update
   - sudo apt-get install language-pack-cs language-pack-ja
   - sudo /etc/init.d/postgresql stop
-  - sudo /etc/init.d/postgresql start 9.4
-  - psql -c "ALTER SYSTEM SET max_prepared_transactions TO 1" -U postgres
-  - sudo /etc/init.d/postgresql stop
-  - sudo /etc/init.d/postgresql start 9.4
+  - sudo sed -e 's~#?max_prepared_transactions = 0~max_prepared_transactions = 1~' --in-place /etc/postgresql/9.3/main/postgresql.conf
+  - sudo /etc/init.d/postgresql start 9.3
   - composer self-update
 
 install:
