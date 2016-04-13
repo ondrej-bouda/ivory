@@ -42,8 +42,8 @@ class DateTest extends \PHPUnit_Framework_TestCase
 
     public function testFromTimestamp()
     {
-        $this->assertEquals(self::d(2016, 2, 27), Date::fromTimestamp(mktime(0, 0, 0, 2, 27, 2016)));
-        $this->assertEquals(self::d(2016, 2, 27), Date::fromTimestamp(mktime(23, 59, 59, 2, 27, 2016)));
+        $this->assertEquals(self::d(2016, 2, 27), Date::fromTimestamp(gmmktime(0, 0, 0, 2, 27, 2016)));
+        $this->assertEquals(self::d(2016, 2, 27), Date::fromTimestamp(gmmktime(23, 59, 59, 2, 27, 2016)));
     }
 
     public function testFromParts()
@@ -151,8 +151,8 @@ class DateTest extends \PHPUnit_Framework_TestCase
 
     public function testToTimestamp()
     {
-        $this->assertSame(mktime(0, 0, 0, 1, 30, 2016), self::d(2016, 1, 30)->toTimestamp());
-        $this->assertSame(mktime(0, 0, 0, 1, 30, 2016), Date::fromTimestamp(mktime(12, 55, 0, 1, 30, 2016))->toTimestamp());
+        $this->assertSame(gmmktime(0, 0, 0, 1, 30, 2016), self::d(2016, 1, 30)->toTimestamp());
+        $this->assertSame(gmmktime(0, 0, 0, 1, 30, 2016), Date::fromTimestamp(gmmktime(12, 55, 0, 1, 30, 2016))->toTimestamp());
         $this->assertNull(Date::infinity()->toTimestamp());
         $this->assertNull(Date::minusInfinity()->toTimestamp());
     }

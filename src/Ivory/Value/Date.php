@@ -26,7 +26,7 @@ class Date implements IComparable
     // NOTE: the order of the fields is important for the `<` and `>` operators to work correctly
     /** @var int -1, 0, or 1 if this date is <tt>-infinity</tt>, finite, or <tt>infinity</tt> */
     private $inf;
-    /** @var \DateTimeImmutable; the current timezone is always used */
+    /** @var \DateTimeImmutable; the UTC timezone is always used */
     private $dt;
 
 
@@ -35,7 +35,7 @@ class Date implements IComparable
      */
     public static function today()
     {
-        return new Date(0, new \DateTimeImmutable('today'));
+        return new Date(0, new \DateTimeImmutable('today', self::getUTCTimeZone()));
     }
 
     /**
@@ -43,7 +43,7 @@ class Date implements IComparable
      */
     public static function tomorrow()
     {
-        return new Date(0, new \DateTimeImmutable('tomorrow'));
+        return new Date(0, new \DateTimeImmutable('tomorrow', self::getUTCTimeZone()));
     }
 
     /**
@@ -51,7 +51,7 @@ class Date implements IComparable
      */
     public static function yesterday()
     {
-        return new Date(0, new \DateTimeImmutable('yesterday'));
+        return new Date(0, new \DateTimeImmutable('yesterday', self::getUTCTimeZone()));
     }
 
     /**
@@ -111,7 +111,7 @@ class Date implements IComparable
             $dateCreateInput .= " $sgn$addYears years";
         }
 
-        $dt = date_create_immutable($dateCreateInput); // using the procedural style as it does not throw the generic Exception
+        $dt = date_create_immutable($dateCreateInput, self::getUTCTimeZone()); // using the procedural style as it does not throw the generic Exception
         if ($dt === false) {
             throw new \InvalidArgumentException('$isoDateString');
         }
@@ -120,12 +120,16 @@ class Date implements IComparable
     }
 
     /**
-     * @param int $timestamp the UNIX timestamp; just the date part is used, other information is ignored
+     * @param int $timestamp the UNIX timestamp;
+     *                       just the date part is used, other information is ignored;
+     *                       note that a UNIX timestamp represents the number of seconds since 1970-01-01 UTC, i.e., it
+     *                         corresponds to usage of PHP functions {@link gmmktime()} and {@link gmdate()} rather than
+     *                         {@link mktime()} or {@link date()}
      * @return Date the date of the given timestamp
      */
     public static function fromTimestamp($timestamp)
     {
-        return new Date(0, new \DateTimeImmutable(date('Y-m-d', $timestamp)));
+        return new Date(0, new \DateTimeImmutable(gmdate('Y-m-d', $timestamp), self::getUTCTimeZone()));
     }
 
     /**
@@ -219,6 +223,15 @@ class Date implements IComparable
         else {
             throw new \OutOfRangeException('$day out of range');
         }
+    }
+
+    private static function getUTCTimeZone()
+    {
+        static $utc = null;
+        if ($utc === null) {
+            $utc = new \DateTimeZone('UTC');
+        }
+        return $utc;
     }
 
 
@@ -382,7 +395,10 @@ class Date implements IComparable
 
     /**
      * @return int|null the date represented as the UNIX timestamp;
-     *                     <tt>null</tt> iff the date is not finite
+     *                  <tt>null</tt> iff the date is not finite;
+     *                  note that a UNIX timestamp represents the number of seconds since 1970-01-01 UTC, i.e., it
+     *                    corresponds to usage of PHP functions {@link gmmktime()} and {@link gmdate()} rather than
+     *                    {@link mktime()} or {@link date()}
      */
     public function toTimestamp()
     {
