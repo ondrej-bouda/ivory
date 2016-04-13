@@ -49,6 +49,8 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 
 			case 'date':
 				return new DateType($schemaName, $typeName, $connection);
+			case 'time':
+				return new TimeType($schemaName, $typeName, $connection);
 
 			case 'bytea':
 				return new BinaryType($schemaName, $typeName, $connection);

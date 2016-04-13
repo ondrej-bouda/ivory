@@ -7,6 +7,7 @@ use Ivory\Connection\DateStyle;
 use Ivory\Connection\IConnection;
 use Ivory\Type\BaseType;
 use Ivory\Type\IDiscreteType;
+use Ivory\Type\TotallyOrderedByPhpOperators;
 use Ivory\Value\Date;
 
 /**
@@ -39,6 +40,9 @@ use Ivory\Value\Date;
  */
 class DateType extends BaseType implements IDiscreteType
 {
+	use TotallyOrderedByPhpOperators;
+
+
 	private $dateStyleRetriever;
 
 	public function __construct($schemaName, $name, IConnection $connection)
@@ -114,24 +118,6 @@ class DateType extends BaseType implements IDiscreteType
 			$val->getDay(),
 			($val->getYear() < 0 ? ' BC' : '')
 		);
-	}
-
-	public function compareValues($a, $b)
-	{
-		if ($a === null || $b === null) {
-			return null;
-		}
-
-		// PHP 7: use the <=> operator as a shorthand
-		if ($a < $b) {
-			return -1;
-		}
-		elseif ($a == $b) {
-			return 0;
-		}
-		else {
-			return 1;
-		}
 	}
 
 	public function step($delta, $value)

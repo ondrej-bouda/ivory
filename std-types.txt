@@ -31,6 +31,7 @@ smallint	                int2	            signed two-byte integer
 smallserial	                serial2	            autoincrementing two-byte integer
 serial	                    serial4	            autoincrementing four-byte integer
 text	 	                                    variable-length character string
+time [ (p) ] [ without time zone ]	            time of day (no time zone)
 uuid	 	                                    universally unique identifier
 xml	 	                                        XML data
 
@@ -41,7 +42,6 @@ PostgreSQL built-in types yet to be supported:
 Name                        Aliases             Description
 interval [ fields ] [ (p) ]	 	                time span
 pg_lsn	 	                                    PostgreSQL Log Sequence Number
-time [ (p) ] [ without time zone ]	            time of day (no time zone)
 time [ (p) ] with time zone	timetz	            time of day, including time zone
 timestamp [ (p) ] [ without time zone ]         date and time (no time zone)
 timestamp [ (p) ] with time zone    timestamptz	date and time, including time zone

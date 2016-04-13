@@ -5,6 +5,7 @@ use Ivory\Value\Composite;
 use Ivory\Value\Box;
 use Ivory\Value\Date;
 use Ivory\Value\Range;
+use Ivory\Value\Time;
 
 class QueryRelationTest extends \Ivory\IvoryTestCase
 {
@@ -189,9 +190,9 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
     {
         $conn = $this->getIvoryConnection();
         $qr = new QueryRelation($conn,
-            "SELECT name, released
+            'SELECT name, released
              FROM album
-             ORDER BY released, name"
+             ORDER BY released, name'
         );
 
         $list = $qr->toArray();
@@ -229,5 +230,22 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
             [Date::fromParts(2005, 1, 1), Date::fromParts(2005, 1, 1)],
             $qr->value('activerng', 2)->toBounds('[]')
         );
+    }
+
+    public function testTimeResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn,
+            "SELECT '0:00'::TIME AS midnight,
+                    '07:59:60.123456'::TIME AS leapsec,
+                    '15:42:54'::TIME AS pm,
+                    '24:00:00'::TIME AS next_midnight"
+        );
+
+        $tuple = $qr->tuple();
+        $this->assertEquals(Time::fromString('00:00:00'), $tuple['midnight']);
+        $this->assertEquals(Time::fromString('08:00:00.123456'), $tuple['leapsec']);
+        $this->assertEquals(Time::fromString('15:42:54'), $tuple['pm']);
+        $this->assertEquals(Time::fromString('24:00:00'), $tuple['next_midnight']);
     }
 }
