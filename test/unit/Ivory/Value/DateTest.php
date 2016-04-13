@@ -139,7 +139,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
         $this->assertNull(Date::minusInfinity()->toParts());
     }
 
-    public function toISOString()
+    public function testToISOString()
     {
         $this->assertSame('2016-01-30', self::d(2016, 1, 30)->toISOString());
         $this->assertSame('0000-01-30', self::d(-1, 1, 30)->toISOString());
@@ -149,10 +149,10 @@ class DateTest extends \PHPUnit_Framework_TestCase
         $this->assertNull(Date::minusInfinity()->toISOString());
     }
 
-    public function toTimestamp()
+    public function testToTimestamp()
     {
         $this->assertSame(mktime(0, 0, 0, 1, 30, 2016), self::d(2016, 1, 30)->toTimestamp());
-        $this->assertSame(mktime(0, 0, 0, 1, 30, 2016), Date::fromTimestamp(mktime(12, 55, 0, 1, 30, 2016)));
+        $this->assertSame(mktime(0, 0, 0, 1, 30, 2016), Date::fromTimestamp(mktime(12, 55, 0, 1, 30, 2016))->toTimestamp());
         $this->assertNull(Date::infinity()->toTimestamp());
         $this->assertNull(Date::minusInfinity()->toTimestamp());
     }
