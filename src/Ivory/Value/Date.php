@@ -15,7 +15,7 @@ use Ivory\Utils\IComparable;
  * operators with the expected results.
  *
  * All the operations work correctly beyond the UNIX timestamp range bounded by 32bit integers, i.e., it is no problem
- * calculating with year 9000, for example.
+ * calculating with year 12345, for example.
  *
  * Note the date value is immutable, i.e., once constructed, its value cannot be changed.
  *
@@ -138,15 +138,7 @@ class Date implements IComparable
      */
     public static function fromDateTime(\DateTimeInterface $dateTime)
     {
-        if ($dateTime instanceof \DateTimeImmutable) {
-            return new Date(0, $dateTime);
-        }
-        elseif ($dateTime instanceof \DateTime) {
-            return new Date(0, \DateTimeImmutable::createFromMutable($dateTime));
-        }
-        else {
-            return self::fromISOString($dateTime->format('Y-m-d'));
-        }
+        return self::fromISOString($dateTime->format('Y-m-d'));
     }
 
     /**

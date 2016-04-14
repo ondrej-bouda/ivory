@@ -19,13 +19,13 @@ use Ivory\Value\Date;
  * PostgreSQL may use for output, depending on the
  * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-client.html#GUC-DATESTYLE DateStyle} environment
  * setting:
- * - `ISO`, e.g., `1997-12-17`
- * - `SQL`, e.g., `12/17/1997`
+ * - `ISO`, e.g., `1997-12-17`,
+ * - `SQL`, e.g., `12/17/1997`,
  * - `Postgres`, e.g., `12-17-1997`, or
  * - `German`, e.g., `17.12.1997`.
  *
  * Apart from that, the order of the day, month, and year in dates parsed from PostgreSQL by
- * {@link DateType::parseValue()} also depends on the `DateStyle` setting, but in rather limited fashion:
+ * {@link DateType::parseValue()} also depends on the `DateStyle` setting, but in a rather limited fashion:
  * - `SQL` and `Postgres` both expect either `MDY` or `DMY` (and default to `MDY` for other values),
  * - `ISO` and `German` are insensitive of the month-day-year order.
  *
