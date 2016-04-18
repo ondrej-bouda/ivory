@@ -32,6 +32,7 @@ smallserial	                serial2	            autoincrementing two-byte intege
 serial	                    serial4	            autoincrementing four-byte integer
 text	 	                                    variable-length character string
 time [ (p) ] [ without time zone ]	            time of day (no time zone)
+timestamp [ (p) ] [ without time zone ]         date and time (no time zone)
 uuid	 	                                    universally unique identifier
 xml	 	                                        XML data
 
@@ -43,7 +44,6 @@ Name                        Aliases             Description
 interval [ fields ] [ (p) ]	 	                time span
 pg_lsn	 	                                    PostgreSQL Log Sequence Number
 time [ (p) ] with time zone	timetz	            time of day, including time zone
-timestamp [ (p) ] [ without time zone ]         date and time (no time zone)
 timestamp [ (p) ] with time zone    timestamptz	date and time, including time zone
 tsquery	 	                                    text search query
 tsvector	 	                                text search document

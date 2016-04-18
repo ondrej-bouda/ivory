@@ -6,6 +6,13 @@ use Ivory\Type\ITotallyOrderedType;
 use Ivory\Type\TotallyOrderedByPhpOperators;
 use Ivory\Value\Time;
 
+/**
+ * Time of day.
+ *
+ * Represented as a {@link \Ivory\Value\Time} object.
+ *
+ * @see http://www.postgresql.org/docs/9.4/static/datatype-datetime.html
+ */
 class TimeType extends BaseType implements ITotallyOrderedType
 {
     use TotallyOrderedByPhpOperators;
@@ -13,9 +20,9 @@ class TimeType extends BaseType implements ITotallyOrderedType
 
     public function parseValue($str)
     {
-        if ($str === null) {
-            return null;
-        }
+            if ($str === null) {
+                return null;
+            }
 
         return Time::fromString($str);
     }

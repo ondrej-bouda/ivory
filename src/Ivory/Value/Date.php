@@ -1,8 +1,6 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\Utils\IComparable;
-
 /**
  * Representation of a date according to the
  * {@link https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar proleptic} Gregorian calendar.
@@ -21,15 +19,8 @@ use Ivory\Utils\IComparable;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datetime-units-history.html
  */
-class Date implements IComparable
+class Date extends DateBase
 {
-    // NOTE: the order of the fields is important for the `<` and `>` operators to work correctly
-    /** @var int -1, 0, or 1 if this date is <tt>-infinity</tt>, finite, or <tt>infinity</tt> */
-    private $inf;
-    /** @var \DateTimeImmutable; the UTC timezone is always used */
-    private $dt;
-
-
     /**
      * @return Date date representing the current day
      */
@@ -55,30 +46,6 @@ class Date implements IComparable
     }
 
     /**
-     * @return Date the special `infinity` date, taking part after any other date
-     */
-    public static function infinity()
-    {
-        static $inst = null;
-        if ($inst === null) {
-            $inst = new Date(1, null);
-        }
-        return $inst;
-    }
-
-    /**
-     * @return Date the special `-infinity` date, taking part before any other date
-     */
-    public static function minusInfinity()
-    {
-        static $inst = null;
-        if ($inst === null) {
-            $inst = new Date(-1, null);
-        }
-        return $inst;
-    }
-
-    /**
      * Creates a date from an ISO 8601 string, i.e., formatted as `YYYY-MM-DD`.
      *
      * Years beyond 4 digits are supported, i.e., `'12345-01-30'` is a valid input, representing a date of year 12345.
@@ -97,7 +64,7 @@ class Date implements IComparable
         // check out for more than 4 digits for the year - something date_create_immutable() does not handle properly
         $addYears = 0;
         $dateCreateInput = preg_replace_callback(
-            '~\d{5,}~',
+            '~\d{5,}(?=-|\d{4})~', // supports both dash-separated date parts and also the form without dash separators
             function ($y) use (&$addYears) {
                 $res = $y[0] % 10000;
                 $addYears = $y[0] - $res;
@@ -171,7 +138,7 @@ class Date implements IComparable
             return self::fromISOString(sprintf('%s%04d-%02d-%02d', ($z < 0 ? '-' : ''), abs($z), $month, $day));
         }
         else {
-            return self::fromISOString(sprintf('%s%04d-%02d-%02d', ($z < 0 ? '-' : ''), abs($z), 1, 1))
+            return self::fromISOString(sprintf('%s%04d-01-01', ($z < 0 ? '-' : ''), abs($z)))
                 ->addParts(0, $month - 1, $day - 1);
         }
     }
@@ -217,119 +184,16 @@ class Date implements IComparable
         }
     }
 
-    private static function getUTCTimeZone()
+
+    final protected function getISOFormat()
     {
-        static $utc = null;
-        if ($utc === null) {
-            $utc = new \DateTimeZone('UTC');
-        }
-        return $utc;
-    }
-
-
-    private function __construct($inf, \DateTimeImmutable $dt = null)
-    {
-        $this->inf = $inf;
-        $this->dt = $dt;
-    }
-
-
-    /**
-     * @return int|null the year part of the date;
-     *                  years before Christ are negative, starting from -1 for year 1 BC, -2 for year 2 BC, etc.;
-     *                  <tt>null</tt> iff the date is not finite
-     */
-    public function getYear()
-    {
-        $z = $this->getZeroBasedYear();
-        if ($z > 0 || $z === null) {
-            return $z;
-        }
-        else {
-            return $z - 1;
-        }
+        return 'Y-m-d';
     }
 
     /**
-     * Returns the year from this date, interpreting years before Christ as non-positive numbers: 0 for year 1 BC,
-     * -1 for year 2 BC, etc. This is the number appearing as year in the ISO 8601 date string format.
+     * Adds a given number of years, months, and days to this date and returns the result.
      *
-     * @return int|null the year of the date, basing year 1 BC as zero;
-     *                  <tt>null</tt> iff the date is not finite
-     */
-    public function getZeroBasedYear() // NOTE: not named getISOYear() to avoid confusion with EXTRACT(ISOYEAR FROM ...)
-    {
-        return ($this->inf ? null : (int)$this->dt->format('Y'));
-    }
-
-    /**
-     * @return int|null the month part of the date;
-     *                  <tt>null</tt> iff the date is not finite
-     */
-    public function getMonth()
-    {
-        return ($this->inf ? null : (int)$this->dt->format('n'));
-    }
-
-    /**
-     * @return int|null the day part of the date;
-     *                  <tt>null</tt> iff the date is not finite
-     */
-    public function getDay()
-    {
-        return ($this->inf ? null : (int)$this->dt->format('j'));
-    }
-
-    /**
-     * @param string $dateFmt the format string as accepted by {@link date()}
-     * @return string|null the date formatted according to <tt>$dateFmt</tt>;
-     *                     <tt>null</tt> iff the date is not finite
-     */
-    public function format($dateFmt)
-    {
-        if ($this->inf) {
-            return null;
-        }
-        else {
-            return $this->dt->format($dateFmt);
-        }
-    }
-
-    /**
-     * Adds a given number of days (1 by default) to this date and returns the result. Only affects finite dates.
-     *
-     * @param int $days
-     * @return Date the date <tt>$days</tt> days after (or before, if negative) this date
-     */
-    public function addDay($days = 1)
-    {
-        return $this->addParts(0, 0, $days);
-    }
-
-    /**
-     * Adds a given number of months (1 by default) to this date and returns the result. Only affects finite dates.
-     *
-     * @param int $months
-     * @return Date the date <tt>$months</tt> months after (or before, if negative) this date
-     */
-    public function addMonth($months = 1)
-    {
-        return $this->addParts(0, $months, 0);
-    }
-
-    /**
-     * Adds a given number of years (1 by default) to this date and returns the result. Only affects finite dates.
-     *
-     * @param int $years
-     * @return Date the date <tt>$years</tt> years after (or before, if negative) this date
-     */
-    public function addYear($years = 1)
-    {
-        return $this->addParts($years, 0, 0);
-    }
-
-    /**
-     * Adds a given number of years, months, and days to this date and returns the result. Only affects finite dates.
+     * Only affects finite dates - an infinite date is returned as is.
      *
      * Note that addition of months respects the month days, and might actually change the day part. Example:
      * - adding 1 month to `2015-05-31` results in `2015-07-01` (June only has 30 days).
@@ -349,15 +213,7 @@ class Date implements IComparable
      */
     public function addParts($years, $months, $days)
     {
-        if ($this->inf) {
-            return $this;
-        }
-
-        $yp = ($years >= 0 ? '+' : '');
-        $mp = ($months >= 0 ? '+' : '');
-        $dp = ($days >= 0 ? '+' : '');
-
-        return new Date(0, $this->dt->modify("$yp$years years $mp$months months $dp$days days"));
+        return $this->addPartsImpl($years, $months, $days, 0, 0, 0);
     }
 
     /**
@@ -374,68 +230,4 @@ class Date implements IComparable
             return [($z > 0 ? $z : $z - 1), (int)$this->dt->format('n'), (int)$this->dt->format('j')];
         }
     }
-
-    /**
-     * @return string|null the date represented as an ISO 8601 string;
-     *                     years before Christ represented are using the minus prefix, year 1 BC as <tt>0000</tt>;
-     *                     <tt>null</tt> iff the date is not finite
-     */
-    public function toISOString()
-    {
-        return ($this->inf ? null : $this->dt->format('Y-m-d'));
-    }
-
-    /**
-     * @return int|null the date represented as the UNIX timestamp;
-     *                  <tt>null</tt> iff the date is not finite;
-     *                  note that a UNIX timestamp represents the number of seconds since 1970-01-01 UTC, i.e., it
-     *                    corresponds to usage of PHP functions {@link gmmktime()} and {@link gmdate()} rather than
-     *                    {@link mktime()} or {@link date()}
-     */
-    public function toTimestamp()
-    {
-        return ($this->inf ? null : $this->dt->getTimestamp());
-    }
-
-    /**
-     * @param \DateTimeZone $timezone timezone to create the {@link \DateTime} object with
-     * @return \DateTime|null the date represented as a {@link \DateTime} object;
-     *                        <tt>null</tt> iff the date is not finite
-     */
-    public function toDateTime(\DateTimeZone $timezone = null)
-    {
-        return ($this->inf ? null : new \DateTime($this->toISOString(), $timezone));
-    }
-
-    /**
-     * @param \DateTimeZone $timezone timezone to create the {@link \DateTime} object with
-     * @return \DateTime|null the date represented as a {@link \DateTimeImmutable} object;
-     *                        <tt>null</tt> iff the date is not finite
-     */
-    public function toDateTimeImmutable(\DateTimeZone $timezone = null)
-    {
-        if ($this->inf) {
-            return null;
-        }
-        else {
-            if ($timezone === $this->dt->getTimezone()) {
-                return $this->dt;
-            }
-            else {
-                return new \DateTimeImmutable($this->toISOString(), $timezone);
-            }
-        }
-    }
-
-    //region IComparable
-
-    public function equals($object)
-    {
-        if ($object === null) {
-            return null;
-        }
-        return ($this == $object);
-    }
-
-    //endregion
 }

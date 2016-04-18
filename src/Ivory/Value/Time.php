@@ -6,6 +6,8 @@ use Ivory\Utils\IComparable;
 /**
  * Representation of time of day (no date, just time).
  *
+ * No timezone information is handled by this class - see {@link TimeTz} instead.
+ *
  * The supported range is from `00:00:00` to `24:00:00`. Fractional seconds may be used.
  *
  * Besides being {@link IComparable}, the {@link Date} objects may safely be compared using the `<`, `==`, and `>`

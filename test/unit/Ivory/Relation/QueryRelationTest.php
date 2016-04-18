@@ -5,6 +5,7 @@ use Ivory\Connection\ConfigParam;
 use Ivory\Value\Composite;
 use Ivory\Value\Box;
 use Ivory\Value\Date;
+use Ivory\Value\DateTime;
 use Ivory\Value\Range;
 use Ivory\Value\Time;
 
@@ -276,5 +277,42 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         $this->assertEquals(Time::fromString('08:00:00.123456'), $tuple['leap_sec']);
         $this->assertEquals(Time::fromString('15:42:54'), $tuple['pm']);
         $this->assertEquals(Time::fromString('24:00:00'), $tuple['next_midnight']);
+    }
+
+    public function testDateTimeResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $conn->startTransaction();
+
+        try {
+            $dateStyles = ['ISO', 'German', 'SQL, DMY', 'SQL, MDY', 'Postgres, DMY', 'Postgres, MDY'];
+            foreach ($dateStyles as $dateStyle) {
+                $conn->getConfig()->setForTransaction(ConfigParam::DATE_STYLE, $dateStyle);
+                $qr = new QueryRelation($conn,
+                    "SELECT '2016-04-17 0:00'::TIMESTAMP AS midnight,
+                            '2016-05-17 07:59:60.123456'::TIMESTAMP AS leap_sec,
+                            '2016-06-17 15:42:54'::TIMESTAMP AS pm,
+                            '2016-07-17 24:00:00'::TIMESTAMP AS next_midnight,
+                            '1987-08-17 13:01:02.5 BC'::TIMESTAMP AS bc,
+                            'infinity'::TIMESTAMP AS inf,
+                            '-infinity'::TIMESTAMP AS minus_inf,
+                            '294276-12-31 24:00:00'::TIMESTAMP AS mx,
+                            '4713-01-01 00:00:00 BC'::TIMESTAMP AS mn"
+                );
+                $tuple = $qr->tuple();
+                $this->assertEquals(DateTime::fromParts(2016, 4, 17, 0, 0, 0), $tuple['midnight'], $dateStyle);
+                $this->assertEquals(DateTime::fromParts(2016, 5, 17, 8, 0, 0.123456), $tuple['leap_sec'], $dateStyle);
+                $this->assertEquals(DateTime::fromParts(2016, 6, 17, 15, 42, 54), $tuple['pm'], $dateStyle);
+                $this->assertEquals(DateTime::fromParts(2016, 7, 18, 0, 0, 0), $tuple['next_midnight'], $dateStyle);
+                $this->assertEquals(DateTime::fromParts(-1987, 8, 17, 13, 1, 2.5), $tuple['bc'], $dateStyle);
+                $this->assertEquals(DateTime::infinity(), $tuple['inf'], $dateStyle);
+                $this->assertEquals(DateTime::minusInfinity(), $tuple['minus_inf'], $dateStyle);
+                $this->assertEquals(DateTime::fromParts(294277, 1, 1, 0, 0, 0), $tuple['mx'], $dateStyle);
+                $this->assertEquals(DateTime::fromParts(-4713, 1, 1, 0, 0, 0), $tuple['mn'], $dateStyle);
+            }
+        }
+        finally {
+            $conn->rollback();
+        }
     }
 }
