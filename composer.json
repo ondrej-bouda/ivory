@@ -2,7 +2,6 @@
   "name": "ondrej-bouda/ivory",
   "description": "A PHP PostgreSQL layer as complete as possible",
   "homepage": "https://github.com/ondrej-bouda/ivory",
-  "minimum-stability": "dev",
   "license": "BSD-3-Clause",
   "authors": [
     {
