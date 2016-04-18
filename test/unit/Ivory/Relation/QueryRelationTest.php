@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Relation;
 
+use Ivory\Connection\ConfigParam;
 use Ivory\Value\Composite;
 use Ivory\Value\Box;
 use Ivory\Value\Date;
@@ -200,6 +201,34 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         $this->assertEquals(['name' => 'S & M', 'released' => Date::fromParts(1999, 11, 23)], $list[1]);
         $this->assertEquals(['name' => 'Live One', 'released' => Date::fromParts(2005, 1, 1)], $list[2]);
         $this->assertEquals(['name' => 'The Piano Guys', 'released' => Date::fromParts(2012, 10, 2)], $list[3]);
+
+        $conn = $this->getIvoryConnection();
+        $conn->startTransaction();
+
+        try {
+            $dateStyles = ['ISO', 'German', 'SQL, DMY', 'SQL, MDY', 'Postgres, DMY', 'Postgres, MDY'];
+            foreach ($dateStyles as $dateStyle) {
+                $conn->getConfig()->setForTransaction(ConfigParam::DATE_STYLE, $dateStyle);
+                $qr = new QueryRelation($conn,
+                    "SELECT '2016-04-17'::DATE as d,
+                            '1987-08-17 BC'::DATE AS bc,
+                            'infinity'::DATE AS inf,
+                            '-infinity'::DATE AS minus_inf,
+                            '5874897-12-31'::DATE AS mx,
+                            '4713-01-01 BC'::DATE AS mn"
+                );
+                $tuple = $qr->tuple();
+                $this->assertEquals(Date::fromParts(2016, 4, 17), $tuple['d'], $dateStyle);
+                $this->assertEquals(Date::fromParts(-1987, 8, 17), $tuple['bc'], $dateStyle);
+                $this->assertEquals(Date::infinity(), $tuple['inf'], $dateStyle);
+                $this->assertEquals(Date::minusInfinity(), $tuple['minus_inf'], $dateStyle);
+                $this->assertEquals(Date::fromParts(5874897, 12, 31), $tuple['mx'], $dateStyle);
+                $this->assertEquals(Date::fromParts(-4713, 1, 1), $tuple['mn'], $dateStyle);
+            }
+        }
+        finally {
+            $conn->rollback();
+        }
     }
 
     public function testDateRangeResult()
@@ -237,14 +266,14 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         $conn = $this->getIvoryConnection();
         $qr = new QueryRelation($conn,
             "SELECT '0:00'::TIME AS midnight,
-                    '07:59:60.123456'::TIME AS leapsec,
+                    '07:59:60.123456'::TIME AS leap_sec,
                     '15:42:54'::TIME AS pm,
                     '24:00:00'::TIME AS next_midnight"
         );
 
         $tuple = $qr->tuple();
         $this->assertEquals(Time::fromString('00:00:00'), $tuple['midnight']);
-        $this->assertEquals(Time::fromString('08:00:00.123456'), $tuple['leapsec']);
+        $this->assertEquals(Time::fromString('08:00:00.123456'), $tuple['leap_sec']);
         $this->assertEquals(Time::fromString('15:42:54'), $tuple['pm']);
         $this->assertEquals(Time::fromString('24:00:00'), $tuple['next_midnight']);
     }

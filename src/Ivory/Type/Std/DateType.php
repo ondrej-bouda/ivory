@@ -59,6 +59,12 @@ class DateType extends BaseType implements IDiscreteType
 		if ($str === null) {
 			return null;
 		}
+		elseif ($str == 'infinity') {
+			return Date::infinity();
+		}
+		elseif ($str == '-infinity') {
+			return Date::minusInfinity();
+		}
 
 		$matched = preg_match('~^(\d+)([-/.])(\d+)(?2)(\d+)(\s+BC)?$~', $str, $m);
 		if (PHP_MAJOR_VERSION >= 7) {
@@ -111,13 +117,24 @@ class DateType extends BaseType implements IDiscreteType
 			$val = (is_numeric($val) ? Date::fromTimestamp($val) : Date::fromISOString($val));
 		}
 
-		return sprintf(
-			"'%d-%d-%d%s'",
-			abs($val->getYear()),
-			$val->getMonth(),
-			$val->getDay(),
-			($val->getYear() < 0 ? ' BC' : '')
-		);
+		if ($val->isFinite()) {
+			return sprintf(
+				"'%04d-%02d-%02d%s'",
+				abs($val->getYear()),
+				$val->getMonth(),
+				$val->getDay(),
+				($val->getYear() < 0 ? ' BC' : '')
+			);
+		}
+		elseif ($val === Date::infinity()) {
+			return "'infinity'";
+		}
+		elseif ($val === Date::minusInfinity()) {
+			return "'-infinity'";
+		}
+		else {
+			throw new \LogicException('A non-finite date not recognized');
+		}
 	}
 
 	public function step($delta, $value)

@@ -46,6 +46,17 @@ class DateTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(self::d(2016, 2, 27), Date::fromTimestamp(gmmktime(23, 59, 59, 2, 27, 2016)));
     }
 
+    public function testFromDateTime()
+    {
+        $utc = new \DateTimeZone('UTC');
+
+        $this->assertEquals(self::d(2016,  2, 27), Date::fromDateTime(new \DateTime('2016-02-27', $utc)));
+        $this->assertEquals(self::d(2016,  2, 27), Date::fromDateTime(new \DateTime('2016-02-27 15:48:12.1234', $utc)));
+
+        $this->assertEquals(self::d(2016,  2, 27), Date::fromDateTime(new \DateTimeImmutable('2016-02-27', $utc)));
+        $this->assertEquals(self::d(2016,  2, 27), Date::fromDateTime(new \DateTimeImmutable('2016-02-27 15:48:12.1234', $utc)));
+    }
+
     public function testFromParts()
     {
         $this->assertEquals(self::d(2016, 2, 27), Date::fromParts(2016, 2, 27));
