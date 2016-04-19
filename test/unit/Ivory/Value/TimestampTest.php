@@ -32,8 +32,8 @@ class TimestampTest extends \PHPUnit_Framework_TestCase
             $start = time();
             $dt = Timestamp::now();
             $end = time();
-            $this->assertLessThanOrEqual($dt->toTimestamp(), $start);
-            $this->assertLessThanOrEqual($end, $dt->toTimestamp());
+            $this->assertLessThanOrEqual($dt->toUnixTimestamp(), $start);
+            $this->assertLessThanOrEqual($end, $dt->toUnixTimestamp());
             $this->assertEquals(0, $dt->format('u'));
         }
     }
@@ -46,8 +46,8 @@ class TimestampTest extends \PHPUnit_Framework_TestCase
             $start = time();
             $dt = Timestamp::nowMicro();
             $end = time();
-            $this->assertLessThanOrEqual($dt->toTimestamp(), $start);
-            $this->assertLessThanOrEqual($end, $dt->toTimestamp());
+            $this->assertLessThanOrEqual($dt->toUnixTimestamp(), $start);
+            $this->assertLessThanOrEqual($end, $dt->toUnixTimestamp());
             if ($dt->format('u') != 0) {
                 $hitNonZeroMicrosec = true;
                 break; // OK - non-zero fractional part

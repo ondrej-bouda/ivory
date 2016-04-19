@@ -114,7 +114,7 @@ class DateType extends BaseType implements IDiscreteType
 		}
 
 		if (!$val instanceof Date) {
-			$val = (is_numeric($val) ? Date::fromTimestamp($val) : Date::fromISOString($val));
+			$val = (is_numeric($val) ? Date::fromUnixTimestamp($val) : Date::fromISOString($val));
 		}
 
 		if ($val->isFinite()) {

@@ -98,7 +98,7 @@ class Timestamp extends DateBase
      *                         {@link mktime()} or {@link date()}
      * @return Timestamp
      */
-    public static function fromTimestamp($timestamp)
+    public static function fromUnixTimestamp($timestamp)
     {
         $str = gmdate('Y-m-d H:i:s', (int)$timestamp);
         $dt = new Timestamp(0, new \DateTimeImmutable($str, self::getUTCTimeZone()));

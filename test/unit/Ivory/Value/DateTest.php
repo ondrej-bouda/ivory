@@ -40,10 +40,10 @@ class DateTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(self::d(-2, 2, 27), Date::fromISOString('-0001-02-27'));
     }
 
-    public function testFromTimestamp()
+    public function testFromUnixTimestamp()
     {
-        $this->assertEquals(self::d(2016, 2, 27), Date::fromTimestamp(gmmktime(0, 0, 0, 2, 27, 2016)));
-        $this->assertEquals(self::d(2016, 2, 27), Date::fromTimestamp(gmmktime(23, 59, 59, 2, 27, 2016)));
+        $this->assertEquals(self::d(2016, 2, 27), Date::fromUnixTimestamp(gmmktime(0, 0, 0, 2, 27, 2016)));
+        $this->assertEquals(self::d(2016, 2, 27), Date::fromUnixTimestamp(gmmktime(23, 59, 59, 2, 27, 2016)));
     }
 
     public function testFromDateTime()
@@ -160,11 +160,11 @@ class DateTest extends \PHPUnit_Framework_TestCase
         $this->assertNull(Date::minusInfinity()->toISOString());
     }
 
-    public function testToTimestamp()
+    public function testToUnixTimestamp()
     {
-        $this->assertSame(gmmktime(0, 0, 0, 1, 30, 2016), self::d(2016, 1, 30)->toTimestamp());
-        $this->assertSame(gmmktime(0, 0, 0, 1, 30, 2016), Date::fromTimestamp(gmmktime(12, 55, 0, 1, 30, 2016))->toTimestamp());
-        $this->assertNull(Date::infinity()->toTimestamp());
-        $this->assertNull(Date::minusInfinity()->toTimestamp());
+        $this->assertSame(gmmktime(0, 0, 0, 1, 30, 2016), self::d(2016, 1, 30)->toUnixTimestamp());
+        $this->assertSame(gmmktime(0, 0, 0, 1, 30, 2016), Date::fromUnixTimestamp(gmmktime(12, 55, 0, 1, 30, 2016))->toUnixTimestamp());
+        $this->assertNull(Date::infinity()->toUnixTimestamp());
+        $this->assertNull(Date::minusInfinity()->toUnixTimestamp());
     }
 }

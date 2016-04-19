@@ -38,7 +38,7 @@ class TimeType extends BaseType implements ITotallyOrderedType
                 $val = Time::fromDateTime($val);
             }
             elseif (is_numeric($val)) {
-                $val = Time::fromTimestamp($val);
+                $val = Time::fromUnixTimestamp($val);
             }
             elseif (is_string($val)) {
                 try {

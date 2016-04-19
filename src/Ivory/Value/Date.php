@@ -94,7 +94,7 @@ class Date extends DateBase
      *                         {@link mktime()} or {@link date()}
      * @return Date the date of the given timestamp
      */
-    public static function fromTimestamp($timestamp)
+    public static function fromUnixTimestamp($timestamp)
     {
         return new Date(0, new \DateTimeImmutable(gmdate('Y-m-d', $timestamp), self::getUTCTimeZone()));
     }

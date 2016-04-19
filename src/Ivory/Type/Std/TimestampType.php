@@ -120,7 +120,7 @@ class TimestampType extends BaseType implements ITotallyOrderedType
         }
 
         if (!$val instanceof Timestamp) {
-            $val = (is_numeric($val) ? Timestamp::fromTimestamp($val) : Timestamp::fromISOString($val));
+            $val = (is_numeric($val) ? Timestamp::fromUnixTimestamp($val) : Timestamp::fromISOString($val));
         }
 
         if ($val->isFinite()) {

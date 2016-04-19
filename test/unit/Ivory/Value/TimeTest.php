@@ -5,7 +5,7 @@ class TimeTest extends \PHPUnit_Framework_TestCase
 {
     private static function t($hour, $min, $sec)
     {
-        return Time::fromTimestamp($hour * 60 * 60 + $min * 60 + $sec);
+        return Time::fromUnixTimestamp($hour * 60 * 60 + $min * 60 + $sec);
     }
 
     public function testEqualityOperator()
@@ -76,15 +76,15 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testFromTimestamp()
+    public function testFromUnixTimestamp()
     {
-        $this->assertEquals(self::t(8, 9, 10), Time::fromTimestamp(29350));
-        $this->assertEquals(self::t(8, 9, 10), Time::fromTimestamp(288550));
-        $this->assertEquals(self::t(8, 9, 10.1234), Time::fromTimestamp(288550.1234));
+        $this->assertEquals(self::t(8, 9, 10), Time::fromUnixTimestamp(29350));
+        $this->assertEquals(self::t(8, 9, 10), Time::fromUnixTimestamp(288550));
+        $this->assertEquals(self::t(8, 9, 10.1234), Time::fromUnixTimestamp(288550.1234));
 
-        $this->assertEquals(self::t(23, 59, 30), Time::fromTimestamp(-30));
-        $this->assertEquals(self::t(23, 59, 29.9), Time::fromTimestamp(-30.1));
-        $this->assertEquals(self::t(23, 59, 30), Time::fromTimestamp(-172830));
+        $this->assertEquals(self::t(23, 59, 30), Time::fromUnixTimestamp(-30));
+        $this->assertEquals(self::t(23, 59, 29.9), Time::fromUnixTimestamp(-30.1));
+        $this->assertEquals(self::t(23, 59, 30), Time::fromUnixTimestamp(-172830));
     }
 
     public function testFromDateTime()
@@ -125,29 +125,29 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('15:45:03 \\u 1234', self::t(15, 45, 3.1234)->format('H:i:s \\\\\\u u'));
     }
 
-    public function testToTimestamp()
+    public function testToUnixTimestamp()
     {
-        $this->assertSame(gmmktime(8, 9, 10, 1, 1, 1970), self::t(8, 9, 10)->toTimestamp());
-        $this->assertSame(gmmktime(8, 9, 10, 1, 1, 1970) + .1234, self::t(8, 9, 10.1234)->toTimestamp());
-        $this->assertSame(gmmktime(8, 9, 10, 3, 14, 2016), self::t(8, 9, 10)->toTimestamp('2016-03-14'));
-        $this->assertSame(gmmktime(8, 9, 10, 3, 14, 2016), self::t(8, 9, 10)->toTimestamp(Date::fromISOString('2016-03-14')));
+        $this->assertSame(gmmktime(8, 9, 10, 1, 1, 1970), self::t(8, 9, 10)->toUnixTimestamp());
+        $this->assertSame(gmmktime(8, 9, 10, 1, 1, 1970) + .1234, self::t(8, 9, 10.1234)->toUnixTimestamp());
+        $this->assertSame(gmmktime(8, 9, 10, 3, 14, 2016), self::t(8, 9, 10)->toUnixTimestamp('2016-03-14'));
+        $this->assertSame(gmmktime(8, 9, 10, 3, 14, 2016), self::t(8, 9, 10)->toUnixTimestamp(Date::fromISOString('2016-03-14')));
 
         try {
-            self::t(8, 9, 10)->toTimestamp('abc');
+            self::t(8, 9, 10)->toUnixTimestamp('abc');
             $this->fail();
         }
         catch (\InvalidArgumentException $e) {
         }
 
         try {
-            self::t(8, 9, 10)->toTimestamp(Date::infinity());
+            self::t(8, 9, 10)->toUnixTimestamp(Date::infinity());
             $this->fail();
         }
         catch (\InvalidArgumentException $e) {
         }
 
         try {
-            self::t(8, 9, 10)->toTimestamp(Date::minusInfinity());
+            self::t(8, 9, 10)->toUnixTimestamp(Date::minusInfinity());
             $this->fail();
         }
         catch (\InvalidArgumentException $e) {

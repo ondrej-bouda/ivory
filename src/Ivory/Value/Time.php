@@ -73,13 +73,13 @@ class Time implements IComparable
      * Negative timestamps are supported. E.g., timestamp `-30.1` results in time `23:59:29.9`.
      *
      * Note there is one exception: the timestamp `1970-01-02 00:00:00 UTC` gets extracted as time `24:00:00` so that
-     * there is symmetry with {@link Time::toTimestamp()}. Other timestamps are processed as expected, i.e., the day
+     * there is symmetry with {@link Time::toUnixTimestamp()}. Other timestamps are processed as expected, i.e., the day
      * part gets truncated and the result being less then `24:00:00`.
      *
      * @param int|float $timestamp
      * @return Time
      */
-    public static function fromTimestamp($timestamp)
+    public static function fromUnixTimestamp($timestamp)
     {
         if ($timestamp == 24 * 60 * 60) {
             return new Time($timestamp);
@@ -178,7 +178,7 @@ class Time implements IComparable
      * @throws \InvalidArgumentException if the date is finite or if the <tt>$date</tt> string is not a valid ISO date
      *                                     string
      */
-    public function toTimestamp($date = null)
+    public function toUnixTimestamp($date = null)
     {
         if ($date === null) {
             return $this->sec;
@@ -187,7 +187,7 @@ class Time implements IComparable
             if (!$date instanceof Date) {
                 $date = Date::fromISOString($date);
             }
-            $dayTs = $date->toTimestamp();
+            $dayTs = $date->toUnixTimestamp();
             if ($dayTs !== null) {
                 return $dayTs + $this->sec;
             }

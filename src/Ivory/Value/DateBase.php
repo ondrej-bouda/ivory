@@ -150,7 +150,7 @@ abstract class DateBase implements IComparable
      *                    corresponds to usage of PHP functions {@link gmmktime()} and {@link gmdate()} rather than
      *                    {@link mktime()} or {@link date()}
      */
-    public function toTimestamp()
+    public function toUnixTimestamp()
     {
         return ($this->inf ? null : $this->dt->getTimestamp());
     }
