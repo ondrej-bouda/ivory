@@ -1,7 +1,6 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\Exception\UnsupportedException;
 use Ivory\Utils\IComparable;
 
 abstract class DateBase implements IComparable
@@ -52,7 +51,7 @@ abstract class DateBase implements IComparable
         $this->inf = $inf;
         $this->dt = $dt;
 
-        // there was a bug in some PHP versions that DateTime objects comparison did not take fractional seconds into account
+        // there was a bug in some PHP versions that \DateTime objects comparison did not take fractional seconds into account
         if (PHP_VERSION_ID < 50619 || (PHP_VERSION_ID >= 70000 && PHP_VERSION_ID < 70004)) {
             $this->frac = ($dt !== null ? $dt->format('u') : null);
         }

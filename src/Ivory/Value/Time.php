@@ -94,7 +94,7 @@ class Time implements IComparable
     }
 
     /**
-     * Extracts the time part from a {@link \DateTime} or {@link DateTimeImmutable} object.
+     * Extracts the time part from a {@link \DateTime} or {@link \DateTimeImmutable} object.
      *
      * @param \DateTimeInterface $dateTime
      * @return Time

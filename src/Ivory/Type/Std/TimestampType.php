@@ -8,12 +8,12 @@ use Ivory\Connection\IConnection;
 use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Type\TotallyOrderedByPhpOperators;
-use Ivory\Value\DateTime;
+use Ivory\Value\Timestamp;
 
 /**
  * Date and time, counted according to the Gregorian calendar, even in years before that calendar was introduced.
  *
- * Represented as a {@link \Ivory\Value\DateTime} object.
+ * Represented as a {@link \Ivory\Value\Timestamp} object.
  *
  * The values recognized by the {@link TimestampType::parseValue()} method are expected to be in one of the four styles
  * PostgreSQL may use for output, depending on the
@@ -60,10 +60,10 @@ class TimestampType extends BaseType implements ITotallyOrderedType
             return null;
         }
         elseif ($str == 'infinity') {
-            return DateTime::infinity();
+            return Timestamp::infinity();
         }
         elseif ($str == '-infinity') {
-            return DateTime::minusInfinity();
+            return Timestamp::minusInfinity();
         }
 
         /** @var DateStyle $dateStyle */
@@ -110,7 +110,7 @@ class TimestampType extends BaseType implements ITotallyOrderedType
         if (isset($matches[7])) {
             $y = -$y;
         }
-        return DateTime::fromParts($y, $m, $d, $h, $i, $s);
+        return Timestamp::fromParts($y, $m, $d, $h, $i, $s);
     }
 
     public function serializeValue($val)
@@ -119,8 +119,8 @@ class TimestampType extends BaseType implements ITotallyOrderedType
             return 'NULL';
         }
 
-        if (!$val instanceof DateTime) {
-            $val = (is_numeric($val) ? DateTime::fromTimestamp($val) : DateTime::fromISOString($val));
+        if (!$val instanceof Timestamp) {
+            $val = (is_numeric($val) ? Timestamp::fromTimestamp($val) : Timestamp::fromISOString($val));
         }
 
         if ($val->isFinite()) {
@@ -136,10 +136,10 @@ class TimestampType extends BaseType implements ITotallyOrderedType
                 ($val->getYear() < 0 ? ' BC' : '')
             );
         }
-        elseif ($val === DateTime::infinity()) {
+        elseif ($val === Timestamp::infinity()) {
             return "'infinity'";
         }
-        elseif ($val === DateTime::minusInfinity()) {
+        elseif ($val === Timestamp::minusInfinity()) {
             return "'-infinity'";
         }
         else {

@@ -5,13 +5,13 @@ namespace Ivory\Value;
  * Representation of a date and time according to the
  * {@link https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar proleptic} Gregorian calendar.
  * 
- * No timezone information is handled by this class - see {@link DateTimeTz} instead.
+ * No timezone information is handled by this class - see {@link TimestampTz} instead.
  *
  * As in PostgreSQL, there are two special date/time values, `-infinity` and `infinity`, representing a date/time
- * respectively before or after any other date/time. There are special factory methods {@link DateTime::minusInfinity()}
- * and {@link DateTime::infinity()} for getting these values.
+ * respectively before or after any other date/time. There are special factory methods {@link Timestamp::minusInfinity()}
+ * and {@link Timestamp::infinity()} for getting these values.
  *
- * Besides being {@link IComparable}, the {@link DateTime} objects may safely be compared using the `<`, `==`, and `>`
+ * Besides being {@link IComparable}, the {@link Timestamp} objects may safely be compared using the `<`, `==`, and `>`
  * operators with the expected results.
  *
  * All the operations work correctly beyond the UNIX timestamp range bounded by 32bit integers, i.e., it is no problem
@@ -21,18 +21,18 @@ namespace Ivory\Value;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datetime-units-history.html
  */
-class DateTime extends DateBase
+class Timestamp extends DateBase
 {
     /**
-     * @return DateTime date/time representing the current moment with precision to seconds
+     * @return Timestamp date/time representing the current moment with precision to seconds
      */
     public static function now()
     {
-        return new DateTime(0, new \DateTimeImmutable('now', self::getUTCTimeZone()));
+        return new Timestamp(0, new \DateTimeImmutable('now', self::getUTCTimeZone()));
     }
 
     /**
-     * @return DateTime date/time representing the current moment with precision to microseconds (or, more specifically,
+     * @return Timestamp date/time representing the current moment with precision to microseconds (or, more specifically,
      *                    with the precision supported by the hosting platform - {@link microtime()} is used internally)
      */
     public static function nowMicro()
@@ -40,7 +40,7 @@ class DateTime extends DateBase
         list($micro, $sec) = explode(' ', microtime());
         $microFrac = substr($micro, 1); // cut off the whole part (always a zero)
         $inputStr = gmdate('Y-m-d\TH:i:s', $sec) . $microFrac . 'UTC';
-        return new DateTime(0, new \DateTimeImmutable($inputStr));
+        return new Timestamp(0, new \DateTimeImmutable($inputStr));
     }
 
     /**
@@ -48,7 +48,7 @@ class DateTime extends DateBase
      *
      * As ISO 8601, the input shall be formatted as, e.g., `2016-03-30T18:30:42Z`. This method also accepts a space as
      * the date/time separator instead of the `T` letter. Timezone information may be included, but is ignored by this
-     * method as this class represents a date/time without timezone - use {@link DateTimeTz} for that.
+     * method as this class represents a date/time without timezone - use {@link TimestampTz} for that.
      *
      * Years beyond 4 digits are supported, i.e., `'12345-01-30'` is a valid input, representing a date of year 12345.
      *
@@ -58,7 +58,7 @@ class DateTime extends DateBase
      * Years anno Domini, i.e., the positive years, may optionally be prefixed with a plus sign.
      *
      * @param string $isoDateTimeString
-     * @return DateTime
+     * @return Timestamp
      * @throws \InvalidArgumentException on invalid input
      */
     public static function fromISOString($isoDateTimeString)
@@ -87,7 +87,7 @@ class DateTime extends DateBase
             throw new \InvalidArgumentException('$isoDateString');
         }
 
-        return new DateTime(0, $dt);
+        return new Timestamp(0, $dt);
     }
 
     /**
@@ -96,12 +96,12 @@ class DateTime extends DateBase
      *                       note that a UNIX timestamp represents the number of seconds since 1970-01-01 UTC, i.e., it
      *                         corresponds to usage of PHP functions {@link gmmktime()} and {@link gmdate()} rather than
      *                         {@link mktime()} or {@link date()}
-     * @return DateTime
+     * @return Timestamp
      */
     public static function fromTimestamp($timestamp)
     {
         $str = gmdate('Y-m-d H:i:s', (int)$timestamp);
-        $dt = new DateTime(0, new \DateTimeImmutable($str, self::getUTCTimeZone()));
+        $dt = new Timestamp(0, new \DateTimeImmutable($str, self::getUTCTimeZone()));
 
         // gmdate() only accepts an integer - add the fractional part separately
         $frac = $timestamp - (int)$timestamp;
@@ -113,7 +113,7 @@ class DateTime extends DateBase
 
     /**
      * @param \DateTimeInterface $dateTime
-     * @return DateTime date/time represented by the given <tt>$dateTime</tt> object, ignoring the timezone information
+     * @return Timestamp date/time represented by the given <tt>$dateTime</tt> object, ignoring the timezone information
      */
     public static function fromDateTime(\DateTimeInterface $dateTime)
     {
@@ -127,7 +127,7 @@ class DateTime extends DateBase
      * Invalid combinations of months and days, as well as hours, minutes and seconds outside their standard ranges,
      * are accepted similarly to the {@link mktime()} function.
      * E.g., `$year 2015, $month 14, $day 32, $hour 25, $minute -2, second 70` will be silently converted to
-     * `2016-03-04 00:59:10`. If this is unacceptable, use the strict variant {@link DateTime::fromPartsStrict()}
+     * `2016-03-04 00:59:10`. If this is unacceptable, use the strict variant {@link Timestamp::fromPartsStrict()}
      * instead.
      *
      * Years before Christ shall be represented by negative numbers. E.g., year 42 BC shall be given as -42.
@@ -141,7 +141,7 @@ class DateTime extends DateBase
      * @param int $hour
      * @param int $minute
      * @param int|float $second
-     * @return DateTime
+     * @return Timestamp
      * @throws \InvalidArgumentException if <tt>$year</tt> is zero
      */
     public static function fromParts($year, $month, $day, $hour, $minute, $second)
@@ -175,7 +175,7 @@ class DateTime extends DateBase
      * validity of the data.
      *
      * For a friendlier variant, accepting even out-of-range values (doing the adequate calculations), see
-     * {@link DateTime::fromParts()}.
+     * {@link Timestamp::fromParts()}.
      *
      * Years before Christ shall be represented by negative numbers. E.g., year 42 BC shall be given as -42.
      *
@@ -188,7 +188,7 @@ class DateTime extends DateBase
      * @param int $hour
      * @param int $minute
      * @param int|float $second
-     * @return DateTime
+     * @return Timestamp
      * @throws \OutOfRangeException if <tt>$month</tt> or <tt>$day</tt> are out of their valid ranges, according to the
      *                                Gregorian calendar, or if <tt>$hour</tt>, <tt>$minute</tt> or <tt>$second</tt> are
      *                                out of their ranges (0-23, 0-59 and 0-60, respectively, with the exception of time
@@ -294,7 +294,7 @@ class DateTime extends DateBase
      * @param int $hours
      * @param int $minutes
      * @param int|float $seconds
-     * @return DateTime the date/time <tt>$years</tt> years, <tt>$months</tt> months, <tt>$days</tt> days,
+     * @return Timestamp the date/time <tt>$years</tt> years, <tt>$months</tt> months, <tt>$days</tt> days,
      *                  <tt>$hours</tt> hours, <tt>$minutes</tt> minutes, and <tt>$seconds</tt> seconds after this
      *                  date/time
      */

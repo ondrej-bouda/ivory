@@ -5,7 +5,7 @@ use Ivory\Connection\ConfigParam;
 use Ivory\Value\Composite;
 use Ivory\Value\Box;
 use Ivory\Value\Date;
-use Ivory\Value\DateTime;
+use Ivory\Value\Timestamp;
 use Ivory\Value\Range;
 use Ivory\Value\Time;
 
@@ -300,15 +300,15 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
                             '4713-01-01 00:00:00 BC'::TIMESTAMP AS mn"
                 );
                 $tuple = $qr->tuple();
-                $this->assertEquals(DateTime::fromParts(2016, 4, 17, 0, 0, 0), $tuple['midnight'], $dateStyle);
-                $this->assertEquals(DateTime::fromParts(2016, 5, 17, 8, 0, 0.123456), $tuple['leap_sec'], $dateStyle);
-                $this->assertEquals(DateTime::fromParts(2016, 6, 17, 15, 42, 54), $tuple['pm'], $dateStyle);
-                $this->assertEquals(DateTime::fromParts(2016, 7, 18, 0, 0, 0), $tuple['next_midnight'], $dateStyle);
-                $this->assertEquals(DateTime::fromParts(-1987, 8, 17, 13, 1, 2.5), $tuple['bc'], $dateStyle);
-                $this->assertEquals(DateTime::infinity(), $tuple['inf'], $dateStyle);
-                $this->assertEquals(DateTime::minusInfinity(), $tuple['minus_inf'], $dateStyle);
-                $this->assertEquals(DateTime::fromParts(294277, 1, 1, 0, 0, 0), $tuple['mx'], $dateStyle);
-                $this->assertEquals(DateTime::fromParts(-4713, 1, 1, 0, 0, 0), $tuple['mn'], $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(2016, 4, 17, 0, 0, 0), $tuple['midnight'], $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(2016, 5, 17, 8, 0, 0.123456), $tuple['leap_sec'], $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(2016, 6, 17, 15, 42, 54), $tuple['pm'], $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(2016, 7, 18, 0, 0, 0), $tuple['next_midnight'], $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(-1987, 8, 17, 13, 1, 2.5), $tuple['bc'], $dateStyle);
+                $this->assertEquals(Timestamp::infinity(), $tuple['inf'], $dateStyle);
+                $this->assertEquals(Timestamp::minusInfinity(), $tuple['minus_inf'], $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(294277, 1, 1, 0, 0, 0), $tuple['mx'], $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(-4713, 1, 1, 0, 0, 0), $tuple['mn'], $dateStyle);
             }
         }
         finally {

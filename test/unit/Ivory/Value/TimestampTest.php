@@ -1,11 +1,11 @@
 <?php
 namespace Ivory\Value;
 
-class DateTimeTest extends \PHPUnit_Framework_TestCase
+class TimestampTest extends \PHPUnit_Framework_TestCase
 {
     private static function dt($year, $month, $day, $hour, $min, $sec)
     {
-        return DateTime::fromPartsStrict($year, $month, $day, $hour, $min, $sec);
+        return Timestamp::fromPartsStrict($year, $month, $day, $hour, $min, $sec);
     }
 
     public function testEqualityOperator()
@@ -16,11 +16,11 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(self::dt(-2015, 1, 31, 0, 1, 0), self::dt(-2015, 1, 30, 24, 0, 60));
         $this->assertEquals(self::dt(2015, 1, 30, 12, 34, 56.123456), self::dt(2015, 1, 30, 12, 34, 56.123456));
         $this->assertEquals(self::dt(-2015, 1, 31, 0, 1, .123456), self::dt(-2015, 1, 30, 24, 0, 60.123456));
-        $this->assertEquals(DateTime::infinity(), DateTime::infinity());
-        $this->assertEquals(DateTime::minusInfinity(), DateTime::minusInfinity());
+        $this->assertEquals(Timestamp::infinity(), Timestamp::infinity());
+        $this->assertEquals(Timestamp::minusInfinity(), Timestamp::minusInfinity());
 
-        $this->assertNotEquals(DateTime::infinity(), DateTime::minusInfinity());
-        $this->assertNotEquals(DateTime::infinity(), self::dt(2015, 1, 30, 12, 34, 56));
+        $this->assertNotEquals(Timestamp::infinity(), Timestamp::minusInfinity());
+        $this->assertNotEquals(Timestamp::infinity(), self::dt(2015, 1, 30, 12, 34, 56));
         $this->assertNotEquals(self::dt(2015, 1, 29, 12, 34, 56), self::dt(2015, 1, 30, 12, 34, 56));
         $this->assertNotEquals(self::dt(2015, 1, 30, 12, 34, 56), self::dt(2015, 1, 30, 12, 34, 56.000001));
     }
@@ -30,7 +30,7 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
         // there is a little chance of hitting the following code exactly at time with no microseconds
         for ($i = 0; $i < 10; $i++) {
             $start = time();
-            $dt = DateTime::now();
+            $dt = Timestamp::now();
             $end = time();
             $this->assertLessThanOrEqual($dt->toTimestamp(), $start);
             $this->assertLessThanOrEqual($end, $dt->toTimestamp());
@@ -44,7 +44,7 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
         $hitNonZeroMicrosec = false;
         for ($i = 0; $i < 10; $i++) {
             $start = time();
-            $dt = DateTime::nowMicro();
+            $dt = Timestamp::nowMicro();
             $end = time();
             $this->assertLessThanOrEqual($dt->toTimestamp(), $start);
             $this->assertLessThanOrEqual($end, $dt->toTimestamp());
@@ -58,13 +58,13 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
 
     public function testFromISOString()
     {
-        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16), DateTime::fromISOString('2016-03-01T14:30:16Z'));
-        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16), DateTime::fromISOString('2016-03-01T14:30:16'));
-        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16), DateTime::fromISOString('2016-03-01T14:30:16.0-0800'));
-        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16.1), DateTime::fromISOString('2016-03-01T14:30:16.1+08:00'));
-        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16), DateTime::fromISOString('2016-03-01T14:30:16-08'));
-        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16.1234), DateTime::fromISOString('2016-03-01T14:30:16.1234'));
-        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16), DateTime::fromISOString('2016-03-01 14:30:16'));
+        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16), Timestamp::fromISOString('2016-03-01T14:30:16Z'));
+        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16), Timestamp::fromISOString('2016-03-01T14:30:16'));
+        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16), Timestamp::fromISOString('2016-03-01T14:30:16.0-08:00'));
+        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16.1), Timestamp::fromISOString('2016-03-01T14:30:16.1+0800'));
+        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16), Timestamp::fromISOString('2016-03-01T14:30:16-08'));
+        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16.1234), Timestamp::fromISOString('2016-03-01T14:30:16.1234'));
+        $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 16), Timestamp::fromISOString('2016-03-01 14:30:16'));
     }
 
     public function testAddSecond()
