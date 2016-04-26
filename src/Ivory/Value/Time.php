@@ -1,8 +1,6 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\Utils\IComparable;
-
 /**
  * Representation of time of day (no date, just time).
  *
@@ -17,20 +15,16 @@ use Ivory\Utils\IComparable;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-datetime.html
  */
-class Time implements IComparable
+class Time extends TimeBase
 {
-    /** Number of decimal digits of precision in the fractional seconds part. */
-    const PRECISION = 6;
-
-    /** @var int|float */
-    private $sec;
-
     /**
      * Creates a time object from a string containing the time.
      *
      * The accepted format is `H:M[:S[.p]]`, where `H` holds hours (0-24), `M` minutes (0-59), `S` seconds (0-60), `p`
-     * fractional seconds. Note that, although 60 is accepted in the seconds part, it gets automatically converted to
-     * 0 of the next minute, as neither PostgreSQL supports leap seconds.
+     * fractional seconds.
+     *
+     * Note that, although 60 is accepted in the seconds part, it gets automatically converted to 0 of the next minute,
+     * as neither PostgreSQL supports leap seconds.
      *
      * @param string $timeString
      * @return Time
@@ -47,24 +41,46 @@ class Time implements IComparable
         $min = $m[2];
         $sec = (isset($m[3]) ? $m[3] : 0); // PHP 7: abbreviate using ??
 
-        if ($hour == 24) {
-            if ($min > 0 || $sec > 0) {
-                throw new \OutOfRangeException('with hour 24, the minutes and seconds must be zero');
-            }
-        }
-        elseif ($hour < 0 || $hour > 24) {
-            throw new \OutOfRangeException('hours');
-        }
+        return self::fromPartsStrict($hour, $min, $sec);
+    }
 
-        if ($min < 0 || $min > 59) {
-            throw new \OutOfRangeException('minutes');
-        }
+    /**
+     * Creates a time object from the specified hours, minutes, and seconds.
+     *
+     * Any part exceeding its standard range overflows in the expected way to the higher part. E.g., it is possible to
+     * pass 70 seconds, which results, in 1 minute 10 seconds. Moreover, the arithmetic also works for subtracting
+     * negative minutes or seconds. Still, the overall time must fit between 00:00:00 and 24:00:00.
+     *
+     * The overflow rule applies to leap seconds as well as to any other value, i.e., 60 seconds get converted to 0 of
+     * the next minute, as neither PostgreSQL supports leap seconds.
+     *
+     * @param int $hour
+     * @param int $minute
+     * @param int|float $second
+     * @return Time
+     * @throws \OutOfRangeException when the resulting time underruns 00:00:00 or exceeds 24:00:00
+     */
+    public static function fromParts($hour, $minute, $second)
+    {
+        return new Time(self::partsToSec($hour, $minute, $second));
+    }
 
-        if ($sec < 0 || $sec >= 61) {
-            throw new \OutOfRangeException('seconds');
-        }
-
-        return new Time($hour * 60 * 60 + $min * 60 + $sec);
+    /**
+     * Creates a time object from the specified hours, minutes, and seconds with range checks for each of them.
+     *
+     * Note that, although 60 is accepted in the seconds part, it gets automatically converted to 0 of the next minute,
+     * as neither PostgreSQL supports leap seconds. In this case it is possible to get time even greater than 24:00:00
+     * (but still less than 24:00:01).
+     *
+     * @param int $hour 0-24, but when 24, the others must be zero
+     * @param int $minute 0-59
+     * @param int|float $second greater than or equal to 0, less than 61
+     * @return Time
+     * @throws \OutOfRangeException when some of the parts is outside its range
+     */
+    public static function fromPartsStrict($hour, $minute, $second)
+    {
+        return new Time(self::partsToSecStrict($hour, $minute, $second));
     }
 
     /**
@@ -74,23 +90,14 @@ class Time implements IComparable
      *
      * Note there is one exception: the timestamp `1970-01-02 00:00:00 UTC` gets extracted as time `24:00:00` so that
      * there is symmetry with {@link Time::toUnixTimestamp()}. Other timestamps are processed as expected, i.e., the day
-     * part gets truncated and the result being less then `24:00:00`.
+     * part gets truncated and the result being less than `24:00:00`.
      *
      * @param int|float $timestamp
      * @return Time
      */
     public static function fromUnixTimestamp($timestamp)
     {
-        if ($timestamp == 24 * 60 * 60) {
-            return new Time($timestamp);
-        }
-
-        $dayRes = (int)($timestamp - ($timestamp % (24 * 60 * 60)));
-        $sec = $timestamp - $dayRes;
-        if ($sec < 0) {
-            $sec += 24 * 60 * 60;
-        }
-        return new Time($sec);
+        return new Time(self::cutUnixTimestampToSec($timestamp));
     }
 
     /**
@@ -103,115 +110,4 @@ class Time implements IComparable
     {
         return self::fromString($dateTime->format('H:i:s.u'));
     }
-
-    private function __construct($sec)
-    {
-        $this->sec = $sec;
-    }
-
-    /**
-     * @return int the hours part of the time (0-24)
-     */
-    public function getHours()
-    {
-        return (int)($this->sec / (60 * 60));
-    }
-
-    /**
-     * @return int the minutes part of the time (0-59)
-     */
-    public function getMinutes()
-    {
-        return ($this->sec / 60) % 60;
-    }
-
-    /**
-     * @return int|float the seconds part of the time (0-59), potentially with the fractional part, if any
-     */
-    public function getSeconds()
-    {
-        return $this->sec - $this->getMinutes() * 60 - $this->getHours() * 60 * 60;
-    }
-
-    /**
-     * @return string the ISO representation of this time, in format <tt>HH:MM:SS[.p]</tt>;
-     *                the fractional seconds part is only used if non-zero
-     */
-    public function toString()
-    {
-        $frac = round($this->sec - (int)$this->sec, self::PRECISION);
-        return sprintf(
-            '%02d:%02d:%02d%s',
-            $this->getHours(), $this->getMinutes(), $this->getSeconds(),
-            ($frac ? substr($frac, 1) : '') // cut off the leading "0" for non-zero fractional seconds
-        );
-    }
-
-    /**
-     * @param string $timeFmt the format string as accepted by {@link date()}
-     * @return string the time formatted according to <tt>$timeFmt</tt>
-     */
-    public function format($timeFmt)
-    {
-        if (strpos($timeFmt, 'u') !== false) {
-            $frac = round($this->sec - (int)$this->sec, self::PRECISION);
-            $fracStr = ($frac ? substr($frac, 2) : '0'); // cut off the leading "0." for non-zero fractional seconds
-
-            $re = '~
-                   (?<!\\\\)            # not prefixed with a backslash
-                   ((?:\\\\\\\\)*)      # any number of pairs of backslashes, each meaning a single literal backslash
-                   u                    # the microseconds format character to be replaced
-                   ~x';
-            $timeFmt = preg_replace($re, '${1}' . $fracStr, $timeFmt);
-        }
-        return gmdate($timeFmt, $this->sec);
-    }
-
-    /**
-     * @param Date|string|null $date the date for the resulting timestamp;
-     *                               besides a {@link Date} object, an ISO date string is accepted - see
-     *                                 {@link Date::fromISOString()};
-     *                               the given date (if any) must be finite;
-     *                               if not given the time on 1970-01-01 is returned, which is effectively the amount of
-     *                                 time, in seconds, between the time this object represents and <tt>00:00:00</tt>
-     * @return float|int the UNIX timestamp of this time on the given day
-     * @throws \InvalidArgumentException if the date is finite or if the <tt>$date</tt> string is not a valid ISO date
-     *                                     string
-     */
-    public function toUnixTimestamp($date = null)
-    {
-        if ($date === null) {
-            return $this->sec;
-        }
-        else {
-            if (!$date instanceof Date) {
-                $date = Date::fromISOString($date);
-            }
-            $dayTs = $date->toUnixTimestamp();
-            if ($dayTs !== null) {
-                return $dayTs + $this->sec;
-            }
-            else {
-                throw new \InvalidArgumentException('infinite date');
-            }
-        }
-    }
-
-    //region IComparable
-
-    /**
-     * @param object $object
-     * @return bool|null <tt>true</tt> if <tt>$this</tt> and the other <tt>$object</tt> are equal to each other,
-     *                   <tt>false</tt> if they are not equal,
-     *                   <tt>null</tt> iff <tt>$object</tt> is <tt>null</tt>
-     */
-    public function equals($object)
-    {
-        if ($object === null) {
-            return null;
-        }
-        return ($this == $object);
-    }
-
-    //endregion
 }

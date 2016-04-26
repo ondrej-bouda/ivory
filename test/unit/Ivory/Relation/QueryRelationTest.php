@@ -8,6 +8,7 @@ use Ivory\Value\Date;
 use Ivory\Value\Timestamp;
 use Ivory\Value\Range;
 use Ivory\Value\Time;
+use Ivory\Value\TimeTz;
 
 class QueryRelationTest extends \Ivory\IvoryTestCase
 {
@@ -273,10 +274,27 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         );
 
         $tuple = $qr->tuple();
-        $this->assertEquals(Time::fromString('00:00:00'), $tuple['midnight']);
-        $this->assertEquals(Time::fromString('08:00:00.123456'), $tuple['leap_sec']);
-        $this->assertEquals(Time::fromString('15:42:54'), $tuple['pm']);
-        $this->assertEquals(Time::fromString('24:00:00'), $tuple['next_midnight']);
+        $this->assertEquals(Time::fromPartsStrict(0, 0, 0), $tuple['midnight']);
+        $this->assertEquals(Time::fromPartsStrict(8, 0, .123456), $tuple['leap_sec']);
+        $this->assertEquals(Time::fromPartsStrict(15, 42, 54), $tuple['pm']);
+        $this->assertEquals(Time::fromPartsStrict(24, 0, 0), $tuple['next_midnight']);
+    }
+
+    public function testTimeTzResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn,
+            "SELECT '0:00+0000'::TIMETZ AS midnight,
+                    '07:59:60.123456+13:30'::TIMETZ AS leap_sec,
+                    '15:42:54-08:00'::TIMETZ AS pm,
+                    '24:00:00+0600'::TIMETZ AS next_midnight"
+        );
+
+        $tuple = $qr->tuple();
+        $this->assertEquals(TimeTz::fromPartsStrict(0, 0, 0, 0), $tuple['midnight']);
+        $this->assertEquals(TimeTz::fromPartsStrict(8, 0, .123456, 48600), $tuple['leap_sec']);
+        $this->assertEquals(TimeTz::fromPartsStrict(15, 42, 54, -28800), $tuple['pm']);
+        $this->assertEquals(TimeTz::fromPartsStrict(24, 0, 0, 21600), $tuple['next_midnight']);
     }
 
     public function testDateTimeResult()

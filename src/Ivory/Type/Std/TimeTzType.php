@@ -4,16 +4,16 @@ namespace Ivory\Type\Std;
 use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Type\TotallyOrderedByPhpOperators;
-use Ivory\Value\Time;
+use Ivory\Value\TimeTz;
 
 /**
- * Time of day.
+ * Timezone-aware time of day.
  *
- * Represented as a {@link \Ivory\Value\Time} object.
+ * Represented as a {@link \Ivory\Value\TimeTz} object.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-datetime.html
  */
-class TimeType extends BaseType implements ITotallyOrderedType
+class TimeTzType extends BaseType implements ITotallyOrderedType
 {
     use TotallyOrderedByPhpOperators;
 
@@ -24,7 +24,7 @@ class TimeType extends BaseType implements ITotallyOrderedType
             return null;
         }
 
-        return Time::fromString($str);
+        return TimeTz::fromString($str);
     }
 
     public function serializeValue($val)
@@ -33,16 +33,16 @@ class TimeType extends BaseType implements ITotallyOrderedType
             return 'NULL';
         }
 
-        if (!$val instanceof Time) {
+        if (!$val instanceof TimeTz) {
             if ($val instanceof \DateTimeInterface) {
-                $val = Time::fromDateTime($val);
+                $val = TimeTz::fromDateTime($val);
             }
             elseif (is_numeric($val)) {
-                $val = Time::fromUnixTimestamp($val);
+                $val = TimeTz::fromUnixTimestamp($val);
             }
             elseif (is_string($val)) {
                 try {
-                    $val = Time::fromString($val);
+                    $val = TimeTz::fromString($val);
                 }
                 catch (\InvalidArgumentException $e) {
                     $this->throwInvalidValue($val, $e);

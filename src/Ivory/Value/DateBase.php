@@ -3,6 +3,11 @@ namespace Ivory\Value;
 
 use Ivory\Utils\IComparable;
 
+/**
+ * Common base for date and date/time representations.
+ *
+ * @internal Only for the purpose of Ivory itself.
+ */
 abstract class DateBase implements IComparable
 {
     // NOTE: the order of the fields is important for the `<` and `>` operators to work correctly
@@ -46,6 +51,9 @@ abstract class DateBase implements IComparable
     }
 
 
+    /**
+     * @internal Only for the purpose of Ivory itself.
+     */
     final protected function __construct($inf, \DateTimeImmutable $dt = null)
     {
         $this->inf = $inf;

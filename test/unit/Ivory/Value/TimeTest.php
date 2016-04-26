@@ -5,7 +5,85 @@ class TimeTest extends \PHPUnit_Framework_TestCase
 {
     private static function t($hour, $min, $sec)
     {
-        return Time::fromUnixTimestamp($hour * 60 * 60 + $min * 60 + $sec);
+        return Time::fromPartsStrict($hour, $min, $sec);
+    }
+
+    public function testFromPartsStrict()
+    {
+        $this->assertSame('08:45:03', Time::fromPartsStrict(8, 45, 3)->toString());
+        $this->assertSame('00:00:00', Time::fromPartsStrict(0, 0, 0)->toString());
+        $this->assertSame('24:00:00', Time::fromPartsStrict(24, 0, 0)->toString());
+        $this->assertSame('24:00:00', Time::fromPartsStrict(23, 59, 60)->toString());
+        $this->assertSame('11:00:00.123', Time::fromPartsStrict(10, 59, 60.123)->toString());
+        $this->assertSame('24:00:00.999', Time::fromPartsStrict(23, 59, 60.999)->toString());
+
+        try {
+            Time::fromPartsStrict(24, 0, 0.000001);
+            $this->fail();
+        }
+        catch (\OutOfRangeException $e) {
+        }
+
+        try {
+            Time::fromPartsStrict(25, 0, 0);
+            $this->fail();
+        }
+        catch (\OutOfRangeException $e) {
+        }
+
+        try {
+            Time::fromPartsStrict(10, 60, 0);
+            $this->fail();
+        }
+        catch (\OutOfRangeException $e) {
+        }
+
+        try {
+            Time::fromPartsStrict(10, 59, 61);
+            $this->fail();
+        }
+        catch (\OutOfRangeException $e) {
+        }
+    }
+
+    public function testFromParts()
+    {
+        $this->assertEquals(self::t(8, 45, 3), Time::fromParts(8, 45, 3));
+        $this->assertEquals(self::t(0, 0, 0), Time::fromParts(0, 0, 0));
+        $this->assertEquals(self::t(24, 0, 0), Time::fromParts(24, 0, 0));
+        $this->assertEquals(self::t(24, 0, 0), Time::fromParts(23, 59, 60));
+        $this->assertEquals(self::t(11, 0, 0.123), Time::fromParts(10, 59, 60.123));
+        $this->assertEquals(self::t(4, 11, 20), Time::fromParts(3, 70, 80));
+        $this->assertEquals(self::t(3, 58, 40), Time::fromParts(3, 60, -80));
+        $this->assertEquals(self::t(0, 0, 0), Time::fromParts(0, 30, -1800));
+
+        try {
+            Time::fromParts(24, 0, 0.000001);
+            $this->fail();
+        }
+        catch (\OutOfRangeException $e) {
+        }
+
+        try {
+            Time::fromParts(25, 0, 0);
+            $this->fail();
+        }
+        catch (\OutOfRangeException $e) {
+        }
+
+        try {
+            Time::fromParts(23, 59, 60.000001);
+            $this->fail();
+        }
+        catch (\OutOfRangeException $e) {
+        }
+
+        try {
+            Time::fromParts(0, 30, -1800.00001);
+            $this->fail();
+        }
+        catch (\OutOfRangeException $e) {
+        }
     }
 
     public function testEqualityOperator()
@@ -117,12 +195,15 @@ class TimeTest extends \PHPUnit_Framework_TestCase
     public function testFormat()
     {
         $this->assertSame('08:45:03', self::t(8, 45, 3)->format('H:i:s'));
-        $this->assertSame('15:45:03.1234', self::t(15, 45, 3.1234)->format('H:i:s.u'));
-        $this->assertSame('15:46:00.0', self::t(15, 45, 60)->format('H:i:s.u'));
+        $this->assertSame('15:45:03.123400', self::t(15, 45, 3.1234)->format('H:i:s.u'));
+        $this->assertSame('15:45:03.012340', self::t(15, 45, 3.01234)->format('H:i:s.u'));
+        $this->assertSame('15:46:00.000000', self::t(15, 45, 60)->format('H:i:s.u'));
 
-        $this->assertSame('15:45:03|1234|1234', self::t(15, 45, 3.1234)->format('H:i:s|u|u'));
+        $this->assertSame('15:45:03|123400|123400', self::t(15, 45, 3.1234)->format('H:i:s|u|u'));
 
-        $this->assertSame('15:45:03 \\u 1234', self::t(15, 45, 3.1234)->format('H:i:s \\\\\\u u'));
+        $this->assertSame('15:45:03 \\u 123400', self::t(15, 45, 3.1234)->format('H:i:s \\\\\\u u'));
+
+        $this->assertSame('1.1.1970', self::t(8, 45, 3, 0)->format('j.n.Y'));
     }
 
     public function testToUnixTimestamp()
