@@ -73,4 +73,13 @@ class TimestampTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 17.01), self::dt(2016, 3, 1, 14, 30, 16.9)->addSecond(.11));
         $this->assertEquals(self::dt(2016, 3, 1, 14, 30, 15.01), self::dt(2016, 3, 1, 14, 30, 16)->addSecond(-.99));
     }
+
+    public function testToParts()
+    {
+        $this->assertSame([2016, 3, 1, 14, 30, 16], Timestamp::fromISOString('2016-03-01T14:30:16')->toParts());
+
+        $partsWithFracSec = Timestamp::fromISOString('2016-03-01T14:30:16.0123')->toParts();
+        $this->assertSame([2016, 3, 1, 14, 30], array_slice($partsWithFracSec, 0, 5));
+        $this->assertEquals(16.0123, $partsWithFracSec[5], '', 1e-9);
+    }
 }

@@ -8,6 +8,7 @@ use Ivory\Value\Date;
 use Ivory\Value\Timestamp;
 use Ivory\Value\Range;
 use Ivory\Value\Time;
+use Ivory\Value\TimestampTz;
 use Ivory\Value\TimeTz;
 
 class QueryRelationTest extends \Ivory\IvoryTestCase
@@ -297,7 +298,7 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         $this->assertEquals(TimeTz::fromPartsStrict(24, 0, 0, 21600), $tuple['next_midnight']);
     }
 
-    public function testDateTimeResult()
+    public function testTimestampResult()
     {
         $conn = $this->getIvoryConnection();
         $conn->startTransaction();
@@ -327,6 +328,71 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
                 $this->assertEquals(Timestamp::minusInfinity(), $tuple['minus_inf'], $dateStyle);
                 $this->assertEquals(Timestamp::fromParts(294277, 1, 1, 0, 0, 0), $tuple['mx'], $dateStyle);
                 $this->assertEquals(Timestamp::fromParts(-4713, 1, 1, 0, 0, 0), $tuple['mn'], $dateStyle);
+            }
+        }
+        finally {
+            $conn->rollback();
+        }
+    }
+
+    public function testTimestampTzResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $conn->startTransaction();
+
+        try {
+            $dateStyles = ['ISO', 'German', 'SQL, DMY', 'SQL, MDY', 'Postgres, DMY', 'Postgres, MDY'];
+            $timeZones = [
+                'UTC' => [['+0000', 'UTC'], ['+0000', 'UTC']],
+                'Europe/Prague' => [['+0100', 'CET'], ['+0200', 'CEST']],
+            ];
+            foreach ($dateStyles as $dateStyle) {
+                $conn->getConfig()->setForTransaction(ConfigParam::DATE_STYLE, $dateStyle);
+                foreach ($timeZones as $tz => list($tzStdSpec, $tzSmrSpec)) {
+                    $tzStd = ($dateStyle == 'ISO' ? $tzStdSpec[0] : $tzStdSpec[1]);
+                    $tzSmr = ($dateStyle == 'ISO' ? $tzSmrSpec[0] : $tzSmrSpec[1]);
+                    $msg = "$dateStyle; $tz";
+
+                    $conn->getConfig()->setForTransaction(ConfigParam::TIME_ZONE, $tz);
+                    $qr = new QueryRelation($conn,
+                        "SELECT '2016-01-17 0:00'::TIMESTAMPTZ AS midnight,
+                                '2016-06-17 15:42:54'::TIMESTAMPTZ AS pm,
+                                '2016-07-17 24:00:00'::TIMESTAMPTZ AS next_midnight,
+                                '2016-05-17 07:59:60.123456'::TIMESTAMPTZ AS leap_sec,
+                                'infinity'::TIMESTAMPTZ AS inf,
+                                '-infinity'::TIMESTAMPTZ AS minus_inf,
+                                '1987-08-17 13:01:02.5 BC'::TIMESTAMPTZ AS bc,
+                                '294276-12-31 24:00:00'::TIMESTAMPTZ AS mx,
+                                '4713-01-01 00:00:00 BC'::TIMESTAMPTZ AS mn"
+                    );
+
+                    $this->errorNonInterruptMode(E_USER_WARNING);
+                    $tuple = $qr->tuple();
+                    $this->errorInterruptMode();
+                    if ($dateStyle == 'ISO' && $tz != 'UTC') {
+                        $this->assertErrorsTriggered(2, "~Cutting '\\+00:57:44' to '\\+00:57'~", E_ALL, $msg);
+                    }
+                    $this->assertNoMoreErrors($msg);
+
+                    $this->assertEquals(TimestampTz::fromParts(2016, 1, 17, 0, 0, 0, $tzStd), $tuple['midnight'], $msg);
+                    $this->assertEquals(TimestampTz::fromParts(2016, 6, 17, 15, 42, 54, $tzSmr), $tuple['pm'], $msg);
+                    $this->assertEquals(TimestampTz::fromParts(2016, 7, 18, 0, 0, 0, $tzSmr), $tuple['next_midnight'], $msg);
+                    $this->assertEquals(TimestampTz::fromParts(2016, 5, 17, 8, 0, 0.123456, $tzSmr), $tuple['leap_sec'], $msg);
+                    $this->assertEquals(TimestampTz::infinity(), $tuple['inf'], $msg);
+                    $this->assertEquals(TimestampTz::minusInfinity(), $tuple['minus_inf'], $msg);
+                    $this->assertEquals(TimestampTz::fromParts(294277, 1, 1, 0, 0, 0, $tzStd), $tuple['mx'], $msg);
+                    if ($tz == 'UTC') {
+                        /* Only testing very old years for UTC, as PHP does not support local mean time very well, and
+                         * it is out of scope of Ivory to remedy that.
+                         * See also:
+                         * * https://en.wikipedia.org/wiki/Time_zone
+                         * * https://en.wikipedia.org/wiki/Local_mean_time
+                         * * http://dba.stackexchange.com/questions/127965/why-does-time-zone-have-such-a-crazy-offset-from-utc-on-year-0001-in-postgres
+                         */
+                        $this->assertEquals(TimestampTz::fromParts(-1987, 8, 17, 13, 1, 2.5, $tz), $tuple['bc'], $msg);
+                        $this->assertEquals(TimestampTz::fromParts(-4713, 1, 1, 0, 0, 0, $tz), $tuple['mn'], $msg);
+                    }
+                }
             }
         }
         finally {

@@ -125,13 +125,9 @@ class TimestampType extends BaseType implements ITotallyOrderedType
 
         if ($val->isFinite()) {
             return sprintf(
-                "'%04d-%02d-%02d %02d:%02d:%02d%s%s'",
+                "'%04d-%s%s%s'",
                 abs($val->getYear()),
-                $val->getMonth(),
-                $val->getDay(),
-                $val->getHour(),
-                $val->getMinute(),
-                $val->getSecond(),
+                $val->format('m-d H:i:s'),
                 ($val->format('u') ? $val->format('.u') : ''),
                 ($val->getYear() < 0 ? ' BC' : '')
             );
@@ -143,7 +139,7 @@ class TimestampType extends BaseType implements ITotallyOrderedType
             return "'-infinity'";
         }
         else {
-            throw new \LogicException('A non-finite date not recognized');
+            throw new \LogicException('A non-finite timestamp not recognized');
         }
     }
 }

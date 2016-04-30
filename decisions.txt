@@ -10,3 +10,5 @@
 ** After all, Ivory is so flexible that it is extremely easy to change this behaviour - just write a custom DATE type converter and register it either globally or on a per-connection basis.
 ** The final reason, common for the decision regarding other temporal types, is that PHP made a poor choice (although performance-wise, in those days) when designing the \DateTime objects as mutable; \DateTimeImmutable, as for typing and reading such a horrible name, is quite an unsuccessful try to fix this. (That's not to undermine the whole work done for PHP date/time support - in fact, Ivory internally uses \DateTime for implementation of its own value types. It's just that the interface is not among the best.)
 * Similar reasons hold for using a special Timestamp class instead of the built-in DateTime class.
+* As for the own class for representing date/time intervals: the PHP built-in DateInterval is out of question as it is unable to represent mixed intervals (e.g., '-1 year -2 mons +3 days -04:05:06') - which Postgres might give on output. And, by the way, PHP's DateInterval only represents the duration, without any reasonable operations on them.
+

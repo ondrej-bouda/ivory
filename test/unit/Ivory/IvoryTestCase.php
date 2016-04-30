@@ -16,6 +16,186 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
     /** @var IConnection */
     private $ivoryConn = null;
 
+    /** @var bool whether in the error-interrupt mode */
+    private $errorInterrupt = true;
+    /** @var callable|null */
+    private $origErrHandler = null;
+    /** @var \PHPUnit_Framework_Error[] error exceptions triggered in the non-interrupt mode and not yet asserted */
+    private $triggeredErrors = [];
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->triggeredErrors = [];
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+        if (!$this->errorInterrupt) {
+            $this->errorInterruptMode();
+        }
+    }
+
+    /**
+     * @param int $errorTypes bitwise combination of PHP error-level constants <tt>E_*</tt>;
+     *                        only those errors will be caught and preserved, other errors will still be handled by the
+     *                          original error handler
+     */
+    protected function errorNonInterruptMode($errorTypes = E_ALL)
+    {
+        $origHandler = set_error_handler(
+            function ($errNo, $errStr, $errFile, $errLine, $errContext) use ($errorTypes) {
+                if ($errNo & $errorTypes) {
+                    $this->triggeredErrors[] = [
+                        'type' => $errNo,
+                        'msg' => $errStr,
+                        'file' => $errFile,
+                        'line' => $errLine,
+                        'context' => $errContext,
+                    ];
+                }
+                else {
+                    call_user_func($this->origErrHandler, $errNo, $errStr, $errFile, $errLine, $errContext);
+                }
+            },
+            E_ALL
+        );
+
+        if ($this->errorInterrupt) {
+            $this->origErrHandler = $origHandler;
+            $this->errorInterrupt = false;
+        }
+    }
+
+    protected function errorInterruptMode()
+    {
+        if (!$this->errorInterrupt) {
+            restore_error_handler();
+            $this->origErrHandler = null;
+            $this->errorInterrupt = true;
+        }
+    }
+
+    /**
+     * @param string $expectedErrMsgRegex regular expression the error message is expected to match against
+     * @param int $expectedErrType the expected error level;
+     *                             one or more PHP error-level constants <tt>E_*</tt> may be given using bitwise OR,
+     *                               the error satisfying such specification if it matches any of the contained levels;
+     *                             skip with <tt>E_ALL</tt> if the error type does not matter
+     * @param string $message
+     */
+    protected function assertErrorTriggered($expectedErrMsgRegex, $expectedErrType = E_ALL, $message = '')
+    {
+        if (!$this->triggeredErrors) {
+            $failMsg = 'There were no (more) errors triggered';
+            if (strlen($message) > 0) {
+                $failMsg = "$message ($failMsg)";
+            }
+            $this->fail($failMsg);
+        }
+
+        $err = array_shift($this->triggeredErrors);
+
+        if (!($expectedErrType & $err['type'])) {
+            $failMsg = sprintf(
+                'Wrong error type: expected %s, actual %s',
+                self::errorTypeBitmaskToString($expectedErrType),
+                self::errorTypeToString($err['type'])
+            );
+            if (strlen($message) > 0) {
+                $failMsg = "$message ($failMsg)";
+            }
+            $this->fail($failMsg);
+        }
+
+        $this->assertRegExp($expectedErrMsgRegex, $err['msg'], $message);
+    }
+
+    protected function assertErrorsTriggered($count, $expectedErrMsgRegex, $expectedErrType = E_ALL, $message = '')
+    {
+        for ($i = 1; $i <= $count; $i++) {
+            $this->assertErrorTriggered($expectedErrMsgRegex, $expectedErrType, "$message (error $i of $count expected)");
+        }
+    }
+
+    private static $errorTypes = [
+        E_ERROR => 'E_ERROR',
+        E_WARNING => 'E_WARNING',
+        E_PARSE => 'E_PARSE',
+        E_NOTICE => 'E_NOTICE',
+        E_CORE_ERROR => 'E_CORE_ERROR',
+        E_CORE_WARNING => 'E_CORE_WARNING',
+        E_COMPILE_ERROR => 'E_COMPILE_ERROR',
+        E_COMPILE_WARNING => 'E_COMPILE_WARNING',
+        E_USER_ERROR => 'E_USER_ERROR',
+        E_USER_WARNING => 'E_USER_WARNING',
+        E_USER_NOTICE => 'E_USER_NOTICE',
+        E_STRICT => 'E_STRICT',
+        E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+        E_DEPRECATED => 'E_DEPRECATED',
+        E_USER_DEPRECATED => 'E_USER_DEPRECATED',
+    ];
+
+    private static function errorTypeBitmaskToString($errorTypeBitmask)
+    {
+        $contained = [];
+        $absent = [];
+
+        $mx = max(array_keys(self::$errorTypes));
+        for ($i = 1; $i <= $mx; $i <<= 1) {
+            if ($errorTypeBitmask & $i) {
+                $contained[] = $i;
+            }
+            else {
+                $absent[] = $i;
+            }
+        }
+
+        if (count($absent) <= 3) {
+            $absStrs = ['E_ALL'];
+            foreach ($absent as $t) {
+                $absStrs[] = '~' . self::errorTypeToString($t);
+            }
+            return implode(' & ', $absStrs);
+        }
+        else {
+            $contStrs = [];
+            foreach ($contained as $t) {
+                $contStrs[] = self::errorTypeToString($t);
+            }
+            return implode(' | ', $contStrs);
+        }
+    }
+
+    private static function errorTypeToString($errorType)
+    {
+        return (isset(self::$errorTypes[$errorType]) ? self::$errorTypes[$errorType] : $errorType); // PHP 7: simplify using ??
+    }
+
+    /**
+     * @param string $message
+     */
+    protected function assertNoMoreErrors($message = '')
+    {
+        if ($this->triggeredErrors) {
+            $failMsg = "There is error '{$this->triggeredErrors[0]['msg']}'";
+            if (count($this->triggeredErrors) > 1) {
+                $failMsg .= sprintf(
+                    ' and %d %s',
+                    count($this->triggeredErrors) - 1,
+                    (count($this->triggeredErrors) > 2 ? 'others' : 'other')
+                );
+            }
+            if (strlen($message) > 0) {
+                $failMsg = "$message ($failMsg)";
+            }
+            $this->fail($failMsg);
+        }
+
+        $this->assertEmpty($this->triggeredErrors, $message);
+    }
+
 
     final protected function getConnection()
     {
