@@ -5,6 +5,7 @@ use Ivory\Connection\ConfigParam;
 use Ivory\Value\Composite;
 use Ivory\Value\Box;
 use Ivory\Value\Date;
+use Ivory\Value\PgLogSequenceNumber;
 use Ivory\Value\Timestamp;
 use Ivory\Value\Range;
 use Ivory\Value\Time;
@@ -398,5 +399,20 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         finally {
             $conn->rollback();
         }
+    }
+
+    public function testPgLsnResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn,
+            "SELECT '16/B374D848'::pg_lsn,
+                    '0/0'::pg_lsn,
+                    'FFFFFFFF/FFFFFFFF'::pg_lsn"
+        );
+
+        $tuple = $qr->tuple();
+        $this->assertEquals(PgLogSequenceNumber::fromString('16/B374D848'), $tuple[0]);
+        $this->assertEquals(PgLogSequenceNumber::fromString('0/0'), $tuple[1]);
+        $this->assertEquals(PgLogSequenceNumber::fromString('FFFFFFFF/FFFFFFFF'), $tuple[2]);
     }
 }

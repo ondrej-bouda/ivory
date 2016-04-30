@@ -24,6 +24,7 @@ macaddr	 	                                    MAC (Media Access Control) address
 money	 	                                    currency amount
 numeric [ (p, s) ]	        decimal [ (p, s) ]	exact numeric of selectable precision
 path	 	                                    geometric path on a plane
+pg_lsn	 	                                    PostgreSQL Log Sequence Number
 point	 	                                    geometric point on a plane
 polygon	 	                                    closed geometric path on a plane
 real	                    float4	            single precision floating-point number (4 bytes)
@@ -44,7 +45,6 @@ PostgreSQL built-in types yet to be supported:
 
 Name                        Aliases             Description
 interval [ fields ] [ (p) ]	 	                time span
-pg_lsn	 	                                    PostgreSQL Log Sequence Number
 tsquery	 	                                    text search query
 tsvector	 	                                text search document
 txid_snapshot	 	                            user-level transaction ID snapshot

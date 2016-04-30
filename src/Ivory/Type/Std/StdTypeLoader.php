@@ -104,6 +104,9 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'money':
 				return new MoneyType($schemaName, $typeName, $connection);
 
+			case 'pg_lsn':
+				return new PgLsnType($schemaName, $typeName, $connection);
+
 			case 'void':
 				return new VoidType($schemaName, $typeName, $connection);
 
