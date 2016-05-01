@@ -11,6 +11,7 @@ use Ivory\Value\Range;
 use Ivory\Value\Time;
 use Ivory\Value\TimestampTz;
 use Ivory\Value\TimeTz;
+use Ivory\Value\TxIdSnapshot;
 
 class QueryRelationTest extends \Ivory\IvoryTestCase
 {
@@ -414,5 +415,22 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         $this->assertEquals(PgLogSequenceNumber::fromString('16/B374D848'), $tuple[0]);
         $this->assertEquals(PgLogSequenceNumber::fromString('0/0'), $tuple[1]);
         $this->assertEquals(PgLogSequenceNumber::fromString('FFFFFFFF/FFFFFFFF'), $tuple[2]);
+    }
+
+    public function testTxidSnapshotResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn,
+            "SELECT '10:20:10,14,15'::txid_snapshot,
+                    '10:20:19'::txid_snapshot,
+                    '10:20:'::txid_snapshot,
+                    '10:10:'::txid_snapshot"
+        );
+
+        $tuple = $qr->tuple();
+        $this->assertEquals(TxIdSnapshot::fromParts(10, 20, [10, 14, 15]), $tuple[0]);
+        $this->assertEquals(TxIdSnapshot::fromParts(10, 20, [19]), $tuple[1]);
+        $this->assertEquals(TxIdSnapshot::fromParts(10, 20, []), $tuple[2]);
+        $this->assertEquals(TxIdSnapshot::fromParts(10, 10, []), $tuple[3]);
     }
 }

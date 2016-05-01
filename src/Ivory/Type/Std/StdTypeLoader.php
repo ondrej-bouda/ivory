@@ -106,6 +106,8 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 
 			case 'pg_lsn':
 				return new PgLsnType($schemaName, $typeName, $connection);
+			case 'txid_snapshot':
+				return new TxIdSnapshotType($schemaName, $typeName, $connection);
 
 			case 'void':
 				return new VoidType($schemaName, $typeName, $connection);
