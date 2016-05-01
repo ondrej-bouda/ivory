@@ -109,6 +109,9 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 			case 'txid_snapshot':
 				return new TxIdSnapshotType($schemaName, $typeName, $connection);
 
+			case 'tsvector':
+				return new TsVectorType($schemaName, $typeName, $connection);
+
 			case 'void':
 				return new VoidType($schemaName, $typeName, $connection);
 

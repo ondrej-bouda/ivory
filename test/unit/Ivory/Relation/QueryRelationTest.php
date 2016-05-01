@@ -6,6 +6,7 @@ use Ivory\Value\Composite;
 use Ivory\Value\Box;
 use Ivory\Value\Date;
 use Ivory\Value\PgLogSequenceNumber;
+use Ivory\Value\TextSearchVector;
 use Ivory\Value\Timestamp;
 use Ivory\Value\Range;
 use Ivory\Value\Time;
@@ -432,5 +433,44 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         $this->assertEquals(TxIdSnapshot::fromParts(10, 20, [19]), $tuple[1]);
         $this->assertEquals(TxIdSnapshot::fromParts(10, 20, []), $tuple[2]);
         $this->assertEquals(TxIdSnapshot::fromParts(10, 10, []), $tuple[3]);
+    }
+
+    public function testTsVectorResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn,
+            "SELECT 'a fat cat sat on a mat and ate a fat rat'::tsvector AS list,
+                    \$\$the lexeme '    ' contains spaces\$\$::tsvector AS whitespace,
+                    \$\$the lexeme 'Joe''s' contains a quote\$\$::tsvector AS quotes,
+                    'a:1 fat:2 cat:3 sat:4 on:5 a:6 mat:7 and:8 ate:9 a:10 fat:11 rat:12'::tsvector AS positioned,
+                    'a:1A fat:2B,4C cat:5D'::tsvector AS weighted"
+        );
+
+        $tuple = $qr->tuple();
+
+        $this->assertEquals(
+            TextSearchVector::fromSet(['a', 'and', 'ate', 'cat', 'fat', 'mat', 'on', 'rat', 'sat']),
+            $tuple['list']
+        );
+
+        $this->assertEquals(
+            TextSearchVector::fromSet(['    ', 'contains', 'lexeme', 'spaces', 'the']),
+            $tuple['whitespace']
+        );
+
+        $this->assertEquals(
+            TextSearchVector::fromSet(['a', 'contains', "Joe's", 'lexeme', 'quote', 'the']),
+            $tuple['quotes']
+        );
+        
+        $this->assertEquals(
+            TextSearchVector::fromList(['a', 'fat', 'cat', 'sat', 'on', 'a', 'mat', 'and', 'ate', 'a', 'fat', 'rat']),
+            $tuple['positioned']
+        );
+
+        $this->assertEquals(
+            TextSearchVector::fromMap(['a' => [['1', 'A']], 'fat' => [[2, 'B'], [4, 'C']], 'cat' => [[5, 'D']]]),
+            $tuple['weighted']
+        );
     }
 }

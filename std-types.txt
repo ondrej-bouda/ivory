@@ -36,6 +36,7 @@ time [ (p) ] [ without time zone ]	            time of day (no time zone)
 time [ (p) ] with time zone	timetz	            time of day, including time zone
 timestamp [ (p) ] [ without time zone ]         date and time (no time zone)
 timestamp [ (p) ] with time zone    timestamptz	date and time, including time zone
+tsvector	 	                                text search document
 txid_snapshot	 	                            user-level transaction ID snapshot
 uuid	 	                                    universally unique identifier
 xml	 	                                        XML data
@@ -47,4 +48,3 @@ PostgreSQL built-in types yet to be supported:
 Name                        Aliases             Description
 interval [ fields ] [ (p) ]	 	                time span
 tsquery	 	                                    text search query
-tsvector	 	                                text search document
