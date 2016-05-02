@@ -111,6 +111,8 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 
 			case 'tsvector':
 				return new TsVectorType($schemaName, $typeName, $connection);
+			case 'tsquery':
+				return new TsQueryType($schemaName, $typeName, $connection);
 
 			case 'void':
 				return new VoidType($schemaName, $typeName, $connection);

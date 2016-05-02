@@ -6,6 +6,7 @@ use Ivory\Value\Composite;
 use Ivory\Value\Box;
 use Ivory\Value\Date;
 use Ivory\Value\PgLogSequenceNumber;
+use Ivory\Value\TextSearchQuery;
 use Ivory\Value\TextSearchVector;
 use Ivory\Value\Timestamp;
 use Ivory\Value\Range;
@@ -472,5 +473,20 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
             TextSearchVector::fromMap(['a' => [['1', 'A']], 'fat' => [[2, 'B'], [4, 'C']], 'cat' => [[5, 'D']]]),
             $tuple['weighted']
         );
+    }
+
+    public function testTsQueryResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn,
+            "SELECT '!fat & (rat:ab | cat)'::tsquery AS ops,
+                    'super:*'::tsquery AS star,
+                    \$\$'Jo  e''s'''\$\$::tsquery AS quotes"
+        );
+
+        $tuple = $qr->tuple();
+        $this->assertEquals(TextSearchQuery::fromString("!'fat' & ( 'rat':AB | 'cat' )"), $tuple['ops']);
+        $this->assertEquals(TextSearchQuery::fromString("'super':*"), $tuple['star']);
+        $this->assertEquals(TextSearchQuery::fromString("'Jo  e''s'''"), $tuple['quotes']);
     }
 }
