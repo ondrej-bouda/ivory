@@ -26,6 +26,7 @@ use Ivory\Value\TimestampTz;
 class TimestampTzType extends BaseType implements ITotallyOrderedType
 {
     private $dateStyleRetriever;
+    private $localMeanTimeZoneRetriever;
 
     public function __construct($schemaName, $name, IConnection $connection)
     {
@@ -33,6 +34,28 @@ class TimestampTzType extends BaseType implements ITotallyOrderedType
 
         $this->dateStyleRetriever = new ConnConfigValueRetriever(
             $connection->getConfig(), ConfigParam::DATE_STYLE, [DateStyle::class, 'fromString']
+        );
+        $this->localMeanTimeZoneRetriever = new ConnConfigValueRetriever(
+            $connection->getConfig(),
+            ConfigParam::TIME_ZONE,
+            function ($timeZone) use ($connection) {
+                try {
+                    $tz = new \DateTimeZone($timeZone);
+                    $longitude = $tz->getLocation()['longitude'];
+                    $offset = $longitude * 24 / 360;
+                    $abs = abs($offset);
+                    $tzSpec = sprintf('%s%d:%02d', ($offset >= 0 ? '+' : '-'), (int)$abs, (int)(($abs - (int)$abs)*60));
+                    // unfortunately, \DateTimeZone cannot be created with offsets precise to seconds
+                    return new \DateTimeZone($tzSpec);
+                }
+                catch (\Exception $e) {
+                    $msg = "Time zone '$timeZone', as configured for the PostgreSQL connection {$connection->getName()}, "
+                        . "is unknown to PHP. Falling back to UTC (only relevant for timestamptz values representing "
+                        . "very old date/times).";
+                    trigger_error($msg, E_USER_NOTICE);
+                    return new \DateTimeZone('UTC');
+                }
+            }
         );
     }
 
@@ -91,6 +114,9 @@ class TimestampTzType extends BaseType implements ITotallyOrderedType
 
         if (isset($matches[8])) {
             $y = -$y;
+        }
+        if ($z == 'LMT') {
+            $z = $this->localMeanTimeZoneRetriever->getValue();
         }
         return TimestampTz::fromParts($y, $m, $d, $h, $i, $s, $z);
     }

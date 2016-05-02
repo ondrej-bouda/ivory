@@ -347,12 +347,12 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         try {
             $dateStyles = ['ISO', 'German', 'SQL, DMY', 'SQL, MDY', 'Postgres, DMY', 'Postgres, MDY'];
             $timeZones = [
-                'UTC' => [['+0000', 'UTC'], ['+0000', 'UTC']],
-                'Europe/Prague' => [['+0100', 'CET'], ['+0200', 'CEST']],
+                'UTC' => [['+0000', 'UTC'], ['+0000', 'UTC'], '+0000'],
+                'Europe/Prague' => [['+0100', 'CET'], ['+0200', 'CEST'], '+0057'],
             ];
             foreach ($dateStyles as $dateStyle) {
                 $conn->getConfig()->setForTransaction(ConfigParam::DATE_STYLE, $dateStyle);
-                foreach ($timeZones as $tz => list($tzStdSpec, $tzSmrSpec)) {
+                foreach ($timeZones as $tz => list($tzStdSpec, $tzSmrSpec, $lmtOffset)) {
                     $tzStd = ($dateStyle == 'ISO' ? $tzStdSpec[0] : $tzStdSpec[1]);
                     $tzSmr = ($dateStyle == 'ISO' ? $tzSmrSpec[0] : $tzSmrSpec[1]);
                     $msg = "$dateStyle; $tz";
@@ -384,18 +384,9 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
                     $this->assertEquals(TimestampTz::fromParts(2016, 5, 17, 8, 0, 0.123456, $tzSmr), $tuple['leap_sec'], $msg);
                     $this->assertEquals(TimestampTz::infinity(), $tuple['inf'], $msg);
                     $this->assertEquals(TimestampTz::minusInfinity(), $tuple['minus_inf'], $msg);
+                    $this->assertEquals(TimestampTz::fromParts(-1987, 8, 17, 13, 1, 2.5, $lmtOffset), $tuple['bc'], $msg);
                     $this->assertEquals(TimestampTz::fromParts(294277, 1, 1, 0, 0, 0, $tzStd), $tuple['mx'], $msg);
-                    if ($tz == 'UTC') {
-                        /* Only testing very old years for UTC, as PHP does not support local mean time very well, and
-                         * it is out of scope of Ivory to remedy that.
-                         * See also:
-                         * * https://en.wikipedia.org/wiki/Time_zone
-                         * * https://en.wikipedia.org/wiki/Local_mean_time
-                         * * http://dba.stackexchange.com/questions/127965/why-does-time-zone-have-such-a-crazy-offset-from-utc-on-year-0001-in-postgres
-                         */
-                        $this->assertEquals(TimestampTz::fromParts(-1987, 8, 17, 13, 1, 2.5, $tz), $tuple['bc'], $msg);
-                        $this->assertEquals(TimestampTz::fromParts(-4713, 1, 1, 0, 0, 0, $tz), $tuple['mn'], $msg);
-                    }
+                    $this->assertEquals(TimestampTz::fromParts(-4713, 1, 1, 0, 0, 0, $lmtOffset), $tuple['mn'], $msg);
                 }
             }
         }
