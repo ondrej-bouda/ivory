@@ -53,10 +53,8 @@ class TsVectorType extends BaseType
         }
 
         $tokens = [];
-        $quoted = 0;
         foreach ($val->getLexemes() as $lex => $positions) {
-            $tok = preg_replace('~.*[\s\':].*~', "'\\0'", strtr($lex, ["'" => "''"]), -1, $cnt);
-            $quoted += $cnt;
+            $tok = preg_replace('~.*[\s\':].*~', "'\\0'", strtr($lex, ["'" => "''"]));
             if ($positions) {
                 $tokPos = [];
                 foreach ($positions as list($pos, $weight)) {
@@ -71,7 +69,6 @@ class TsVectorType extends BaseType
             $tokens[] = $tok;
         }
 
-        $q = ($quoted ? '$$' : "'"); // a friendly quoting - using dollar quotes only if useful
-        return $q . implode(' ', $tokens) . $q;
+        return "'" . strtr(implode(' ', $tokens), ["'" => "''"]) . "'";
     }
 }
