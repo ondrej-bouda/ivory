@@ -57,6 +57,8 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 				return new TimestampType($schemaName, $typeName, $connection);
 			case 'timestamptz':
 				return new TimestampTzType($schemaName, $typeName, $connection);
+			case 'interval':
+				return new IntervalType($schemaName, $typeName, $connection);
 
 			case 'bytea':
 				return new BinaryType($schemaName, $typeName, $connection);

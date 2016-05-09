@@ -16,6 +16,7 @@ date	 	                                    calendar date (year, month, day)
 double precision	        float8	            double precision floating-point number (8 bytes)
 inet	 	                                    IPv4 or IPv6 host address
 integer                     int, int4	        signed four-byte integer
+interval [ fields ] [ (p) ]	 	                time span
 json	 	                                    textual JSON data
 jsonb	 	                                    binary JSON data, decomposed
 line	 	                                    infinite line on a plane
@@ -47,4 +48,4 @@ xml	 	                                        XML data
 PostgreSQL built-in types yet to be supported:
 
 Name                        Aliases             Description
-interval [ fields ] [ (p) ]	 	                time span
+ --- (none standard types as of PostgreSQL 9.4 :-)

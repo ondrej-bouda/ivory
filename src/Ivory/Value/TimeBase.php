@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Value;
 
+use Ivory\Utils\ComparableWithPhpOperators;
 use Ivory\Utils\IComparable;
 
 /**
@@ -10,6 +11,8 @@ use Ivory\Utils\IComparable;
  */
 abstract class TimeBase implements IComparable
 {
+    use ComparableWithPhpOperators;
+
     /** Number of decimal digits of precision in the fractional seconds part. */
     const PRECISION = 6;
 
@@ -191,23 +194,4 @@ abstract class TimeBase implements IComparable
             ($frac ? substr($frac, 1) : '') // cut off the leading "0" for non-zero fractional seconds
         );
     }
-
-
-    //region IComparable
-
-    /**
-     * @param object $object
-     * @return bool|null <tt>true</tt> if <tt>$this</tt> and the other <tt>$object</tt> are equal to each other,
-     *                   <tt>false</tt> if they are not equal,
-     *                   <tt>null</tt> iff <tt>$object</tt> is <tt>null</tt>
-     */
-    public function equals($object)
-    {
-        if ($object === null) {
-            return null;
-        }
-        return ($this == $object);
-    }
-
-    //endregion
 }

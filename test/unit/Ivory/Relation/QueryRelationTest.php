@@ -8,6 +8,7 @@ use Ivory\Value\Date;
 use Ivory\Value\PgLogSequenceNumber;
 use Ivory\Value\TextSearchQuery;
 use Ivory\Value\TextSearchVector;
+use Ivory\Value\TimeInterval;
 use Ivory\Value\Timestamp;
 use Ivory\Value\Range;
 use Ivory\Value\Time;
@@ -479,5 +480,48 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         $this->assertEquals(TextSearchQuery::fromString("!'fat' & ( 'rat':AB | 'cat' )"), $tuple['ops']);
         $this->assertEquals(TextSearchQuery::fromString("'super':*"), $tuple['star']);
         $this->assertEquals(TextSearchQuery::fromString("'Jo  e''s'''"), $tuple['quotes']);
+    }
+
+    public function testIntervalResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn,
+            "SELECT 'P1Y2M3W3DT4H5M6S'::interval AS iso,
+                    'P0001-02-03T04:05:06'::interval AS iso_alt,
+                    '1-2'::interval AS sql_year_mon,
+                    '3 12:34:56'::interval AS sql_day_time,
+                    '4 days ago'::interval AS pg"
+        );
+
+        $tuple = $qr->tuple();
+        $this->assertEquals(
+            TimeInterval::fromParts([
+                TimeInterval::YEAR => 1, TimeInterval::MONTH => 2, TimeInterval::WEEK => 3, TimeInterval::DAY => 3,
+                TimeInterval::HOUR => 4, TimeInterval::MINUTE => 5, TimeInterval::SECOND => 6,
+            ]),
+            $tuple['iso']
+        );
+        $this->assertEquals(
+            TimeInterval::fromParts([
+                TimeInterval::YEAR => 1, TimeInterval::MONTH => 2, TimeInterval::DAY => 3,
+                TimeInterval::HOUR => 4, TimeInterval::MINUTE => 5, TimeInterval::SECOND => 6,
+            ]),
+            $tuple['iso_alt']
+        );
+        $this->assertEquals(
+            TimeInterval::fromParts([TimeInterval::YEAR => 1, TimeInterval::MONTH => 2]),
+            $tuple['sql_year_mon']
+        );
+        $this->assertEquals(
+            TimeInterval::fromParts([
+                TimeInterval::DAY => 3,
+                TimeInterval::HOUR => 12, TimeInterval::MINUTE => 34, TimeInterval::SECOND => 56,
+            ]),
+            $tuple['sql_day_time']
+        );
+        $this->assertEquals(
+            TimeInterval::fromParts([TimeInterval::DAY => -4]),
+            $tuple['pg']
+        );
     }
 }

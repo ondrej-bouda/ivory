@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Value;
 
+use Ivory\Utils\ComparableWithPhpOperators;
 use Ivory\Utils\IComparable;
 
 /**
@@ -15,6 +16,8 @@ use Ivory\Utils\IComparable;
  */
 class PgLogSequenceNumber implements IComparable
 {
+    use ComparableWithPhpOperators;
+
     /** @var int the higher 32 bits */
     private $hi;
     /** @var int the lower 32 bits */
@@ -46,15 +49,5 @@ class PgLogSequenceNumber implements IComparable
     public function toString()
     {
         return sprintf('%X/%X', $this->hi, $this->lo);
-    }
-
-    public function equals($object)
-    {
-        if ($object === null) {
-            return null;
-        }
-        else {
-            return ($this == $object);
-        }
     }
 }

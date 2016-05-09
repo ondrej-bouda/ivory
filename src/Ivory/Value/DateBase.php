@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Value;
 
+use Ivory\Utils\ComparableWithPhpOperators;
 use Ivory\Utils\IComparable;
 
 /**
@@ -10,6 +11,8 @@ use Ivory\Utils\IComparable;
  */
 abstract class DateBase implements IComparable
 {
+    use ComparableWithPhpOperators;
+
     // NOTE: the order of the fields is important for the `<` and `>` operators to work correctly
     /** @var int -1, 0, or 1 if this date is <tt>-infinity</tt>, finite, or <tt>infinity</tt> */
     protected $inf;
@@ -269,16 +272,4 @@ abstract class DateBase implements IComparable
 
         return new static(0, $dt);
     }
-
-    //region IComparable
-
-    final public function equals($object)
-    {
-        if ($object === null) {
-            return null;
-        }
-        return ($this == $object);
-    }
-
-    //endregion
 }
