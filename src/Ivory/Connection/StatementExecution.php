@@ -3,6 +3,8 @@ namespace Ivory\Connection;
 
 use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
+use Ivory\Exception\StatementExceptionFactory;
+use Ivory\Ivory;
 use Ivory\Result\CommandResult;
 use Ivory\Result\CopyInResult;
 use Ivory\Result\CopyOutResult;
@@ -13,11 +15,18 @@ class StatementExecution implements IStatementExecution
 {
     private $connCtl;
     private $typeCtl;
+    private $stmtExFactory;
 
     public function __construct(ConnectionControl $connCtl, ITypeControl $typeCtl)
     {
         $this->connCtl = $connCtl;
         $this->typeCtl = $typeCtl;
+        $this->stmtExFactory = new StatementExceptionFactory();
+    }
+
+    public function getStatementExceptionFactory()
+    {
+        return $this->stmtExFactory;
     }
 
     public function rawQuery($sqlStatement)
@@ -93,6 +102,7 @@ class StatementExecution implements IStatementExecution
      * @param resource $resHandler
      * @param string $query
      * @return IResult
+     * @throws StatementException upon an SQL statement error
      */
     private function processResult($connHandler, $resHandler, $query)
     {
@@ -114,7 +124,8 @@ class StatementExecution implements IStatementExecution
             case PGSQL_NONFATAL_ERROR:
                 // non-fatal errors are supposedly not possible to be received by the PHP client library, but anyway...
             case PGSQL_FATAL_ERROR:
-                throw new StatementException($resHandler, $query);
+                $ex = $this->stmtExFactory->createException($resHandler, $query, Ivory::getStatementExceptionFactory());
+                throw new $ex($resHandler, $query);
 
             default:
                 throw new \UnexpectedValueException("Unexpected PostgreSQL statement result status: $stat", $stat);

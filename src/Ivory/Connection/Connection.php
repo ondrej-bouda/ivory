@@ -106,6 +106,11 @@ class Connection implements IConnection
 
 	//region Statement Execution
 
+	public function getStatementExceptionFactory()
+	{
+		return $this->stmtExec->getStatementExceptionFactory();
+	}
+
 	public function rawQuery($sqlStatement)
 	{
 		return $this->stmtExec->rawQuery($sqlStatement);

@@ -13,6 +13,12 @@ use Ivory\Result\SqlState;
  * Besides the primary message and SQLSTATE code, the exception holds the error message detail, error hint, and all the
  * other error diagnostic fields except those referring to PostgreSQL source code (those referred to by the PHP
  * `PGSQL_DIAG_SOURCE_*` constants).
+ *
+ * This class is expected to be sub-classed by custom exception classes. *Any such subclasses are required to have the
+ * same constructor arguments as this class, and are required to pass these arguments to the constructor of this class.*
+ * See {@link StatementExceptionFactory} and its usages - either the global
+ * {@link \Ivory\Ivory::getStatementExceptionFactory()} or the local
+ * {@link \Ivory\Connection::getStatementExceptionFactory()} - for details on using custom statement exceptions.
  */
 class StatementException extends \RuntimeException
 {

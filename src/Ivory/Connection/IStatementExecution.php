@@ -1,12 +1,18 @@
 <?php
 namespace Ivory\Connection;
 
+use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Result\IResult;
 use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
 
 interface IStatementExecution // TODO: support prepared statements
 {
+    /**
+     * @return StatementExceptionFactory the local factory used for emitting exception upon statement errors
+     */
+    function getStatementExceptionFactory();
+
     /**
      * Sends a raw SQL statement, as is, to the database, waits for its execution and returns the result.
      *

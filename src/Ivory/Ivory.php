@@ -5,6 +5,7 @@ use Ivory\Connection\Connection;
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\ConnectionException;
+use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Type\Std\StdRangeCanonicalFuncProvider;
 use Ivory\Type\Std\StdTypeLoader;
 use Ivory\Type\TypeRegister;
@@ -13,6 +14,8 @@ class Ivory
 {
 	/** @var TypeRegister */
 	private static $typeRegister = null;
+	/** @var StatementExceptionFactory */
+	private static $stmtExFactory = null;
 	/** @var IConnection[] map: name => connection */
 	private static $connections = [];
 	/** @var IConnection */
@@ -30,6 +33,20 @@ class Ivory
 			self::$typeRegister->registerRangeCanonicalFuncProvider(new StdRangeCanonicalFuncProvider());
 		}
 		return self::$typeRegister;
+	}
+
+	/**
+	 * @return StatementExceptionFactory the global statement exception factory, used for emitting the
+	 *                                     {@link \Ivory\Exception\StatementException}s upon statement errors;
+	 *                                   like the type register, an overriding factory is also defined locally on each
+	 *                                     connection - this factory only applies if the local one does not
+	 */
+	public static function getStatementExceptionFactory()
+	{
+		if (self::$stmtExFactory === null) {
+			self::$stmtExFactory = new StatementExceptionFactory();
+		}
+		return self::$stmtExFactory;
 	}
 
 	/**
@@ -81,7 +98,7 @@ class Ivory
 		$conn = new Connection($connName, $params);
 
 		if (empty(self::$connections)) {
-			self::setConnectionAsDefault($conn);
+			self::useConnectionAsDefault($conn);
 		}
 
 		self::$connections[$connName] = $conn;
@@ -115,10 +132,10 @@ class Ivory
 	}
 
 	/**
-	 * @param IConnection|string $conn (name of) connection to set as the default connection
+	 * @param IConnection|string $conn (name of) connection to use as the default connection
 	 * @throws \RuntimeException if the requested connection is not defined
 	 */
-	public static function setConnectionAsDefault($conn)
+	public static function useConnectionAsDefault($conn)
 	{
 		if (is_string($conn)) {
 			if (isset(self::$connections[$conn])) {

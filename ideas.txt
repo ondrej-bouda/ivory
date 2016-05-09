@@ -77,6 +77,12 @@ Supporting PostgreSQL features:
 
 
 
+Flexibility:
+* Easy way to provide custom type handlers.
+* Possibility to define custom exceptions thrown on specific SQL errors. Based on the SQLSTATE code or the error message, a specific exception may be thrown, thus, error processing may directly catch only the interesting exceptions using specific catch blocks, not the general StatementException.
+
+
+
 IDE Support:
 * static analysis
 * ability to systematically recognize all database queries or input yielding a query, and search just within them
