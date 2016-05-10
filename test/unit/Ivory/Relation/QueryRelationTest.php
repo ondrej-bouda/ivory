@@ -148,6 +148,19 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         $this->assertSame('Live One', $qr->value('albums', 2)[1]->name);
     }
 
+    public function testAnonymousCompositeResult()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn,
+            "WITH a (k,l,m) AS (VALUES (1, 'a', true))
+             SELECT a FROM a"
+        );
+        /** @var Composite $composite */
+        $composite = $qr->value();
+        // there does not seem to be a way to get associative array, as well as the types of components
+        $this->assertSame(['1', 'a', 't'], $composite->toList());
+    }
+
     public function testRangeResult()
     {
         $conn = $this->getIvoryConnection();
