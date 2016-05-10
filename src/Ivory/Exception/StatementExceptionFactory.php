@@ -36,7 +36,7 @@ class StatementExceptionFactory
      */
     public function registerBySqlStateCodeAndMessage($sqlStateCode, $preg, $exceptionClass)
     {
-        assert(is_subclass_of($exceptionClass, StatementException::class));
+        assert(is_a($exceptionClass, StatementException::class, true));
         if (!isset($this->bySqlStateCodeAndMessage[$sqlStateCode])) {
             $this->bySqlStateCodeAndMessage[$sqlStateCode] = [];
         }
@@ -52,7 +52,7 @@ class StatementExceptionFactory
      */
     public function registerBySqlStateCode($sqlStateCode, $exceptionClass)
     {
-        assert(is_subclass_of($exceptionClass, StatementException::class));
+        assert(is_a($exceptionClass, StatementException::class, true));
         $this->bySqlStateCode[$sqlStateCode] = $exceptionClass;
         return $this;
     }
@@ -65,7 +65,7 @@ class StatementExceptionFactory
      */
     public function registerBySqlStateClass($sqlStateClass, $exceptionClass)
     {
-        assert(is_subclass_of($exceptionClass, StatementException::class));
+        assert(is_a($exceptionClass, StatementException::class, true));
         $this->bySqlStateClass[$sqlStateClass] = $exceptionClass;
         return $this;
     }
@@ -77,7 +77,7 @@ class StatementExceptionFactory
      */
     public function registerByMessage($preg, $exceptionClass)
     {
-        assert(is_subclass_of($exceptionClass, StatementException::class));
+        assert(is_a($exceptionClass, StatementException::class, true));
         $this->byMessage[$preg] = $exceptionClass;
         return $this;
     }
@@ -92,7 +92,7 @@ class StatementExceptionFactory
     public function createException($resultHandler, $query, StatementExceptionFactory $fallbackFactory = null)
     {
         $exClass = $this->inferExceptionClass($resultHandler, $fallbackFactory);
-        assert(is_subclass_of($exClass, StatementException::class));
+        assert(is_a($exClass, StatementException::class, true));
         return new $exClass($resultHandler, $query);
     }
 
