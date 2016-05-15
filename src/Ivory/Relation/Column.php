@@ -2,27 +2,26 @@
 namespace Ivory\Relation;
 
 use Ivory\Exception\NotImplementedException;
-use Ivory\Result\QueryResult;
+use Ivory\Relation\Alg\ITupleEvaluator;
 use Ivory\Type\IType;
 
-class Column implements \Iterator, IColumn
+class Column implements \IteratorAggregate, IColumn
 {
-    private $queryResult;
+    private $relation;
     private $colDef;
     private $name;
     private $type;
-    private $pos = 0;
 
 
     /**
-     * @param QueryResult $queryResult query result the column comes from
-     * @param int $colDef offset or tuple evaluator of the column within the query result
+     * @param IRelation $relation relation the column is a part of
+     * @param int|string|ITupleEvaluator|\Closure $colDef offset or tuple evaluator of the column within the relation
      * @param string|null $name name of the column, or <tt>null</tt> if not named
      * @param IType|null $type type of the column values
      */
-    public function __construct(QueryResult $queryResult, $colDef, $name, $type)
+    public function __construct(IRelation $relation, $colDef, $name, $type)
     {
-        $this->queryResult = $queryResult;
+        $this->relation = $relation;
         $this->colDef = $colDef;
         $this->name = $name;
         $this->type = $type;
@@ -37,6 +36,11 @@ class Column implements \Iterator, IColumn
     public function getType()
     {
         return $this->type;
+    }
+
+    public function renameTo($newName)
+    {
+        return new Column($this->relation, $this->colDef, $newName, $this->type);
     }
 
     public function filter($decider)
@@ -60,7 +64,7 @@ class Column implements \Iterator, IColumn
 
     public function value($valueOffset = 0)
     {
-        return $this->queryResult->value($this->colDef, $valueOffset);
+        return $this->relation->value($this->colDef, $valueOffset);
     }
 
     //region ICachingDataProcessor
@@ -81,36 +85,16 @@ class Column implements \Iterator, IColumn
 
     public function count()
     {
-        return $this->queryResult->count();
+        return $this->relation->count();
     }
 
     //endregion
 
-    //region Iterator
+    //region IteratorAggregate
 
-    public function current()
+    public function getIterator()
     {
-        return $this->value($this->pos);
-    }
-
-    public function next()
-    {
-        $this->pos++;
-    }
-
-    public function key()
-    {
-        return $this->pos;
-    }
-
-    public function valid()
-    {
-        return $this->pos < $this->count();
-    }
-
-    public function rewind()
-    {
-        $this->pos = 0;
+        return new ColumnIterator($this);
     }
 
     //endregion

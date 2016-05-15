@@ -3,19 +3,17 @@ namespace Ivory\Result;
 
 use Ivory\Exception\NotImplementedException;
 use Ivory\Exception\ResultException;
-use Ivory\Exception\UndefinedColumnException;
-use Ivory\Relation\Alg\ITupleEvaluator;
 use Ivory\Relation\Column;
 use Ivory\Relation\RelationMacros;
+use Ivory\Relation\RenamedRelation;
 use Ivory\Relation\Tuple;
 use Ivory\Type\ITypeDictionary;
 
-class QueryResult extends Result implements \Iterator, IQueryResult
+class QueryResult extends Result implements IQueryResult
 {
 	use RelationMacros;
 
 	private $typeDictionary;
-	private $pos = 0;
 	private $numRows;
 	private $populated = false;
 	/** @var Column[] */
@@ -121,37 +119,12 @@ class QueryResult extends Result implements \Iterator, IQueryResult
 
 	public function rename($renamePairs)
 	{
-		throw new NotImplementedException();
+		return new RenamedRelation($this, $renamePairs);
 	}
 
 	public function col($offsetOrNameOrEvaluator)
 	{
-		if (is_scalar($offsetOrNameOrEvaluator)) {
-			if (filter_var($offsetOrNameOrEvaluator, FILTER_VALIDATE_INT) !== false) {
-				if (isset($this->columns[$offsetOrNameOrEvaluator])) {
-					return $this->columns[$offsetOrNameOrEvaluator];
-				}
-				else {
-					throw new UndefinedColumnException("No column at offset $offsetOrNameOrEvaluator");
-				}
-			}
-			else {
-				if (isset($this->colNameMap[$offsetOrNameOrEvaluator])) {
-					return $this->columns[$this->colNameMap[$offsetOrNameOrEvaluator]];
-				}
-				else {
-					throw new UndefinedColumnException("No column named $offsetOrNameOrEvaluator");
-				}
-			}
-		}
-		elseif ($offsetOrNameOrEvaluator instanceof ITupleEvaluator ||
-		  		$offsetOrNameOrEvaluator instanceof \Closure)
-		{
-			return new Column($this, $offsetOrNameOrEvaluator, null, null);
-		}
-		else {
-			throw new \InvalidArgumentException('$offsetOrNameOrEvaluator');
-		}
+		return $this->_colImpl($offsetOrNameOrEvaluator, $this->columns, $this->colNameMap, $this);
 	}
 
 	public function map(...$mappingCols)
@@ -209,31 +182,11 @@ class QueryResult extends Result implements \Iterator, IQueryResult
 
 	//endregion
 
-	//region \Iterator
+	//region \IteratorAggregate
 
-	public function current()
+	public function getIterator()
 	{
-		return $this->tuple($this->pos);
-	}
-
-	public function next()
-	{
-		$this->pos++;
-	}
-
-	public function key()
-	{
-		return $this->pos;
-	}
-
-	public function valid()
-	{
-		return ($this->pos < $this->numRows);
-	}
-
-	public function rewind()
-	{
-		$this->pos = 0;
+		return new QueryResultIterator($this);
 	}
 
 	//endregion

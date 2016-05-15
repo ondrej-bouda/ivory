@@ -16,6 +16,8 @@ class QueryRelation extends RelationBase implements IQueryRelation
 
     public function __construct(IStatementExecution $conn, $query, ...$args)
     {
+        parent::__construct();
+
         if ($args) {
             throw new NotImplementedException('args not implemented yet');
         }
@@ -25,6 +27,11 @@ class QueryRelation extends RelationBase implements IQueryRelation
         $this->args = $args;
     }
 
+    public function getColumns()
+    {
+        $this->populate();
+        return $this->result->getColumns();
+    }
 
     public function getSql()
     {
@@ -46,7 +53,6 @@ class QueryRelation extends RelationBase implements IQueryRelation
         throw new NotImplementedException();
     }
 
-
     public function col($offsetOrNameOrEvaluator)
     {
         $this->populate();
@@ -65,7 +71,7 @@ class QueryRelation extends RelationBase implements IQueryRelation
     public function getIterator()
     {
         $this->populate();
-        return $this->result;
+        return $this->result->getIterator();
     }
 
     //endregion

@@ -29,6 +29,12 @@ interface IColumn extends \Traversable, \Countable, ICachingDataProcessor
 	function getType();
 
 	/**
+	 * @param string $newName
+	 * @return static a new column - copy of this column - with the given name
+	 */
+	function renameTo($newName);
+
+	/**
 	 * Reduces the column data only to values satisfying a given filter.
 	 *
 	 * @param IValueFilter|\Closure $decider

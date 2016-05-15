@@ -8,10 +8,10 @@ abstract class RelationBase implements \IteratorAggregate, IRelation
     use RelationMacros;
 
 
-    public function getColumns()
+    public function __construct()
     {
-        throw new NotImplementedException();
     }
+
 
     public function filter($decider)
     {
@@ -25,7 +25,7 @@ abstract class RelationBase implements \IteratorAggregate, IRelation
 
     public function rename($renamePairs)
     {
-        throw new NotImplementedException();
+        return new RenamedRelation($this, $renamePairs);
     }
 
     public function map(...$mappingCols)

@@ -31,7 +31,7 @@ class FilteredRelation extends StreamlinedRelation
     public function getIterator()
     {
         $src = parent::getIterator();
-        if ($src instanceof \Traversable) {
+        if (!$src instanceof \Iterator && $src instanceof \Traversable) {
             $src = new \IteratorIterator($src);
         }
         return new TupleFilterIterator($src, $this->decider);

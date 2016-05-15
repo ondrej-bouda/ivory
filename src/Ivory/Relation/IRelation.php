@@ -37,7 +37,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                  an {@link ITupleFilter} gets called its {@link ITupleFilter::accept()} method;
      *                                  a <tt>Closure</tt> is given one {@link ITuple} argument and is expected to
      *                                    return <tt>true</tt> or <tt>false</tt> telling whether the tuple is allowed
-     * @return IRelation relation containing only those tuples from this relation, in their original order, which are
+     * @return static relation containing only those tuples from this relation, in their original order, which are
      *                   accepted by <tt>$decider</tt>
      */
     function filter($decider);
@@ -56,8 +56,8 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *   `person_`, and shortens the prefix to `p_` in the result relation.
      * - `$rel->project(['*', 'copy' => 'a')` extends `$rel` with column `copy` containing the same values as column
      *   `a`; the {@link extend()} method may be used for such a special case.
-     * - `$rel->project(['a', '/_.*_/', '\1' => '/(.*)name$/i'])` narrows `$rel` to column `a`, columns the name of
-     *   which contains at least two underscores, and columns the name of which ends with "name" (case insensitive) -
+     * - `$rel->project(['a', '/_.*_/', '\1' => '/(.*)name$/i'])` narrows `$rel` to column `a`, columns the names of
+     *   which contain at least two underscores, and columns the names of which end with "name" (case insensitive) -
      *   omitting the "name" suffix.
      *
      * # Specification
@@ -101,7 +101,8 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * literals. Multiple stars may be used in a single macro.
      *
      * The replacement pattern, if specified, may contain stars, too, each of which is replaced by the part of the
-     * original column name matched by the corresponding star from the matching pattern.
+     * original column name matched by the corresponding star from the matching pattern. Again, to use the star
+     * character literally, escape it with a backslash, as well as to use a literal backslash.
      *
      * ### PCRE macros
      *
@@ -113,7 +114,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                  the specification of new columns;
      *                                  if a <tt>Traversable</tt> object is given, it is guaranteed to be traversed only
      *                                    once
-     * @return IRelation a new relation with columns according to the <tt>$columns</tt> specification
+     * @return static a new relation with columns according to the <tt>$columns</tt> specification
      */
     function project($columns);
 
@@ -129,7 +130,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                  the specification of the extra columns;
      *                                  if a <tt>Traversable</tt> object is given, it is guaranteed to be traversed only
      *                                    once
-     * @return IRelation the same relation as this one, extended with extra columns
+     * @return static the same relation as this one, extended with extra columns
      */
     function extend($extraColumns);
 
@@ -138,11 +139,17 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *
      * Columns not mentioned by the argument are left in the resulting relation as is.
      *
+     * Alternatively to original column names, integers may also be used as rename mapping keys to refer to columns by
+     * their zero-based position.
+     * 
      * The same macros as for the {@link project()} method may be used for pattern-based renaming of several columns at
-     * once.
+     * once. In case multiple macros would match a single column, the column gets renamed by the macro which appears
+     * first in the `$renamePairs` map.
+     * 
+     * If there are multiple columns matching a macro, or even multiple columns of the same name, they all get renamed.
      *
      * @param string[]|\Traversable $renamePairs old-new name map
-     * @return IRelation the same relation as this one except that columns in <tt>$renamePairs</tt> are renamed
+     * @return static the same relation as this one except that columns in <tt>$renamePairs</tt> are renamed
      */
     function rename($renamePairs);
 
@@ -265,7 +272,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                    return <tt>true</tt> if it considers the tuples equivalent, or <tt>false</tt>
      *                                    otherwise;
      *                                  if not given, the default comparator provided by the implementing class is used
-     * @return IRelation
+     * @return static
      */
     function uniq($hasher = null, $comparator = null);
 

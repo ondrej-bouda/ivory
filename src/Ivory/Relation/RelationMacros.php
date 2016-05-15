@@ -1,6 +1,9 @@
 <?php
 namespace Ivory\Relation;
 
+use Ivory\Exception\UndefinedColumnException;
+use Ivory\Relation\Alg\ITupleEvaluator;
+
 /**
  * Standard implementations of IRelation operations which are defined solely in terms of other operations.
  */
@@ -14,6 +17,7 @@ trait RelationMacros
      * @throws \OutOfBoundsException when this relation has fewer than `$offset+1` tuples
      */
     abstract public function tuple($offset = 0);
+
 
     final public function extend($extraColumns)
     {
@@ -38,4 +42,35 @@ trait RelationMacros
     {
         return $this->tuple($tupleOffset)->value($colOffsetOrNameOrEvaluator);
     }
+
+    final protected function _colImpl($offsetOrNameOrEvaluator, $columns, $colNameMap, IRelation $relation)
+    {
+        if (is_scalar($offsetOrNameOrEvaluator)) {
+            if (filter_var($offsetOrNameOrEvaluator, FILTER_VALIDATE_INT) !== false) {
+                if (isset($columns[$offsetOrNameOrEvaluator])) {
+                    return $columns[$offsetOrNameOrEvaluator];
+                }
+                else {
+                    throw new UndefinedColumnException("No column at offset $offsetOrNameOrEvaluator");
+                }
+            }
+            else {
+                if (isset($colNameMap[$offsetOrNameOrEvaluator])) {
+                    return $columns[$colNameMap[$offsetOrNameOrEvaluator]];
+                }
+                else {
+                    throw new UndefinedColumnException("No column named $offsetOrNameOrEvaluator");
+                }
+            }
+        }
+        elseif ($offsetOrNameOrEvaluator instanceof ITupleEvaluator ||
+            $offsetOrNameOrEvaluator instanceof \Closure)
+        {
+            return new Column($relation, $offsetOrNameOrEvaluator, null, null);
+        }
+        else {
+            throw new \InvalidArgumentException('$offsetOrNameOrEvaluator');
+        }
+    }
+
 }
