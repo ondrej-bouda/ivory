@@ -41,7 +41,7 @@ interface IQueryRelation extends IRelation
      * Returns this relation limited only to certain number of rows, or starting from a certain row.
      *
      * @param int|null $limit the number of rows to limit this relation to; <tt>null</tt> means no limit
-     * @param int|null $offset the number of leading rows to skip
+     * @param int $offset the number of leading rows to skip
      * @return IQueryRelation relation containing at most <tt>$limit</tt> rows, skipping the first <tt>$offset</tt> rows
      */
     function limit($limit, $offset = 0);

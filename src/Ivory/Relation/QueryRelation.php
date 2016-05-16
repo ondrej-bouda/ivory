@@ -50,7 +50,7 @@ class QueryRelation extends RelationBase implements IQueryRelation
 
     public function limit($limit, $offset = 0)
     {
-        throw new NotImplementedException();
+        return new LimitedQueryRelation($this->conn, $this->getSql(), $limit, $offset);
     }
 
     public function col($offsetOrNameOrEvaluator)
