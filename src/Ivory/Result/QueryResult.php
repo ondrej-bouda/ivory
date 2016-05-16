@@ -154,11 +154,13 @@ class QueryResult extends Result implements IQueryResult
 
 	public function tuple($offset = 0)
 	{
-		if ($offset >= $this->numRows) {
+		if ($offset >= $this->numRows || $offset < -$this->numRows) {
 			throw new \OutOfBoundsException("Offset $offset is out of the result bounds [0,{$this->numRows})");
 		}
 
-		$rawData = pg_fetch_row($this->handler, $offset);
+		$effectiveOffset = ($offset >= 0 ? $offset : $this->numRows + $offset);
+		
+		$rawData = pg_fetch_row($this->handler, $effectiveOffset);
 		if ($rawData === false || $rawData === null) {
 			throw new ResultException("Error fetching row at offset $offset");
 		}

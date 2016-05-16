@@ -12,9 +12,8 @@ trait RelationMacros
     abstract public function project($columns);
 
     /**
-     * @param int $offset zero-based offset of the tuple to get
-     * @return ITuple the `$offset`-th tuple of this relation
-     * @throws \OutOfBoundsException when this relation has fewer than `$offset+1` tuples
+     * @param int $offset
+     * @return ITuple
      */
     abstract public function tuple($offset = 0);
 

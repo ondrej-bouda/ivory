@@ -15,6 +15,7 @@ interface ICachingDataProcessor extends IDataProcessor
      * serving the requests for them.
      */
     function populate();
+
     /**
      * Flushes any data already taken and cached from the source, as well as any auxiliary caches used by this object.
      *

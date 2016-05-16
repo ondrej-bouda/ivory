@@ -84,9 +84,11 @@ interface IColumn extends \Traversable, \Countable, ICachingDataProcessor
 	function toArray();
 
 	/**
-	 * @param int $valueOffset zero-based offset of the value to get
+	 * @param int $valueOffset zero-based offset of the value to get;
+	 *                         if negative, the <tt>-$valueOffset</tt>'th value from the end is returned
 	 * @return mixed
-	 * @throws \OutOfBoundsException when this column has fewer than <tt>$valueOffset+1</tt> values
+	 * @throws \OutOfBoundsException when this column has fewer than <tt>$valueOffset+1</tt> values, or fewer than
+	 *                                 <tt>-$valueOffset</tt> tuples if <tt>$valueOffset</tt> is negative
 	 */
 	function value($valueOffset = 0);
 }

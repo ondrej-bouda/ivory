@@ -1,13 +1,12 @@
 <?php
 namespace Ivory\Relation\Alg;
 
-use Iterator;
-
 class TupleFilterIterator extends \FilterIterator
 {
     private $decider;
+    private $k = 0;
 
-    public function __construct(Iterator $iterator, ITupleFilter $decider)
+    public function __construct(\Iterator $iterator, ITupleFilter $decider)
     {
         parent::__construct($iterator);
 
@@ -17,5 +16,22 @@ class TupleFilterIterator extends \FilterIterator
     public function accept()
     {
         return $this->decider->accept($this->current());
+    }
+
+    public function key()
+    {
+        return $this->k;
+    }
+
+    public function rewind()
+    {
+        parent::rewind();
+        $this->k = 0;
+    }
+
+    public function next()
+    {
+        parent::next();
+        $this->k++;
     }
 }

@@ -288,9 +288,11 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
     /**
      * Retrieves a single tuple from this relation.
      *
-     * @param int $offset zero-based offset of the tuple to get
+     * @param int $offset zero-based offset of the tuple to get;
+     *                    if negative, the <tt>-$offset</tt>'th tuple from the end is returned
      * @return ITuple the `$offset`-th tuple of this relation
-     * @throws \OutOfBoundsException when this relation has fewer than `$offset+1` tuples
+     * @throws \OutOfBoundsException when this relation has fewer than <tt>$offset+1</tt> tuples, or fewer than
+     *                                 <tt>-$tupleOffset</tt> tuples if <tt>$tupleOffset</tt> is negative
      */
     function tuple($offset = 0);
 
@@ -298,9 +300,11 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @param int|string|ITupleEvaluator|\Closure $colOffsetOrNameOrEvaluator
      *                                  Specification of column from which to get the value. See {@link col()} for more
      *                                    details on the column specification.
-     * @param int $tupleOffset zero-based offset of the tuple to get
+     * @param int $tupleOffset zero-based offset of the tuple to get;
+     *                         if negative, the <tt>-$tupleOffset</tt>'th tuple from the end is returned
      * @return mixed
-     * @throws \OutOfBoundsException when this relation has fewer than <tt>$tupleOffset+1</tt> tuples
+     * @throws \OutOfBoundsException when this relation has fewer than <tt>$tupleOffset+1</tt> tuples, or fewer than
+     *                                 <tt>-$tupleOffset</tt> tuples if <tt>$tupleOffset</tt> is negative
      * @throws UndefinedColumnException if no column matches the specification
      */
     function value($colOffsetOrNameOrEvaluator = 0, $tupleOffset = 0);

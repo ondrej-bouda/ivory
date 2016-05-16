@@ -71,6 +71,25 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         $this->assertSame($expArray[1], $tuples[1]->toMap());
         $this->assertSame($expArray[2], $tuples[2]->toMap());
 
+        $this->assertSame($expArray[0], $qr->tuple(0)->toMap());
+        $this->assertSame($expArray[0], $qr->tuple(-3)->toMap());
+        $this->assertSame($expArray[1], $qr->tuple(1)->toMap());
+        $this->assertSame($expArray[1], $qr->tuple(-2)->toMap());
+        $this->assertSame($expArray[2], $qr->tuple(2)->toMap());
+        $this->assertSame($expArray[2], $qr->tuple(-1)->toMap());
+        try {
+            $qr->tuple(3);
+            $this->fail();
+        }
+        catch (\OutOfBoundsException $e) {
+        }
+        try {
+            $qr->tuple(-4);
+            $this->fail();
+        }
+        catch (\OutOfBoundsException $e) {
+        }
+
         $this->assertSame($expArray, $qr->toArray());
 
         $this->assertSame('S & M', $qr->value(1)[2]);
@@ -95,6 +114,25 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
             ['M (2)', 'T (1)', 'T (1)'],
             $qr->col($evaluator)->toArray()
         );
+
+        $this->assertSame('Metallica', $qr->col(0)->value(0));
+        $this->assertSame('The Piano Guys', $qr->col(0)->value(1));
+        $this->assertSame('Tommy Emmanuel', $qr->col(0)->value(2));
+        $this->assertSame('Tommy Emmanuel', $qr->col(0)->value(-1));
+        $this->assertSame('The Piano Guys', $qr->col(0)->value(-2));
+        $this->assertSame('Metallica', $qr->col(0)->value(-3));
+        try {
+            $qr->col(0)->value(3);
+            $this->fail();
+        }
+        catch (\OutOfBoundsException $e) {
+        }
+        try {
+            $qr->col(0)->value(-4);
+            $this->fail();
+        }
+        catch (\OutOfBoundsException $e) {
+        }
 
         $this->assertSame(
             [[1 => 'Black Album', 'S & M'], [1 => 'The Piano Guys'], [1 => 'Live One']],

@@ -8,6 +8,7 @@ use Ivory\Relation\Alg\TupleFilterIterator;
 class FilteredRelation extends StreamlinedRelation
 {
     private $decider;
+    private $acceptMap = null;
 
     /**
      * @param IRelation $source
@@ -25,6 +26,43 @@ class FilteredRelation extends StreamlinedRelation
         }
         else {
             throw new \InvalidArgumentException('$decider');
+        }
+    }
+
+    public function populate()
+    {
+        if ($this->acceptMap !== null) {
+            return;
+        }
+
+        $this->acceptMap = [];
+        foreach ($this->source as $i => $tuple) {
+            if ($this->decider->accept($tuple)) {
+                $this->acceptMap[] = $i;
+            };
+        }
+    }
+
+    public function flush()
+    {
+        $this->acceptMap = null;
+    }
+
+    public function count()
+    {
+        $this->populate();
+        return count($this->acceptMap);
+    }
+
+    public function tuple($offset = 0)
+    {
+        $this->populate();
+        $effectiveOffset = ($offset >= 0 ? $offset : $this->count() + $offset);
+        if (isset($this->acceptMap[$effectiveOffset])) {
+            return parent::tuple($this->acceptMap[$effectiveOffset]);
+        }
+        else {
+            throw new \OutOfBoundsException("Tuple offset $offset out of the relation bounds");
         }
     }
 
