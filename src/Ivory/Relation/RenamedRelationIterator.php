@@ -1,14 +1,12 @@
 <?php
 namespace Ivory\Relation;
 
-use Traversable;
-
 class RenamedRelationIterator extends \IteratorIterator
 {
     private $columns;
     private $colNameMap;
 
-    public function __construct(Traversable $iterator, $columns, $colNameMap)
+    public function __construct(\Traversable $iterator, $columns, $colNameMap)
     {
         parent::__construct($iterator);
         $this->columns = $columns;

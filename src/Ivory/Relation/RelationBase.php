@@ -20,7 +20,7 @@ abstract class RelationBase implements \IteratorAggregate, IRelation
 
     public function project($columns)
     {
-        throw new NotImplementedException();
+        return new ProjectedRelation($this, $columns);
     }
 
     public function rename($renamePairs)

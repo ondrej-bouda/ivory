@@ -50,12 +50,14 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * - `$rel->project(['a', 'b'])` narrows `$rel` only to columns `a` and `b`.
      * - `$rel->project(['a' => 'b', 'b' => 'a'])` narrows `$rel` only to columns `a` and `b`, swapping the values
      *   between them.
+     * - `$rel->project([1, 'x' => 0])` puts the second column of `$rel` as the first column in the result, followed by
+     *   column named `x` having values from the first `$rel` column.
      * - `$rel->project(['sum' => function (ITuple $t) { return $t['a'] + $t['b']; }])` computes a relation containing
      *   `sum` as its only column, values of which are the sums from `$rel`'s columns `a` and `b`.
      * - `$rel->project(['p_*' => 'person_*'])` narrows `$rel` only to columns the names of which start with the prefix
      *   `person_`, and shortens the prefix to `p_` in the result relation.
-     * - `$rel->project(['*', 'copy' => 'a')` extends `$rel` with column `copy` containing the same values as column
-     *   `a`; the {@link extend()} method may be used for such a special case.
+     * - `$rel->project(['*', 'copy' => 'a'])` extends `$rel` with column `copy` containing the same values as column
+     *   `a`; the {@link extend()} method may alternatively be used for such a special case.
      * - `$rel->project(['a', '/_.*_/', '\1' => '/(.*)name$/i'])` narrows `$rel` to column `a`, columns the names of
      *   which contain at least two underscores, and columns the names of which end with "name" (case insensitive) -
      *   omitting the "name" suffix.
@@ -68,21 +70,23 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * ## Definition of a single column
      *
      * There are two forms of specifying a single column:
-     * - The short form merely names an existing column from this relation. It is then copied to the result relation.
+     * - The short form merely refers to an existing column from this relation. It is then copied to the result
+     *   relation. A column may either be referred to by its name or zero-based position.
      * - The full form specifies both the array key and value of the `$columns` item - key specifying the name of the
-     *   new column, value specifying its value. The value may either be a plain string, taking the values from an
-     *   existing column of this relation, or a dynamic tuple evaluator, computing the value from the whole tuple. The
-     *   tuple evaluator may either be a {@link ITupleEvaluator} object which gets called its
-     *   {@link ITupleEvaluator::evaluate()} method, or a `Closure` which is given one {@link ITuple} argument holding
-     *   the current tuple and is expected to return the value computed from the tuple for the column.
+     *   new column, value specifying its value. The value may either be a plain string or integer referring to values
+     *   of an existing column of this relation (similarly to the short form mentioned above), or a dynamic tuple
+     *   evaluator, computing the value from the whole tuple. The tuple evaluator may either be a
+     *   {@link ITupleEvaluator} object which gets called its {@link ITupleEvaluator::evaluate()} method, or a `Closure`
+     *   which is given one {@link ITuple} argument holding the current tuple and is expected to return the value
+     *   computed from the tuple for the column.
      *
      * Note the short and full form might collide. In such a case, i.e., if the item key is numeric and the item value
-     * is a string, the short form is preferred.
+     * is a string or integer, the short form is preferred.
      *
      * Note that if there are multiple same-named columns in this relation, the first of them is always used when
-     * referring to the column by its name, and a notice is issued about it.
+     * referring to the column by its name.
      *
-     * ## Defining multiple columns using a macro
+     * ## Defining multiple columns at once using a macro
      *
      * Macros may be used for defining multiple columns at once by matching the column names to a pattern. Each of the
      * original columns matching the pattern is added to the result relation. If both the `$columns` item key and value
@@ -115,6 +119,8 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                  if a <tt>Traversable</tt> object is given, it is guaranteed to be traversed only
      *                                    once
      * @return static a new relation with columns according to the <tt>$columns</tt> specification
+     * @throw UndefinedColumnException if any <tt>$columns</tt> item refers to an undefined column; this also includes
+     *                                   macros - each macro must refer to at least one column
      */
     function project($columns);
 

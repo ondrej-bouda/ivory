@@ -137,12 +137,12 @@ class Tuple implements \Iterator, ITuple
         }
     }
 
-    public function offsetSet($offset, $value)
+    final public function offsetSet($offset, $value)
     {
         throw new ImmutableException();
     }
 
-    public function offsetUnset($offset)
+    final public function offsetUnset($offset)
     {
         throw new ImmutableException();
     }

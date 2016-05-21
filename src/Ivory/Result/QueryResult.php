@@ -4,6 +4,8 @@ namespace Ivory\Result;
 use Ivory\Exception\NotImplementedException;
 use Ivory\Exception\ResultException;
 use Ivory\Relation\Column;
+use Ivory\Relation\FilteredRelation;
+use Ivory\Relation\ProjectedRelation;
 use Ivory\Relation\RelationMacros;
 use Ivory\Relation\RenamedRelation;
 use Ivory\Relation\Tuple;
@@ -109,12 +111,12 @@ class QueryResult extends Result implements IQueryResult
 
 	public function filter($decider)
 	{
-		throw new NotImplementedException();
+		return new FilteredRelation($this, $decider);
 	}
 
 	public function project($columns)
 	{
-		throw new NotImplementedException();
+		return new ProjectedRelation($this, $columns);
 	}
 
 	public function rename($renamePairs)
@@ -159,7 +161,7 @@ class QueryResult extends Result implements IQueryResult
 		}
 
 		$effectiveOffset = ($offset >= 0 ? $offset : $this->numRows + $offset);
-		
+
 		$rawData = pg_fetch_row($this->handler, $effectiveOffset);
 		if ($rawData === false || $rawData === null) {
 			throw new ResultException("Error fetching row at offset $offset");
