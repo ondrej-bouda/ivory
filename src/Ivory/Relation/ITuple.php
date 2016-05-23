@@ -54,6 +54,11 @@ interface ITuple extends \ArrayAccess, \Traversable
     function value($colOffsetOrNameOrEvaluator = 0);
 
     /**
+     * @return IColumn[] list of columns the tuple consists of
+     */
+    function getColumns();
+
+    /**
      * @param string $name column name
      * @return mixed value for the given column, or <tt>null</tt> if no such column is defined above the tuple
      */

@@ -86,6 +86,11 @@ class Tuple implements \Iterator, ITuple
         }
     }
 
+    public function getColumns()
+    {
+        return $this->columns;
+    }
+
     //endregion
 
     //region dynamic properties
