@@ -43,11 +43,6 @@ abstract class RelationBase implements \IteratorAggregate, IRelation
         throw new NotImplementedException();
     }
 
-    public function hash($colOffsetOrNameOrEvaluator, $hasher = null)
-    {
-        throw new NotImplementedException();
-    }
-
     public function uniq($hasher = null, $comparator = null)
     {
         throw new NotImplementedException();

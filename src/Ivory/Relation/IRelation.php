@@ -1,16 +1,15 @@
 <?php
 namespace Ivory\Relation;
 
+use Ivory\Data\Set\ISet;
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Relation\Alg\ITupleComparator;
 use Ivory\Relation\Alg\ITupleEvaluator;
 use Ivory\Relation\Alg\ITupleFilter;
 use Ivory\Relation\Alg\ITupleHasher;
-use Ivory\Relation\Alg\IValueHasher;
 use Ivory\Relation\Mapping\IMappedRelation;
 use Ivory\Relation\Mapping\IMappedTuple;
 use Ivory\Relation\Mapping\IMappedValue;
-use Ivory\Result\IHash;
 
 /**
  * A client-side relation.
@@ -232,24 +231,21 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
     function assoc(...$cols);
 
     /**
-     * Hashes the tuples so that it is fast to tell whether there was at least one tuple of a given hash in this
-     * relation.
+     * Makes a set of values of a column which is able to tell whether there was at least one tuple with the value of
+     * the column equal to a given value.
      *
-     * Note the returned object only answers questions about presence of some data, it is unable to return the original
-     * data, however. Use {@link map()} instead for such a purpose.
+     * Note the returned object stores the values of the given column only, it is unable to return the original tuple,
+     * however. Use {@link map()} instead for such a purpose.
      *
      * @param int|string|ITupleEvaluator|\Closure $colOffsetOrNameOrEvaluator
      *                                  Specification of column the values of which to hash. See {@link col()} for more
      *                                    details on the column specification.
-     * @param IValueHasher|\Closure $hasher hashes the values obtained from <tt>$colOffsetOrNameOrEvaluator</tt>;
-     *                                  an {@link IValueHasher} gets called its {@link IValueHasher::hash()} method;
-     *                                  a <tt>Closure</tt> is given a single value as its only argument and is expected
-     *                                    to return the value hash as a <tt>string</tt> or <tt>int</tt>;
-     *                                  if not given, the default hasher provided by the implementing class is used
-     * @return IHash
+     * @param ISet $set A set to add the values to. If not given, the default type of set is provided by the
+     *                    implementing class is used.
+     * @return ISet <tt>$set</tt>, or a newly created set
      * @throws UndefinedColumnException if no column matches the specification
      */
-    function hash($colOffsetOrNameOrEvaluator, $hasher = null);
+    function toSet($colOffsetOrNameOrEvaluator, ISet $set = null);
 
     /**
      * Reduces the relation only to unique tuples.
@@ -265,19 +261,19 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * {@internal The implementing method should document behaviour of the default tuple hasher and comparator.}
      *
      * @param ITupleHasher|\Closure|int $hasher hashes a tuple;
-     *                                  an {@link ITupleHasher} gets called its {@link ITupleHasher::hash()} method;
-     *                                  a <tt>Closure</tt> is given one {@link ITuple} argument and is expected to
-     *                                    return the tuple hash as a <tt>string</tt> or <tt>int</tt>;
-     *                                  the integer <tt>1</tt> may specially be used for a constant hasher, which
-     *                                    effectively skips hashing and leads to only using <tt>$comparator</tt>;
-     *                                  if not given, the default hasher provided by the implementing class is used
-     * @param ITupleComparator|\Closure $comparator tells whether two tuples are equivalent or not;
-     *                                  an {@link ITupleComparator} gets called its {@link ITupleComparator::equal()}
-     *                                    method;
-     *                                  a <tt>Closure</tt> is given two {@link ITuple} arguments and is expected to
+     *                                  An {@link ITupleHasher} gets called its {@link ITupleHasher::hash()} method.
+     *                                  A <tt>Closure</tt> is given one {@link ITuple} argument and is expected to
+     *                                    return the tuple hash as a <tt>string</tt> or <tt>int</tt>.
+     *                                  The integer <tt>1</tt> may specially be used for a constant hasher, which
+     *                                    effectively skips hashing and leads to only using <tt>$comparator</tt>.
+     *                                  If not given, the default hasher provided by the implementing class is used.
+     * @param ITupleComparator|\Closure $comparator Tells whether two tuples are equivalent or not.
+     *                                  An {@link ITupleComparator} gets called its {@link ITupleComparator::equal()}
+     *                                    method.
+     *                                  A <tt>Closure</tt> is given two {@link ITuple} arguments and is expected to
      *                                    return <tt>true</tt> if it considers the tuples equivalent, or <tt>false</tt>
-     *                                    otherwise;
-     *                                  if not given, the default comparator provided by the implementing class is used
+     *                                    otherwise.
+     *                                  If not given, the default comparator provided by the implementing class is used.
      * @return static
      */
     function uniq($hasher = null, $comparator = null);

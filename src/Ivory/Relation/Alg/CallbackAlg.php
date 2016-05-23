@@ -6,7 +6,7 @@ abstract class CallbackAlg
     private $callback;
 
     /**
-     * @param \Closure $callback
+     * @param callable $callback
      */
     public function __construct($callback)
     {

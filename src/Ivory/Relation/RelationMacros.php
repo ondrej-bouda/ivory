@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Relation;
 
+use Ivory\Data\Set\DictionarySet;
+use Ivory\Data\Set\ISet;
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Relation\Alg\ITupleEvaluator;
 
@@ -17,6 +19,20 @@ trait RelationMacros
      */
     abstract public function tuple($offset = 0);
 
+    abstract function col($offsetOrNameOrEvaluator);
+
+    public function toSet($colOffsetOrNameOrEvaluator, ISet $set = null)
+    {
+        if ($set === null) {
+            $set = new DictionarySet();
+        }
+
+        foreach ($this->col($colOffsetOrNameOrEvaluator) as $value) {
+            $set->add($value);
+        }
+
+        return $set;
+    }
 
     final public function extend($extraColumns)
     {
@@ -71,5 +87,4 @@ trait RelationMacros
             throw new \InvalidArgumentException('$offsetOrNameOrEvaluator');
         }
     }
-
 }
