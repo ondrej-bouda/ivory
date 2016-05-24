@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Relation;
 
+use Ivory\Data\Set\CustomSet;
+
 class RelationTest extends \Ivory\IvoryTestCase
 {
     public function testChaining()
@@ -21,5 +23,21 @@ class RelationTest extends \Ivory\IvoryTestCase
                 }])
                 ->toArray()
         );
+    }
+
+    public function testToSet()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn, 'SELECT id, name, is_active FROM artist ORDER BY name, id');
+
+        $set = $qr->toSet('name');
+        $this->assertTrue($set->contains('B-Side Band'));
+        $this->assertFalse($set->contains('b-side band'));
+        $this->assertFalse($set->contains('b-SIDE band'));
+
+        $set = $qr->toSet('name', new CustomSet('strtolower'));
+        $this->assertTrue($set->contains('B-Side Band'));
+        $this->assertTrue($set->contains('b-side band'));
+        $this->assertTrue($set->contains('b-SIDE band'));
     }
 }
