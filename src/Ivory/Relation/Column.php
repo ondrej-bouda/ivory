@@ -55,11 +55,7 @@ class Column implements \IteratorAggregate, IColumn
 
     public function toArray()
     {
-        $result = [];
-        foreach ($this as $value) {
-            $result[] = $value;
-        }
-        return $result;
+        return iterator_to_array($this, false);
     }
 
     public function value($valueOffset = 0)
