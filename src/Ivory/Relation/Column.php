@@ -45,7 +45,7 @@ class Column implements \IteratorAggregate, IColumn
 
     public function filter($decider)
     {
-        throw new NotImplementedException();
+        return new FilteredColumn($this, $decider);
     }
 
     public function uniq($hasher = null, $comparator = null)
