@@ -56,7 +56,7 @@ interface IColumn extends \Traversable, \Countable, ICachingDataProcessor
 	 * any of the previous values, `$comparator` is used for deciding the equivalence precisely.
 	 *
 	 * Note the `$hasher` and `$comparator` must be consistent, i.e., values equal according to the comparator must be
-	 * hashed to the same hash.
+	 * hashed to the same key.
 	 *
 	 * {@internal The implementing method should document behaviour of the default value hasher and comparator.}
 	 *

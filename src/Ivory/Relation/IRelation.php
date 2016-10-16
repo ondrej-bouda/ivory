@@ -15,7 +15,8 @@ use Ivory\Relation\Mapping\IMappedValue;
  * A client-side relation.
  *
  * A relation is essentially a `Countable` `Traversable` list of {@link ITuple}s, each conforming to the same scheme -
- * the relation columns.
+ * the relation columns. Note the relation is intentionally not `ArrayAccess`ible - use the {@link IRelation::tuple()}
+ * method to get to specific rows.
  *
  * The relation itself might not actually hold the data (and for performance reasons, it usually will not). Instead, it
  * may be derived from another relation. From this point of view, a relation is an {@link ICachingDataProcessor}.
@@ -176,7 +177,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
     /**
      * Maps the tuples of this relation by one or more dimensions of keys.
      *
-     * The relation gets enclosed in one or more {@link ITupleMapping} boxes, each for one dimension of mapping. The
+     * The relation gets enclosed in one or more {@link IMappedTuple} boxes, each for one dimension of mapping. The
      * innermost box maps individual {@link ITuple}s.
      *
      * Note that the last level of mapping (i.e., mapping according to the last argument) leads to elimination of
@@ -191,7 +192,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @return IMappedTuple
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
-    function map(...$mappingCols);
+    function map(...$mappingCols); // TODO: test & implement
 
     /**
      * Divides this relation to several relations mapped by one or more keys.
@@ -210,7 +211,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @return IMappedRelation
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
-    function multimap(...$mappingCols);
+    function multimap(...$mappingCols); // TODO: test & implement
 
     /**
      * Associates values of one column by (combinations of) values of one or more columns.
@@ -228,7 +229,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @return IMappedValue
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
-    function assoc(...$cols);
+    function assoc(...$cols); // TODO: test & implement
 
     /**
      * Makes a set of values of a column which is able to tell whether there was at least one tuple with the value of
@@ -245,7 +246,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @return ISet <tt>$set</tt>, or a newly created set
      * @throws UndefinedColumnException if no column matches the specification
      */
-    function toSet($colOffsetOrNameOrEvaluator, ISet $set = null);
+    function toSet($colOffsetOrNameOrEvaluator, ISet $set = null); // TODO: test & implement
 
     /**
      * Reduces the relation only to unique tuples.
@@ -256,7 +257,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * as any of the previous tuples, `$comparator` is used for deciding the equivalence precisely.
      *
      * Note the `$hasher` and `$comparator` must be consistent, i.e., tuples equal according to the comparator must be
-     * hashed to the same value.
+     * hashed to the same key.
      *
      * {@internal The implementing method should document behaviour of the default tuple hasher and comparator.}
      *
@@ -276,7 +277,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                  If not given, the default comparator provided by the implementing class is used.
      * @return static
      */
-    function uniq($hasher = null, $comparator = null);
+    function uniq($hasher = null, $comparator = null); // TODO: test & implement
 
     /**
      * @return array[] list of associative arrays, each representing one tuple of this relation (in the original order);

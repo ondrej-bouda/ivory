@@ -4,6 +4,7 @@ namespace Ivory\Relation;
 use Ivory\Exception\ImmutableException;
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Relation\Alg\ITupleEvaluator;
+use Ivory\Utils\ValueUtils;
 
 /**
  * {@inheritdoc}
@@ -150,6 +151,18 @@ class Tuple implements \Iterator, ITuple
     final public function offsetUnset($offset)
     {
         throw new ImmutableException();
+    }
+
+    //endregion
+
+    //region IComparable
+
+    public function equals($object)
+    {
+        if (!$object instanceof ITuple) {
+            return false;
+        }
+        return ValueUtils::equals($this->data, $object->toList());
     }
 
     //endregion

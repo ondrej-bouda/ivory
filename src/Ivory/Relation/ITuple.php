@@ -3,6 +3,7 @@ namespace Ivory\Relation;
 
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Relation\Alg\ITupleEvaluator;
+use Ivory\Utils\IComparable;
 
 /**
  * Represents one relation row.
@@ -23,7 +24,7 @@ use Ivory\Relation\Alg\ITupleEvaluator;
  * - when accessing a value by the column name, value of the first column of the given name is returned, the rest being
  *   ignored.
  */
-interface ITuple extends \ArrayAccess, \Traversable
+interface ITuple extends \ArrayAccess, \Traversable, IComparable // TODO: test IComparable
 {
     /**
      * Converts the tuple to an associative array of column names to the corresponding values held by this tuple.

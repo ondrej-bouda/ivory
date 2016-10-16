@@ -6,6 +6,7 @@ use Ivory\Exception\UnsupportedException;
 use Ivory\Type\CompositeType;
 use Ivory\Type\NamedCompositeType;
 use Ivory\Utils\IComparable;
+use Ivory\Utils\ValueUtils;
 
 /**
  * A value of a composite type.
@@ -96,26 +97,8 @@ class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
 		if ($this->type !== $other->type) {
 			return false;
 		}
-		if (count($this->values) != count($other->values)) {
-			return false;
-		}
 
-		foreach ($this->values as $i => $v) {
-			if (!isset($other->values[$i])) {
-				return false;
-			}
-			if ($v instanceof IComparable) {
-				$eq = $v->equals($other->values[$i]);
-			}
-			else {
-				$eq = ($v == $other->values[$i]);
-			}
-			if (!$eq) {
-				return false;
-			}
-		}
-
-		return true;
+		return ValueUtils::equals($this->values, $other->values);
 	}
 
 	/**
