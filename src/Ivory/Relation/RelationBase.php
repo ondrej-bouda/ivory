@@ -2,6 +2,7 @@
 namespace Ivory\Relation;
 
 use Ivory\Exception\NotImplementedException;
+use Ivory\Relation\Mapping\ArrayTupleMap;
 
 abstract class RelationBase implements \IteratorAggregate, IRelation
 {
@@ -30,7 +31,41 @@ abstract class RelationBase implements \IteratorAggregate, IRelation
 
     public function map(...$mappingCols)
     {
-        throw new NotImplementedException();
+        if (!$mappingCols) {
+            throw new \InvalidArgumentException('no $mappingCols');
+        }
+
+        $multiDimCols = array_slice($mappingCols, 0, -1);
+        $lastCol = $mappingCols[count($mappingCols) - 1];
+
+        // FIXME: depending on the data type of the key, either use an array-based implementation, or an object hashing implementation
+        $map = new ArrayTupleMap();
+        foreach ($this as $tuple) {
+            /** @var ITuple $tuple */
+            $m = $map;
+            foreach ($multiDimCols as $col) {
+                $key = $tuple->value($col);
+                if (!isset($m[$key])) {
+                    $m->put($key, new ArrayTupleMap());
+                }
+                $m = $m[$key];
+            }
+
+            $key = $tuple->value($lastCol);
+            $added = $m->putIfNotExists($key, $tuple);
+
+            if (!$added) {
+                $keys = [];
+                foreach ($multiDimCols as $col) {
+                    $keys[] = $tuple->value($col);
+                }
+                $keys[] = $tuple->value($lastCol);
+                $keyDesc = implode(', ', $keys);
+                trigger_error("Duplicate entry under key ($keyDesc). Skipping.", E_USER_WARNING);
+            }
+        }
+
+        return $map;
     }
 
     public function multimap(...$mappingCols)

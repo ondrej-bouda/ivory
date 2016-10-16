@@ -11,7 +11,7 @@ use Ivory\Utils\ValueUtils;
  *
  * This implementation is immutable, i.e., once constructed, the tuple values cannot be changed. Thus, both `__set()`
  * and `ArrayAccess` write operations (namely {@link \ArrayAccess::offsetSet()} and {@link \ArrayAccess::offsetUnset()})
- * throw an {@link \Ivory\Exception\UnsupportedException}.
+ * throw an {@link \Ivory\Exception\ImmutableException}.
  */
 class Tuple implements \Iterator, ITuple
 {

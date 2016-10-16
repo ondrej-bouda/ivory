@@ -8,7 +8,7 @@ use Ivory\Relation\Alg\ITupleEvaluator;
 use Ivory\Relation\Alg\ITupleFilter;
 use Ivory\Relation\Alg\ITupleHasher;
 use Ivory\Relation\Mapping\IMappedRelation;
-use Ivory\Relation\Mapping\IMappedTuple;
+use Ivory\Relation\Mapping\ITupleMap;
 use Ivory\Relation\Mapping\IMappedValue;
 
 /**
@@ -177,7 +177,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
     /**
      * Maps the tuples of this relation by one or more dimensions of keys.
      *
-     * The relation gets enclosed in one or more {@link IMappedTuple} boxes, each for one dimension of mapping. The
+     * The relation gets enclosed in one or more {@link ITupleMap} boxes, each for one dimension of mapping. The
      * innermost box maps individual {@link ITuple}s.
      *
      * Note that the last level of mapping (i.e., mapping according to the last argument) leads to elimination of
@@ -185,14 +185,14 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * happens, only the first tuple is considered, the other conflicting tuples are ignored, and a warning is issued.
      * Use {@link multimap()} to get a relation (i.e., *list* of tuples) instead of a single tuple.
      *
-     * @param int|string|ITupleEvaluator|\Closure $mappingCols
+     * @param (int|string|ITupleEvaluator|\Closure)[] ...$mappingCols
      *                                  The mapping specification - one or more columns, each specifying values for one
      *                                    dimension of mapping.
      *                                  Specification of each mapping column is the same as for {@link col()}.
-     * @return IMappedTuple
+     * @return ITupleMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
-    function map(...$mappingCols); // TODO: test & implement
+    function map(...$mappingCols);
 
     /**
      * Divides this relation to several relations mapped by one or more keys.
@@ -204,7 +204,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * called on the returned box are redirected to the innermost box which holds the original relation being mapped -
      * the operation is called on it and the result is stored to the innermost box instead of the original relation.
      *
-     * @param int|string|ITupleEvaluator|\Closure $mappingCols
+     * @param (int|string|ITupleEvaluator|\Closure)[] ...$mappingCols
      *                                  The mapping specification - one or more columns, each specifying values for one
      *                                    dimension of mapping.
      *                                  Specification of each mapping column is the same as for {@link col()}.
@@ -220,7 +220,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * argument and `$lastArg` is the last argument of this method call. See {@link multimap()} and {@link value()} for
      * complete specification.
      *
-     * @param int|string|ITupleEvaluator|\Closure $cols
+     * @param (int|string|ITupleEvaluator|\Closure)[] ...$cols
      *                                  The association specification. The last column specifies the associated values,
      *                                    whereas the other columns specify the mapping.
      *                                  If not specified, all the relation columns are consecutively used as though they
