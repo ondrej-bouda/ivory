@@ -6,8 +6,8 @@ use Ivory\Result\SqlState;
 /**
  * Exception thrown upon errors on querying the database.
  *
- * The exception message and code contain the primary error message and the SQLSTATE code, respectively. To recognize
- * SQLSTATE codes, {@link \Ivory\Result\SqlState} constants might be helpful. Alternatively,
+ * The exception message contains the primary error message. To get the SQL State code, use {@link getSqlStateCode()}
+ * method. To recognize SQLSTATE codes, {@link \Ivory\Result\SqlState} constants might be helpful. Alternatively,
  * {@link StatementException::getSqlState()} may be used to get an {@link SqlState} object.
  *
  * Besides the primary message and SQLSTATE code, the exception holds the error message detail, error hint, and all the
@@ -33,13 +33,13 @@ class StatementException extends \RuntimeException
 	public function __construct($resultHandler, $query)
 	{
 		$message = self::inferMessage($resultHandler);
-		$code = pg_result_error_field($resultHandler, PGSQL_DIAG_SQLSTATE);
 
-		parent::__construct($message, $code);
+		parent::__construct($message); // NOTE: SQL state code (string) cannot be used as the exception code (int)
 
 		$this->query = $query;
 
 		$fields = [
+            PGSQL_DIAG_SQLSTATE,
 			PGSQL_DIAG_SEVERITY,
 			PGSQL_DIAG_MESSAGE_DETAIL,
 			PGSQL_DIAG_MESSAGE_HINT,
@@ -74,9 +74,14 @@ class StatementException extends \RuntimeException
 		}
 	}
 
-	final public function getSqlState()
+    final public function getSqlStateCode()
+    {
+        return $this->errorFields[PGSQL_DIAG_SQLSTATE];
+    }
+
+    final public function getSqlState()
 	{
-		return SqlState::fromCode($this->getCode());
+		return SqlState::fromCode($this->getSqlStateCode());
 	}
 
 	/**
