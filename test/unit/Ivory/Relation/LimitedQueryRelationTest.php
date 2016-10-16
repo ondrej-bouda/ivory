@@ -92,6 +92,35 @@ class LimitedRelationTest extends \Ivory\IvoryTestCase
         $this->assertSame(2, $i);
     }
 
+    public function testLimitTwoOffsetOneNotEnough()
+    {
+        $conn = $this->getIvoryConnection();
+        $qr = new QueryRelation($conn,
+            'VALUES (1,2), (3,4)'
+        );
+        $limited = $qr->limit(2, 1);
+
+        $this->assertSame(1, $limited->count());
+
+        $this->assertSame([3, 4], $limited->tuple(0)->toList());
+        try {
+            $limited->tuple(1);
+            $this->fail();
+        }
+        catch (\OutOfBoundsException $e) {
+        }
+
+        $i = 0;
+        $expected = [[3, 4]];
+        foreach ($limited as $k => $tuple) {
+            /** @var ITuple $tuple */
+            $this->assertSame($i, $k, "tuple $i");
+            $this->assertSame($expected[$i], $tuple->toList(), "tuple $i");
+            $i++;
+        }
+        $this->assertSame(1, $i);
+    }
+
     public function testOffsetOneUnlimited()
     {
         $conn = $this->getIvoryConnection();
