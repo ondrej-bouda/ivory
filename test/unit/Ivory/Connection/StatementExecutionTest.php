@@ -17,7 +17,6 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         }
         catch (StatementException $e) {
             $this->assertSame(SqlState::INVALID_ARGUMENT_FOR_LOGARITHM, $e->getSqlStateCode());
-            $this->assertSame('ERROR', $e->getSeverity());
         }
     }
 }
