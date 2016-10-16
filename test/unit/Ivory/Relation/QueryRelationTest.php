@@ -18,23 +18,18 @@ use Ivory\Value\TxIdSnapshot;
 
 class QueryRelationTest extends \Ivory\IvoryTestCase
 {
-    public function testDummy()
-    {
-        $this->assertEquals(4, $this->getConnection()->getRowCount('artist'));
-    }
-
     public function testBasic()
     {
         $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn, 'SELECT id, name, is_active FROM artist ORDER BY name, id');
+        $qr = new QueryRelation($conn, 'SELECT id, name, is_active FROM artist WHERE id IN (1,2,3,4) ORDER BY name, id');
         /** @var ITuple[] $tuples */
         $tuples = [];
         foreach ($qr as $tuple) {
             $tuples[] = $tuple;
         }
         $expArray = [
-            ['id' => 4, 'name' => 'B-Side Band', 'is_active' => null],
             ['id' => 2, 'name' => 'Metallica', 'is_active' => false],
+            ['id' => 4, 'name' => 'Robbie Williams', 'is_active' => null],
             ['id' => 1, 'name' => 'The Piano Guys', 'is_active' => true],
             ['id' => 3, 'name' => 'Tommy Emmanuel', 'is_active' => null],
         ];
@@ -48,6 +43,7 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
                   FROM artist
                        JOIN album_artist ON album_artist.artist_id = artist.id
                        JOIN album ON album.id = album_artist.album_id
+                  WHERE artist.id IN (1,2,3)
                   GROUP BY artist.id
                   ORDER BY artist.name';
         $conn = $this->getIvoryConnection();
@@ -148,6 +144,7 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
              FROM artist
                   JOIN album_artist ON album_artist.artist_id = artist.id
                   JOIN album ON album.id = album_artist.album_id
+             WHERE artist.id IN (1,2,3)
              GROUP BY artist.id
              ORDER BY artist.name'
         );
@@ -212,6 +209,7 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
                   LEFT JOIN (album_artist
                              JOIN album ON album.id = album_artist.album_id
                             ) ON album_artist.artist_id = artist.id
+             WHERE artist.id IN (1,2,3,4)
              GROUP BY artist.id
              ORDER BY artist.name"
         );
@@ -224,10 +222,10 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
         // TODO: refactor to the following code after implementing assoc()
 //        $map = $qr->assoc('artist_name', 'active_years');
 
-        $this->assertSame(['B-Side Band', 'Metallica', 'The Piano Guys', 'Tommy Emmanuel'], array_keys($map));
+        $this->assertSame(['Metallica', 'Robbie Williams', 'The Piano Guys', 'Tommy Emmanuel'], array_keys($map));
 
-        $this->assertTrue($map['B-Side Band']->isEmpty());
         $this->assertSame([1991, 1999], $map['Metallica']->toBounds('[]'));
+        $this->assertTrue($map['Robbie Williams']->isEmpty());
         $this->assertSame([2012, 2012], $map['The Piano Guys']->toBounds('[]'));
         $this->assertSame([2005, 2005], $map['Tommy Emmanuel']->toBounds('[]'));
     }
@@ -298,6 +296,7 @@ class QueryRelationTest extends \Ivory\IvoryTestCase
              FROM artist
                   JOIN album_artist aa ON aa.artist_id = artist.id
                   JOIN album ON album.id = aa.album_id
+             WHERE artist.id IN (1,2,3,4)
              GROUP BY artist.id
              ORDER BY artist.name"
         );
