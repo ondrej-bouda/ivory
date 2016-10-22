@@ -177,6 +177,9 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
     /**
      * Associates values of one column by (combinations of) values of one or more columns.
      *
+     * The association is specified by two or more columns. The last column specifies the associated values, whereas all
+     * the preceding columns specify the mapping. Specification of each column is the same as for {@link col()}.
+     *
      * E.g., if this was a relation of three columns, `id`, `firstname`, and `lastname`, then
      * `$this->assoc('id', function (ITuple $t) { return $t['firstname'] . ' ' . $t['lastname']; })`
      * would return an {@link IValueMap} with person IDs as keys and their full names as values.
@@ -186,16 +189,19 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * a situation happens, only the first tuple is considered, the other conflicting tuples are ignored, and a warning
      * is issued.
      *
-     * @param (int|string|ITupleEvaluator|\Closure)[] ...$cols
-     *                                  The association specification. The last column specifies the associated values,
-     *                                    whereas the other columns specify the mapping.
+     * @param int|string|ITupleEvaluator|\Closure $col1 the first column specifying the association
+     * @param int|string|ITupleEvaluator|\Closure $col2 the first column specifying the association
+     * @param (int|string|ITupleEvaluator|\Closure)[] ...$moreCols additional columns specifying the association
      * @return IValueMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
-    function assoc(...$cols);
+    function assoc($col1, $col2, ...$moreCols);
 
     /**
      * Maps the tuples of this relation by one or more dimensions of keys.
+     *
+     * The mapping is specified by one or more columns, each defining values for one dimension of mapping. Specification
+     * of each mapping column is the same as for {@link col()}.
      *
      * The relation gets enclosed in one or more {@link ITupleMap} boxes, each for one dimension of mapping. The
      * innermost box maps individual {@link ITuple}s.
@@ -209,14 +215,14 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * themselves. In fact, `map()` is a specialized {@link assoc()} - it is essentially a shortcut for
      * `$this->assoc(...$mappingCols, function (ITuple $t) { return $t; })`.
      *
-     * @param (int|string|ITupleEvaluator|\Closure)[] ...$mappingCols
-     *                                  The mapping specification - one or more columns, each specifying values for one
-     *                                    dimension of mapping.
-     *                                  Specification of each mapping column is the same as for {@link col()}.
+     * @param int|string|ITupleEvaluator|\Closure $mappingCol
+     *                                  the first column specifying the mapping
+     * @param (int|string|ITupleEvaluator|\Closure)[] ...$moreMappingCols
+     *                                  optional additional columns specifying the mapping
      * @return ITupleMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
-    function map(...$mappingCols);
+    function map($mappingCol, ...$moreMappingCols);
 
     /**
      * Divides this relation to several relations mapped by one or more keys.

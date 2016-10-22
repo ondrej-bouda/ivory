@@ -91,35 +91,25 @@ trait RelationMacros
         }
     }
 
-    public function assoc(...$cols)
+    public function assoc($col1, $col2, ...$moreCols)
     {
-        if (count($cols) < 2) {
-            // TODO: consider specifying the first two arguments explicitly in IRelation - then, even IDE may check that no or only one argument is given
-            throw new \InvalidArgumentException('at least 2 arguments are expected');
-        }
-
         return $this->assocImpl(
             function () {
                 // FIXME: depending on the data type of the keys, either use an array-based implementation, or an object hashing implementation
                 return new ArrayValueMap();
             },
-            true, $cols
+            true, array_merge([$col1, $col2], $moreCols)
         );
     }
 
-    public function map(...$mappingCols)
+    public function map($mappingCol, ...$moreMappingCols)
     {
-        if (!$mappingCols) {
-            // TODO: consider specifying at least one argument explicitly in IRelation - then, even IDE may check that no argument is given
-            throw new \InvalidArgumentException('no $mappingCols');
-        }
-
         return $this->assocImpl(
             function () {
                 // FIXME: depending on the data type of the keys, either use an array-based implementation, or an object hashing implementation
                 return new ArrayTupleMap();
             },
-            false, $mappingCols
+            false, array_merge([$mappingCol], $moreMappingCols)
         );
     }
 
