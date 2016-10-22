@@ -2,6 +2,7 @@
 namespace Ivory\Relation;
 
 use Ivory\Data\Map\ArrayValueMap;
+use Ivory\Data\Map\IWritableValueMap;
 use Ivory\Data\Set\DictionarySet;
 use Ivory\Data\Set\ISet;
 use Ivory\Exception\UndefinedColumnException;
@@ -97,42 +98,13 @@ trait RelationMacros
             throw new \InvalidArgumentException('at least 2 arguments are expected');
         }
 
-        $multiDimKeyCols = array_slice($cols, 0, -2);
-        $lastKeyCol = $cols[count($cols) - 2];
-        $valueCol = $cols[count($cols) - 1];
-
-        $map = new ArrayValueMap();
-        $emptyMap = new ArrayValueMap();
-        foreach ($this as $tuple) { /** @var ITuple $tuple */
-            $m = $map;
-            foreach ($multiDimKeyCols as $col) {
-                $key = $tuple->value($col);
-                $added = $m->putIfNotExists($key, $emptyMap);
-                if ($added) {
-                    $emptyMap = new ArrayValueMap(); // prepare a new copy for the following iterations
-                }
-                $m = $m[$key];
-            }
-
-            $key = $tuple->value($lastKeyCol);
-            $val = $tuple->value($valueCol);
-            $added = $m->putIfNotExists($key, $val);
-
-            if (!$added) {
-                $keys = [];
-                foreach ($multiDimKeyCols as $col) {
-                    $keys[] = $tuple->value($col);
-                }
-                $keys[] = $tuple->value($lastKeyCol);
-                $keyDesc = implode(', ', $keys);
-                trigger_error(
-                    "Duplicate entry under key ($keyDesc). Skipping. Consider using multimap() instead.",
-                    E_USER_WARNING
-                );
-            }
-        }
-
-        return $map;
+        return $this->assocImpl(
+            function () {
+                // FIXME: depending on the data type of the keys, either use an array-based implementation, or an object hashing implementation
+                return new ArrayValueMap();
+            },
+            true, $cols
+        );
     }
 
     public function map(...$mappingCols)
@@ -142,32 +114,51 @@ trait RelationMacros
             throw new \InvalidArgumentException('no $mappingCols');
         }
 
-        $multiDimCols = array_slice($mappingCols, 0, -1);
-        $lastCol = $mappingCols[count($mappingCols) - 1];
+        return $this->assocImpl(
+            function () {
+                // FIXME: depending on the data type of the keys, either use an array-based implementation, or an object hashing implementation
+                return new ArrayTupleMap();
+            },
+            false, $mappingCols
+        );
+    }
 
-        // FIXME: depending on the data type of the key, either use an array-based implementation, or an object hashing implementation
-        $map = new ArrayTupleMap();
-        $emptyMap = new ArrayTupleMap();
+    /**
+     * @param \Closure $emptyMapFactory closure creating an empty map for storing the data
+     * @param bool $lastForValues whether the last of <tt>$cols</tt> shall be used for mapped values
+     * @param array $cols
+     * @return IWritableValueMap
+     */
+    private function assocImpl($emptyMapFactory, $lastForValues, $cols)
+    {
+        $multiDimKeyCols = array_slice($cols, 0, -1 - (int)$lastForValues);
+        $lastKeyCol = $cols[count($cols) - 1 - (int)$lastForValues];
+        $valueCol = ($lastForValues ? $cols[count($cols) - 1] : null);
+
+        /** @var IWritableValueMap $map */
+        $map = $emptyMapFactory();
+        $emptyMap = $emptyMapFactory();
         foreach ($this as $tuple) { /** @var ITuple $tuple */
             $m = $map;
-            foreach ($multiDimCols as $col) {
+            foreach ($multiDimKeyCols as $col) {
                 $key = $tuple->value($col);
                 $added = $m->putIfNotExists($key, $emptyMap);
                 if ($added) {
-                    $emptyMap = new ArrayTupleMap();
+                    $emptyMap = $emptyMapFactory(); // prepare a new copy for the following iterations
                 }
                 $m = $m[$key];
             }
 
-            $key = $tuple->value($lastCol);
-            $added = $m->putIfNotExists($key, $tuple);
+            $key = $tuple->value($lastKeyCol);
+            $val = ($lastForValues ? $tuple->value($valueCol) : $tuple);
+            $added = $m->putIfNotExists($key, $val);
 
             if (!$added) {
                 $keys = [];
-                foreach ($multiDimCols as $col) {
+                foreach ($multiDimKeyCols as $col) {
                     $keys[] = $tuple->value($col);
                 }
-                $keys[] = $tuple->value($lastCol);
+                $keys[] = $tuple->value($lastKeyCol);
                 $keyDesc = implode(', ', $keys);
                 trigger_error(
                     "Duplicate entry under key ($keyDesc). Skipping. Consider using multimap() instead.",
