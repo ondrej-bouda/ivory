@@ -24,6 +24,26 @@ class Tuple implements \Iterator, ITuple
     /** @var int iteration position */
     private $pos = 0;
 
+
+    // TODO: allow the user to compose a tuple; it needs a relation to refer to, though
+//    /**
+//     * Creates a tuple from an associative array.
+//     *
+//     * @param array|\Traversable $map
+//     * @return Tuple
+//     */
+//    public static function fromMap($map)
+//    {
+//        $data = [];
+//        $columns = [];
+//        $colNameMap = [];
+//        foreach ($map as $k => $v) {
+//            $data[] = $v;
+//            $columns[] = new Column()
+//            $colNameMap[$k] = count($data) - 1;
+//        }
+//    }
+
     /**
      * @param array $data
      * @param Column[] $columns
@@ -118,7 +138,7 @@ class Tuple implements \Iterator, ITuple
     public function offsetExists($offset)
     {
         if (filter_var($offset, FILTER_VALIDATE_INT) !== false) {
-            return isset($this->data[$offset]);
+            return array_key_exists($offset, $this->data);
         }
         else {
             return isset($this->colNameMap[$offset]);
@@ -134,7 +154,7 @@ class Tuple implements \Iterator, ITuple
             $key = $this->colNameMap[$offset];
         }
 
-        if (isset($this->data[$key])) {
+        if (array_key_exists($key, $this->data)) {
             return $this->data[$key];
         }
         else {

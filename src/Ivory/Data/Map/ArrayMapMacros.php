@@ -1,27 +1,26 @@
 <?php
-namespace Ivory\Relation\Mapping;
+namespace Ivory\Data\Map;
 
-/**
- * {@inheritdoc}
- *
- * This implementation uses a plain PHP array to store the mapping. Thus, it is limited to only store string or integer
- * keys.
- */
-class ArrayTupleMap implements \IteratorAggregate, IWritableTupleMap
+// Until PHP has generics, there will have to be separate interfaces for maps storing different types of objects.
+trait ArrayMapMacros
 {
     private $map = [];
 
-    //region ITupleMap
+
+    abstract protected function isNestedMap($entry);
+
+    //region map operations
 
     public function get(...$key)
     {
         $data = $this;
+        $className = __CLASS__;
         foreach ($key as $i => $k) {
-            if (!$data instanceof ITupleMap) {
+            if (!$this->isNestedMap($data)) {
                 throw new \InvalidArgumentException("Invalid key `$k`");
             }
-            if (!$data instanceof ArrayTupleMap) {
-                return $data->maybe(...array_slice($key, $i));
+            if (!$data instanceof $className) {
+                return $data->get(...array_slice($key, $i));
             }
             if (!isset($data->map[$k])) {
                 throw new \OutOfBoundsException($k);
@@ -34,11 +33,12 @@ class ArrayTupleMap implements \IteratorAggregate, IWritableTupleMap
     public function maybe(...$key)
     {
         $data = $this;
+        $className = __CLASS__;
         foreach ($key as $i => $k) {
-            if (!$data instanceof ITupleMap) {
+            if (!$this->isNestedMap($data)) {
                 throw new \InvalidArgumentException("Invalid key `$k`");
             }
-            if (!$data instanceof ArrayTupleMap) {
+            if (!$data instanceof $className) {
                 return $data->maybe(...array_slice($key, $i));
             }
             if (!isset($data->map[$k])) {
@@ -79,7 +79,7 @@ class ArrayTupleMap implements \IteratorAggregate, IWritableTupleMap
         }
         else {
             $inner = $this->map[$k];
-            if (!$inner instanceof ITupleMap) {
+            if (!$this->isNestedMap($inner)) {
                 throw new \InvalidArgumentException("Invalid key `$k`");
             }
             return $inner->remove(...array_slice($key, 1));

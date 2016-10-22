@@ -129,17 +129,7 @@ class QueryResult extends Result implements IQueryResult
 		return $this->_colImpl($offsetOrNameOrEvaluator, $this->columns, $this->colNameMap, $this);
 	}
 
-	public function map(...$mappingCols)
-	{
-		throw new NotImplementedException();
-	}
-
 	public function multimap(...$mappingCols)
-	{
-		throw new NotImplementedException();
-	}
-
-	public function assoc(...$cols)
 	{
 		throw new NotImplementedException();
 	}

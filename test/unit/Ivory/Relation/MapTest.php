@@ -1,9 +1,10 @@
 <?php
 namespace Ivory\Relation;
 
-use Ivory\Relation\Mapping\ITupleMap;
+use Ivory\Data\Map\ITupleMap;
+use Ivory\Exception\UndefinedColumnException;
 
-class TupleMapTest extends \Ivory\IvoryTestCase
+class MapTest extends \Ivory\IvoryTestCase
 {
     /** @var IRelation relation with all tuples */
     private $fullRel;
@@ -210,5 +211,11 @@ class TupleMapTest extends \Ivory\IvoryTestCase
             }
             $i++;
         }
+    }
+
+    public function testUndefinedColumn()
+    {
+        $this->expectException(UndefinedColumnException::class);
+        $this->artistRel->map('nonexistent');
     }
 }

@@ -8,8 +8,8 @@ use Ivory\Relation\Alg\ITupleEvaluator;
 use Ivory\Relation\Alg\ITupleFilter;
 use Ivory\Relation\Alg\ITupleHasher;
 use Ivory\Relation\Mapping\IMappedRelation;
-use Ivory\Relation\Mapping\ITupleMap;
-use Ivory\Relation\Mapping\IMappedValue;
+use Ivory\Data\Map\ITupleMap;
+use Ivory\Data\Map\IValueMap;
 
 /**
  * A client-side relation.
@@ -185,6 +185,10 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * happens, only the first tuple is considered, the other conflicting tuples are ignored, and a warning is issued.
      * Use {@link multimap()} to get a relation (i.e., *list* of tuples) instead of a single tuple.
      *
+     * See also {@link assoc()} to get just single values, or custom values computed from tuples, instead of tuples
+     * themselves. In fact, `map()` is a specialized {@link assoc()} - it is essentially a shortcut for
+     * `$this->assoc(...$mappingCols, function (ITuple $t) { return $t; })`.
+     *
      * @param (int|string|ITupleEvaluator|\Closure)[] ...$mappingCols
      *                                  The mapping specification - one or more columns, each specifying values for one
      *                                    dimension of mapping.
@@ -216,20 +220,28 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
     /**
      * Associates values of one column by (combinations of) values of one or more columns.
      *
-     * This is a mere shorthand for `$rel->multimap($leadArgs)->value($lastArg)`, where `$leadArgs` are all but the last
-     * argument and `$lastArg` is the last argument of this method call. See {@link multimap()} and {@link value()} for
-     * complete specification.
+     * E.g., if this was a relation of three columns, `id`, `firstname`, and `lastname`, then
+     * `$this->assoc('id', function (ITuple $t) { return $t['firstname'] . ' ' . $t['lastname']; })`
+     * would return an {@link IValueMap} with person IDs as keys and their full names as values.
+     *
+     * Note that the last level of association (i.e., mapping according to the last but one argument) leads to
+     * elimination of duplicates, as at most one value may be associated by the combination of the mapping keys. If such
+     * a situation happens, only the first tuple is considered, the other conflicting tuples are ignored, and a warning
+     * is issued.
+     *
+     * // FIXME: do not support implicit arguments - it only makes sense for the typical $rel->assoc(0, 1) case; introduce a pairs($a, $b) shortcut instead
+     * // TODO: move in the code above map()
      *
      * @param (int|string|ITupleEvaluator|\Closure)[] ...$cols
      *                                  The association specification. The last column specifies the associated values,
      *                                    whereas the other columns specify the mapping.
      *                                  If not specified, all the relation columns are consecutively used as though they
      *                                    were arguments to this method call. E.g., <tt>$rel->assoc()</tt> on a relation
-     *                                    consisting of 3 columns is equivalent to <tt>$rel->assoc(0, 1, 2)</tt>.
-     * @return IMappedValue
+     *                                    consisting of 2 columns is equivalent to <tt>$rel->assoc(0, 1)</tt>.
+     * @return IValueMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
-    function assoc(...$cols); // TODO: test & implement
+    function assoc(...$cols);
 
     /**
      * Makes a set of values of a column which is able to tell whether there was at least one tuple with the value of

@@ -1,5 +1,5 @@
 <?php
-namespace Ivory\Relation\Mapping;
+namespace Ivory\Data\Map;
 
 use Ivory\Relation\ITuple;
 
