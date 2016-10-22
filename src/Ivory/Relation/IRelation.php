@@ -186,14 +186,9 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * a situation happens, only the first tuple is considered, the other conflicting tuples are ignored, and a warning
      * is issued.
      *
-     * // FIXME: do not support implicit arguments - it only makes sense for the typical $rel->assoc(0, 1) case; introduce a pairs($a, $b) shortcut instead
-     *
      * @param (int|string|ITupleEvaluator|\Closure)[] ...$cols
      *                                  The association specification. The last column specifies the associated values,
      *                                    whereas the other columns specify the mapping.
-     *                                  If not specified, all the relation columns are consecutively used as though they
-     *                                    were arguments to this method call. E.g., <tt>$rel->assoc()</tt> on a relation
-     *                                    consisting of 2 columns is equivalent to <tt>$rel->assoc(0, 1)</tt>.
      * @return IValueMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
