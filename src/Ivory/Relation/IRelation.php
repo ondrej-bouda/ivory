@@ -175,6 +175,31 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
     function col($offsetOrNameOrEvaluator);
 
     /**
+     * Associates values of one column by (combinations of) values of one or more columns.
+     *
+     * E.g., if this was a relation of three columns, `id`, `firstname`, and `lastname`, then
+     * `$this->assoc('id', function (ITuple $t) { return $t['firstname'] . ' ' . $t['lastname']; })`
+     * would return an {@link IValueMap} with person IDs as keys and their full names as values.
+     *
+     * Note that the last level of association (i.e., mapping according to the last but one argument) leads to
+     * elimination of duplicates, as at most one value may be associated by the combination of the mapping keys. If such
+     * a situation happens, only the first tuple is considered, the other conflicting tuples are ignored, and a warning
+     * is issued.
+     *
+     * // FIXME: do not support implicit arguments - it only makes sense for the typical $rel->assoc(0, 1) case; introduce a pairs($a, $b) shortcut instead
+     *
+     * @param (int|string|ITupleEvaluator|\Closure)[] ...$cols
+     *                                  The association specification. The last column specifies the associated values,
+     *                                    whereas the other columns specify the mapping.
+     *                                  If not specified, all the relation columns are consecutively used as though they
+     *                                    were arguments to this method call. E.g., <tt>$rel->assoc()</tt> on a relation
+     *                                    consisting of 2 columns is equivalent to <tt>$rel->assoc(0, 1)</tt>.
+     * @return IValueMap
+     * @throws UndefinedColumnException if there is no column matching the specification of an argument
+     */
+    function assoc(...$cols);
+
+    /**
      * Maps the tuples of this relation by one or more dimensions of keys.
      *
      * The relation gets enclosed in one or more {@link ITupleMap} boxes, each for one dimension of mapping. The
@@ -216,32 +241,6 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
     function multimap(...$mappingCols); // TODO: test & implement
-
-    /**
-     * Associates values of one column by (combinations of) values of one or more columns.
-     *
-     * E.g., if this was a relation of three columns, `id`, `firstname`, and `lastname`, then
-     * `$this->assoc('id', function (ITuple $t) { return $t['firstname'] . ' ' . $t['lastname']; })`
-     * would return an {@link IValueMap} with person IDs as keys and their full names as values.
-     *
-     * Note that the last level of association (i.e., mapping according to the last but one argument) leads to
-     * elimination of duplicates, as at most one value may be associated by the combination of the mapping keys. If such
-     * a situation happens, only the first tuple is considered, the other conflicting tuples are ignored, and a warning
-     * is issued.
-     *
-     * // FIXME: do not support implicit arguments - it only makes sense for the typical $rel->assoc(0, 1) case; introduce a pairs($a, $b) shortcut instead
-     * // TODO: move in the code above map()
-     *
-     * @param (int|string|ITupleEvaluator|\Closure)[] ...$cols
-     *                                  The association specification. The last column specifies the associated values,
-     *                                    whereas the other columns specify the mapping.
-     *                                  If not specified, all the relation columns are consecutively used as though they
-     *                                    were arguments to this method call. E.g., <tt>$rel->assoc()</tt> on a relation
-     *                                    consisting of 2 columns is equivalent to <tt>$rel->assoc(0, 1)</tt>.
-     * @return IValueMap
-     * @throws UndefinedColumnException if there is no column matching the specification of an argument
-     */
-    function assoc(...$cols);
 
     /**
      * Makes a set of values of a column which is able to tell whether there was at least one tuple with the value of
