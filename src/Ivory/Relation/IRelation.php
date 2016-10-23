@@ -258,7 +258,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @return ISet <tt>$set</tt>, or a newly created set
      * @throws UndefinedColumnException if no column matches the specification
      */
-    function toSet($colOffsetOrNameOrEvaluator, ISet $set = null); // TODO: test & implement
+    function toSet($colOffsetOrNameOrEvaluator, ISet $set = null);
 
     /**
      * Reduces the relation only to unique tuples.

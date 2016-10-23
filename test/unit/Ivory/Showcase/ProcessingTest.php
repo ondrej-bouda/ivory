@@ -91,6 +91,45 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         );
     }
 
+    public function testValue()
+    {
+        $this->assertSame(1, $this->teachers->value());
+        $this->assertSame('Angus', $this->teachers->value('firstname'));
+        $this->assertSame('Angus', $this->teachers->value(1));
+        $this->assertSame('Ada', $this->teachers->value(1, 5));
+        $this->assertSame('Ada Lovelace',
+            $this->teachers->value(function (ITuple $t) { return "$t[firstname] $t[lastname]"; }, 5)
+        );
+    }
+
+    public function testTuple()
+    {
+        $this->assertSame(1, $this->teachers->tuple()['id']);
+        $this->assertSame('Ada', $this->teachers->tuple(5)->value('firstname'));
+        $this->assertSame('Ada Lovelace',
+            $this->teachers->tuple(5)->value(function (ITuple $t) { return "$t[firstname] $t[lastname]"; })
+        );
+    }
+
+    public function testCol()
+    {
+        $firstNameCol = $this->teachers->col('firstname');
+
+        $this->assertSame('Angus', $firstNameCol->value(0));
+        $this->assertSame(
+            ['Angus', 'Jean', 'Eugene F.', 'Lars Peter', 'Robert J.', 'Ada'],
+            $firstNameCol->toArray()
+        );
+
+        $abbrCol = $this->teachers->col(function (ITuple $t) {
+            return ($t['abbr'] ?: mb_substr($t['lastname'], 0, 4));
+        });
+        $expected = ['Dtn', 'Tir', 'Fama', 'Hans', 'Shil', 'Love'];
+        foreach ($abbrCol as $i => $v) {
+            $this->assertSame($expected[$i], $v, "Columns value at offset $i");
+        }
+    }
+
     public function testAssocSingleLevel()
     {
         $res = $this->teachers->assoc('id', function (ITuple $t) {
@@ -158,5 +197,27 @@ class ProcessingTest extends \Ivory\IvoryTestCase
     public function testMultimapMultiLevel()
     {
 //        $res = $this->rel->multimap(); // TODO
+    }
+
+    public function testToSet()
+    {
+        $idSet = $this->teachers->toSet('id');
+
+        $this->assertTrue($idSet->contains(6));
+        $this->assertFalse($idSet->contains(7));
+
+        $abbrSet = $this->teachers->toSet(function (ITuple $t) {
+            return ($t['abbr'] ? : mb_substr($t['lastname'], 0, 4));
+        });
+
+        $this->assertTrue($abbrSet->contains('Dtn'));
+        $this->assertTrue($abbrSet->contains('Love'));
+        $this->assertFalse($abbrSet->contains('Ada'));
+        $this->assertFalse($abbrSet->contains(null));
+    }
+
+    public function testMultimapToSet()
+    {
+        // TODO: test set() applied on relation split into several classes
     }
 }
