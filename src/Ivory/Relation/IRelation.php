@@ -122,7 +122,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @throw UndefinedColumnException if any <tt>$columns</tt> item refers to an undefined column; this also includes
      *                                   macros - each macro must refer to at least one column
      */
-    function project($columns);
+    function project($columns); // TODO: decide whether it is rather expected to interpret the key and values the other way round (see the ProcessingTest)
 
     /**
      * Extends this relation with some extra columns.

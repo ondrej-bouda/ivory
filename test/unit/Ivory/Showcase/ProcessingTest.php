@@ -87,8 +87,22 @@ class ProcessingTest extends \Ivory\IvoryTestCase
                     t.abbr AS teacher_abbr
              FROM lesson l
                   JOIN lessonteacher lt ON lt.lesson_id = l.id
-                  JOIN teacher t ON t.id = lt.teacher_id"
+                  JOIN teacher t ON t.id = lt.teacher_id
+             ORDER BY l.id, lt.schedulingstatus DESC, t.id"
         );
+    }
+
+    public function testCount()
+    {
+        $this->assertCount(6, $this->teachers);
+    }
+
+    public function testTraversal()
+    {
+        $exp = ['Dtn', 'Tir', null, null, null, null];
+        foreach ($this->teachers as $i => $tuple) { /** @var ITuple $tuple */
+            $this->assertSame($exp[$i], $tuple['abbr'], "Tuple $i does not match");
+        }
     }
 
     public function testValue()
@@ -109,6 +123,15 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         $this->assertSame('Ada Lovelace',
             $this->teachers->tuple(5)->value(function (ITuple $t) { return "$t[firstname] $t[lastname]"; })
         );
+
+        $this->assertSame(
+            ['id' => 6, 'firstname' => 'Ada', 'lastname' => 'Lovelace', 'abbr' => null],
+            $this->teachers->tuple(5)->toMap()
+        );
+        $this->assertSame(
+            [6, 'Ada', 'Lovelace', null],
+            $this->teachers->tuple(5)->toList()
+        );
     }
 
     public function testCol()
@@ -128,6 +151,52 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         foreach ($abbrCol as $i => $v) {
             $this->assertSame($expected[$i], $v, "Columns value at offset $i");
         }
+    }
+
+    public function testFilter()
+    {
+        $res = $this->teachers->filter(function (ITuple $t) {
+            return ($t['firstname'][0] == 'A');
+        });
+
+        $this->assertCount(2, $res);
+        $exp = ['Angus', 'Ada'];
+        foreach ($res as $i => $tuple) { /** @var ITuple $tuple */
+            $this->assertSame($exp[$i], $tuple->value('firstname'), "Tuple $i does not match");
+        }
+    }
+
+    public function testProject()
+    {
+        $res = $this->teachers->project([
+            'id',
+            'initials' => function (ITuple $t) { return "{$t['firstname'][0]}.{$t['lastname'][0]}."; },
+        ]);
+
+        $this->assertSame(
+            ['id' => 1, 'initials' => 'A.D.'],
+            $res->tuple(0)->toMap()
+        );
+    }
+
+    public function testProjectSimpleMacro()
+    {
+        $res = $this->rel->project(['lesson_id', 'stat' => 'schedulingstatus', '*' => 'teacher_*']);
+
+        $this->assertSame(
+            ['lesson_id' => 1, 'stat' => 'scheduled', 'id' => 1, 'firstname' => 'Angus', 'lastname' => 'Deaton', 'abbr' => 'Dtn'],
+            $res->tuple(0)->toMap()
+        );
+    }
+
+    public function testProjectPcreMacro()
+    {
+        $res = $this->rel->project(['\\1' => '/^(.+)_id$/', 'schedulingstatus']);
+
+        $this->assertSame(
+            ['lesson' => 1, 'teacher' => 1, 'schedulingstatus' => 'scheduled'],
+            $res->tuple(0)->toMap()
+        );
     }
 
     public function testAssocSingleLevel()
@@ -219,5 +288,18 @@ class ProcessingTest extends \Ivory\IvoryTestCase
     public function testMultimapToSet()
     {
         // TODO: test set() applied on relation split into several classes
+    }
+
+    public function testComposition()
+    {
+        $res = $this->teachers
+            ->project(['id', 'firstname'])
+            ->filter(function (ITuple $t) { return ($t['firstname'][0] == 'A'); })
+            ->rename(['firstname' => 'name'])
+            ->assoc('name', 'id');
+
+        $this->assertCount(2, $res);
+        $this->assertSame(1, $res['Angus']);
+        $this->assertSame(6, $res['Ada']);
     }
 }
