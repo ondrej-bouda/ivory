@@ -17,6 +17,7 @@ To Do:
 Values:
 * PostgreSQL has full feature set. Instead of generic layer which omits some features or has to be more complicated in order to abstract out DBMS differences, let's just fully support one DBMS.
 * Object query builders, which introduce special objects or methods for composing SQL expressions, shall be considered as an anti-pattern. Instead, prefer SQL as it is a standard, proven language specifically designed for querying relational data.
+* Different situations (small/large projects, prototyping/production coding) call for measures of different strictness. While the library promotes robust and correct code (e.g., by issuing warnings in potentially erroneous situations), it shall fit different styles (e.g., passing callbacks as anonymous functions vs. as objects implementing an interface - the latter of which leads to safer code with more boilerplate).
 
 
 
