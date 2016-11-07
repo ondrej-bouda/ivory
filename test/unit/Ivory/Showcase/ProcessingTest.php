@@ -69,7 +69,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
                  (5, 'Robert J.', 'Shiller', NULL),
                  (6, 'Ada', 'Lovelace', NULL)
              ),
-             lessonteacher (lesson_id, teacher_id, schedulingstatus) AS (
+             lessonteacher (lesson_id, teacher_id, scheduling_status) AS (
                VALUES
                  (1, 1, 'scheduled'), (1, 1, 'actual'),
                  (2, 6, 'scheduled'), (2, 6, 'actual'),
@@ -83,13 +83,13 @@ class ProcessingTest extends \Ivory\IvoryTestCase
                  (8, 6, 'scheduled'), (8, 6, 'actual')
              )
              SELECT l.id AS lesson_id, l.topic AS lesson_topic,
-                    lt.schedulingstatus,
+                    lt.scheduling_status,
                     t.id AS teacher_id, t.firstname AS teacher_firstname, t.lastname AS teacher_lastname,
                     t.abbr AS teacher_abbr
              FROM lesson l
                   JOIN lessonteacher lt ON lt.lesson_id = l.id
                   JOIN teacher t ON t.id = lt.teacher_id
-             ORDER BY l.id, lt.schedulingstatus DESC, t.id"
+             ORDER BY l.id, lt.scheduling_status DESC, t.id"
         );
     }
 
@@ -182,7 +182,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
 
     public function testProjectSimpleMacro()
     {
-        $res = $this->rel->project(['lesson_id', 'stat' => 'schedulingstatus', '*' => 'teacher_*']);
+        $res = $this->rel->project(['lesson_id', 'stat' => 'scheduling_status', '*' => 'teacher_*']);
 
         $this->assertSame(
             ['lesson_id' => 1, 'stat' => 'scheduled', 'id' => 1, 'firstname' => 'Angus', 'lastname' => 'Deaton', 'abbr' => 'Dtn'],
@@ -192,10 +192,10 @@ class ProcessingTest extends \Ivory\IvoryTestCase
 
     public function testProjectPcreMacro()
     {
-        $res = $this->rel->project(['\\1' => '/^(.+)_id$/', 'schedulingstatus']);
+        $res = $this->rel->project(['\\1' => '/^(.+)_id$/', 'scheduling_status']);
 
         $this->assertSame(
-            ['lesson' => 1, 'teacher' => 1, 'schedulingstatus' => 'scheduled'],
+            ['lesson' => 1, 'teacher' => 1, 'scheduling_status' => 'scheduled'],
             $res->tuple(0)->toMap()
         );
     }
@@ -213,7 +213,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
 
     public function testAssocMultiLevel()
     {
-        $res = $this->rel->assoc('lesson_id', 'schedulingstatus', 'teacher_id', 'teacher_abbr');
+        $res = $this->rel->assoc('lesson_id', 'scheduling_status', 'teacher_id', 'teacher_abbr');
 
         $this->assertSame('Tir', $res[4]['scheduled'][2]);
         $this->assertTrue(!isset($res[4]['actual'][2]));
@@ -241,7 +241,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
 
     public function testMapMultiLevel()
     {
-        $res = $this->rel->map('teacher_id', 'schedulingstatus', 'lesson_id');
+        $res = $this->rel->map('teacher_id', 'scheduling_status', 'lesson_id');
 
         $this->assertSame('Ruby', $res[6]['actual'][2]['lesson_topic']);
         $this->assertCount(2, $res[1]['actual']);
@@ -268,7 +268,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
 
     public function testMultimapMultiLevel()
     {
-        $res = $this->rel->multimap('teacher_id', 'schedulingstatus');
+        $res = $this->rel->multimap('teacher_id', 'scheduling_status');
 	    $this->assertInstanceOf(IRelationMap::class, $res);
 	    $this->assertInstanceOf(IRelationMap::class, $res[1]);
 	    $this->assertInstanceOf(IRelation::class, $res[1]['actual']);
@@ -279,10 +279,10 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         $this->assertSame('1+1', $deatonActualLessonRel->value('lesson_topic'));
         $this->assertSame(['1+1', '1+2'], $deatonActualLessonRel->col('lesson_topic')->toArray());
 
-	    // TODO: comment that each multimap item is a relation, and as such allows col() and other standard relation methods
+	    // Each multimap item is a relation, and as such offers IRelation::col() and other standard relation methods.
         $expectedMap = [
-            1 => [
-                'actual' => ['1+1', '1+2'],
+            1 => [ // teacher ID
+                'actual' => ['1+1', '1+2'], // under each scheduling status, we list the lesson topics
                 'scheduled' => ['1+1'],
             ],
             2 => [
@@ -331,11 +331,6 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         $this->assertTrue($abbrSet->contains('Love'));
         $this->assertFalse($abbrSet->contains('Ada'));
         $this->assertFalse($abbrSet->contains(null));
-    }
-
-    public function testMultimapToSet()
-    {
-        // TODO: test set() applied on relation split into several classes
     }
 
     public function testComposition()
