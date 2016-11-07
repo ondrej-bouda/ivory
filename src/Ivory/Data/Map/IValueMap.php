@@ -7,10 +7,10 @@ namespace Ivory\Data\Map;
  * Multiple levels of mapping are possible, i.e., a map entry may in fact be another map.
  * At the last level of mapping, there is a single value.
  */
-interface IValueMap extends \ArrayAccess, \Countable, \Traversable
+interface IValueMap extends IMappedObject
 {
     /**
-     * Returns an item mapped by the given key or series of keys.
+     * Returns the item mapped by the given key or series of keys.
      *
      * @param array ...$key
      * @return mixed|IValueMap the value, or inner map in case of multi-level map, mapped by the given key
@@ -21,7 +21,7 @@ interface IValueMap extends \ArrayAccess, \Countable, \Traversable
     function get(...$key);
 
     /**
-     * Returns an item mapped by the given key or series of keys, or <tt>null</tt> if there is no such item.
+     * Returns the item mapped by the given key or series of keys, or <tt>null</tt> if there is no such item.
      *
      * @param array ...$key
      * @return mixed|IValueMap|null the value, or inner map in case of multi-level map, mapped by the given key, or

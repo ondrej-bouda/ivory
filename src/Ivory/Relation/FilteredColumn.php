@@ -59,6 +59,11 @@ class FilteredColumn implements \IteratorAggregate, IColumn
         return new FilteredColumn($this->baseCol->renameTo($newName), $this->decider);
     }
 
+    public function bindToRelation(IRelation $relation)
+    {
+        return new FilteredColumn($this->baseCol->bindToRelation($relation), $this->decider);
+    }
+
     public function filter($decider)
     {
         return new FilteredColumn($this, $decider);

@@ -6,6 +6,7 @@ use Ivory\Exception\ResultException;
 use Ivory\Relation\Column;
 use Ivory\Relation\FilteredRelation;
 use Ivory\Relation\ProjectedRelation;
+use Ivory\Relation\RelationSeekableIterator;
 use Ivory\Relation\RelationMacros;
 use Ivory\Relation\RenamedRelation;
 use Ivory\Relation\Tuple;
@@ -129,11 +130,6 @@ class QueryResult extends Result implements IQueryResult
 		return $this->_colImpl($offsetOrNameOrEvaluator, $this->columns, $this->colNameMap, $this);
 	}
 
-	public function multimap(...$mappingCols)
-	{
-		throw new NotImplementedException();
-	}
-
 	public function uniq($hasher = null, $comparator = null)
 	{
 		throw new NotImplementedException();
@@ -175,7 +171,7 @@ class QueryResult extends Result implements IQueryResult
 
 	public function getIterator()
 	{
-		return new QueryResultIterator($this);
+		return new RelationSeekableIterator($this);
 	}
 
 	//endregion

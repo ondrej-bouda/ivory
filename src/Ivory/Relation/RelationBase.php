@@ -28,11 +28,6 @@ abstract class RelationBase implements \IteratorAggregate, IRelation
         return new RenamedRelation($this, $renamePairs);
     }
 
-    public function multimap(...$mappingCols)
-    {
-        throw new NotImplementedException();
-    }
-
     public function uniq($hasher = null, $comparator = null)
     {
         throw new NotImplementedException();

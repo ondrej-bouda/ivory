@@ -34,6 +34,12 @@ interface IColumn extends \Traversable, \Countable, ICachingDataProcessor
 	 */
 	function renameTo($newName);
 
+    /**
+     * @param IRelation $relation the new relation to bind the column to
+     * @return static a new column - copy of this column - binded to the given relation
+     */
+    function bindToRelation(IRelation $relation);
+
 	/**
 	 * Reduces the column data only to values satisfying a given filter.
 	 *

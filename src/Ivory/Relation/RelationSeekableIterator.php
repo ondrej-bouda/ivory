@@ -1,20 +1,20 @@
 <?php
-namespace Ivory\Result;
+namespace Ivory\Relation;
 
-class QueryResultIterator implements \SeekableIterator
+class RelationSeekableIterator implements \SeekableIterator
 {
-    private $queryResult;
+    private $relation;
     private $pos = 0;
 
-    public function __construct(IQueryResult $queryResult)
+    public function __construct(IRelation $relation)
     {
-        $this->queryResult = $queryResult;
+        $this->relation = $relation;
     }
 
 
     public function current()
     {
-        return $this->queryResult->tuple($this->pos);
+        return $this->relation->tuple($this->pos);
     }
 
     public function next()
@@ -29,7 +29,7 @@ class QueryResultIterator implements \SeekableIterator
 
     public function valid()
     {
-        return ($this->pos < $this->queryResult->count());
+        return ($this->pos < $this->relation->count());
     }
 
     public function rewind()

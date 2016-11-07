@@ -9,7 +9,7 @@ use Ivory\Relation\ITuple;
  * Multiple levels of mapping are possible, i.e., a map entry may in fact be another map.
  * At the last level of mapping, there is a single {@link ITuple}.
  */
-interface ITupleMap extends \ArrayAccess, \Countable, \Traversable
+interface ITupleMap extends IMappedObject
 {
     /**
      * Returns an item mapped by the given key or series of keys.

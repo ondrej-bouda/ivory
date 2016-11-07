@@ -4,6 +4,8 @@ namespace Ivory\Relation;
 abstract class StreamlinedRelation extends RelationBase
 {
     protected $source;
+    private $cols = null;
+    private $colNameMap = null;
 
     public function __construct(IRelation $source)
     {
@@ -14,7 +16,22 @@ abstract class StreamlinedRelation extends RelationBase
 
     public function getColumns()
     {
-        return $this->source->getColumns();
+        if ($this->cols === null) {
+            $this->cols = [];
+            foreach ($this->source->getColumns() as $srcCol) {
+                $this->cols[] = $srcCol->bindToRelation($this);
+            }
+        }
+
+        return $this->cols;
+    }
+
+    private function getColNameMap()
+    {
+        if ($this->colNameMap === null) {
+            $this->colNameMap = self::computeColNameMap($this->source);
+        }
+        return $this->colNameMap;
     }
 
     public function getIterator()
@@ -29,7 +46,7 @@ abstract class StreamlinedRelation extends RelationBase
 
     public function col($offsetOrNameOrEvaluator)
     {
-        return $this->source->col($offsetOrNameOrEvaluator);
+        return $this->_colImpl($offsetOrNameOrEvaluator, $this->getColumns(), $this->getColNameMap(), $this);
     }
 
     public function count()

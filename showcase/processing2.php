@@ -1,12 +1,17 @@
 <?php
-use Ivory\Relation\Mapping\IMappedRelation;
+/**
+ * @deprecated relation mapping was redesigned
+ * @todo remove this showcase script
+ */
+
+use Ivory\Data\Map\IRelationMap;
 use Ivory\Relation\IRelation;
 
 /** @var IRelation $rel */
 $rel = null;
-/** @var IMappedRelation $mmapped */
+/** @var IRelationMap $mmapped */
 $mmapped = $rel->multimap('a', 'b');
-/** @var IMappedRelation $mmapped2 */
+/** @var IRelationMap $mmapped2 */
 $mmapped2 = $mmapped->multimap('c');
 
 /** @var IMappedColumn $mcol */

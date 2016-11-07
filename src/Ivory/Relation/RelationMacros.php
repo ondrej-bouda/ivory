@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Relation;
 
+use Ivory\Data\Map\ArrayRelationMap;
 use Ivory\Data\Map\ArrayValueMap;
 use Ivory\Data\Map\IWritableValueMap;
 use Ivory\Data\Set\DictionarySet;
@@ -20,9 +21,22 @@ trait RelationMacros
      * @param int $offset
      * @return ITuple
      */
-    abstract public function tuple($offset = 0);
+    abstract public function tuple($offset = 0); // PHP 7: type-hint the return type rather than using PHPDoc
 
     abstract function col($offsetOrNameOrEvaluator);
+
+
+    protected static function computeColNameMap(IRelation $relation)
+    {
+        $result = [];
+        foreach ($relation->getColumns() as $i => $col) {
+            $name = $col->getName();
+            if ($name !== null && !isset($result[$name])) {
+                $result[$name] = $i;
+            }
+        }
+        return $result;
+    }
 
     public function toSet($colOffsetOrNameOrEvaluator, ISet $set = null)
     {
@@ -49,8 +63,7 @@ trait RelationMacros
     final public function toArray()
     {
         $result = [];
-        foreach ($this as $tuple) {
-            /** @var ITuple $tuple */
+        foreach ($this as $tuple) { /** @var ITuple $tuple */
             $result[] = $tuple->toMap();
         }
         return $result;
@@ -111,6 +124,38 @@ trait RelationMacros
             },
             false, array_merge([$mappingCol], $moreMappingCols)
         );
+    }
+
+    public function multimap($mappingCol, ...$moreMappingCols)
+    {
+        $mappingCols = array_merge([$mappingCol], $moreMappingCols);
+        $multiDimKeyCols = array_slice($mappingCols, 0, -1);
+        $lastKeyCol = $mappingCols[count($mappingCols) - 1];
+
+        // FIXME: depending on the data type of the keys, either use an array-based implementation, or an object hashing implementation
+        $map = new ArrayRelationMap();
+        $emptyMap = new ArrayRelationMap();
+        foreach ($this as $tupleOffset => $tuple) { /** @var ITuple $tuple */
+            $m = $map;
+            foreach ($multiDimKeyCols as $col) {
+                $key = $tuple->value($col);
+                $added = $m->putIfNotExists($key, $emptyMap);
+                if ($added) {
+                    $emptyMap = new ArrayRelationMap(); // prepare a new copy for the following iterations
+                }
+                $m = $m[$key];
+            }
+
+            $key = $tuple->value($lastKeyCol);
+            $rel = $m->maybe($key);
+            if ($rel === null) {
+                $rel = new CherryPickedRelation($this, []);
+                $m->put($key, $rel);
+            }
+            $rel->cherryPick($tupleOffset);
+        }
+
+        return $map;
     }
 
     /**

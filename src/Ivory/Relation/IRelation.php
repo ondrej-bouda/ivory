@@ -7,7 +7,7 @@ use Ivory\Relation\Alg\ITupleComparator;
 use Ivory\Relation\Alg\ITupleEvaluator;
 use Ivory\Relation\Alg\ITupleFilter;
 use Ivory\Relation\Alg\ITupleHasher;
-use Ivory\Relation\Mapping\IMappedRelation;
+use Ivory\Data\Map\IRelationMap;
 use Ivory\Data\Map\ITupleMap;
 use Ivory\Data\Map\IValueMap;
 
@@ -227,21 +227,20 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
     /**
      * Divides this relation to several relations mapped by one or more keys.
      *
-     * The relation gets enclosed by one or more {@link IMappedRelation} boxes, each for one dimension of mapping. The
+     * The mapping is specified by one or more columns, each defining values for one dimensions of mapping.
+     * Specification of each mapping column is the same as for {@link col()}.
+     *
+     * The relation gets enclosed by one or more {@link IRelationMap} boxes, each for one dimension of mapping. The
      * innermost box maps the individual {@link IRelation}s.
      *
-     * Note the box returned by this method still behaves as an {@link IRelation}. Further {@link IRelation} operations
-     * called on the returned box are redirected to the innermost box which holds the original relation being mapped -
-     * the operation is called on it and the result is stored to the innermost box instead of the original relation.
-     *
-     * @param (int|string|ITupleEvaluator|\Closure)[] ...$mappingCols
-     *                                  The mapping specification - one or more columns, each specifying values for one
-     *                                    dimension of mapping.
-     *                                  Specification of each mapping column is the same as for {@link col()}.
-     * @return IMappedRelation
+     * @param (int|string|ITupleEvaluator|\Closure)[] $mappingCol
+     *                                  the first column specifying the mapping
+     * @param (int|string|ITupleEvaluator|\Closure)[] ...$moreMappingCols
+     *                                  optional additional columns specifying further dimensions of the mapping
+     * @return IRelationMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
-    function multimap(...$mappingCols); // TODO: test & implement
+    function multimap($mappingCol, ...$moreMappingCols);
 
     /**
      * Makes a set of values of a column which is able to tell whether there was at least one tuple with the value of

@@ -48,6 +48,11 @@ class Column implements \IteratorAggregate, IColumn
         return new Column($this->relation, $this->colDef, $newName, $this->type);
     }
 
+    public function bindToRelation(IRelation $relation)
+    {
+        return new Column($relation, $this->colDef, $this->name, $this->type);
+    }
+
     public function filter($decider)
     {
         return new FilteredColumn($this, $decider);

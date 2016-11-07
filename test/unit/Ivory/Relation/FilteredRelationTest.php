@@ -33,6 +33,10 @@ class FilteredRelationTest extends \Ivory\IvoryTestCase
             $i++;
         }
         $this->assertSame(2, $i);
+
+        $col = $filtered->col('a');
+        $this->assertSame(5, $col->value(1));
+        $this->assertSame([1, 5], $col->toArray());
     }
 
     public function testTupleFilter()

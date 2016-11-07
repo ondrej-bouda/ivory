@@ -251,21 +251,60 @@ class ProcessingTest extends \Ivory\IvoryTestCase
 
     public function testMultimapSingleLevel()
     {
-//        $res = $this->teachers->multimap(function (ITuple $t) { return $t['firstname'][0]; });
-//
-//        $this->assertInstanceOf(IRelation::class, $res['A']);
-//        $this->assertCount(2, $res['A']);
-//        /** @var IRelation $jRel */
-//        $jRel = $res['J'];
-//        $this->assertEquals(
-//            [['id' => 2, 'firstname' => 'Jean', 'lastname' => 'Tirole', 'abbr' => 'Tir']],
-//            $jRel->toArray()
-//        );
+        $res = $this->teachers->multimap(function (ITuple $t) { return $t['firstname'][0]; });
+
+        $this->assertInstanceOf(IRelation::class, $res['A']);
+        $this->assertCount(2, $res['A']);
+        /** @var IRelation $jRel */
+        $jRel = $res['J'];
+        $this->assertEquals(
+            [['id' => 2, 'firstname' => 'Jean', 'lastname' => 'Tirole', 'abbr' => 'Tir']],
+            $jRel->toArray()
+        );
     }
 
     public function testMultimapMultiLevel()
     {
-//        $res = $this->rel->multimap(); // TODO
+        $res = $this->rel->multimap('teacher_id', 'schedulingstatus');
+
+        /** @var IRelation $deatonActualLessonRel */
+        $deatonActualLessonRel = $res[1]['actual'];
+        $this->assertInstanceOf(IRelation::class, $deatonActualLessonRel);
+        $this->assertSame('1+1', $deatonActualLessonRel->value('lesson_topic'));
+        $this->assertSame(['1+1', '1+2'], $deatonActualLessonRel->col('lesson_topic')->toArray());
+
+        $expectedMap = [
+            1 => [
+                'actual' => ['1+1', '1+2'],
+                'scheduled' => ['1+1'],
+            ],
+            2 => [
+                'actual' => [],
+                'scheduled' => ['1+2'],
+            ],
+            3 => [
+                'actual' => ['1+3'],
+                'scheduled' => ['1+3'],
+            ],
+            4 => [
+                'actual' => ['1+3'],
+                'scheduled' => ['1+3'],
+            ],
+            5 => [
+                'actual' => ['1+3'],
+                'scheduled' => ['1+3'],
+            ],
+            6 => [
+                'actual' => ['Ruby', 'PHP', 'Perl', 'C', 'C++'],
+                'scheduled' => ['Ruby', 'PHP', 'Perl', 'C', 'C++'],
+            ],
+        ];
+        foreach ($res as $teacherId => $lessonsByStatus) {
+            foreach ($lessonsByStatus as $status => $lessons) {
+                /** @var IRelation $lessons */
+                $this->assertSame($expectedMap[$teacherId][$status], $lessons->col('lesson_topic')->toArray());
+            }
+        }
     }
 
     public function testToSet()
