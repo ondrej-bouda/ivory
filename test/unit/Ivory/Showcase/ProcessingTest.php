@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Showcase;
 
+use Ivory\Data\Map\IRelationMap;
 use Ivory\Relation\IRelation;
 use Ivory\Relation\ITuple;
 use Ivory\Relation\QueryRelation;
@@ -258,7 +259,9 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         /** @var IRelation $jRel */
         $jRel = $res['J'];
         $this->assertEquals(
-            [['id' => 2, 'firstname' => 'Jean', 'lastname' => 'Tirole', 'abbr' => 'Tir']],
+            [
+            	['id' => 2, 'firstname' => 'Jean', 'lastname' => 'Tirole', 'abbr' => 'Tir'],
+            ],
             $jRel->toArray()
         );
     }
@@ -266,6 +269,9 @@ class ProcessingTest extends \Ivory\IvoryTestCase
     public function testMultimapMultiLevel()
     {
         $res = $this->rel->multimap('teacher_id', 'schedulingstatus');
+	    $this->assertInstanceOf(IRelationMap::class, $res);
+	    $this->assertInstanceOf(IRelationMap::class, $res[1]);
+	    $this->assertInstanceOf(IRelation::class, $res[1]['actual']);
 
         /** @var IRelation $deatonActualLessonRel */
         $deatonActualLessonRel = $res[1]['actual'];
@@ -273,6 +279,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         $this->assertSame('1+1', $deatonActualLessonRel->value('lesson_topic'));
         $this->assertSame(['1+1', '1+2'], $deatonActualLessonRel->col('lesson_topic')->toArray());
 
+	    // TODO: comment that each multimap item is a relation, and as such allows col() and other standard relation methods
         $expectedMap = [
             1 => [
                 'actual' => ['1+1', '1+2'],
@@ -301,8 +308,10 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         ];
         foreach ($res as $teacherId => $lessonsByStatus) {
             foreach ($lessonsByStatus as $status => $lessons) {
+	            $this->assertInstanceOf(IRelation::class, $lessons);
                 /** @var IRelation $lessons */
-                $this->assertSame($expectedMap[$teacherId][$status], $lessons->col('lesson_topic')->toArray());
+	            $lessonTopics = $lessons->col('lesson_topic');
+	            $this->assertSame($expectedMap[$teacherId][$status], $lessonTopics->toArray());
             }
         }
     }
