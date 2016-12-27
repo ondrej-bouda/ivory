@@ -24,10 +24,10 @@ class SqlPatternParserTest extends \PHPUnit_Framework_TestCase
 
 	public function testPositionalTypedPlaceholder()
 	{
-		$pattern = $this->parser->parse('SELECT * FROM person WHERE id = %d AND is_active');
+		$pattern = $this->parser->parse('SELECT * FROM person WHERE id = %ivory.d AND is_active');
 		$this->assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getRawSql());
 		$this->assertEquals(
-			[new SqlPatternPlaceholder(32, 0, 'd')],
+			[new SqlPatternPlaceholder(32, 0, 'ivory.d')],
 			$pattern->getPositionalPlaceholders()
 		);
 		$this->assertEmpty($pattern->getNamedPlaceholderMap());

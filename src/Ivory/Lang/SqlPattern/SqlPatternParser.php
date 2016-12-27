@@ -21,8 +21,11 @@ class SqlPatternParser
 	    	'~
 	    	  %                                             # the percent sign introducing the sequence
 	    	  (?: (?! % )                                   # anything but another percent sign -> placeholder
-	    	      ( [[:alpha:]_] [[:alnum:]_]* )?           #   optional type name, starting with a letter or underscore
-	    	      (?: : ( [[:alpha:]_] [[:alnum:]_]* ) )?   #   optional parameter name
+	    	      (                                         #   optional type name
+	    	        [[:alpha:]_]                            #     starting with a letter or underscore
+	    	        (?: [[:alnum:]_.]* [[:alnum:]_] )?      #     dots allowed inside the type name
+	    	      )?                                        #
+	    	      (?: : ( [[:alpha:]_] [[:alnum:]_]* ) )?   #   optional parameter name, starting with a letter or underscore
 	    	    | ( % )                                     # or another percent sign -> literal %
 	    	  )
 	    	 ~x',
