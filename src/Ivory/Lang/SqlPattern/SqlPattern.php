@@ -1,8 +1,12 @@
 <?php
 namespace Ivory\Lang\SqlPattern;
 
+use Ivory\Exception\NoDataException;
+
 /**
  * Representation of an SQL pattern.
+ *
+ * The objects are immutable.
  */
 class SqlPattern
 {
@@ -121,6 +125,58 @@ class SqlPattern
             $val = $parameterValueSqlStrings[$plcHld->getNameOrPosition()];
             $result .= substr($this->rawSql, $offset, $plcHld->getOffset() - $offset) . $val;
             $offset = $plcHld->getOffset();
+        }
+        $result .= substr($this->rawSql, $offset);
+
+        return $result;
+    }
+
+    /**
+     * Generate SQL string from this pattern with encoded parameter values requested to be filled by the caller.
+     *
+     * This is a more general method to {@link fillSql()}. The reason for this method is that a single named parameter
+     * may have multiple placeholders within the pattern, each with a different type specification. Therefore, each
+     * occurrence might result in different encoding. This method presents the caller each placeholder, one by one, so
+     * that the caller provides the encoded parameter value.
+     *
+     * Technically, this is achieved by returning a `\Generator`. Each placeholder is yielded as a
+     * `$placeholder => &$value` pair - the key is a {@link SqlPatternPlaceholder} object describing the placeholder to
+     * fill the value for, and `$value` is a reference into which the value shall be encoded. After iterating over all
+     * placeholders for which a value is requested, the final SQL string may be retrieved by calling
+     * {@link \Generator::getReturn()} on the generator.
+     *
+     * Example:
+     * <pre>
+     * <?php
+     * $pattern = new SqlPattern(
+     *     'SELECT id FROM  UNION SELECT object_id FROM log WHERE table = ',
+     *     [new SqlPatternPlaceholder(15, 'tbl', 'ident'), new SqlPatternPlaceholder(62, 'tbl', 'string')],
+     *     []
+     * );
+     * $gen = $pattern->generateSql();
+     * foreach ($gen as $placeholder => &$value) {
+     *     $value = ($placeholder->getTypeName() == 'string' ? "'person'" : 'person');
+     * }
+     * echo $gen->getReturn(); // prints "SELECT id FROM person UNION SELECT object_id FROM log WHERE table = 'person'"
+     * </pre>
+     *
+     * @throws NoDataException if a yielded parameter does not get its encoded value
+     */
+    public function &generateSql() : \Generator
+    {
+        $result = '';
+        $offset = 0;
+        foreach ($this->placeholderSequence as $plcHdr) {
+            $val = false;
+            yield $plcHdr => $val;
+            assert(
+                $val !== false,
+                new NoDataException(
+                    "No value encoded for placeholder {$plcHdr->getNameOrPosition()} at offset {$plcHdr->getOffset()}."
+                )
+            );
+            $result .= substr($this->rawSql, $offset, $plcHdr->getOffset() - $offset) . $val;
+            $offset = $plcHdr->getOffset();
         }
         $result .= substr($this->rawSql, $offset);
 

@@ -15,7 +15,7 @@ class SqlPatternPlaceholder
      * @param string|int $nameOrPosition name or zero-based position of the placeholders within the SQL pattern
      * @param string|null $typeName name of type specified for the placeholder, or <tt>null</tt> if no type is given
      */
-    public function __construct(int $offset, $nameOrPosition, $typeName)
+    public function __construct(int $offset, $nameOrPosition, string $typeName = null)
     {
         $this->offset = $offset;
         $this->nameOrPosition = $nameOrPosition;
