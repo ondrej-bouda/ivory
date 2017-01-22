@@ -21,24 +21,29 @@ class SqlPatternParser
 	    	'~
 	    	  %                                             # the percent sign introducing the sequence
 	    	  (?: (?! % )                                   # anything but another percent sign -> placeholder
-	    	      (                                         #   optional type name
-	    	        [[:alpha:]_]                            #     starting with a letter or underscore
-	    	        (?: [[:alnum:]_.]* [[:alnum:]_] )?      #     dots allowed inside the type name
+	    	      (?:                                       #   optional type name
+	    	        ( [[:alpha:]_]                          #     starting with a letter or underscore
+	    	          (?: [[:alnum:]_.]* [[:alnum:]_] )?    #     dots allowed inside the type name
+	    	        )                                       #
+	    	        ( \[\] )*                               #     optionally ended with pairs of brackets
 	    	      )?                                        #
 	    	      (?: : ( [[:alpha:]_] [[:alnum:]_]* ) )?   #   optional parameter name, starting with a letter or underscore
 	    	    | ( % )                                     # or another percent sign -> literal %
 	    	  )
 	    	 ~x',
 		    function ($matchWithOffsets) use (&$positionalPlaceholders, &$namedPlaceholderMap, &$rawOffsetDelta) {
-			    if (isset($matchWithOffsets[3])) {
+			    if (isset($matchWithOffsets[4])) {
 				    $rawOffsetDelta--; // put one character instead of two
 				    return '%';
 			    }
 			    else {
 			    	$offset = $matchWithOffsets[0][1] + $rawOffsetDelta;
 				    $type = (!empty($matchWithOffsets[1][0]) ? $matchWithOffsets[1][0] : null); // correctness: empty() is OK as the type name may not be "0"
-				    if (isset($matchWithOffsets[2])) {
-					    $name = $matchWithOffsets[2][0];
+                    if (!empty($matchWithOffsets[2][0])) {
+                        $type .= '[]'; // regardless of the number of bracket pairs, just a single pair is taken
+                    }
+				    if (isset($matchWithOffsets[3])) {
+					    $name = $matchWithOffsets[3][0];
 					    $plcHld = new SqlPatternPlaceholder($offset, $name, $type);
 					    if (!isset($namedPlaceholderMap[$name])) {
 						    $namedPlaceholderMap[$name] = [];

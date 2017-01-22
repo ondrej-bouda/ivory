@@ -55,6 +55,17 @@ class SqlPatternParserTest extends \PHPUnit_Framework_TestCase
 		);
 	}
 
+    public function testSquareBrackets()
+    {
+        $pattern = $this->parser->parse('SELECT %bigint[][][][2]');
+        $this->assertEquals('SELECT [2]', $pattern->getRawSql());
+        $this->assertEquals(
+            [new SqlPatternPlaceholder(7, 0, 'bigint[]')],
+            $pattern->getPositionalPlaceholders()
+        );
+        $this->assertEmpty($pattern->getNamedPlaceholderMap());
+    }
+
 	public function testMultiplePlaceholders()
 	{
 		$pattern = $this->parser->parse(

@@ -58,4 +58,22 @@ class StringUtils
 
 		return $result;
 	}
+
+    /**
+     * @param int $num
+     * @return string "1st", "2nd", "3rd", "4th", etc. according to <tt>$num</tt>
+     */
+    public static function englishOrd(int $num) : string
+    {
+        switch ($num) {
+            case 1:
+                return '1st';
+            case 2:
+                return '2nd';
+            case 3:
+                return '3rd';
+            default:
+                return $num . 'th';
+        }
+    }
 }

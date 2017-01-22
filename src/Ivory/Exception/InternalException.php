@@ -2,7 +2,7 @@
 namespace Ivory\Exception;
 
 /**
- * Exception thrown when on an Ivory internal error.
+ * Exception thrown on an Ivory internal error.
  */
 class InternalException extends \LogicException
 {

@@ -139,14 +139,18 @@ class SqlPattern
      * occurrence might result in different encoding. This method presents the caller each placeholder, one by one, so
      * that the caller provides the encoded parameter value.
      *
-     * Technically, this is achieved by returning a `\Generator`. Each placeholder is yielded as a
-     * `$placeholder => &$value` pair - the key is a {@link SqlPatternPlaceholder} object describing the placeholder to
-     * fill the value for, and `$value` is a reference into which the value shall be encoded. After iterating over all
-     * placeholders for which a value is requested, the final SQL string may be retrieved by calling
-     * {@link \Generator::getReturn()} on the generator.
+     * Technically, this is achieved by returning a `\Generator` being treated as a coroutine. Each placeholder is
+     * yielded from the generator as a {@link SqlPatternPlaceholder} object, describing the placeholder to fill the
+     * value for. The caller has to {@link \Generator::send() send()} the encoded value for this placeholder, and then
+     * take the next placeholder. After iterating over all placeholders for which a value was requested, the final SQL
+     * string may be retrieved by calling {@link \Generator::getReturn()} on the generator.
+     *
+     * The encoded values sent to the generator are treated as strings. They has to either be strings or other types
+     * convertible to strings. `null`, however, is considered as if the caller forgot to provide a value at all, and a
+     * {@link NoDataException} is thrown in such a case.
      *
      * Example:
-     * <pre>
+     * <code>
      * <?php
      * $pattern = new SqlPattern(
      *     'SELECT id FROM  UNION SELECT object_id FROM log WHERE table = ',
@@ -154,28 +158,29 @@ class SqlPattern
      *     []
      * );
      * $gen = $pattern->generateSql();
-     * foreach ($gen as $placeholder => &$value) {
-     *     $value = ($placeholder->getTypeName() == 'string' ? "'person'" : 'person');
+     * while ($gen->valid()) {
+     *     $placeholder = $gen->current();
+     *     $serializedValue = ($placeholder->getTypeName() == 'string' ? "'person'" : 'person');
+     *     $gen->send($serializedValue);
      * }
      * echo $gen->getReturn(); // prints "SELECT id FROM person UNION SELECT object_id FROM log WHERE table = 'person'"
-     * </pre>
+     * </code>
      *
-     * @throws NoDataException if a yielded parameter does not get its encoded value
+     * @throws NoDataException if no encoded value is sent for a yielded parameter
      */
-    public function &generateSql() : \Generator
+    public function generateSql() : \Generator
     {
         $result = '';
         $offset = 0;
         foreach ($this->placeholderSequence as $plcHdr) {
-            $val = false;
-            yield $plcHdr => $val;
+            $encodedValue = yield $plcHdr;
             assert(
-                $val !== false,
+                $encodedValue !== null,
                 new NoDataException(
                     "No value encoded for placeholder {$plcHdr->getNameOrPosition()} at offset {$plcHdr->getOffset()}."
                 )
             );
-            $result .= substr($this->rawSql, $offset, $plcHdr->getOffset() - $offset) . $val;
+            $result .= substr($this->rawSql, $offset, $plcHdr->getOffset() - $offset) . $encodedValue;
             $offset = $plcHdr->getOffset();
         }
         $result .= substr($this->rawSql, $offset);

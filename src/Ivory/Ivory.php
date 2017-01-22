@@ -1,19 +1,21 @@
 <?php
 namespace Ivory;
 
-use Ivory\Connection\Connection;
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\ConnectionException;
 use Ivory\Exception\StatementExceptionFactory;
-use Ivory\Type\Std\StdRangeCanonicalFuncProvider;
-use Ivory\Type\Std\StdTypeLoader;
+use Ivory\Lang\SqlPattern\SqlPatternParser;
 use Ivory\Type\TypeRegister;
 
-class Ivory
+final class Ivory
 {
+    /** @var ICoreFactory */
+    private static $coreFactory = null;
 	/** @var TypeRegister */
 	private static $typeRegister = null;
+	/** @var SqlPatternParser */
+	private static $sqlPatternParser = null;
 	/** @var StatementExceptionFactory */
 	private static $stmtExFactory = null;
 	/** @var IConnection[] map: name => connection */
@@ -22,18 +24,50 @@ class Ivory
 	private static $defaultConn = null;
 
 
+    private function __construct()
+    {
+        // the class is static - no actual instance is to be used
+    }
+
+    public static function getCoreFactory() : ICoreFactory
+    {
+        if (self::$coreFactory === null) {
+            self::$coreFactory = new StdCoreFactory();
+        }
+        return self::$coreFactory;
+    }
+
+    /**
+     * Provides Ivory with a factory for core objects.
+     *
+     * Note that {@link Ivory} caches the objects so setting another core factory is only effective at the very
+     * beginning of working with Ivory.
+     *
+     * @param ICoreFactory $coreFactory
+     */
+    public static function setCoreFactory(ICoreFactory $coreFactory)
+    {
+        self::$coreFactory = $coreFactory;
+    }
+
 	/**
 	 * @return TypeRegister the global type register, used for getting types not defined locally for a connection
 	 */
-	public static function getTypeRegister()
+	public static function getTypeRegister() : TypeRegister
 	{
 		if (self::$typeRegister === null) {
-			self::$typeRegister = new TypeRegister();
-			self::$typeRegister->registerTypeLoader(new StdTypeLoader());
-			self::$typeRegister->registerRangeCanonicalFuncProvider(new StdRangeCanonicalFuncProvider());
+            self::$typeRegister = self::getCoreFactory()->createTypeRegister();
 		}
 		return self::$typeRegister;
 	}
+
+    public static function getSqlPatternParser() : SqlPatternParser
+    {
+        if (self::$sqlPatternParser === null) {
+            self::$sqlPatternParser = self::getCoreFactory()->createSqlPatternParser();
+        }
+        return self::$sqlPatternParser;
+    }
 
 	/**
 	 * @return StatementExceptionFactory the global statement exception factory, used for emitting the
@@ -41,10 +75,10 @@ class Ivory
 	 *                                   like the type register, an overriding factory is also defined locally on each
 	 *                                     connection - this factory only applies if the local one does not
 	 */
-	public static function getStatementExceptionFactory()
+	public static function getStatementExceptionFactory() : StatementExceptionFactory
 	{
 		if (self::$stmtExFactory === null) {
-			self::$stmtExFactory = new StatementExceptionFactory();
+			self::$stmtExFactory = self::getCoreFactory()->createStatementExceptionFactory();
 		}
 		return self::$stmtExFactory;
 	}
@@ -71,11 +105,11 @@ class Ivory
 	 *                                or the fallback name <tt>'conn'</tt> is used;
 	 *                              if not given and if the auto-generated name is already taken, it is appended with a
 	 *                                numeric suffix, e.g., <tt>'conn1'</tt>, <tt>'conn2'</tt>, etc.
-	 * @return Connection
+	 * @return IConnection
 	 * @throws ConnectionException if connection name is explicitly specified but a connection with the same name
 	 *                               already exists
 	 */
-	public static function setupConnection($params, $connName = null)
+	public static function setupConnection($params, $connName = null) : IConnection
 	{
 		if (!$params instanceof ConnectionParameters) {
 			$params = ConnectionParameters::create($params);
@@ -95,7 +129,7 @@ class Ivory
 			}
 		}
 
-		$conn = new Connection($connName, $params);
+		$conn = self::getCoreFactory()->createConnection($connName, $params);
 
 		if (empty(self::$connections)) {
 			self::useConnectionAsDefault($conn);
@@ -112,7 +146,7 @@ class Ivory
 	 * @throws \RuntimeException if the default connection is requested but no connection has been setup yet, or if the
 	 *                             requested connection is not defined
 	 */
-	public static function getConnection($connName = null)
+	public static function getConnection($connName = null) : IConnection
 	{
 		if ($connName === null) {
 			if (self::$defaultConn) {

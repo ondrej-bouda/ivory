@@ -89,13 +89,14 @@ class SqlPatternTest extends \PHPUnit_Framework_TestCase
             'SELECT id FROM %n:tbl UNION SELECT object_id FROM log WHERE table = %s:tbl'
         );
         $gen = $pattern->generateSql();
-        foreach ($gen as $plcHdr => &$value) {
+        while ($gen->valid()) {
             /** @var SqlPatternPlaceholder $plcHdr */
+            $plcHdr = $gen->current();
             if ($plcHdr->getNameOrPosition() == 'tbl' && $plcHdr->getTypeName() == 'n') {
-                $value = 'person';
+                $gen->send('person');
             }
             elseif ($plcHdr->getNameOrPosition() == 'tbl' && $plcHdr->getTypeName() == 's') {
-                $value = "'person'";
+                $gen->send("'person'");
             }
             else {
                 $this->fail('Unexpected parameter to give value for.');
@@ -116,15 +117,11 @@ class SqlPatternTest extends \PHPUnit_Framework_TestCase
             'SELECT id FROM %n:tbl UNION SELECT object_id FROM log WHERE table = %s:tbl'
         );
         $gen = $pattern->generateSql();
-        $i = 0;
         try {
-            foreach ($gen as $plcHdr => &$value) {
-                if ($i > 0) {
-                    break;
-                }
-                $i++;
-            }
-            $this->fail("Did not stop due to the value not being filled.");
+            $gen->next();
+            $gen->send('person'); // provide the value for the first placeholder
+            $gen->next(); // but not for the next one
+            $this->fail("Should have stopped due to the second value not being filled.");
         }
         catch (NoDataException $e) {
         }

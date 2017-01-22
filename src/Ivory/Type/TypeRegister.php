@@ -6,7 +6,7 @@ use Ivory\Connection\IConnection;
 /**
  * Collection of PHP type converters for recognized PostgreSQL base types.
  *
- * There are two levels of type registers: at the Ivory class and at a connection to a concrete database. At either
+ * Type registers are used at two levels: at the Ivory class and at a connection to a concrete database. At either
  * level, specific types and type loaders may be registered. Whenever a type converter is requested for a PostgreSQL
  * type, it is retrieved from the connection type register, then from the global register. If neither of them already
  * knows the requested type, type loaders registered at both the registers are consecutively tried to load the type
@@ -20,8 +20,9 @@ use Ivory\Connection\IConnection;
  * requested by a connection, it may be cached for the whole script lifetime so that later type or type loader
  * registration changes are not reflected.
  *
- * Besides types and type loaders, the type register also collects type supplements. As the only kind of supplements (so
- * far), there are range canonical functions and their providers.
+ * Besides types and type loaders, the type register also collects several type supplements:
+ * - range canonical functions and their providers;
+ * - abbreviations of qualified type names.
  */
 class TypeRegister
 {
@@ -38,6 +39,10 @@ class TypeRegister
      * @var IRangeCanonicalFuncProvider[] list of registered range canonical function providers, in the definition order
      */
     private $rangeCanonFuncProviders = [];
+    /** @var IType[] map: name => type converter */
+    private $sqlPatternTypes = [];
+    /** @var string[] type name abbreviation => qualified type name as "<schema>.<name>" */
+    private $sqlPatternTypeAbbreviations = [];
 
     /**
      * Registers a type converter for a PostgreSQL base data type.
@@ -273,6 +278,71 @@ class TypeRegister
         else {
             return false;
         }
+    }
+
+    /**
+     * Registers a type converter to be used for serializing parameters of {@link Ivory\Lang\SqlPattern\SqlPattern}
+     * typed placeholders.
+     *
+     * This method is only useful for registering special converters, such as `sql`. Common data types are registered
+     * automatically by their name, abbreviations are registered with {@link registerSqlPatternTypeAbbreviation()}.
+     *
+     * If a type converter has already been registered with the given name, it gets dropped in favor of the new one.
+     *
+     * @param string $name
+     * @param IType $type
+     */
+    public function registerSqlPatternType(string $name, IType $type)
+    {
+        $this->sqlPatternTypes[$name] = $type;
+    }
+
+    public function unregisterSqlPatternType(string $name)
+    {
+        unset($this->sqlPatternTypes[$name]);
+    }
+
+    /**
+     * Registers an abbreviation for a qualified type name to be used in {@link Ivory\Lang\SqlPattern\SqlPattern} typed
+     * placeholders.
+     *
+     * If the abbreviation has already been registered before, it gets dropped in favor of the new one.
+     *
+     * @param string $abbreviation abbreviation for the type name;
+     *                             may only contain letters, digits and underscores, optionally ended with an empty pair
+     *                               of square brackets
+     * @param string $schemaName name of schema a referred-to type is defined in
+     * @param string $typeName name of type the abbreviation refers to
+     */
+    public function registerSqlPatternTypeAbbreviation(string $abbreviation, string $schemaName, string $typeName)
+    {
+        assert(
+            preg_match('~ ^ [[:alnum:]_]+ (?: \[\] )? $ ~x', $abbreviation),
+            new \InvalidArgumentException('$abbreviation contains illegal characters')
+        );
+
+        $this->sqlPatternTypeAbbreviations[$abbreviation] = "$schemaName.$typeName";
+    }
+
+    public function unregisterSqlPatternTypeAbbreviation(string $abbreviation)
+    {
+        unset($this->sqlPatternTypeAbbreviations[$abbreviation]);
+    }
+
+    /**
+     * @return IType[] map: name => type converter
+     */
+    public function getSqlPatternTypes()
+    {
+        return $this->sqlPatternTypes;
+    }
+
+    /**
+     * @return string[] map: abbreviation => qualified type name as "<schema>.<name>" string
+     */
+    public function getSqlPatternTypeAbbreviations()
+    {
+        return $this->sqlPatternTypeAbbreviations;
     }
 
     /**
