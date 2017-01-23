@@ -72,7 +72,8 @@ class StatementExceptionFactory
 
     /**
      * @param string $preg Perl-compatible regular expression, given to {@link preg_match()}, to match the error
-     * @param string $exceptionClass
+     * @param string $exceptionClass name of class, inheriting from {@link StatementException}, to be thrown upon a
+     *                                 statement error with a message matching the regular expression
      * @return $this
      */
     public function registerByMessage($preg, $exceptionClass)
@@ -80,6 +81,17 @@ class StatementExceptionFactory
         assert(is_a($exceptionClass, StatementException::class, true));
         $this->byMessage[$preg] = $exceptionClass;
         return $this;
+    }
+
+    /**
+     * Clears all registered exception classes, leaving the factory as in the initial state.
+     */
+    public function clear()
+    {
+        $this->bySqlStateCodeAndMessage = [];
+        $this->bySqlStateCode = [];
+        $this->bySqlStateClass = [];
+        $this->byMessage = [];
     }
 
 
