@@ -12,8 +12,13 @@
   "config": {
     "vendor-dir": "lib/composed"
   },
+  "require": {
+    "php": ">= 7.0",
+    "ext-mbstring": "*",
+    "ext-pgsql": "*"
+  },
   "require-dev": {
-    "php": ">= 5.6",
+    "ext-pdo_pgsql": "*",
     "phpunit/phpunit": "~5.3",
     "phpunit/dbunit": "~1.2"
   }
