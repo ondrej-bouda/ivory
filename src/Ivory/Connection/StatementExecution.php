@@ -124,8 +124,7 @@ class StatementExecution implements IStatementExecution
             case PGSQL_NONFATAL_ERROR:
                 // non-fatal errors are supposedly not possible to be received by the PHP client library, but anyway...
             case PGSQL_FATAL_ERROR:
-                $ex = $this->stmtExFactory->createException($resHandler, $query, Ivory::getStatementExceptionFactory());
-                throw new $ex($resHandler, $query);
+                throw $this->stmtExFactory->createException($resHandler, $query, Ivory::getStatementExceptionFactory());
 
             default:
                 throw new \UnexpectedValueException("Unexpected PostgreSQL statement result status: $stat", $stat);
