@@ -60,7 +60,7 @@ class TimeTz extends TimeBase
 
         $hour = $m[1];
         $min = $m[2];
-        $sec = (isset($m[3]) ? $m[3] : 0); // PHP 7: abbreviate using ??
+        $sec = (!empty($m[3]) ? $m[3] : 0);
 
         if ($hour == 24) {
             if ($min > 0 || $sec > 0) {
