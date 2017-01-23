@@ -24,23 +24,21 @@ namespace Ivory\Value;
 class Timestamp extends TimestampBase
 {
     /**
-     * @return Timestamp date/time representing the current moment with precision to seconds
+     * @return Timestamp date/time representing the current moment, with precision to microseconds (or, more
+     *                     specifically, with the precision supported by the hosting platform)
      */
     public static function now()
     {
-        return new Timestamp(0, new \DateTimeImmutable('now', self::getUTCTimeZone()));
-    }
-
-    /**
-     * @return Timestamp date/time representing the current moment with precision to microseconds (or, more specifically,
-     *                    with the precision supported by the hosting platform - {@link microtime()} is used internally)
-     */
-    public static function nowMicro()
-    {
-        list($micro, $sec) = explode(' ', microtime());
-        $microFrac = substr($micro, 1); // cut off the whole part (always a zero)
-        $inputStr = gmdate('Y-m-d\TH:i:s', $sec) . $microFrac . 'UTC';
-        return new Timestamp(0, new \DateTimeImmutable($inputStr));
+        if (PHP_VERSION_ID >= 70100) {
+            return new Timestamp(0, new \DateTimeImmutable('now', self::getUTCTimeZone()));
+        }
+        else {
+            // up to PHP 7.0, new \DateTimeImmutable('now') had only precision up to seconds
+            list($micro, $sec) = explode(' ', microtime());
+            $microFrac = substr($micro, 1); // cut off the whole part (always a zero)
+            $inputStr = gmdate('Y-m-d\TH:i:s', $sec) . $microFrac . 'UTC';
+            return new Timestamp(0, new \DateTimeImmutable($inputStr));
+        }
     }
 
     /**

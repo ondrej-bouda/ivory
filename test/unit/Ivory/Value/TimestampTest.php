@@ -28,26 +28,14 @@ class TimestampTest extends \PHPUnit_Framework_TestCase
     public function testNow()
     {
         // there is a little chance of hitting the following code exactly at time with no microseconds
+        $hitNonZeroMicrosec = false;
         for ($i = 0; $i < 10; $i++) {
             $start = time();
             $dt = Timestamp::now();
             $end = time();
             $this->assertLessThanOrEqual($dt->toUnixTimestamp(), $start);
             $this->assertLessThanOrEqual($end, $dt->toUnixTimestamp());
-            $this->assertEquals(0, $dt->format('u'));
-        }
-    }
-
-    public function testNowMicro()
-    {
-        // there is a little chance of hitting the following code exactly at time with no microseconds
-        $hitNonZeroMicrosec = false;
-        for ($i = 0; $i < 10; $i++) {
-            $start = time();
-            $dt = Timestamp::nowMicro();
-            $end = time();
-            $this->assertLessThanOrEqual($dt->toUnixTimestamp(), $start);
-            $this->assertLessThanOrEqual($end, $dt->toUnixTimestamp());
+            // the precision should be greater than just mere seconds
             if ($dt->format('u') != 0) {
                 $hitNonZeroMicrosec = true;
                 break; // OK - non-zero fractional part
