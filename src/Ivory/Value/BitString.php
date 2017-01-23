@@ -14,7 +14,7 @@ use Ivory\Utils\IComparable;
  * It is possible to access individual bits using the array indices (readonly). The leftmost bit is at offset 0. Testing
  * whether the bit string has a bit at a given offset may be performed using `isset($this[$offset])`. Note that, apart
  * from reading out of such a call, it does not test whether the given bit is *set* (i.e., whether it is 1) - it merely
- * tests whether it is legal to access it.
+ * tests whether it is legal to access it. Negative offsets may be used to get bits off the end of the string.
  *
  * @see http://www.postgresql.org/docs/current/static/datatype-bit.html PostgreSQL Bit String Types
  * @see http://www.postgresql.org/docs/current/static/functions-bitstring.html PostgreSQL Bit String Functions and Operators
@@ -349,22 +349,31 @@ abstract class BitString implements IComparable, \ArrayAccess
 
 
 	/**
-	 * @param int $offset the bit to know existence of; 0 for the leftmost bit, 1 for the next bit, etc.
+	 * @param int $offset the bit to know existence of; 0 for the leftmost bit, 1 for the next bit, -1 for the rightmost
+     *                      bit, etc.
 	 * @return bool <tt>true</tt> if the bit string has <tt>$offset</tt>-th bit defined,
 	 *              <tt>false</tt> if the bit string is too short (i.e., shorter than <tt>$offset+1</tt> bits)
 	 */
 	public function offsetExists($offset)
 	{
-		return isset($this->bits[$offset]);
+	    if ($offset < 0 && PHP_VERSION_ID < 70100) { // PHP < 7.1 did not support negative string offsets
+            $offset = $this->len + $offset;
+        }
+
+        return isset($this->bits[$offset]);
 	}
 
 	/**
-	 * @param int $offset the bit to get; 0 for the leftmost bit, 1 for the next bit, etc.
+	 * @param int $offset the bit to get; 0 for the leftmost bit, 1 for the next bit, -1 for the rightmost bit, etc.
 	 * @return int|null 0 or 1 depending on whether the <tt>$offset</tt>-th bit is set, or
 	 *                  <tt>null</tt> if outside of the bit string
 	 */
 	public function offsetGet($offset)
 	{
+        if ($offset < 0 && PHP_VERSION_ID < 70100) { // PHP < 7.1 did not support negative string offsets
+            $offset = $this->len + $offset;
+        }
+
 		if (isset($this->bits[$offset])) {
 			return (int)$this->bits[$offset];
 		}

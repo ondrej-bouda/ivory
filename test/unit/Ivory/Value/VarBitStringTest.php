@@ -538,12 +538,16 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 		$this->assertSame(1, $small[1]);
 		$this->assertSame(0, $small[2]);
 		$this->assertSame(1, $small[6]);
+        $this->assertSame(1, $small[-1]);
+        $this->assertSame(0, $small[-2]);
+        $this->assertSame(1, $small[-6]);
+        $this->assertSame(1, $small[-7]);
 		$this->assertSame(0, $big[24]);
 		$this->assertSame(1, $limited[8]);
 		$this->assertNull($small[7]);
 		$this->assertNull($small[8]);
-		$this->assertNull($small[-1]);
-		$this->assertNull($small[-4]);
+		$this->assertNull($small[-8]);
+		$this->assertNull($small[-9]);
 		$this->assertNull($big[25]);
 		$this->assertNull($limited[9]);
 
@@ -551,12 +555,16 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(isset($small[1]));
 		$this->assertTrue(isset($small[2]));
 		$this->assertTrue(isset($small[6]));
+        $this->assertTrue(isset($small[-1]));
+        $this->assertTrue(isset($small[-2]));
+        $this->assertTrue(isset($small[-6]));
+        $this->assertTrue(isset($small[-7]));
 		$this->assertTrue(isset($big[24]));
 		$this->assertTrue(isset($limited[8]));
 		$this->assertFalse(isset($small[7]));
 		$this->assertFalse(isset($small[8]));
-		$this->assertFalse(isset($small[-1]));
-		$this->assertFalse(isset($small[-4]));
+		$this->assertFalse(isset($small[-8]));
+		$this->assertFalse(isset($small[-9]));
 		$this->assertFalse(isset($big[25]));
 		$this->assertFalse(isset($limited[9]));
 

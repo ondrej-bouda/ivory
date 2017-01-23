@@ -12,7 +12,7 @@ use Ivory\Exception\NotImplementedException;
  * It is possible to access individual bits using the array indices (readonly). The leftmost bit is at offset 0. Testing
  * whether the bit string has a bit at a given offset may be performed using `isset($this[$offset])`. Note that, apart
  * from reading out of such a call, it does not test whether the given bit is *set* (i.e., whether it is 1) - it merely
- * tests whether it is legal to access it.
+ * tests whether it is legal to access it. Negative offsets may be used to get bits off the end of the string.
  *
  * @see http://www.postgresql.org/docs/current/static/datatype-bit.html PostgreSQL Bit String Types
  * @see http://www.postgresql.org/docs/current/static/functions-bitstring.html PostgreSQL Bit String Functions and Operators
