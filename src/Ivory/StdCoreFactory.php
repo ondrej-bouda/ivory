@@ -7,6 +7,8 @@ use Ivory\Connection\IConnection;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
 use Ivory\Type\Ivory\CommandRecipeType;
+use Ivory\Type\Ivory\IdentifierType;
+use Ivory\Type\Ivory\QuotedIdentifierType;
 use Ivory\Type\Ivory\RelationRecipeType;
 use Ivory\Type\Ivory\SqlType;
 use Ivory\Type\Std\StdRangeCanonicalFuncProvider;
@@ -30,10 +32,11 @@ class StdCoreFactory implements ICoreFactory
 
         // standard non-volatile type converters for SQL patterns; volatile ones will be defined on the connection
         $reg->registerSqlPatternType('sql', new SqlType());
+        $reg->registerSqlPatternType('ident', new IdentifierType());
+        $reg->registerSqlPatternType('qident', new QuotedIdentifierType());
 
         // standard type abbreviations
         $reg->registerSqlPatternTypeAbbreviation('s', 'pg_catalog', 'text');
-//        $reg->registerSqlPatternTypeAbbreviation('ident', 'pg_catalog', 'name'); // FIXME: uncomment once the "name" type converter gets implemented
         $reg->registerSqlPatternTypeAbbreviation('d', 'pg_catalog', 'int');
         $reg->registerSqlPatternTypeAbbreviation('D', 'pg_catalog', 'bigint');
         $reg->registerSqlPatternTypeAbbreviation('n', 'pg_catalog', 'numeric');

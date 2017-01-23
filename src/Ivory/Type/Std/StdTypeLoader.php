@@ -6,7 +6,6 @@ use Ivory\Type\AdHocCompositeType;
 /**
  * Type loader for the standard PostgreSQL base types.
  *
- * @todo define the converter for the "name" type
  * @todo define the converter for the "hstore" type and possibly other extensions delivered in the standard installation
  */
 class StdTypeLoader implements \Ivory\Type\ITypeLoader
