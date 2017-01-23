@@ -54,17 +54,6 @@ class DecimalTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(Decimal::fromNumber(0)->lessThan(Decimal::NaN()));
 		$this->assertFalse(Decimal::NaN()->lessThan(0));
 
-		$this->assertEquals(Decimal::fromNumber(gmp_init('123456789012345678901234567890')), Decimal::fromNumber('123456789012345678901234567890'));
-		$this->assertTrue(Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->equals('123456789012345678901234567890'));
-		$this->assertEquals(0, Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->compareTo('123456789012345678901234567890'));
-		$this->assertFalse(Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->lessThan('123456789012345678901234567890'));
-		$this->assertFalse(Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->greaterThan('123456789012345678901234567890'));
-		$this->assertNotEquals(Decimal::fromNumber(gmp_init('123456789012345678901234567890')), Decimal::fromNumber('123456789012345678901234567891'));
-		$this->assertFalse(Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->equals('123456789012345678901234567891'));
-		$this->assertEquals(-1, Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->compareTo('123456789012345678901234567891'));
-		$this->assertTrue(Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->lessThan('123456789012345678901234567891'));
-		$this->assertFalse(Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->greaterThan('123456789012345678901234567891'));
-
 		$this->assertEquals(Decimal::fromNumber('1234.00'), Decimal::fromNumber(1234, 2));
 		$this->assertNotEquals(Decimal::fromNumber('1234.00'), Decimal::fromNumber(1234));
 		$this->assertNotEquals(Decimal::fromNumber('1234.00'), Decimal::fromNumber(1234.00));
@@ -86,6 +75,23 @@ class DecimalTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue(Decimal::fromNumber(-5, 2)->equals(Decimal::fromNumber('-5')));
 	}
 
+    /**
+   	 * @requires extension gmp
+   	 */
+    public function testEqualsGmp()
+    {
+        $this->assertEquals(Decimal::fromNumber(gmp_init('123456789012345678901234567890')), Decimal::fromNumber('123456789012345678901234567890'));
+        $this->assertTrue(Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->equals('123456789012345678901234567890'));
+        $this->assertEquals(0, Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->compareTo('123456789012345678901234567890'));
+        $this->assertFalse(Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->lessThan('123456789012345678901234567890'));
+        $this->assertFalse(Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->greaterThan('123456789012345678901234567890'));
+        $this->assertNotEquals(Decimal::fromNumber(gmp_init('123456789012345678901234567890')), Decimal::fromNumber('123456789012345678901234567891'));
+        $this->assertFalse(Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->equals('123456789012345678901234567891'));
+        $this->assertEquals(-1, Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->compareTo('123456789012345678901234567891'));
+        $this->assertTrue(Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->lessThan('123456789012345678901234567891'));
+        $this->assertFalse(Decimal::fromNumber(gmp_init('123456789012345678901234567890'))->greaterThan('123456789012345678901234567891'));
+    }
+
 	public function testFromNumber()
 	{
 		$this->assertSame('1.5', Decimal::fromNumber('1.49', 1)->toString());
@@ -105,7 +111,6 @@ class DecimalTest extends \PHPUnit_Framework_TestCase
 		$this->assertSame('-0.12', Decimal::fromNumber('-.12')->toString());
 
 		$this->assertSame('123456789123456789123456789', Decimal::fromNumber(Decimal::fromNumber('123456789123456789123456789'))->toString());
-		$this->assertSame('123456789123456789123456789', Decimal::fromNumber(gmp_init('123456789123456789123456789'))->toString());
 		$this->assertSame('42', Decimal::fromNumber(new DecimalTestClass())->toString());
 
 		$this->assertSame('123400000000000000000000000', Decimal::fromNumber(12.34e25)->toString());
@@ -155,6 +160,17 @@ class DecimalTest extends \PHPUnit_Framework_TestCase
 		catch (\InvalidArgumentException $e) {
 		}
 	}
+
+    /**
+   	 * @requires extension gmp
+   	 */
+    public function testFromNumberGmp()
+    {
+        $this->assertSame(
+            '123456789123456789123456789',
+            Decimal::fromNumber(gmp_init('123456789123456789123456789'))->toString()
+        );
+    }
 
 	public function testNan()
 	{
