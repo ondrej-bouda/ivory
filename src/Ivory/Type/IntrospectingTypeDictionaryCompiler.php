@@ -84,75 +84,77 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
             /* OPT: This leads to a great flexibility - any type may be registered explicitly, bypassing the generic
              *      type constructors offered by Ivory. It may as well lead to a performance penalty, though.
              */
-            $explicit = $typeProvider->provideType($schemaName, $typeName);
-            if ($explicit !== null) {
-                $dict->defineType($row['oid'], $explicit);
-                continue;
-            }
+            $type = $typeProvider->provideType($schemaName, $typeName);
+            if ($type === null) {
+                switch ($row['typtype']) {
+                    case 'A':
+                        $elemType = $dict->requireTypeByOid($row['parenttype']);
+                        $type = $this->createArrayType($elemType, $row['arrelemtypdelim']);
+                        // NOTE: typdelim of the array type itself seems irrelevant
+                        break;
 
-            switch ($row['typtype']) {
-                case 'A':
-                    $elemType = $dict->requireTypeByOid($row['parenttype']);
-                    $type = $this->createArrayType($elemType, $row['arrelemtypdelim']);
-                    // NOTE: typdelim of the array type itself seems irrelevant
-                    break;
+                    case 'b':
+                    case 'p': // treating pseudo-types as base types - they must be recognized, not built up on another type
+                        $type = $this->createBaseType($schemaName, $typeName, $typeProvider);
+                        // OPT: types not recognized by the type provider are asked twice
+                        break;
 
-                case 'b':
-                case 'p': // treating pseudo-types as base types - they must be recognized, not built up on another type
-                    $type = $this->createBaseType($schemaName, $typeName, $typeProvider);
-                    // OPT: types not recognized by the type provider are asked twice
-                    break;
+                    case 'c':
+                        $type = $this->createCompositeType($schemaName, $typeName); // attributes added later
+                        break;
 
-                case 'c':
-                    $type = $this->createCompositeType($schemaName, $typeName); // attributes added later
-                    break;
+                    case 'd':
+                        $baseType = $dict->requireTypeByOid($row['parenttype']);
+                        $type = $this->createDomainType($schemaName, $typeName, $baseType);
+                        break;
 
-                case 'd':
-                    $baseType = $dict->requireTypeByOid($row['parenttype']);
-                    $type = $this->createDomainType($schemaName, $typeName, $baseType);
-                    break;
+                    case 'e':
+                        $labels = (isset($enumLabels[$row['oid']]) ? $enumLabels[$row['oid']] : []);
+                        $type = $this->createEnumType($schemaName, $typeName, $labels);
+                        break;
 
-                case 'e':
-                    $labels = (isset($enumLabels[$row['oid']]) ? $enumLabels[$row['oid']] : []);
-                    $type = $this->createEnumType($schemaName, $typeName, $labels);
-                    break;
+                    case 'r':
+                        $subtype = $dict->requireTypeByOid($row['parenttype']);
+                        if (!$subtype instanceof ITotallyOrderedType) {
+                            if ($subtype instanceof UndefinedType) {
+                                $type = new UndefinedType($schemaName, $typeName, $this->connection->getName(), $this->connection);
+                                break;
+                            }
 
-                case 'r':
-                    $subtype = $dict->requireTypeByOid($row['parenttype']);
-                    if (!$subtype instanceof ITotallyOrderedType) {
-                        if ($subtype instanceof UndefinedType) {
-                            $type = new UndefinedType($schemaName, $typeName, $this->connection->getName(), $this->connection);
-                            break;
-                        }
-
-                        $sc = get_class($subtype);
-                        $msg = "Cannot create range type $schemaName.$typeName: the subtype $sc is not totally ordered";
-                        trigger_error($msg, E_USER_WARNING);
-                        continue 2;
-                    }
-                    if ($row['rngcfname'] !== null) {
-                        $canonFunc = $typeProvider->provideRangeCanonicalFunc(
-                            $row['rngcfnspname'], $row['rngcfname'], $subtype
-                        );
-                        if ($canonFunc === null) {
-                            $msg = "Range $typeName has a canonical function $row[rngcfnspname].$row[rngcfname], " .
-                                "but there is no implementation of this function registered. Using the range " .
-                                "without any canonical function - the range will be treated as a continuous " .
-                                "range. That might lead to unexpected results, though.";
+                            $sc = get_class($subtype);
+                            $msg = "Cannot create range type $schemaName.$typeName: the subtype $sc is not totally ordered";
                             trigger_error($msg, E_USER_WARNING);
+                            continue 2;
                         }
-                    }
-                    else {
-                        $canonFunc = null;
-                    }
-                    $type = $this->createRangeType($schemaName, $typeName, $subtype, $canonFunc);
-                    break;
+                        if ($row['rngcfname'] !== null) {
+                            $canonFunc = $typeProvider->provideRangeCanonicalFunc(
+                                $row['rngcfnspname'], $row['rngcfname'], $subtype
+                            );
+                            if ($canonFunc === null) {
+                                $msg = "Range $typeName has a canonical function $row[rngcfnspname].$row[rngcfname], " .
+                                    "but there is no implementation of this function registered. Using the range " .
+                                    "without any canonical function - the range will be treated as a continuous " .
+                                    "range. That might lead to unexpected results, though.";
+                                trigger_error($msg, E_USER_WARNING);
+                            }
+                        }
+                        else {
+                            $canonFunc = null;
+                        }
+                        $type = $this->createRangeType($schemaName, $typeName, $subtype, $canonFunc);
+                        break;
 
-                default:
-                    throw new \RuntimeException("Error fetching types: unexpected typtype '$row[typtype]'");
+                    default:
+                        throw new \RuntimeException("Error fetching types: unexpected typtype '$row[typtype]'");
+                }
             }
 
             $dict->defineType($row['oid'], $type);
+
+            // FIXME: so far, take as implicit that pg_catalog types need not be fully qualified; better, drive this by a configuration
+            if ($schemaName == 'pg_catalog') {
+                $dict->defineTypeAlias($typeName, "$schemaName.$typeName");
+            }
         }
 
         $this->fetchCompositeAttributes($dict);

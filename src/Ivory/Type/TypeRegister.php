@@ -42,7 +42,7 @@ class TypeRegister
     /** @var IType[] map: name => type converter */
     private $sqlPatternTypes = [];
     /** @var string[] type name abbreviation => qualified type name as "<schema>.<name>" */
-    private $sqlPatternTypeAbbreviations = [];
+    private $typeAbbreviations = [];
 
     /**
      * Registers a type converter for a PostgreSQL base data type.
@@ -303,30 +303,22 @@ class TypeRegister
     }
 
     /**
-     * Registers an abbreviation for a qualified type name to be used in {@link Ivory\Lang\SqlPattern\SqlPattern} typed
-     * placeholders.
+     * Registers an abbreviation for a qualified type name.
      *
      * If the abbreviation has already been registered before, it gets dropped in favor of the new one.
      *
-     * @param string $abbreviation abbreviation for the type name;
-     *                             may only contain letters, digits and underscores, optionally ended with an empty pair
-     *                               of square brackets
+     * @param string $abbreviation abbreviation for the type name
      * @param string $schemaName name of schema a referred-to type is defined in
      * @param string $typeName name of type the abbreviation refers to
      */
-    public function registerSqlPatternTypeAbbreviation(string $abbreviation, string $schemaName, string $typeName)
+    public function registerTypeAbbreviation(string $abbreviation, string $schemaName, string $typeName)
     {
-        assert(
-            preg_match('~ ^ [[:alnum:]_]+ (?: \[\] )? $ ~x', $abbreviation),
-            new \InvalidArgumentException('$abbreviation contains illegal characters')
-        );
-
-        $this->sqlPatternTypeAbbreviations[$abbreviation] = "$schemaName.$typeName";
+        $this->typeAbbreviations[$abbreviation] = "$schemaName.$typeName";
     }
 
-    public function unregisterSqlPatternTypeAbbreviation(string $abbreviation)
+    public function unregisterTypeAbbreviation(string $abbreviation)
     {
-        unset($this->sqlPatternTypeAbbreviations[$abbreviation]);
+        unset($this->typeAbbreviations[$abbreviation]);
     }
 
     /**
@@ -340,9 +332,9 @@ class TypeRegister
     /**
      * @return string[] map: abbreviation => qualified type name as "<schema>.<name>" string
      */
-    public function getSqlPatternTypeAbbreviations()
+    public function getTypeAbbreviations()
     {
-        return $this->sqlPatternTypeAbbreviations;
+        return $this->typeAbbreviations;
     }
 
     /**
@@ -364,9 +356,7 @@ class TypeRegister
      */
     public function getType($schemaName, $typeName)
     {
-        return (isset($this->types[$schemaName][$typeName]) ? $this->types[$schemaName][$typeName] : null);
-        // PHP 7:
-//        return ($this->types[$schemaName][$typeName] ?? null);
+        return ($this->types[$schemaName][$typeName] ?? null);
     }
 
     /**
@@ -410,11 +400,7 @@ class TypeRegister
      */
     public function getRangeCanonicalFunc($schemaName, $funcName, ITotallyOrderedType $subtype)
     {
-        return (isset($this->rangeCanonFuncs[$schemaName][$funcName][spl_object_hash($subtype)]) ?
-            $this->rangeCanonFuncs[$schemaName][$funcName][spl_object_hash($subtype)] : null
-        );
-        // PHP 7:
-//        return ($this->rangeCanonFuncs[$schemaName][$funcName][spl_object_hash($subtype)] ?? null);
+        return ($this->rangeCanonFuncs[$schemaName][$funcName][spl_object_hash($subtype)] ?? null);
     }
 
     /**

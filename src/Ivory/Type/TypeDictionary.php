@@ -32,7 +32,7 @@ class TypeDictionary implements ITypeDictionary
 
     public function defineTypeAlias(string $alias, string $typeName)
     {
-        $this->nameTypeMap[$alias] =& $this->nameTypeMap[$typeName];
+        $this->nameTypeMap[$alias] =& $this->nameTypeMap[$typeName]; // FIXME: $this->nameTypeMap must be split in two structures to distinguish an alias type "some.type" from fully-qualified type names
     }
 
     /**

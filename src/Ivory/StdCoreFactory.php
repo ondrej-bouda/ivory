@@ -5,6 +5,7 @@ use Ivory\Connection\Connection;
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\StatementExceptionFactory;
+use Ivory\Lang;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
 use Ivory\Type\Ivory\CommandRecipeType;
 use Ivory\Type\Ivory\IdentifierType;
@@ -30,22 +31,26 @@ class StdCoreFactory implements ICoreFactory
         $reg->registerTypeLoader(new StdTypeLoader());
         $reg->registerRangeCanonicalFuncProvider(new StdRangeCanonicalFuncProvider());
 
+        foreach (Lang\Sql\Types::getReservedTypes() as $alias => list($implSchema, $implName)) {
+            $reg->registerTypeAbbreviation($alias, $implSchema, $implName);
+        }
+
         // standard non-volatile type converters for SQL patterns; volatile ones will be defined on the connection
         $reg->registerSqlPatternType('sql', new SqlType());
         $reg->registerSqlPatternType('ident', new IdentifierType());
         $reg->registerSqlPatternType('qident', new QuotedIdentifierType());
 
         // standard type abbreviations
-        $reg->registerSqlPatternTypeAbbreviation('s', 'pg_catalog', 'text');
-        $reg->registerSqlPatternTypeAbbreviation('d', 'pg_catalog', 'int');
-        $reg->registerSqlPatternTypeAbbreviation('D', 'pg_catalog', 'bigint');
-        $reg->registerSqlPatternTypeAbbreviation('n', 'pg_catalog', 'numeric');
-        $reg->registerSqlPatternTypeAbbreviation('f', 'pg_catalog', 'float8');
-        $reg->registerSqlPatternTypeAbbreviation('b', 'pg_catalog', 'bool');
-        $reg->registerSqlPatternTypeAbbreviation('a', 'pg_catalog', 'date'); // FIXME: come up with a reasonable abbreviation for the date type
-        $reg->registerSqlPatternTypeAbbreviation('t', 'pg_catalog', 'time');
-        $reg->registerSqlPatternTypeAbbreviation('ts', 'pg_catalog', 'timestamp');
-        $reg->registerSqlPatternTypeAbbreviation('tstz', 'pg_catalog', 'timestamptz');
+        $reg->registerTypeAbbreviation('s', 'pg_catalog', 'text');
+        $reg->registerTypeAbbreviation('d', 'pg_catalog', 'int');
+        $reg->registerTypeAbbreviation('D', 'pg_catalog', 'bigint');
+        $reg->registerTypeAbbreviation('n', 'pg_catalog', 'numeric');
+        $reg->registerTypeAbbreviation('f', 'pg_catalog', 'float8');
+        $reg->registerTypeAbbreviation('b', 'pg_catalog', 'bool');
+        $reg->registerTypeAbbreviation('a', 'pg_catalog', 'date'); // FIXME: come up with a reasonable abbreviation for the date type
+        $reg->registerTypeAbbreviation('t', 'pg_catalog', 'time');
+        $reg->registerTypeAbbreviation('ts', 'pg_catalog', 'timestamp');
+        $reg->registerTypeAbbreviation('tstz', 'pg_catalog', 'timestamptz');
 
         return $reg;
     }

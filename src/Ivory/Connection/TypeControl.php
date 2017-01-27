@@ -36,28 +36,35 @@ class TypeControl implements ITypeControl, ITypeProvider
     {
         if ($this->typeDictionary === null) {
             $this->typeDictionary = new TypeDictionary(); // TODO: instead of empty dictionary, use a cached dictionary; for getting a cached dictionary, use TypeDictionary::export()
-            $this->initTypeDictionary();
+            $this->initTypeDictionary($this->typeDictionary);
+            $this->setupTypeDictionaryUndefinedHandler();
         }
         return $this->typeDictionary;
     }
 
-    private function initTypeDictionary()
+    private function initTypeDictionary(TypeDictionary $typeDictionary)
     {
-        $localReg = $this->getTypeRegister();
         $globalReg = Ivory::getTypeRegister();
+        $localReg = $this->getTypeRegister();
         foreach ([$globalReg, $localReg] as $reg) {
             /** @var TypeRegister $reg */
             foreach ($reg->getSqlPatternTypes() as $name => $type) {
-                $this->typeDictionary->defineCustomType($name, $type);
+                $typeDictionary->defineCustomType($name, $type);
             }
-            foreach ($reg->getSqlPatternTypeAbbreviations() as $abbr => $name) {
-                $this->typeDictionary->defineTypeAlias($abbr, $name);
+            foreach ($reg->getTypeAbbreviations() as $abbr => $name) {
+                $typeDictionary->defineTypeAlias($abbr, $name);
+                $typeDictionary->defineTypeAlias("{$abbr}[]", "{$name}[]");
             }
         }
+    }
 
+    private function setupTypeDictionaryUndefinedHandler()
+    {
         $handler = function ($oid, $name, $value) {
             $compiler = new IntrospectingTypeDictionaryCompiler($this->connection, $this->connCtl->requireConnection());
             $dict = $compiler->compileTypeDictionary($this);
+            $this->initTypeDictionary($dict);
+
             if ($oid !== null) {
                 $type = $dict->requireTypeByOid($oid);
             }
@@ -71,9 +78,9 @@ class TypeControl implements ITypeControl, ITypeProvider
                 return null;
             }
 
-            // now the requested type was really found - replace the current dictionary with the new one, which recognized the type
+            // now that the requested type was really found, replace the current dictionary with the new one, which recognized the type
             $this->typeDictionary = $dict;
-            $this->initTypeDictionary();
+            $this->setupTypeDictionaryUndefinedHandler();
 
             return $type;
         };

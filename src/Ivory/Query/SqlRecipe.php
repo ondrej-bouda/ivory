@@ -314,7 +314,7 @@ abstract class SqlRecipe
      * @param ITypeDictionary $typeDictionary
      * @return string
      */
-    public function getSql(ITypeDictionary $typeDictionary) : string
+    public function toSql(ITypeDictionary $typeDictionary) : string
     {
         if ($this->unsatisfiedParams) {
             $names = array_keys($this->unsatisfiedParams);

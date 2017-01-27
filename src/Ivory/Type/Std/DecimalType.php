@@ -31,16 +31,16 @@ class DecimalType extends \Ivory\Type\BaseType implements ITotallyOrderedType
 		if ($val === null) {
 			return 'NULL';
 		}
-		elseif ($val instanceof Decimal) {
-			if ($val->isNaN()) {
-				return "'NaN'";
-			}
-			else {
-				return $val->toString();
-			}
-		}
-		else {
-			$this->throwInvalidValue($val);
+
+		if (!$val instanceof Decimal) {
+            $val = Decimal::fromNumber($val);
+        }
+
+        if ($val->isNaN()) {
+            return "'NaN'";
+        }
+        else {
+            return $val->toString();
 		}
 	}
 

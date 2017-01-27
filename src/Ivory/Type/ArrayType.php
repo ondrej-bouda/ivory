@@ -23,7 +23,7 @@ use Ivory\Exception\UnsupportedException;
  *
  * @see http://www.postgresql.org/docs/9.4/static/arrays.html
  */
-class ArrayType implements ITotallyOrderedType
+class ArrayType implements ITotallyOrderedType, INamedType
 {
     private $elemType;
     private $delim;
@@ -34,6 +34,16 @@ class ArrayType implements ITotallyOrderedType
         $this->elemType = $elemType;
         $this->delim = $delimiter;
         $this->elemNeedsQuotesRegex = '~[{}\\s"\\\\' . preg_quote($delimiter, '~') . ']|^NULL$|^$~i';
+    }
+
+    public function getSchemaName()
+    {
+        return $this->elemType->getSchemaName();
+    }
+
+    public function getName()
+    {
+        return $this->elemType->getName() . '[]';
     }
 
     public function parseValue($str)
