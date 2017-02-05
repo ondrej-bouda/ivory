@@ -44,6 +44,9 @@ class TypeControl implements ITypeControl, ITypeProvider
 
     private function initTypeDictionary(TypeDictionary $typeDictionary)
     {
+        $sp = $this->connection->getConfig()->getEffectiveSearchPath();
+        $typeDictionary->setTypeSearchPath($sp);
+
         $globalReg = Ivory::getTypeRegister();
         $localReg = $this->getTypeRegister();
         foreach ([$globalReg, $localReg] as $reg) {
@@ -64,7 +67,6 @@ class TypeControl implements ITypeControl, ITypeProvider
             $compiler = new IntrospectingTypeDictionaryCompiler($this->connection, $this->connCtl->requireConnection());
             $dict = $compiler->compileTypeDictionary($this);
             $this->initTypeDictionary($dict);
-            $dict->setTypeSearchPath($this->typeDictionary->getTypeSearchPath());
 
             if ($oid !== null) {
                 $type = $dict->requireTypeByOid($oid);

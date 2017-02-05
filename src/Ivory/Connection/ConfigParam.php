@@ -203,6 +203,7 @@ class ConfigParam
     const AUTOVACUUM_VACUUM_COST_LIMIT = 'autovacuum_vacuum_cost_limit';
     //endregion
     //region Client Connection Settings
+    /** The explicitly set search path. See also {@link IConnConfig::getEffectiveSearchPath()}. */
     const SEARCH_PATH = 'search_path';
     const ROW_SECURITY = 'row_security';
     const DEFAULT_TABLESPACE = 'default_tablespace';

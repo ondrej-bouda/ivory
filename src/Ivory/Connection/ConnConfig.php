@@ -39,6 +39,8 @@ class ConnConfig implements IObservableConnConfig
     private $watcher;
 
     private $typeCache = null;
+    /** @var string[]|null */
+    private $effectiveSearchPathCache = null;
     /** @var IConfigObserver[][] map: parameter name or <tt>null</tt> => list of observers registered for changes of the
      *                             parameter (or any parameter for <tt>null</tt> entry) */
     private $observers = [];
@@ -285,6 +287,52 @@ class ConnConfig implements IObservableConnConfig
         $txConf->setIsolationLevel($isolationLevels[$isolationLevel]);
 
         return $txConf;
+    }
+
+    public function getEffectiveSearchPath()
+    {
+        if ($this->effectiveSearchPathCache === null) {
+            $this->initEffectiveSearchPathCache();
+            $refresher = function () {
+                $this->initEffectiveSearchPathCache();
+            };
+            $this->addObserver(
+                new class($refresher) implements IConfigObserver
+                {
+                    private $refresher;
+
+                    public function __construct($refresher)
+                    {
+                        $this->refresher = $refresher;
+                    }
+
+                    public function handlePropertyChange($propertyName, $newValue)
+                    {
+                        call_user_func($this->refresher);
+                    }
+
+                    public function handlePropertiesReset(IConnConfig $connConfig)
+                    {
+                        call_user_func($this->refresher);
+                    }
+                },
+                ConfigParam::SEARCH_PATH
+            );
+        }
+
+        return $this->effectiveSearchPathCache;
+    }
+
+    private function initEffectiveSearchPathCache()
+    {
+        $connHandler = $this->connCtl->requireConnection();
+        $res = pg_query($connHandler, 'SELECT unnest(pg_catalog.current_schemas(TRUE))');
+        if ($res !== false) {
+            $this->effectiveSearchPathCache = [];
+            while (($row = pg_fetch_row($res)) !== false) {
+                $this->effectiveSearchPathCache[] = $row[0];
+            }
+        }
     }
 
     public function getMoneyDecimalSeparator()

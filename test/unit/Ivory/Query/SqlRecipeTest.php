@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Query;
 
+use Ivory\Connection\ConfigParam;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\UndefinedTypeException;
 use Ivory\Type\ITypeDictionary;
@@ -131,5 +132,19 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
         }
         catch (UndefinedTypeException $e) {
         }
+    }
+
+    public function testSearchPathChange()
+    {
+        $this->conn->rawQuery('CREATE DOMAIN public.tp AS INT');
+        $this->conn->rawQuery('CREATE SCHEMA s');
+        $this->conn->rawQuery('CREATE DOMAIN s.tp AS TEXT');
+
+        $recip = SqlRelationRecipe::fromPattern('SELECT %tp', 42);
+
+        $this->assertSame('SELECT 42', $recip->toSql($this->typeDict));
+
+        $this->conn->getConfig()->setForSession(ConfigParam::SEARCH_PATH, 's, public');
+        $this->assertSame("SELECT '42'", $recip->toSql($this->typeDict));
     }
 }

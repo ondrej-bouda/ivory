@@ -75,8 +75,6 @@ class StdCoreFactory implements ICoreFactory
         $reg->registerSqlPatternType('rel', new RelationRecipeType($conn));
         $reg->registerSqlPatternType('cmd', new CommandRecipeType($conn));
 
-        $conn->getTypeDictionary()->setTypeSearchPath(['pg_catalog', 'public']);
-
         return $conn;
     }
 }

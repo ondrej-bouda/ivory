@@ -98,6 +98,12 @@ interface IConnConfig
     function getDefaultTxConfig();
 
     /**
+     * @return string[] the effective search path - the explicit search path combined with the implicit schemas
+     * @see https://www.postgresql.org/docs/9.6/static/runtime-config-client.html#RUNTIME-CONFIG-CLIENT-STATEMENT
+     */
+    function getEffectiveSearchPath();
+
+    /**
      * @return string currently configured decimal separator used in values of type <tt>money</tt>
      */
     function getMoneyDecimalSeparator();
