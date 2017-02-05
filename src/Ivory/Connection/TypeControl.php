@@ -51,25 +51,26 @@ class TypeControl implements ITypeControl, ITypeProvider
             foreach ($reg->getSqlPatternTypes() as $name => $type) {
                 $typeDictionary->defineCustomType($name, $type);
             }
-            foreach ($reg->getTypeAbbreviations() as $abbr => $name) {
-                $typeDictionary->defineTypeAlias($abbr, $name);
-                $typeDictionary->defineTypeAlias("{$abbr}[]", "{$name}[]");
+            foreach ($reg->getTypeAbbreviations() as $abbr => list($schemaName, $typeName)) {
+                $typeDictionary->defineTypeAlias($abbr, $schemaName, $typeName);
+                $typeDictionary->defineTypeAlias("{$abbr}[]", $schemaName, "{$typeName}[]");
             }
         }
     }
 
     private function setupTypeDictionaryUndefinedHandler()
     {
-        $handler = function ($oid, $name, $value) {
+        $handler = function ($oid, $schemaName, $typeName, $value) {
             $compiler = new IntrospectingTypeDictionaryCompiler($this->connection, $this->connCtl->requireConnection());
             $dict = $compiler->compileTypeDictionary($this);
             $this->initTypeDictionary($dict);
+            $dict->setTypeSearchPath($this->typeDictionary->getTypeSearchPath());
 
             if ($oid !== null) {
                 $type = $dict->requireTypeByOid($oid);
             }
-            elseif ($name !== null) {
-                $type = $dict->requireTypeByName($name);
+            elseif ($typeName !== null) {
+                $type = $dict->requireTypeByName($typeName, $schemaName);
             }
             elseif ($value !== null) {
                 $type = $dict->requireTypeByValue($value);
@@ -93,9 +94,9 @@ class TypeControl implements ITypeControl, ITypeProvider
                 $this->handler = $handler;
             }
 
-            public function handleUndefinedType($oid, $name, $value)
+            public function handleUndefinedType($oid, $schemaName, $typeName, $value)
             {
-                return call_user_func($this->handler, $oid, $name, $value);
+                return call_user_func($this->handler, $oid, $schemaName, $typeName, $value);
             }
         });
     }

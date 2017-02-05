@@ -150,11 +150,6 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
             }
 
             $dict->defineType($row['oid'], $type);
-
-            // FIXME: so far, take as implicit that pg_catalog types need not be fully qualified; better, drive this by a configuration
-            if ($schemaName == 'pg_catalog') {
-                $dict->defineTypeAlias($typeName, "$schemaName.$typeName");
-            }
         }
 
         $this->fetchCompositeAttributes($dict);

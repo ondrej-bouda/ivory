@@ -223,7 +223,8 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
     protected function getIvoryConnection()
     {
         if ($this->ivoryConn === null) {
-            $this->ivoryConn = new Connection('default', new ConnectionParameters([
+            $coreFactory = Ivory::getCoreFactory();
+            $this->ivoryConn = $coreFactory->createConnection('default', new ConnectionParameters([
                 'host' => ($GLOBALS['DB_HOST'] ? : null),
                 'port' => ($GLOBALS['DB_PORT'] ? : null),
                 'user' => $GLOBALS['DB_USER'],

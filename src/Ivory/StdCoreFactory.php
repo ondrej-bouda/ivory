@@ -31,7 +31,8 @@ class StdCoreFactory implements ICoreFactory
         $reg->registerTypeLoader(new StdTypeLoader());
         $reg->registerRangeCanonicalFuncProvider(new StdRangeCanonicalFuncProvider());
 
-        foreach (Lang\Sql\Types::getReservedTypes() as $alias => list($implSchema, $implName)) {
+        $reservedTypes = Lang\Sql\Types::getReservedTypes();
+        foreach ($reservedTypes as $alias => list($implSchema, $implName)) {
             $reg->registerTypeAbbreviation($alias, $implSchema, $implName);
         }
 
@@ -73,6 +74,8 @@ class StdCoreFactory implements ICoreFactory
         $reg = $conn->getTypeRegister();
         $reg->registerSqlPatternType('rel', new RelationRecipeType($conn));
         $reg->registerSqlPatternType('cmd', new CommandRecipeType($conn));
+
+        $conn->getTypeDictionary()->setTypeSearchPath(['pg_catalog', 'public']);
 
         return $conn;
     }

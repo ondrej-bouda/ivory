@@ -10,15 +10,15 @@ use Ivory\Exception\NoDataException;
  */
 class SqlPattern
 {
-    private $rawSql;
+    private $sqlTorso;
     private $positionalPlaceholders;
     private $namedPlaceholderMap;
     /** @var SqlPatternPlaceholder[] */
     private $placeholderSequence;
 
     /**
-     * @param string $rawSql raw SQL parsed from the described SQL pattern; this is the pattern with removed
-     *                         placeholders and unescaped <tt>%%</tt> sequences
+     * @param string $sqlTorso torso of the SQL parsed from the described SQL pattern; this is the pattern with removed
+     *                           placeholders and unescaped <tt>%%</tt> sequences
      * @param SqlPatternPlaceholder[] $positionalPlaceholders
      *                                  list of positional placeholders, in order of appearance, used in the described
      *                                    SQL pattern
@@ -26,14 +26,14 @@ class SqlPattern
      *                                  map of named placeholders used in the described SQL pattern: name => list of all
      *                                    placeholders (in order of appearance) referring to the parameter name
      */
-    public function __construct(string $rawSql, array $positionalPlaceholders, array $namedPlaceholderMap)
+    public function __construct(string $sqlTorso, array $positionalPlaceholders, array $namedPlaceholderMap)
     {
         assert(
             !$positionalPlaceholders || array_keys($positionalPlaceholders) == range(0, count($positionalPlaceholders) - 1),
             new \InvalidArgumentException('$positionalPlaceholders array is not a list - keys do not form a sequence')
         );
 
-        $this->rawSql = $rawSql;
+        $this->sqlTorso = $sqlTorso;
         $this->positionalPlaceholders = $positionalPlaceholders;
         $this->namedPlaceholderMap = $namedPlaceholderMap;
 
@@ -56,15 +56,14 @@ class SqlPattern
     }
 
     /**
-     * Returns the raw SQL parsed from the described SQL pattern. This is the pattern with removed placeholders and
-     * unescaped `%%` sequences.
+     * Returns the described SQL pattern with placeholders removed and sequences `%%` unescaped.
      *
-     * Parameter values must be inserted in this string to form a valid SQL statement.
-     * {@link SqlPatternPlaceholder::getOffset()} tells the appropriate offset.
+     * Parameter values must be inserted in this string in place of the removed placeholders to form a valid SQL
+     * statement. Use {@link fillSql()} or {@link generateSql()} for that.
      */
-    public function getRawSql() : string
+    public function getSqlTorso() : string
     {
-        return $this->rawSql;
+        return $this->sqlTorso;
     }
 
     /**
@@ -87,7 +86,7 @@ class SqlPattern
     }
 
     /**
-     * Fills gaps in the raw SQL with given SQL strings to form a complete SQL string.
+     * Fills gaps in the SQL torso with given SQL strings to form a complete SQL string.
      *
      * This is merely a utility method concatenating the right parts of strings. The given parameter values must already
      * be encoded, escaped, whatsoever, so that they may just be inserted in the gap. Each of the values is explicitly
@@ -123,10 +122,10 @@ class SqlPattern
         $offset = 0;
         foreach ($this->placeholderSequence as $plcHld) {
             $val = $parameterValueSqlStrings[$plcHld->getNameOrPosition()];
-            $result .= substr($this->rawSql, $offset, $plcHld->getOffset() - $offset) . $val;
+            $result .= substr($this->sqlTorso, $offset, $plcHld->getOffset() - $offset) . $val;
             $offset = $plcHld->getOffset();
         }
-        $result .= substr($this->rawSql, $offset);
+        $result .= substr($this->sqlTorso, $offset);
 
         return $result;
     }
@@ -180,10 +179,10 @@ class SqlPattern
                     "No value encoded for placeholder {$plcHdr->getNameOrPosition()} at offset {$plcHdr->getOffset()}."
                 )
             );
-            $result .= substr($this->rawSql, $offset, $plcHdr->getOffset() - $offset) . $encodedValue;
+            $result .= substr($this->sqlTorso, $offset, $plcHdr->getOffset() - $offset) . $encodedValue;
             $offset = $plcHdr->getOffset();
         }
-        $result .= substr($this->rawSql, $offset);
+        $result .= substr($this->sqlTorso, $offset);
 
         return $result;
     }

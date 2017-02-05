@@ -3,6 +3,7 @@ namespace Ivory\Query;
 
 use Ivory\Exception\InvalidStateException;
 use Ivory\Exception\NoDataException;
+use Ivory\Exception\UndefinedTypeException;
 use Ivory\Lang\SqlPattern\SqlPattern;
 use Ivory\Lang\SqlPattern\SqlPatternPlaceholder;
 use Ivory\Type\ITypeDictionary;
@@ -24,32 +25,56 @@ use Ivory\Utils\StringUtils;
  * the other hand, positional parameters may not be reused - a value must be provided for each positional parameter, and
  * placeholders may not explicitly refer to positional parameter values.
  *
- * The placeholders use the following syntax in the SQL pattern:
+ * Placeholders use the following syntax in SQL patterns:
  * <pre>
  * %[type][:name]
  * </pre>
  * where:
- * - `name` is the name of the parameter (if not specified, the parameter is treated as a positional parameter); and
- * - `type` is an explicit type specification, governing how the value given for the parameter will be encoded to the
- *   SQL string. If the type is not given, it is inferred from the actual data type of the parameter value.
+ * * `name` is the name of the parameter (if not specified, the parameter is treated as a positional parameter); and
+ * * `type` is an explicit type specification, governing how the value given for the parameter will be encoded to the
+ *   SQL string. If type is not given, it is inferred from the actual data type of the parameter value.
  *
- * Both `name` and `type` may consist of one or more letters, digits and underscore characters. Neither `name` nor
- * `type` may start with a digit, though; especially, the name may not be a number - referring to positional arguments
- * is not supported. Moreover, dots may be used in `type` specification, although only inside the string, not as a
- * leading or trailing character. Finally, the `type` specification may be ended with a pair of square brackets,
- * indicating an array type. (Multiple pairs of brackets are accepted, although these are treated the same as a mere one
- * bracket pair, consistently with what PostgreSQL does.)
- * - examples of valid names: `tbl`, `person_id`, `p1`;
- * - examples of valid type specifications: `s`, `int_singleton`, `t1`, `public.planet`, `public.planet[]`, `int[][]`.
- * Regarding the square brackets, note, however, that only empty pairs of brackets are recognized as part of the type
- * specification. An array placeholder immediately followed by a subscript works as expected: e.g.,
- * `SELECT %bigint[][2]` selects the item under index 2 from the provided array.
+ * Examples:
+ * * valid `name`s: `tbl`, `person_id`, `p1`;
+ * * valid `type` specifications: `s`, `int_singleton`, `t1`, `public.planet`, `public.planet[]`, `int[][]`,
+ *   `public."int"`, `"my schema"."my type"`, `{double precision}`.
  *
- * Note that names of available types, as well as rules for inferring the type automatically, are defined by the
- * {@link Ivory\Type\TypeDictionary} used by the connection for which the recipe will be serialized to an SQL string.
- * The standard Ivory deployment registers all types defined in the connected-to database under their fully qualified
- * names (e.g., `public.sometype`) and also under their names (e.g., `text`; in case multiple same-named types are
- * defined in several schemas, the one from the schema preferred by a configuration is used [TODO: specify the configuration]).
+ * Detailed rules on syntax and the corresponding semantics follow:
+ * * Let us define a "token", first, which in this context means a string of one or more letters, digits and underscore
+ *   characters (`_`), not starting with a digit.
+ * * `name` may only be a single token. Especially, the name may not be a number - referring to positional arguments is
+ *   not supported.
+ * * `type` may either be:
+ *   * a single token, or
+ *   * any string enclosed in double quotes (the `"` character; to write a double quote character literally, use two of
+ *     them), or
+ *   * any string within a pair of curly braces (the `{` and `}`); note there is no way to type the closing brace
+ *     literally using this variant).
+ * * The `type` may optionally be prefixed with `typeschema.`, where `typeschema` meets the same syntax rules as `type`.
+ * * The `type` specification may be ended with an empty pair of square brackets, indicating an array type. (Multiple
+ *   pairs of brackets are accepted, although these are treated the same as a mere one bracket pair, consistently with
+ *   what PostgreSQL does.) Note, however, that only empty pairs of brackets are recognized as part of the type
+ *   specification. An array placeholder immediately followed by a subscript works as expected: `SELECT %bigint[][2]`
+ *   selects the item under index 2 from the provided array.
+ * * Names of available types, as well as the rules inferring the type automatically (when the type is not specified),
+ *   are defined by the {@link Ivory\Type\TypeDictionary} used by the connection for which the recipe will be serialized
+ *   to an SQL string. The standard Ivory deployment registers all types defined in the connected-to database under
+ *   their fully qualified names (e.g., `public.sometype`) and also some aliases, especially those corresponding to the
+ *   SQL reserved types (e.g., `int`). Besides, some custom types special for being used in SQL patterns may be
+ *   registered (e.g., `sql`).
+ * * Registered types need not be schema-qualified. Just the name of the type is sufficient provided the type is defined
+ *   within one of the schemas {@link TypeDictionary::setTypeSearchPath() configured} at the `TypeDictionary` -
+ *   a similar facility as the PostgreSQL `search_path`, although a static one, independent on runtime value of the
+ *   `search_path` session variable; defaults to `[pg_catalog, public]`. The priorities are as follows: 1) custom type,
+ *   2) type alias, 3) type from the first schema in the list, 4) type from the second schema in the list, etc.
+ * * Note the difference between quoted type name and an unquoted one (i.e., using the first or the third syntax) is the
+ *   same as for PostgreSQL: a quoted type name is case sensitive and it cannot refer to an
+ *   {@link \Ivory\Lang\Sql\Types::getReservedTypes() SQL reserved type}. Recall specifying, e.g., `SELECT 1::"int"`
+ *   addresses a user-defined type named `int`, while `SELECT 1::int` always refers to the reserved type, regardless of
+ *   `search_path` or any user-defined types. This is, actually, also the reason for the curly braces syntax -
+ *   otherwise, multi-word SQL reserved types (such as `double precision`) could not be specified. The braces syntax
+ *   may, of course, be used for regular built-in or user-defined types as long as there is no conflicting reserved type
+ *   (which would be registered with the `TypeDictionary` as an alias).
  *
  * In specific situations, multiple same-named placeholders may be used with different type specifications, e.g.,
  * `SELECT id FROM %ident:tbl UNION SELECT object_id FROM log WHERE table = %s:tbl`. This is perfectly legal - a single
@@ -207,12 +232,15 @@ abstract class SqlRecipe
                 $overallRawSql .= ' ';
             }
             $rawSqlOffset = strlen($overallRawSql);
-            $overallRawSql .= $curFragment->getRawSql();
+            $overallRawSql .= $curFragment->getSqlTorso();
             foreach ($curFragment->getPositionalPlaceholders() as $plcHdr) {
                 $overallPlcHdr = new SqlPatternPlaceholder(
                     $rawSqlOffset + $plcHdr->getOffset(),
                     count($overallPosPlaceholders),
-                    $plcHdr->getTypeName()
+                    $plcHdr->getTypeName(),
+                    $plcHdr->isTypeNameQuoted(),
+                    $plcHdr->getSchemaName(),
+                    $plcHdr->isSchemaNameQuoted()
                 );
                 $overallPosPlaceholders[] = $overallPlcHdr;
             }
@@ -225,7 +253,10 @@ abstract class SqlRecipe
                     $overallPlcHdr = new SqlPatternPlaceholder(
                         $rawSqlOffset + $plcHdr->getOffset(),
                         $name,
-                        $plcHdr->getTypeName()
+                        $plcHdr->getTypeName(),
+                        $plcHdr->isTypeNameQuoted(),
+                        $plcHdr->getSchemaName(),
+                        $plcHdr->isSchemaNameQuoted()
                     );
                     $overallNamedPlaceholderMap[$name][] = $overallPlcHdr;
                 }
@@ -313,6 +344,8 @@ abstract class SqlRecipe
     /**
      * @param ITypeDictionary $typeDictionary
      * @return string
+     * @throws InvalidStateException when values for one or more named parameters has not been set
+     * @throws UndefinedTypeException when some of the types used in the pattern are not defined
      */
     public function toSql(ITypeDictionary $typeDictionary) : string
     {
@@ -342,7 +375,21 @@ abstract class SqlRecipe
             $value = $this->params[$placeholder->getNameOrPosition()];
 
             if ($placeholder->getTypeName() !== null) {
-                $converter = $typeDictionary->requireTypeByName($placeholder->getTypeName());
+                $typeName = $placeholder->getTypeName();
+                if (!$placeholder->isTypeNameQuoted()) {
+                    $typeName = mb_strtolower($typeName); // OPT: SqlPatternPlaceholder might also store the lower-case name, which might be cached
+                }
+                $schemaName = $placeholder->getSchemaName();
+                if ($schemaName !== null) {
+                    if (!$placeholder->isSchemaNameQuoted()) {
+                        $schemaName = mb_strtolower($schemaName); // OPT: SqlPatternPlaceholder might also store the lower-case name, which might be cached
+                    }
+                }
+                elseif ($placeholder->isTypeNameQuoted()) {
+                    $schemaName = false;
+                }
+
+                $converter = $typeDictionary->requireTypeByName($typeName, $schemaName);
             }
             else {
                 $converter = $typeDictionary->requireTypeByValue($value);

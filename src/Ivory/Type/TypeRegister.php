@@ -41,7 +41,7 @@ class TypeRegister
     private $rangeCanonFuncProviders = [];
     /** @var IType[] map: name => type converter */
     private $sqlPatternTypes = [];
-    /** @var string[] type name abbreviation => qualified type name as "<schema>.<name>" */
+    /** @var string[][] type name abbreviation => pair: schema name, type name */
     private $typeAbbreviations = [];
 
     /**
@@ -313,7 +313,7 @@ class TypeRegister
      */
     public function registerTypeAbbreviation(string $abbreviation, string $schemaName, string $typeName)
     {
-        $this->typeAbbreviations[$abbreviation] = "$schemaName.$typeName";
+        $this->typeAbbreviations[$abbreviation] = [$schemaName, $typeName];
     }
 
     public function unregisterTypeAbbreviation(string $abbreviation)
@@ -330,7 +330,7 @@ class TypeRegister
     }
 
     /**
-     * @return string[] map: abbreviation => qualified type name as "<schema>.<name>" string
+     * @return string[][] map: abbreviation => pair: schema name, type name
      */
     public function getTypeAbbreviations()
     {

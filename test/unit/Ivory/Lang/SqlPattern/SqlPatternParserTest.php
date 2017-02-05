@@ -14,7 +14,7 @@ class SqlPatternParserTest extends \PHPUnit_Framework_TestCase
 	public function testPositionalPlaceholder()
 	{
 		$pattern = $this->parser->parse('SELECT * FROM person WHERE id = % AND is_active');
-		$this->assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getRawSql());
+		$this->assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getSqlTorso());
 		$this->assertEquals(
 			[new SqlPatternPlaceholder(32, 0, null)],
 			$pattern->getPositionalPlaceholders()
@@ -25,9 +25,9 @@ class SqlPatternParserTest extends \PHPUnit_Framework_TestCase
 	public function testPositionalTypedPlaceholder()
 	{
 		$pattern = $this->parser->parse('SELECT * FROM person WHERE id = %ivory.d AND is_active');
-		$this->assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getRawSql());
+		$this->assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getSqlTorso());
 		$this->assertEquals(
-			[new SqlPatternPlaceholder(32, 0, 'ivory.d')],
+			[new SqlPatternPlaceholder(32, 0, 'd', false, 'ivory', false)],
 			$pattern->getPositionalPlaceholders()
 		);
 		$this->assertEmpty($pattern->getNamedPlaceholderMap());
@@ -36,7 +36,7 @@ class SqlPatternParserTest extends \PHPUnit_Framework_TestCase
 	public function testNamedPlaceholder()
 	{
 		$pattern = $this->parser->parse('SELECT * FROM person WHERE id = %:id AND is_active');
-		$this->assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getRawSql());
+		$this->assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getSqlTorso());
 		$this->assertEmpty($pattern->getPositionalPlaceholders());
 		$this->assertEquals(
 			['id' => [new SqlPatternPlaceholder(32, 'id', null)]],
@@ -47,7 +47,7 @@ class SqlPatternParserTest extends \PHPUnit_Framework_TestCase
 	public function testNamedTypedPlaceholder()
 	{
 		$pattern = $this->parser->parse('SELECT * FROM person WHERE id = %d:id AND is_active');
-		$this->assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getRawSql());
+		$this->assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getSqlTorso());
 		$this->assertEmpty($pattern->getPositionalPlaceholders());
 		$this->assertEquals(
 			['id' => [new SqlPatternPlaceholder(32, 'id', 'd')]],
@@ -58,12 +58,53 @@ class SqlPatternParserTest extends \PHPUnit_Framework_TestCase
     public function testSquareBrackets()
     {
         $pattern = $this->parser->parse('SELECT %bigint[][][][2]');
-        $this->assertEquals('SELECT [2]', $pattern->getRawSql());
+        $this->assertEquals('SELECT [2]', $pattern->getSqlTorso());
         $this->assertEquals(
             [new SqlPatternPlaceholder(7, 0, 'bigint[]')],
             $pattern->getPositionalPlaceholders()
         );
         $this->assertEmpty($pattern->getNamedPlaceholderMap());
+    }
+
+    public function testCurlyBracesInTypeSpecification()
+    {
+        $pattern = $this->parser->parse('SELECT %{double precision}, %{"quotes included"}:named');
+        $this->assertEquals('SELECT , ', $pattern->getSqlTorso());
+        $this->assertEquals(
+            [
+                new SqlPatternPlaceholder(7, 0, 'double precision'),
+            ],
+            $pattern->getPositionalPlaceholders()
+        );
+        $this->assertEquals(
+            [
+                'named' => [
+                    new SqlPatternPlaceholder(9, 'named', '"quotes included"'),
+                ],
+            ],
+            $pattern->getNamedPlaceholderMap()
+        );
+    }
+
+    public function testQuotedTypeSpecification()
+    {
+        $pattern = $this->parser->parse('SELECT %"quoted type", %"schema with """."t", %"z":named');
+        $this->assertEquals('SELECT , , ', $pattern->getSqlTorso());
+        $this->assertEquals(
+            [
+                new SqlPatternPlaceholder(7, 0, 'quoted type', true),
+                new SqlPatternPlaceholder(9, 1, 't', true, 'schema with "', true),
+            ],
+            $pattern->getPositionalPlaceholders()
+        );
+        $this->assertEquals(
+            [
+                'named' => [
+                    new SqlPatternPlaceholder(11, 'named', 'z', true),
+                ],
+            ],
+            $pattern->getNamedPlaceholderMap()
+        );
     }
 
 	public function testMultiplePlaceholders()
@@ -74,7 +115,7 @@ class SqlPatternParserTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertEquals(
 			'SELECT * FROM  WHERE name =  AND  AND ord % 2 =  AND (name) AND ',
-			$pattern->getRawSql()
+			$pattern->getSqlTorso()
 		);
 
 		$this->assertEquals(
@@ -103,7 +144,7 @@ class SqlPatternParserTest extends \PHPUnit_Framework_TestCase
 	public function testPercentEscapes()
 	{
 		$pattern = $this->parser->parse('SELECT * FROM person WHERE id %% 2 = 0');
-		$this->assertEquals('SELECT * FROM person WHERE id % 2 = 0', $pattern->getRawSql());
+		$this->assertEquals('SELECT * FROM person WHERE id % 2 = 0', $pattern->getSqlTorso());
 		$this->assertEmpty($pattern->getPositionalPlaceholders());
 		$this->assertEmpty($pattern->getNamedPlaceholderMap());
 	}
