@@ -62,11 +62,9 @@ use Ivory\Utils\StringUtils;
  *   their fully qualified names (e.g., `public.sometype`) and also some aliases, especially those corresponding to the
  *   SQL reserved types (e.g., `int`). Besides, some custom types special for being used in SQL patterns may be
  *   registered (e.g., `sql`).
- * * Registered types need not be schema-qualified. Just the name of the type is sufficient provided the type is defined
- *   within one of the schemas {@link TypeDictionary::setTypeSearchPath() configured} at the `TypeDictionary` -
- *   a similar facility as the PostgreSQL `search_path`, although a static one, independent on runtime value of the
- *   `search_path` session variable; defaults to `[pg_catalog, public]`. The priorities are as follows: 1) custom type,
- *   2) type alias, 3) type from the first schema in the list, 4) type from the second schema in the list, etc.
+ * * Registered types need not be schema-qualified. Just the name of the type is sufficient - the PostgreSQL
+ *   `search_path` facility is leveraged to identify the type. Before the `search_path` schemas are actually searched,
+ *   custom types and type aliases are considered.
  * * Note the difference between quoted type name and an unquoted one (i.e., using the first or the third syntax) is the
  *   same as for PostgreSQL: a quoted type name is case sensitive and it cannot refer to an
  *   {@link \Ivory\Lang\Sql\Types::getReservedTypes() SQL reserved type}. Recall specifying, e.g., `SELECT 1::"int"`
