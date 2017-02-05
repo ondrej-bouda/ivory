@@ -48,8 +48,6 @@ class StdCoreFactory implements ICoreFactory
         $reg->registerTypeAbbreviation('n', 'pg_catalog', 'numeric');
         $reg->registerTypeAbbreviation('f', 'pg_catalog', 'float8');
         $reg->registerTypeAbbreviation('b', 'pg_catalog', 'bool');
-        $reg->registerTypeAbbreviation('a', 'pg_catalog', 'date'); // FIXME: come up with a reasonable abbreviation for the date type
-        $reg->registerTypeAbbreviation('t', 'pg_catalog', 'time');
         $reg->registerTypeAbbreviation('ts', 'pg_catalog', 'timestamp');
         $reg->registerTypeAbbreviation('tstz', 'pg_catalog', 'timestamptz');
 
