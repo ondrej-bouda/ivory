@@ -21,6 +21,6 @@ class CommandRecipeType extends VolatilePatternTypeBase
         }
 
         $typeDictionary = $this->getConnection()->getTypeDictionary();
-        return $val->getSql($typeDictionary);
+        return $val->toSql($typeDictionary);
     }
 }

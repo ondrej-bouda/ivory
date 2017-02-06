@@ -147,4 +147,42 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
         $this->conn->getConfig()->setForSession(ConfigParam::SEARCH_PATH, 's, public');
         $this->assertSame("SELECT '42'", $recip->toSql($this->typeDict));
     }
+
+    public function testFromFragments()
+    {
+        $recip = SqlRelationRecipe::fromFragments(
+            'SELECT %int, %char', 42, 'C', "UNION SELECT %integer, 'D'", 53
+        );
+        $this->assertSame("SELECT ,  UNION SELECT , 'D'", $recip->getSqlPattern()->getSqlTorso());
+        $this->assertSame("SELECT 42, 'C' UNION SELECT 53, 'D'", $recip->toSql($this->typeDict));
+    }
+
+    /**
+     * @depends testFromFragments
+     */
+    public function testRecipeComposition()
+    {
+        $recip = SqlRelationRecipe::fromFragments(
+            'WITH data AS (
+               %rel', SqlRelationRecipe::fromPattern('SELECT x FROM %ident', 'r'), '
+             ),
+             inserted AS (
+               %cmd', SqlCommandRecipe::fromPattern('INSERT INTO t (a) SELECT x FROM data'), '
+               RETURNING a, b
+             )
+             SELECT * FROM inserted'
+        );
+
+        $this->assertSame(
+            'WITH data AS (
+               SELECT x FROM r
+             ),
+             inserted AS (
+               INSERT INTO t (a) SELECT x FROM data
+               RETURNING a, b
+             )
+             SELECT * FROM inserted',
+            $recip->toSql($this->typeDict)
+        );
+    }
 }

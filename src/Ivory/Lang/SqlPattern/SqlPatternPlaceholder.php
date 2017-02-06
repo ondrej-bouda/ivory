@@ -35,8 +35,8 @@ class SqlPatternPlaceholder
     }
 
     /**
-     * @return int $offset byte offset where is the place in the {@link SqlPattern::getSql() parsed SQL} to insert
-     *                       value for the placeholder
+     * @return int $offset byte offset where is the place in the {@link SqlPattern::toSql() parsed SQL} to insert value
+     *                       for the placeholder
      */
     public function getOffset() : int
     {

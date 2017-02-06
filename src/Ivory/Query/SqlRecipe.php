@@ -204,7 +204,7 @@ abstract class SqlRecipe
      */
     public static function fromFragments($fragment, ...$fragmentsAndPositionalParams) : self
     {
-        $overallRawSql = '';
+        $overallSqlTorso = '';
         $overallPosPlaceholders = [];
         $overallNamedPlaceholderMap = [];
         $overallPosParams = [];
@@ -221,19 +221,19 @@ abstract class SqlRecipe
                 }
                 else {
                     $ord = StringUtils::englishOrd($curFragmentNum);
-                    throw new \InvalidArgumentException("Invalid type of $ord fragment. Maybe it is a misplaced parameter value?");
+                    throw new \InvalidArgumentException("Invalid type of $ord fragment. Isn't it a misplaced parameter value?");
                 }
             }
 
             // add to the overall pattern
-            if ($argsProcessed > 0) {
-                $overallRawSql .= ' ';
+            if ($argsProcessed > 0 && !preg_match('~^\s~', $curFragment->getSqlTorso())) {
+                $overallSqlTorso .= ' ';
             }
-            $rawSqlOffset = strlen($overallRawSql);
-            $overallRawSql .= $curFragment->getSqlTorso();
+            $sqlTorsoOffset = strlen($overallSqlTorso);
+            $overallSqlTorso .= $curFragment->getSqlTorso();
             foreach ($curFragment->getPositionalPlaceholders() as $plcHdr) {
                 $overallPlcHdr = new SqlPatternPlaceholder(
-                    $rawSqlOffset + $plcHdr->getOffset(),
+                    $sqlTorsoOffset + $plcHdr->getOffset(),
                     count($overallPosPlaceholders),
                     $plcHdr->getTypeName(),
                     $plcHdr->isTypeNameQuoted(),
@@ -249,7 +249,7 @@ abstract class SqlRecipe
                 }
                 foreach ($occurrences as $plcHdr) {
                     $overallPlcHdr = new SqlPatternPlaceholder(
-                        $rawSqlOffset + $plcHdr->getOffset(),
+                        $sqlTorsoOffset + $plcHdr->getOffset(),
                         $name,
                         $plcHdr->getTypeName(),
                         $plcHdr->isTypeNameQuoted(),
@@ -261,8 +261,9 @@ abstract class SqlRecipe
             }
 
             // values of parameters
-            $posParams = array_slice($fragmentsAndPositionalParams, $argsProcessed, $curFragment->getPositionalPlaceholders());
-            if (count($posParams) == count($curFragment->getPositionalPlaceholders())) {
+            $plcHdrCnt = count($curFragment->getPositionalPlaceholders());
+            $posParams = array_slice($fragmentsAndPositionalParams, $argsProcessed, $plcHdrCnt);
+            if (count($posParams) == $plcHdrCnt) {
                 $overallPosParams = array_merge($overallPosParams, $posParams);
             }
             else {
@@ -272,9 +273,12 @@ abstract class SqlRecipe
 
             $curFragmentNum++;
             $argsProcessed += count($posParams);
-        } while ($argsProcessed < count($fragmentsAndPositionalParams));
 
-        $overallPattern = new SqlPattern($overallRawSql, $overallPosPlaceholders, $overallNamedPlaceholderMap);
+            $curFragment =& $fragmentsAndPositionalParams[$argsProcessed];
+            $argsProcessed++;
+        } while (isset($curFragment));
+
+        $overallPattern = new SqlPattern($overallSqlTorso, $overallPosPlaceholders, $overallNamedPlaceholderMap);
 
         return new static($overallPattern, $overallPosParams);
     }
