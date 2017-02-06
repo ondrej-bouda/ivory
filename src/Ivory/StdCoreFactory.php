@@ -43,11 +43,10 @@ class StdCoreFactory implements ICoreFactory
 
         // standard type abbreviations
         $reg->registerTypeAbbreviation('s', 'pg_catalog', 'text');
-        $reg->registerTypeAbbreviation('d', 'pg_catalog', 'int');
-        $reg->registerTypeAbbreviation('D', 'pg_catalog', 'bigint');
-        $reg->registerTypeAbbreviation('n', 'pg_catalog', 'numeric');
+        $reg->registerTypeAbbreviation('i', 'pg_catalog', 'int');
+        $reg->registerTypeAbbreviation('I', 'pg_catalog', 'bigint');
+        $reg->registerTypeAbbreviation('num', 'pg_catalog', 'numeric');
         $reg->registerTypeAbbreviation('f', 'pg_catalog', 'float8');
-        $reg->registerTypeAbbreviation('b', 'pg_catalog', 'bool');
         $reg->registerTypeAbbreviation('ts', 'pg_catalog', 'timestamp');
         $reg->registerTypeAbbreviation('tstz', 'pg_catalog', 'timestamptz');
 

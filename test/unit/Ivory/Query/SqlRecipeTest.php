@@ -28,7 +28,7 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
 
     public function testTypeAliases()
     {
-        $recip = SqlRelationRecipe::fromPattern('SELECT %s, %n', "Ivory's escaping", 3.14);
+        $recip = SqlRelationRecipe::fromPattern('SELECT %s, %num', "Ivory's escaping", 3.14);
         $sql = $recip->toSql($this->typeDict);
         $this->assertSame("SELECT 'Ivory''s escaping', 3.14", $sql);
     }
@@ -170,7 +170,7 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
                %cmd', SqlCommandRecipe::fromPattern('INSERT INTO t (a) SELECT x FROM data'), '
                RETURNING a, b
              )
-             SELECT * FROM inserted'
+             SELECT * FROM inserted %sql', 'ORDER BY 1, 2'
         );
 
         $this->assertSame(
@@ -181,7 +181,7 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
                INSERT INTO t (a) SELECT x FROM data
                RETURNING a, b
              )
-             SELECT * FROM inserted',
+             SELECT * FROM inserted ORDER BY 1, 2',
             $recip->toSql($this->typeDict)
         );
     }

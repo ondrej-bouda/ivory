@@ -131,7 +131,7 @@ final class Ivory
 
 		$conn = self::getCoreFactory()->createConnection($connName, $params);
 
-		if (empty(self::$connections)) {
+		if (!self::$connections) {
 			self::useConnectionAsDefault($conn);
 		}
 
