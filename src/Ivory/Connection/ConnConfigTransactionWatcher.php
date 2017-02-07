@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Connection;
 
+use Ivory\Exception\InternalException;
+
 class ConnConfigTransactionWatcher implements ITransactionControlObserver
 {
     const SCOPE_TRANSACTION = 'trans';
@@ -77,6 +79,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
     public function handleTransactionCommit()
     {
         $props = [];
+        assert($this->bySavepoint !== null, new InternalException('bySavepoint list should have been initialized'));
         foreach ($this->bySavepoint as $savepoint) {
             $props += $savepoint[self::SCOPE_TRANSACTION];
         }
@@ -92,6 +95,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
     public function handleTransactionRollback()
     {
         $rolledBack = [];
+        assert($this->bySavepoint !== null, new InternalException('bySavepoint list should have been initialized'));
         foreach ($this->bySavepoint as $savepoint) {
             $rolledBack += $savepoint[self::SCOPE_TRANSACTION];
             $rolledBack += $savepoint[self::SCOPE_SESSION];

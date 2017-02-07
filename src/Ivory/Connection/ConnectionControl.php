@@ -163,7 +163,7 @@ class ConnectionControl implements IConnectionControl
      * @return resource handler to the connection, suitable for PHP <tt>pg_*</tt> functions
      * @throws ConnectionException on error connecting to the database
      */
-    public function requireConnection() : resource
+    public function requireConnection()
     {
         $this->connectWait(); // it is a no-op if already connected
 

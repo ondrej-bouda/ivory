@@ -2,6 +2,7 @@
 namespace Ivory\Type;
 
 use Ivory\Connection\IConnection;
+use Ivory\Exception\InternalException;
 
 class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
 {
@@ -89,6 +90,9 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                 switch ($row['typtype']) {
                     case 'A':
                         $elemType = $dict->requireTypeByOid($row['parenttype']);
+                        assert($elemType instanceof INamedType,
+                            new InternalException('Only named types are supposed to be used as array element types.')
+                        );
                         $type = $this->createArrayType($elemType, $row['arrelemtypdelim']);
                         // NOTE: typdelim of the array type itself seems irrelevant
                         break;
