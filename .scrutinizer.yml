@@ -1,0 +1,10 @@
+filter:
+    excluded_paths:
+    	- 'test/*'
+    	- 'sandpit/*'
+    	- 'showcase/*'
+
+checks:
+    php:
+    	code_rating: true
+    	duplication: true
