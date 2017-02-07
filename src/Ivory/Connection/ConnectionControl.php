@@ -166,6 +166,7 @@ class ConnectionControl implements IConnectionControl
     public function requireConnection()
     {
         $this->connectWait(); // it is a no-op if already connected
+        assert($this->handler !== null);
 
         /* TODO: Currently, this method implements the Ivory feature of auto-connection when neither connect() nor
          *       connectWait() was called explicitly or when the connection got broken.

@@ -83,13 +83,23 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
         foreach ($this->bySavepoint as $savepoint) {
             $props += $savepoint[self::SCOPE_TRANSACTION];
         }
-        foreach ($props as $propName) {
-            $this->connConfig->notifyPropertyChange($propName);
-        }
+        $this->handlePropertyChanges($props);
 
         $this->inTrans = false;
         $this->bySavepoint = null;
         $this->tailIdx = null;
+    }
+
+    private function handlePropertyChanges($properties)
+    {
+        if (isset($properties[self::RESET_ALL])) {
+            $this->connConfig->notifyPropertiesReset();
+        }
+        else {
+            foreach ($properties as $propName) {
+                $this->connConfig->notifyPropertyChange($propName);
+            }
+        }
     }
 
     public function handleTransactionRollback()
@@ -100,15 +110,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
             $rolledBack += $savepoint[self::SCOPE_TRANSACTION];
             $rolledBack += $savepoint[self::SCOPE_SESSION];
         }
-
-        if (isset($rolledBack[self::RESET_ALL])) {
-            $this->connConfig->notifyPropertiesReset();
-        }
-        else {
-            foreach ($rolledBack as $propName) {
-                $this->connConfig->notifyPropertyChange($propName);
-            }
-        }
+        $this->handlePropertyChanges($rolledBack);
 
         $this->inTrans = false;
         $this->bySavepoint = null;
@@ -153,14 +155,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
         array_splice($this->bySavepoint, $idx + 1, count($this->bySavepoint), [self::$emptyStruct]);
         $this->tailIdx = $idx + 1;
 
-        if (isset($rolledBack[self::RESET_ALL])) {
-            $this->connConfig->notifyPropertiesReset();
-        }
-        else {
-            foreach ($rolledBack as $propName) {
-                $this->connConfig->notifyPropertyChange($propName);
-            }
-        }
+        $this->handlePropertyChanges($rolledBack);
     }
 
     private function findSavepoint($name)
