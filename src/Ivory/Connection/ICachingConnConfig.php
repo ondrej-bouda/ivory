@@ -36,7 +36,7 @@ interface ICachingConnConfig extends IConnConfig
 	 * @param string|string[] one or more names of parameters the cached values of which to invalidate;
 	 *                        <tt>null</tt> invalidates everything
 	 */
-	function invalidateCache($paramName = null);;
+	function invalidateCache($paramName = null);
 
 	/**
 	 * Disables caching of values of a given configuration parameter, or of any configuration parameter.
