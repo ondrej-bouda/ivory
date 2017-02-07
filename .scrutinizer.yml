@@ -1,8 +1,8 @@
 filter:
     excluded_paths:
-    	- 'test/*'
-    	- 'sandpit/*'
-    	- 'showcase/*'
+        - 'test/*'
+        - 'sandpit/*'
+        - 'showcase/*'
 
 checks:
     php:
