@@ -11,7 +11,9 @@ use Ivory\Exception\NoDataException;
 class SqlPattern
 {
     private $sqlTorso;
+    /** @var SqlPatternPlaceholder[] */
     private $positionalPlaceholders;
+    /** @var SqlPatternPlaceholder[][] */
     private $namedPlaceholderMap;
     /** @var SqlPatternPlaceholder[] */
     private $placeholderSequence;

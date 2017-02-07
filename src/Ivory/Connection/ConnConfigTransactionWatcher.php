@@ -20,13 +20,15 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
     private $inTrans = false;
 
     /**
-     * @var array[] list: struct:
+     * @var array[]|null savepoints held within the current transaction;
+     *              list: struct:
      *                'name' => savepoint name,
      *                'trans' => map: lower-cased names => original-cased names of properties the transaction-wide value
      *                           a change of which has been saved by this savepoint,
      *                'session' => similar for session-wide values;
      *              the list is sorted in the savepoint save order;
-     *              the last struct always holds the currently unsaved values, its 'name' is null
+     *              the last struct always holds the currently unsaved values, its 'name' is null;
+     *              <tt>null</tt> if not within transaction
      */
     private $bySavepoint;
 
