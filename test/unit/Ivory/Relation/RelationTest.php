@@ -10,7 +10,7 @@ class RelationTest extends \Ivory\IvoryTestCase
     public function testBasic()
     {
         $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $qr = $conn->query(
             'SELECT *
              FROM (VALUES (point(0, 0), point(3, 4)), (point(1.3, 4), point(8, -2))) v ("A", "B")'
         );
@@ -29,7 +29,7 @@ class RelationTest extends \Ivory\IvoryTestCase
     public function testGetColumns()
     {
         $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $qr = $conn->query(
             "SELECT 1 AS a, 'foo' AS b, 3 AS c, 4 AS d"
         );
         $cols = $qr->getColumns();
@@ -41,7 +41,7 @@ class RelationTest extends \Ivory\IvoryTestCase
     public function testExtend()
     {
         $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $qr = $conn->query(
             'SELECT *
              FROM (VALUES (point(0, 0), point(3, 4)), (point(1.3, 4), point(8, -2))) v ("A", "B")'
         );
@@ -93,7 +93,7 @@ class RelationTest extends \Ivory\IvoryTestCase
     public function testChaining()
     {
         $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $qr = $conn->query(
             'SELECT 1 AS a, 2 AS b, 3 AS c, 4 AS d'
         );
         $this->assertSame(
@@ -113,7 +113,9 @@ class RelationTest extends \Ivory\IvoryTestCase
     public function testToSet()
     {
         $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn, 'SELECT id, name, is_active FROM artist ORDER BY name, id');
+        $qr = $conn->query(
+            'SELECT id, name, is_active FROM artist ORDER BY name, id'
+        );
 
         $set = $qr->toSet('name');
         $this->assertTrue($set->contains('B-Side Band'));

@@ -14,90 +14,7 @@ use Ivory\Utils\StringUtils;
  *
  * Note this class is not directly instantiable. Instead, use factory methods on subclasses.
  *
- * The SQL pattern is a plain SQL string with special placeholders. Parameter values, given either at the time of the
- * recipe creation or specified later on, are substituted for the placeholders.
- *
- * There are two kinds of parameters which might be used in a pattern:
- * - *named parameters* - these are specified by an explicit name; and
- * - *positional parameters* - specified solely by their position relative to other positional parameters.
- *
- * Multiple occurrences of the same named parameter may be used in the SQL pattern, referring to the same one value. On
- * the other hand, positional parameters may not be reused - a value must be provided for each positional parameter, and
- * placeholders may not explicitly refer to positional parameter values.
- *
- * Placeholders use the following syntax in SQL patterns:
- * <pre>
- * %[type][:name]
- * </pre>
- * where:
- * * `name` is the name of the parameter (if not specified, the parameter is treated as a positional parameter); and
- * * `type` is an explicit type specification, governing how the value given for the parameter will be encoded to the
- *   SQL string. If type is not given, it is inferred from the actual data type of the parameter value.
- *
- * Examples:
- * * valid `name`s: `tbl`, `person_id`, `p1`;
- * * valid `type` specifications: `s`, `int_singleton`, `t1`, `public.planet`, `public.planet[]`, `int[][]`,
- *   `public."int"`, `"my schema"."my type"`, `{double precision}`.
- *
- * Detailed rules on syntax and the corresponding semantics follow:
- * * Let us define a "token", first, which in this context means a string of one or more letters, digits and underscore
- *   characters (`_`), not starting with a digit.
- * * `name` may only be a single token. Especially, the name may not be a number - referring to positional arguments is
- *   not supported.
- * * `type` may either be:
- *   * a single token, or
- *   * any string enclosed in double quotes (the `"` character; to write a double quote character literally, use two of
- *     them), or
- *   * any string within a pair of curly braces (the `{` and `}`); note there is no way to type the closing brace
- *     literally using this variant).
- * * The `type` may optionally be prefixed with `typeschema.`, where `typeschema` meets the same syntax rules as `type`.
- * * The `type` specification may be ended with an empty pair of square brackets, indicating an array type. (Multiple
- *   pairs of brackets are accepted, although these are treated the same as a mere one bracket pair, consistently with
- *   what PostgreSQL does.) Note, however, that only empty pairs of brackets are recognized as part of the type
- *   specification. An array placeholder immediately followed by a subscript works as expected: `SELECT %bigint[][2]`
- *   selects the item under index 2 from the provided array.
- * * Names of available types, as well as the rules inferring the type automatically (when the type is not specified),
- *   are defined by the {@link Ivory\Type\TypeDictionary} used by the connection for which the recipe will be serialized
- *   to an SQL string. The standard Ivory deployment registers all types defined in the connected-to database under
- *   their fully qualified names (e.g., `public.sometype`) and also some aliases, especially those corresponding to the
- *   SQL reserved types (e.g., `int`). Besides, some custom types special for being used in SQL patterns may be
- *   registered (e.g., `sql`).
- * * Registered types need not be schema-qualified. Just the name of the type is sufficient - the PostgreSQL
- *   `search_path` facility is leveraged to identify the type. Before the `search_path` schemas are actually searched,
- *   custom types and type aliases are considered.
- * * Note the difference between quoted type name and an unquoted one (i.e., using the first or the third syntax) is the
- *   same as for PostgreSQL: a quoted type name is case sensitive and it cannot refer to an
- *   {@link \Ivory\Lang\Sql\Types::getReservedTypes() SQL reserved type}. Recall specifying, e.g., `SELECT 1::"int"`
- *   addresses a user-defined type named `int`, while `SELECT 1::int` always refers to the reserved type, regardless of
- *   `search_path` or any user-defined types. This is, actually, also the reason for the curly braces syntax -
- *   otherwise, multi-word SQL reserved types (such as `double precision`) could not be specified. The braces syntax
- *   may, of course, be used for regular built-in or user-defined types as long as there is no conflicting reserved type
- *   (which would be registered with the `TypeDictionary` as an alias).
- *
- * In specific situations, multiple same-named placeholders may be used with different type specifications, e.g.,
- * `SELECT id FROM %ident:tbl UNION SELECT object_id FROM log WHERE table = %s:tbl`. This is perfectly legal - a single
- * value for the `tbl` parameter will be encoded as an identifier for the first placeholder and as a string literal for
- * the second placeholder.
- *
- * To use a literal `%` in the SQL string, type `%%`.
- *
- * The percent signs are searched in the whole string, regardless of the surrounding content. Namely, a percent sign
- * inside string constants written in the SQL string literally *will* be interpreted as a placeholder and replaced with
- * a provided value.
- *
- * Note that even {@link IRelationRecipe} and {@link ICommandRecipe} objects may be used as parameter values to form a
- * more complex recipe, e.g., a
- * {@link https://www.postgresql.org/docs/current/static/queries-with.html Common Table Expression}.
- *
- * @internal Ivory design note: The positional parameters could have been treated as parameters named by their
- * zero-based position. This is not the case, though. If placeholders could refer to positional parameters (e.g.,
- * <tt>%s:0</tt>), it would only complicate the specification without any significant benefit. Especially the
- * {@link SqlRecipe::fromFragments()} would be overcomplicated as the placeholders would have to be re-numbered.
- *
- * @internal Ivory design note: The common placeholder syntax ":name" is intentionally unsupported. PostgreSQL uses
- * <tt>::type</tt> for typecasts, which could be mistaken for the named arguments written as ":name". Moreover, it would
- * collide with Embedded SQL which also uses the same syntax. Rather than complicating the queries with escaping, Ivory
- * requires the leading % sign, which also simplifies parsing the patterns - both for the machine and for the humans.
+ * @see SqlPattern for thorough details on SQL patterns
  */
 abstract class SqlRecipe
 {
@@ -169,11 +86,12 @@ abstract class SqlRecipe
     /**
      * Creates an SQL recipe from one or more fragments, each with its own positional parameters.
      *
-     * Each fragment must be immediately followed by all positional arguments it requires. Then, another fragment may
-     * follow.
+     * Each fragment must be immediately followed by values for all positional parameters it requires. Then, another
+     * fragment may follow. As the very last argument, a map of values for named parameters may optionally be given (or
+     * {@link SqlRecipe::setParams()} may be used to set them later).
      *
      * The fragments get concatenated to form the resulting SQL pattern. A single space is added between each two
-     * fragments.
+     * fragments the latter of which does not start with whitespace.
      *
      * Named parameters are shared among fragments. In other words, if two fragments use the same named parameter,
      * specifying the parameter by {@link setParam()} will substitute the same value to both fragments.
@@ -196,8 +114,12 @@ abstract class SqlRecipe
      * continued with the query.
      *
      * @param string|SqlPattern $fragment
-     * @param array ...$fragmentsAndPositionalParams further fragments (each of which is either a <tt>string</tt> or an
-     *                                                 {@link SqlPattern} object) and values of their parameters
+     * @param array ...$fragmentsAndPositionalParams
+     *                                  further fragments (each of which is either a <tt>string</tt> or an
+     *                                    {@link SqlPattern} object) and values of their parameters;
+     *                                  the very last argument may be a map of values for named parameters to set
+     *                                    immediately
+     *
      * @return static
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
@@ -209,6 +131,8 @@ abstract class SqlRecipe
         $overallNamedPlaceholderMap = [];
         $overallPosParams = [];
 
+        $namedParamValues = [];
+
         $curFragment = $fragment;
         $curFragmentNum = 1;
         $argsProcessed = 0;
@@ -218,6 +142,12 @@ abstract class SqlRecipe
                 if (is_string($curFragment)) {
                     $parser = \Ivory\Ivory::getSqlPatternParser();
                     $curFragment = $parser->parse($curFragment);
+                }
+                elseif ((is_array($curFragment) || $curFragment instanceof \Traversable) && // PHP 7.1: is_iterable()
+                    $argsProcessed > 0 && !array_key_exists($argsProcessed, $fragmentsAndPositionalParams))
+                {
+                    $namedParamValues = $curFragment;
+                    break;
                 }
                 else {
                     $ord = StringUtils::englishOrd($curFragmentNum);
@@ -280,7 +210,9 @@ abstract class SqlRecipe
 
         $overallPattern = new SqlPattern($overallSqlTorso, $overallPosPlaceholders, $overallNamedPlaceholderMap);
 
-        return new static($overallPattern, $overallPosParams);
+        $recipe = new static($overallPattern, $overallPosParams);
+        $recipe->setParams($namedParamValues);
+        return $recipe;
     }
 
     final private function __construct(SqlPattern $sqlPattern, array $positionalParameters)
@@ -319,10 +251,10 @@ abstract class SqlRecipe
     /**
      * Sets values of several parameters in the SQL pattern.
      *
-     * @param array $paramMap map: parameter name (or zero-based position) => parameter value
+     * @param array|\Traversable $paramMap map: parameter name (or zero-based position) => parameter value
      * @return $this
      */
-    public function setParams($paramMap) : self
+    public function setParams($paramMap) : self // PHP 7.1: declare $paramMap as iterable
     {
         foreach ($paramMap as $nameOrPosition => $value) {
             $this->setParam($nameOrPosition, $value);

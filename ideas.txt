@@ -10,6 +10,7 @@ To Do:
 * once released publicly, follow existing standards regarding the project maintenance:
 ** http://keepachangelog.com
 ** http://semver.org/spec/v2.0.0.html
+** look at https://thephpleague.com
 * look at Laravel
 
 
@@ -18,6 +19,8 @@ Values:
 * PostgreSQL has full feature set. Instead of generic layer which omits some features or has to be more complicated in order to abstract out DBMS differences, let's just fully support one DBMS.
 * Object query builders, which introduce special objects or methods for composing SQL expressions, shall be considered as an anti-pattern. Instead, prefer SQL as it is a standard, proven language specifically designed for querying relational data.
 * Different situations (small/large projects, prototyping/production coding) call for measures of different strictness. While the library promotes robust and correct code (e.g., by issuing warnings in potentially erroneous situations), it shall fit different styles (e.g., passing callbacks as anonymous functions vs. as objects implementing an interface - the latter of which leads to safer code with more boilerplate).
+* Type safety wherever possible.
+** E.g., instead of a single query() method, there are two distinguished ones: query() for SELECTs and other statements resulting in a data set, and command() for INSERTs etc., only returning the summary effect of the statement
 
 
 
@@ -88,6 +91,14 @@ Supporting PostgreSQL features:
 Flexibility:
 * Easy way to provide custom type handlers.
 * Possibility to define custom exceptions thrown on specific SQL errors. Based on the SQLSTATE code or the error message, a specific exception may be thrown, thus, error processing may directly catch only the interesting exceptions using specific catch blocks, not the general StatementException.
+
+
+
+Re-Use:
+* There are three kinds of objects:
+** a recipe: connection-independent definition of a relation or command;
+** a data source: a recipe paired to a database connection, ready to be executed;
+** a result: database result set, either containing the relation data or a description of the command result.
 
 
 

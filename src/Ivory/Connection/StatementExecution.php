@@ -5,6 +5,9 @@ use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Ivory;
+use Ivory\Query\SqlCommandRecipe;
+use Ivory\Query\SqlRecipe;
+use Ivory\Query\SqlRelationRecipe;
 use Ivory\Result\CommandResult;
 use Ivory\Result\CopyInResult;
 use Ivory\Result\CopyOutResult;
@@ -24,12 +27,47 @@ class StatementExecution implements IStatementExecution
         $this->stmtExFactory = new StatementExceptionFactory();
     }
 
-    public function getStatementExceptionFactory()
+    public function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap)
     {
-        return $this->stmtExFactory;
+        if ($sqlFragmentPatternOrRecipe instanceof SqlRecipe) {
+            $recipe = $sqlFragmentPatternOrRecipe;
+            if ($fragmentsAndPositionalParamsAndNamedParamsMap) {
+                if (count($fragmentsAndPositionalParamsAndNamedParamsMap) > 1) {
+                    throw new \InvalidArgumentException('Too many arguments given.');
+                }
+                $namedParamsMap = $fragmentsAndPositionalParamsAndNamedParamsMap[0];
+                $recipe->setParams($namedParamsMap);
+            }
+        }
+        else {
+            $recipe = SqlRelationRecipe::fromFragments($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
+        }
+
+        $sql = $recipe->toSql($this->typeCtl->getTypeDictionary());
+        return $this->rawQuery($sql);
     }
 
-    public function rawQuery($sqlStatement)
+    public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap)
+    {
+        if ($sqlFragmentPatternOrRecipe instanceof SqlRecipe) {
+            $recipe = $sqlFragmentPatternOrRecipe;
+            if ($fragmentsAndPositionalParamsAndNamedParamsMap) {
+                if (count($fragmentsAndPositionalParamsAndNamedParamsMap) > 1) {
+                    throw new \InvalidArgumentException('Too many arguments given.');
+                }
+                $namedParamsMap = $fragmentsAndPositionalParamsAndNamedParamsMap[0];
+                $recipe->setParams($namedParamsMap);
+            }
+        }
+        else {
+            $recipe = SqlCommandRecipe::fromFragments($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
+        }
+
+        $sql = $recipe->toSql($this->typeCtl->getTypeDictionary());
+        return $this->rawQuery($sql); // FIXME: call rawCommand() instead once it is defined
+    }
+
+    public function rawQuery(string $sqlStatement)
     {
         $connHandler = $this->connCtl->requireConnection();
 
@@ -57,7 +95,11 @@ class StatementExecution implements IStatementExecution
             trigger_error('The database gave an unexpected result set.', E_USER_NOTICE);
         }
 
-        return $this->processResult($connHandler, $res, $sqlStatement);
+        $result = $this->processResult($connHandler, $res, $sqlStatement);
+
+        // TODO: emit warning if ICommandResult is returned for rawQuery(), or if IQueryResult is returned for command()
+
+        return $result;
     }
 
     public function rawMultiQuery($sqlStatements)
@@ -142,5 +184,10 @@ class StatementExecution implements IStatementExecution
         else {
             return null;
         }
+    }
+
+    public function getStatementExceptionFactory()
+    {
+        return $this->stmtExFactory;
     }
 }

@@ -28,4 +28,4 @@ interface IConnection
     function getName();
 }
 
-// TODO: do not extend the whole interfaces - some methods shall are unnecessary to the public, e.g., getTypeDictionary()
+// TODO: do not extend the whole interfaces - some methods are unnecessary to the public, e.g., getTypeDictionary()

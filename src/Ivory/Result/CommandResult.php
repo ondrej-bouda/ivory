@@ -10,6 +10,6 @@ class CommandResult extends Result implements ICommandResult
 
 	public function getAffectedRows()
 	{
-		// TODO: Implement getAffectedRows() method.
+        return pg_affected_rows($this->handler);
 	}
 }

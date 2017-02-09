@@ -106,12 +106,17 @@ class Connection implements IConnection
 
 	//region Statement Execution
 
-	public function getStatementExceptionFactory()
-	{
-		return $this->stmtExec->getStatementExceptionFactory();
-	}
+    public function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap)
+    {
+        return $this->stmtExec->query($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
+    }
 
-	public function rawQuery($sqlStatement)
+    public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap)
+    {
+        return $this->stmtExec->command($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
+    }
+
+	public function rawQuery(string $sqlStatement)
 	{
 		return $this->stmtExec->rawQuery($sqlStatement);
 	}
@@ -125,6 +130,11 @@ class Connection implements IConnection
 	{
 		return $this->stmtExec->runScript($sqlScript);
 	}
+
+    public function getStatementExceptionFactory()
+   	{
+   		return $this->stmtExec->getStatementExceptionFactory();
+   	}
 
 	//endregion
 

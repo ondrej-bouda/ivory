@@ -185,4 +185,17 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
             $recip->toSql($this->typeDict)
         );
     }
+
+    public function testNamedParametersMap()
+    {
+        $recip = SqlRelationRecipe::fromFragments(
+            'SELECT %ident:tbl.col + %int', 1, 'FROM %ident:tbl',
+            ['tbl' => 't']
+        );
+
+        $this->assertSame(
+            'SELECT t.col + 1 FROM t',
+            $recip->toSql($this->typeDict)
+        );
+    }
 }
