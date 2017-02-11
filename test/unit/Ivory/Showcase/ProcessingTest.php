@@ -2,9 +2,9 @@
 namespace Ivory\Showcase;
 
 use Ivory\Data\Map\IRelationMap;
+use Ivory\Query\SqlRelationRecipe;
 use Ivory\Relation\IRelation;
 use Ivory\Relation\ITuple;
-use Ivory\Relation\QueryRelation;
 
 /**
  * This test presents the relation processing capabilities.
@@ -36,7 +36,8 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         parent::setUp();
 
         $conn = $this->getIvoryConnection();
-        $this->teachers = (new QueryRelation($conn,
+
+        $teachersRelRecipe = SqlRelationRecipe::fromSql(
             "VALUES
              (1, 'Angus', 'Deaton', 'Dtn'),
              (2, 'Jean', 'Tirole', 'Tir'),
@@ -44,10 +45,12 @@ class ProcessingTest extends \Ivory\IvoryTestCase
              (4, 'Lars Peter', 'Hansen', NULL),
              (5, 'Robert J.', 'Shiller', NULL),
              (6, 'Ada', 'Lovelace', NULL)"
-        ))->rename(['id', 'firstname', 'lastname', 'abbr']);
+        );
 
-        // TODO: instead of copying the teacher data, compose the relations
-        $this->rel = $conn->rawQuery(
+        $this->teachers = $conn->query($teachersRelRecipe)
+            ->rename(['id', 'firstname', 'lastname', 'abbr']);
+
+        $this->rel = $conn->query(
             /** @lang PostgreSQL */
             "WITH lesson (id, topic, scheduled_timerange, actual_timerange) AS (
                VALUES
@@ -61,13 +64,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
                  (8, 'C++',  tsrange('2015-09-02 10:15', '2015-09-02 11:00'), tsrange('2015-09-02 10:15', '2015-09-02 11:00'))
              ),
              teacher (id, firstname, lastname, abbr) AS (
-               VALUES
-                 (1, 'Angus', 'Deaton', 'Dtn'),
-                 (2, 'Jean', 'Tirole', 'Tir'),
-                 (3, 'Eugene F.', 'Fama', NULL),
-                 (4, 'Lars Peter', 'Hansen', NULL),
-                 (5, 'Robert J.', 'Shiller', NULL),
-                 (6, 'Ada', 'Lovelace', NULL)
+               %rel:teachersRel
              ),
              lessonteacher (lesson_id, teacher_id, scheduling_status) AS (
                VALUES
@@ -89,7 +86,10 @@ class ProcessingTest extends \Ivory\IvoryTestCase
              FROM lesson l
                   JOIN lessonteacher lt ON lt.lesson_id = l.id
                   JOIN teacher t ON t.id = lt.teacher_id
-             ORDER BY l.id, lt.scheduling_status DESC, t.id"
+             ORDER BY l.id, lt.scheduling_status DESC, t.id",
+            [
+                'teachersRel' => $teachersRelRecipe,
+            ]
         );
     }
 
