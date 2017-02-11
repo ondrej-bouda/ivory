@@ -1,7 +1,9 @@
 <?php
 namespace Ivory\Connection;
 
-use Ivory\Exception\InvalidStateException;
+use Ivory\Exception\StatementExceptionFactory;
+use Ivory\Result\ICommandResult;
+use Ivory\Result\IQueryResult;
 use Ivory\Utils\NotSerializable;
 
 // TODO: consider renaming to Database or Session or... - to reflect it is mere a facade, the single entry point
@@ -106,24 +108,29 @@ class Connection implements IConnection
 
 	//region Statement Execution
 
-    public function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap)
+    public function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): IQueryResult
     {
         return $this->stmtExec->query($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
     }
 
-    public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap)
+    public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): ICommandResult
     {
         return $this->stmtExec->command($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
     }
 
-	public function rawQuery(string $sqlStatement)
+	public function rawQuery(string $sqlQuery): IQueryResult
 	{
-		return $this->stmtExec->rawQuery($sqlStatement);
+		return $this->stmtExec->rawQuery($sqlQuery);
 	}
 
-	public function rawMultiQuery($sqlStatements)
+    public function rawCommand(string $sqlCommand): ICommandResult
+   	{
+   		return $this->stmtExec->rawCommand($sqlCommand);
+   	}
+
+	public function rawMultiStatement($sqlStatements)
 	{
-		return $this->stmtExec->rawMultiQuery($sqlStatements);
+		return $this->stmtExec->rawMultiStatement($sqlStatements);
 	}
 
 	public function runScript($sqlScript)
@@ -131,7 +138,7 @@ class Connection implements IConnection
 		return $this->stmtExec->runScript($sqlScript);
 	}
 
-    public function getStatementExceptionFactory()
+    public function getStatementExceptionFactory(): StatementExceptionFactory
    	{
    		return $this->stmtExec->getStatementExceptionFactory();
    	}

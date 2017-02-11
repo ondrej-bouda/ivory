@@ -10,7 +10,6 @@ use Ivory\Result\IResult;
 use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
 
-// TODO: rename rawMultiQuery() to rawMultiStatement() - it is not distinguished, the user will have to check for the concrete result type
 // TODO: support prepared statements
 /**
  * Execution of statements on the connected database.
@@ -37,7 +36,8 @@ use Ivory\Exception\ConnectionException;
 interface IStatementExecution
 {
     /**
-     * Queries the database for a relation using an SQL pattern.
+     * Queries the database for a relation using an SQL pattern, waits for its execution and returns the resulting
+     * relation.
      *
      * This is an overloaded method. There are two variants:
      * 1. The first argument is either an SQL pattern string or already parsed {@link SqlPattern} object. Values for all
@@ -49,11 +49,11 @@ interface IStatementExecution
      *    optional map of values for named parameters. As the `SqlRecipe` might have already set all its named
      *    parameters, even this argument might not be necessary.
      *
-     * Examples: TODO: implement these as unit tests; also test other variants (SqlRecipe passed, SqlPattern passed, with/out named parameters...); then, implement
+     * Examples:
      * - `query('SELECT 42')`
-     * - `query('SELECT %i', 42)`
-     * - `query('SELECT * FROM %ident', 'tbl', 'WHERE a = %i AND b = %s', 42, 'wheee')`
-     * - `query('SELECT * FROM %ident WHERE a = %i:a AND b = %s:b', 't', ['a' => 42, 'b' => 'wheee'])`
+     * - `query('SELECT %int', 42)`
+     * - `query('SELECT * FROM %ident', 'tbl', 'WHERE a = %int AND b = %s', 42, 'wheee')`
+     * - `query('SELECT * FROM %ident WHERE a = %int:a AND b = %s:b', 't', ['a' => 42, 'b' => 'wheee'])`
      *
      * See {@link SqlPattern} documentation for thorough details on SQL patterns.
      *
@@ -78,17 +78,17 @@ interface IStatementExecution
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      */
-    function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
+    function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): IQueryResult;
 
     /**
-     * Sends a command to the database using an SQL pattern.
+     * Sends a command to the database using an SQL pattern, waits for its execution and returns the command result.
      *
      * This is an overloaded method, like {@link query()}. Either an SQL pattern is given along with values for its
      * parameters, or an {@link SqlRecipe} object is passed.
      *
      * Note the strict distinction of *queries* and *commands* - see the {@link IStatementExecution} docs. If an SQL
-     * query is executed using this method, a result object reporting zero affected rows is returned and a warning is
-     * issued.
+     * query is executed using this method, a result object, reporting as many affected rows as the actual result has,
+     * is returned and a warning is issued.
      *
      * @param string|SqlPattern|SqlRecipe $sqlFragmentPatternOrRecipe
      * @param array ...$fragmentsAndPositionalParamsAndNamedParamsMap
@@ -96,30 +96,52 @@ interface IStatementExecution
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      */
-    function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
+    function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): ICommandResult;
 
 //    function dataSource(); // TODO
 
     /**
-     * Sends a raw SQL statement, as is, to the database, waits for its execution and returns the result.
+     * Sends a raw SQL query, as is, to the database, waits for its execution and returns the resulting relation.
      *
      * Just a single statement may be used. For sending multiple statements at once, use {@link rawMultiQuery()} or
      * {@link runScript()}.
      *
-     * @param string $sqlStatement an SQL statement
-     * @return IResult the result of the statement
-     * @throws StatementException when the statement is erroneous and PostgreSQL returns an error, or if
-     *                            <tt>$sqlStatement</tt> actually contains multiple statements (e.g., separated by a
-     *                            semicolon)
-     * @throws ConnectionException when an error occurred while sending the statement or processing the database
-     *                             response
+     * The same distinction of statements to queries and commands applies to this method the same as for
+     * {@link query()}, including the resolution of commands executed by this method. For sending commands (i.e.,
+     * statements not resulting in a relation), use {@link rawCommand()}.
+     *
+     * @param string $sqlQuery an SQL query
+     * @return IQueryResult the result of the query
+     * @throws StatementException when the query is erroneous and PostgreSQL returns an error, or if <tt>$sqlQuery</tt>
+     *                              actually contains multiple statements (e.g., separated by a semicolon)
+     * @throws ConnectionException when an error occurred while sending the query or processing the database response
      */
-    function rawQuery(string $sqlStatement); // TODO: distinguish into rawQuery() and rawCommand() the same as query() and command()
+    function rawQuery(string $sqlQuery): IQueryResult;
+
+    /**
+     * Sends a raw SQL command, as is, to the database, waits for its execution and returns the command result.
+     *
+     * Just a single statement may be used. For sending multiple statements at once, use {@link rawMultiQuery()} or
+     * {@link runScript()}.
+     *
+     * The same distinction of statements to queries and commands applies to this method the same as for
+     * {@link command()}, including the resolution of queries executed by this method. For sending queries (i.e.,
+     * statements resulting in a relation), use {@link rawQuery()}.
+     *
+     * @param string $sqlCommand
+     * @return ICommandResult the result of the command
+     * @throws StatementException when the command is erroneous and PostgreSQL returns an error, or if
+     *                              <tt>$sqlCommand</tt> actually contains multiple statements (e.g., separated by a
+     *                              semicolon)
+     * @throws ConnectionException when an error occurred while sending the command or processing the database response
+     */
+    function rawCommand(string $sqlCommand): ICommandResult;
 
     /**
      * Sends one or more raw SQL statements to the database, waits for their execution and returns the results.
      *
-     * The operation is equivalent to calling {@link rawQuery()} for each of the statements.
+     * Note this operation, unlike {@link rawQuery()} or {@link rawCommand()}, does *not* distinguish queries and
+     * commands. The user has to check for the result type.
      *
      * @param string[]|\Traversable $sqlStatements
      *                                  list of strings, each containing one SQL statement;
@@ -137,7 +159,7 @@ interface IStatementExecution
      * @throws ConnectionException when an error occurred while sending the statements or processing the database
      *                             response
      */
-    function rawMultiQuery($sqlStatements);
+    function rawMultiStatement($sqlStatements);
 
     /**
      * Sends a script of one or more statements to the database, waits for their execution, and returns the results.
@@ -160,5 +182,5 @@ interface IStatementExecution
     /**
      * @return StatementExceptionFactory the local factory used for emitting exceptions upon statement errors
      */
-    function getStatementExceptionFactory();
+    function getStatementExceptionFactory(): StatementExceptionFactory;
 }

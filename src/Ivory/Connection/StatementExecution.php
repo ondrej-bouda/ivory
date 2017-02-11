@@ -11,6 +11,8 @@ use Ivory\Query\SqlRelationRecipe;
 use Ivory\Result\CommandResult;
 use Ivory\Result\CopyInResult;
 use Ivory\Result\CopyOutResult;
+use Ivory\Result\ICommandResult;
+use Ivory\Result\IQueryResult;
 use Ivory\Result\IResult;
 use Ivory\Result\QueryResult;
 
@@ -27,17 +29,10 @@ class StatementExecution implements IStatementExecution
         $this->stmtExFactory = new StatementExceptionFactory();
     }
 
-    public function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap)
+    public function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): IQueryResult
     {
         if ($sqlFragmentPatternOrRecipe instanceof SqlRecipe) {
-            $recipe = $sqlFragmentPatternOrRecipe;
-            if ($fragmentsAndPositionalParamsAndNamedParamsMap) {
-                if (count($fragmentsAndPositionalParamsAndNamedParamsMap) > 1) {
-                    throw new \InvalidArgumentException('Too many arguments given.');
-                }
-                $namedParamsMap = $fragmentsAndPositionalParamsAndNamedParamsMap[0];
-                $recipe->setParams($namedParamsMap);
-            }
+            $recipe = $this->setupSqlRecipe($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
         }
         else {
             $recipe = SqlRelationRecipe::fromFragments($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
@@ -47,27 +42,67 @@ class StatementExecution implements IStatementExecution
         return $this->rawQuery($sql);
     }
 
-    public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap)
+    public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): ICommandResult
     {
         if ($sqlFragmentPatternOrRecipe instanceof SqlRecipe) {
-            $recipe = $sqlFragmentPatternOrRecipe;
-            if ($fragmentsAndPositionalParamsAndNamedParamsMap) {
-                if (count($fragmentsAndPositionalParamsAndNamedParamsMap) > 1) {
-                    throw new \InvalidArgumentException('Too many arguments given.');
-                }
-                $namedParamsMap = $fragmentsAndPositionalParamsAndNamedParamsMap[0];
-                $recipe->setParams($namedParamsMap);
-            }
+            $recipe = $this->setupSqlRecipe($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
         }
         else {
             $recipe = SqlCommandRecipe::fromFragments($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
         }
 
         $sql = $recipe->toSql($this->typeCtl->getTypeDictionary());
-        return $this->rawQuery($sql); // FIXME: call rawCommand() instead once it is defined
+        return $this->rawCommand($sql);
     }
 
-    public function rawQuery(string $sqlStatement)
+    private function setupSqlRecipe(SqlRecipe $sqlRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): SqlRecipe
+    {
+        if ($fragmentsAndPositionalParamsAndNamedParamsMap) {
+            if (count($fragmentsAndPositionalParamsAndNamedParamsMap) > 1) {
+                throw new \InvalidArgumentException('Too many arguments given.');
+            }
+            $namedParamsMap = $fragmentsAndPositionalParamsAndNamedParamsMap[0];
+            $sqlRecipe->setParams($namedParamsMap);
+        }
+
+        return $sqlRecipe;
+    }
+
+    public function rawQuery(string $sqlQuery): IQueryResult
+    {
+        $result = $this->executeRawStatement($sqlQuery, $resultHandler);
+        if ($result instanceof IQueryResult) {
+            return $result;
+        }
+        else {
+            trigger_error(
+                'The supplied SQL statement was supposed to be a query, but it did not return a result set. ' .
+                'Returning an empty relation. Consider calling command() or rawCommand() instead. ' .
+                "SQL statement: $sqlQuery",
+                E_USER_WARNING
+            );
+            return new QueryResult($resultHandler, $this->typeCtl->getTypeDictionary(), $result->getLastNotice());
+        }
+    }
+
+    public function rawCommand(string $sqlCommand) : ICommandResult
+    {
+        $result = $this->executeRawStatement($sqlCommand, $resultHandler);
+        if ($result instanceof ICommandResult) {
+            return $result;
+        }
+        else {
+            trigger_error(
+                'The supplied SQL statement was supposed to be a command, but it returned a result set. ' .
+                'Returning an empty result. Consider calling query() or rawQuery() instead. ' .
+                "SQL statement: $sqlCommand",
+                E_USER_WARNING
+            );
+            return new CommandResult($resultHandler, $result->getLastNotice());
+        }
+    }
+
+    private function executeRawStatement(string $sqlStatement, &$resultHandler = null): IResult
     {
         $connHandler = $this->connCtl->requireConnection();
 
@@ -81,8 +116,8 @@ class StatementExecution implements IStatementExecution
             throw new ConnectionException('Error sending the query to the database.');
         }
 
-        $res = pg_get_result($connHandler);
-        if ($res === false) {
+        $resultHandler = pg_get_result($connHandler);
+        if ($resultHandler === false) {
             throw new ConnectionException('No results received from the database.');
         }
         /* For erroneous queries, one must call pg_get_result() once again to update the structures at the client side.
@@ -95,14 +130,10 @@ class StatementExecution implements IStatementExecution
             trigger_error('The database gave an unexpected result set.', E_USER_NOTICE);
         }
 
-        $result = $this->processResult($connHandler, $res, $sqlStatement);
-
-        // TODO: emit warning if ICommandResult is returned for rawQuery(), or if IQueryResult is returned for command()
-
-        return $result;
+        return $this->processResult($connHandler, $resultHandler, $sqlStatement);
     }
 
-    public function rawMultiQuery($sqlStatements)
+    public function rawMultiStatement($sqlStatements)
     {
         if (!is_array($sqlStatements) && !$sqlStatements instanceof \Traversable) {
             throw new \InvalidArgumentException('$sqlStatements is neither array nor \Traversable object');
@@ -110,7 +141,7 @@ class StatementExecution implements IStatementExecution
 
         $results = [];
         foreach ($sqlStatements as $stmtKey => $stmt) {
-            $results[$stmtKey] = $this->rawQuery($stmt);
+            $results[$stmtKey] = $this->executeRawStatement($stmt);
         }
         return $results;
     }
@@ -186,7 +217,7 @@ class StatementExecution implements IStatementExecution
         }
     }
 
-    public function getStatementExceptionFactory()
+    public function getStatementExceptionFactory(): StatementExceptionFactory
     {
         return $this->stmtExFactory;
     }

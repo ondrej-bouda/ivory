@@ -68,11 +68,11 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
 
     public function testQuotedTypeNames()
     {
-        $this->conn->rawQuery('CREATE DOMAIN public."name with "" and ." AS TEXT');
+        $this->conn->rawCommand('CREATE DOMAIN public."name with "" and ." AS TEXT');
         $recip = SqlRelationRecipe::fromPattern('SELECT %public."name with "" and ."', 'Ivory');
         $this->assertSame("SELECT 'Ivory'", $recip->toSql($this->typeDict));
 
-        $this->conn->rawQuery('CREATE DOMAIN public."int" AS TEXT');
+        $this->conn->rawCommand('CREATE DOMAIN public."int" AS TEXT');
         $recip = SqlRelationRecipe::fromPattern('SELECT %public."int"', '42');
         $this->assertSame("SELECT '42'", $recip->toSql($this->typeDict));
 
@@ -85,8 +85,8 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
 
     public function testQuotedSchemaNames()
     {
-        $this->conn->rawQuery('CREATE SCHEMA "__Ivory_test"');
-        $this->conn->rawQuery('CREATE DOMAIN "__Ivory_test".d AS INT');
+        $this->conn->rawCommand('CREATE SCHEMA "__Ivory_test"');
+        $this->conn->rawCommand('CREATE DOMAIN "__Ivory_test".d AS INT');
 
         $recip = SqlRelationRecipe::fromPattern('SELECT %"__Ivory_test".d', 42);
         $this->assertSame('SELECT 42', $recip->toSql($this->typeDict));
@@ -108,8 +108,8 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
         }
 
 
-        $this->conn->rawQuery('CREATE SCHEMA "__ivory_test"');
-        $this->conn->rawQuery('CREATE DOMAIN "__ivory_test".d AS TEXT');
+        $this->conn->rawCommand('CREATE SCHEMA "__ivory_test"');
+        $this->conn->rawCommand('CREATE DOMAIN "__ivory_test".d AS TEXT');
 
         $recip = SqlRelationRecipe::fromPattern('SELECT %__ivory_test.d', 42);
         $this->assertSame("SELECT '42'", $recip->toSql($this->typeDict));
@@ -117,7 +117,7 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
 
     public function testBraceEnclosedTypeNames()
     {
-        $this->conn->rawQuery('CREATE DOMAIN public."double precision" AS TEXT');
+        $this->conn->rawCommand('CREATE DOMAIN public."double precision" AS TEXT');
 
         $recip = SqlRelationRecipe::fromPattern('SELECT %"double precision"', 42);
         $this->assertSame("SELECT '42'", $recip->toSql($this->typeDict));
@@ -136,9 +136,9 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
 
     public function testSearchPathChange()
     {
-        $this->conn->rawQuery('CREATE DOMAIN public.tp AS INT');
-        $this->conn->rawQuery('CREATE SCHEMA s');
-        $this->conn->rawQuery('CREATE DOMAIN s.tp AS TEXT');
+        $this->conn->rawCommand('CREATE DOMAIN public.tp AS INT');
+        $this->conn->rawCommand('CREATE SCHEMA s');
+        $this->conn->rawCommand('CREATE DOMAIN s.tp AS TEXT');
 
         $recip = SqlRelationRecipe::fromPattern('SELECT %tp', 42);
 

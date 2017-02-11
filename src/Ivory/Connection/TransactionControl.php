@@ -33,19 +33,19 @@ class TransactionControl implements IObservableTransactionControl
             return false;
         }
 
-        $this->stmtExec->rawQuery('START TRANSACTION');
+        $this->stmtExec->rawCommand('START TRANSACTION');
         $this->notifyTransactionStart();
         return true;
     }
 
     public function setupTransaction($transactionOptions)
     {
-        $this->stmtExec->rawQuery('SET TRANSACTION ' . $this->txConfigToSql($transactionOptions));
+        $this->stmtExec->rawCommand('SET TRANSACTION ' . $this->txConfigToSql($transactionOptions));
     }
 
     public function setupSubsequentTransactions($transactionOptions)
     {
-        $this->stmtExec->rawQuery('SET SESSION CHARACTERISTICS AS TRANSACTION ' . $this->txConfigToSql($transactionOptions));
+        $this->stmtExec->rawCommand('SET SESSION CHARACTERISTICS AS TRANSACTION ' . $this->txConfigToSql($transactionOptions));
     }
 
     private function txConfigToSql($transactionOptions)
@@ -94,7 +94,7 @@ class TransactionControl implements IObservableTransactionControl
             return false;
         }
 
-        $this->stmtExec->rawQuery('COMMIT');
+        $this->stmtExec->rawCommand('COMMIT');
         $this->notifyTransactionCommit();
         return true;
     }
@@ -106,7 +106,7 @@ class TransactionControl implements IObservableTransactionControl
             return false;
         }
 
-        $this->stmtExec->rawQuery('ROLLBACK');
+        $this->stmtExec->rawCommand('ROLLBACK');
         $this->notifyTransactionRollback();
         return true;
     }
@@ -127,7 +127,7 @@ class TransactionControl implements IObservableTransactionControl
             throw new InvalidStateException('No transaction is active, cannot create any savepoint.');
         }
 
-        $this->stmtExec->rawQuery(sprintf('SAVEPOINT %s', $this->quoteIdent($name)));
+        $this->stmtExec->rawCommand(sprintf('SAVEPOINT %s', $this->quoteIdent($name)));
         $this->notifySavepointSaved($name);
     }
 
@@ -137,7 +137,7 @@ class TransactionControl implements IObservableTransactionControl
             throw new InvalidStateException('No transaction is active, cannot roll back to any savepoint.');
         }
 
-        $this->stmtExec->rawQuery(sprintf('ROLLBACK TO SAVEPOINT %s', $this->quoteIdent($name)));
+        $this->stmtExec->rawCommand(sprintf('ROLLBACK TO SAVEPOINT %s', $this->quoteIdent($name)));
         $this->notifyRollbackToSavepoint($name);
     }
 
@@ -147,7 +147,7 @@ class TransactionControl implements IObservableTransactionControl
             throw new InvalidStateException('No transaction is active, cannot release any savepoint.');
         }
 
-        $this->stmtExec->rawQuery(sprintf('RELEASE SAVEPOINT %s', $this->quoteIdent($name)));
+        $this->stmtExec->rawCommand(sprintf('RELEASE SAVEPOINT %s', $this->quoteIdent($name)));
         $this->notifySavepointReleased($name);
     }
 
@@ -158,7 +158,7 @@ class TransactionControl implements IObservableTransactionControl
             return false;
         }
 
-        $this->stmtExec->rawQuery("SET TRANSACTION SNAPSHOT {$this->quoteString($snapshotId)}");
+        $this->stmtExec->rawCommand("SET TRANSACTION SNAPSHOT {$this->quoteString($snapshotId)}");
         return true;
     }
 
@@ -181,7 +181,7 @@ class TransactionControl implements IObservableTransactionControl
             return false;
         }
 
-        $this->stmtExec->rawQuery("PREPARE TRANSACTION {$this->quoteString($name)}");
+        $this->stmtExec->rawCommand("PREPARE TRANSACTION {$this->quoteString($name)}");
         $this->notifyTransactionPrepared($name);
         return true;
     }
@@ -192,7 +192,7 @@ class TransactionControl implements IObservableTransactionControl
             throw new InvalidStateException('Cannot commit a prepared transaction while inside another transaction.');
         }
 
-        $this->stmtExec->rawQuery("COMMIT PREPARED {$this->quoteString($name)}");
+        $this->stmtExec->rawCommand("COMMIT PREPARED {$this->quoteString($name)}");
         $this->notifyPreparedTransactionCommit($name);
     }
 
@@ -202,7 +202,7 @@ class TransactionControl implements IObservableTransactionControl
             throw new InvalidStateException('Cannot rollback a prepared transaction while inside another transaction.');
         }
 
-        $this->stmtExec->rawQuery("ROLLBACK PREPARED {$this->quoteString($name)}");
+        $this->stmtExec->rawCommand("ROLLBACK PREPARED {$this->quoteString($name)}");
         $this->notifyPreparedTransactionRollback($name);
     }
 
