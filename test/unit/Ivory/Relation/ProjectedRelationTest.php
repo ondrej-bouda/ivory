@@ -8,33 +8,33 @@ class ProjectedRelationTest extends \Ivory\IvoryTestCase
     public function testSingleColSpec()
     {
         $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $rel = $conn->query(
             "SELECT 'abc' AS foo, 1, 42 AS the_answer,
                     7 AS a, 8 AS b, 'John' AS person_firstname, 'Doe' AS person_lastname,
                     100 AS a"
         );
-        $this->assertSame([['a' => 7, 'b' => 8]], $qr->project(['a', 'b'])->toArray());
-        $this->assertSame([7, 8], $qr->project(['a', 'b'])->tuple()->toList());
-        $this->assertSame([['a' => 8, 'b' => 7]], $qr->project(['a' => 'b', 'b' => 'a'])->toArray());
-        $this->assertSame([['the_answer' => 42, 'x' => 'abc']], $qr->project([1, 2, 'x' => 0])->toArray());
-        $this->assertSame([['sum' => 15]], $qr->project(['sum' => function (ITuple $t) { return $t['a'] + $t['b']; }])->toArray());
+        $this->assertSame([['a' => 7, 'b' => 8]], $rel->project(['a', 'b'])->toArray());
+        $this->assertSame([7, 8], $rel->project(['a', 'b'])->tuple()->toList());
+        $this->assertSame([['a' => 8, 'b' => 7]], $rel->project(['a' => 'b', 'b' => 'a'])->toArray());
+        $this->assertSame([['the_answer' => 42, 'x' => 'abc']], $rel->project([1, 2, 'x' => 0])->toArray());
+        $this->assertSame([['sum' => 15]], $rel->project(['sum' => function (ITuple $t) { return $t['a'] + $t['b']; }])->toArray());
 
         try {
-            $qr->project(['c']);
+            $rel->project(['c']);
             $this->fail();
         }
         catch (UndefinedColumnException $e) {
         }
 
         try {
-            $qr->project([-1]);
+            $rel->project([-1]);
             $this->fail();
         }
         catch (UndefinedColumnException $e) {
         }
 
         try {
-            $qr->project([8]);
+            $rel->project([8]);
             $this->fail();
         }
         catch (UndefinedColumnException $e) {
@@ -44,29 +44,29 @@ class ProjectedRelationTest extends \Ivory\IvoryTestCase
     public function testMultiColSpec()
     {
         $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $rel = $conn->query(
             "SELECT 'abc' AS foo, 1, 42 AS the_answer,
                     7 AS a, 8 AS b, 'John' AS person_firstname, 'Doe' AS person_lastname,
                     100 AS a"
         );
-        $this->assertSame([['p_firstname' => 'John', 'p_lastname' => 'Doe']], $qr->project(['p_*' => 'person_*'])->toArray());
+        $this->assertSame([['p_firstname' => 'John', 'p_lastname' => 'Doe']], $rel->project(['p_*' => 'person_*'])->toArray());
         $this->assertSame(
             [['foo' => 'abc', 'the_answer' => 42, 'a' => 7, 'b' => 8, 'person_firstname' => 'John', 'person_lastname' => 'Doe', 'copy' => 7]],
-            $qr->project(['*', 'copy' => 'a'])->toArray()
+            $rel->project(['*', 'copy' => 'a'])->toArray()
         );
         $this->assertSame(
             [['a' => 7, 'the_answer' => 42, 'person_firstname' => 'John', 'person_first' => 'John', 'person_last' => 'Doe']],
-            $qr->project(['a', '/_.*R/i', '\1' => '/(.*)name$/'])->toArray()
+            $rel->project(['a', '/_.*R/i', '\1' => '/(.*)name$/'])->toArray()
         );
 
         try {
-            $qr->project(['q*']);
+            $rel->project(['q*']);
         }
         catch (UndefinedColumnException $e) {
         }
 
         try {
-            $qr->project(['/.{255}/']);
+            $rel->project(['/.{255}/']);
         }
         catch (UndefinedColumnException $e) {
         }
@@ -75,7 +75,7 @@ class ProjectedRelationTest extends \Ivory\IvoryTestCase
     public function testColumnValues()
     {
         $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $qr = $conn->query(
             "SELECT *
              FROM (VALUES ('a', 1), ('b', 3), ('h', 3), ('w', -1)) v (x, n)"
         );

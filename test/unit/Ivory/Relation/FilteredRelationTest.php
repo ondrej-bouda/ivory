@@ -1,18 +1,27 @@
 <?php
 namespace Ivory\Relation;
 
+use Ivory\Connection\IConnection;
 use Ivory\Relation\Alg\ITupleFilter;
 
 class FilteredRelationTest extends \Ivory\IvoryTestCase
 {
+    /** @var IConnection */
+    private $conn;
+
+    protected function setUp()
+    {
+        $this->conn = $this->getIvoryConnection();
+    }
+
+
     public function testClosure()
     {
-        $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $rel = $this->conn->query(
             'SELECT *
              FROM (VALUES (1, 2), (4, 3), (5, 6)) v (a, b)'
         );
-        $filtered = $qr->filter(function (ITuple $tuple) {
+        $filtered = $rel->filter(function (ITuple $tuple) {
             return ($tuple['a'] < $tuple['b']);
         });
 
@@ -41,17 +50,16 @@ class FilteredRelationTest extends \Ivory\IvoryTestCase
 
     public function testTupleFilter()
     {
-        $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $rel = $this->conn->query(
             'SELECT *
              FROM (VALUES (1, 2), (4, 3), (5, 6)) v (a, b)'
         );
-        $filteredMod3 = $qr->filter(new FilteredRelationTestTupleFilter(3));
+        $filteredMod3 = $rel->filter(new FilteredRelationTestTupleFilter(3));
         $this->assertSame(2, $filteredMod3->count());
         $this->assertSame([4, 3], $filteredMod3->tuple(0)->toList());
         $this->assertSame([5, 6], $filteredMod3->tuple(1)->toList());
 
-        $filteredMod6 = $qr->filter(new FilteredRelationTestTupleFilter(6));
+        $filteredMod6 = $rel->filter(new FilteredRelationTestTupleFilter(6));
         $this->assertSame(1, $filteredMod6->count());
         $this->assertSame([5, 6], $filteredMod6->tuple(0)->toList());
     }

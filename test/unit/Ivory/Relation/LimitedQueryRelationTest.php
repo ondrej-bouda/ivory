@@ -1,15 +1,25 @@
 <?php
 namespace Ivory\Relation;
 
+use Ivory\Connection\IConnection;
+
 class LimitedRelationTest extends \Ivory\IvoryTestCase
 {
+    /** @var IConnection */
+    private $conn;
+
+    protected function setUp()
+    {
+        $this->conn = $this->getIvoryConnection();
+    }
+
+
     public function testLimitFirstOne()
     {
-        $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $rel = new QueryRelation($this->conn,
             'VALUES (1,2), (3,4), (3,6), (7,8)'
         );
-        $limited = $qr->limit(1);
+        $limited = $rel->limit(1);
 
         $this->assertSame(1, $limited->count());
 
@@ -33,8 +43,7 @@ class LimitedRelationTest extends \Ivory\IvoryTestCase
 
     public function testLimitFirstThree()
     {
-        $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $qr = new QueryRelation($this->conn,
             'VALUES (1,2), (3,4), (5,6), (7,8)'
         );
         $limited = $qr->limit(3);
@@ -64,8 +73,7 @@ class LimitedRelationTest extends \Ivory\IvoryTestCase
 
     public function testLimitTwoOffsetOne()
     {
-        $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $qr = new QueryRelation($this->conn,
             'VALUES (1,2), (3,4), (5,6), (7,8)'
         );
         $limited = $qr->limit(2, 1);
@@ -94,8 +102,7 @@ class LimitedRelationTest extends \Ivory\IvoryTestCase
 
     public function testLimitTwoOffsetOneNotEnough()
     {
-        $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $qr = new QueryRelation($this->conn,
             'VALUES (1,2), (3,4)'
         );
         $limited = $qr->limit(2, 1);
@@ -123,8 +130,7 @@ class LimitedRelationTest extends \Ivory\IvoryTestCase
 
     public function testOffsetOneUnlimited()
     {
-        $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $qr = new QueryRelation($this->conn,
             'VALUES (1,2), (3,4), (5,6), (7,8)'
         );
         $limited = $qr->limit(null, 1);

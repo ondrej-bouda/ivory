@@ -9,11 +9,11 @@ class UniqueColumnTest extends \Ivory\IvoryTestCase
     protected function setUp()
     {
         $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $rel = $conn->query(
             'SELECT *
              FROM (VALUES (4, 3), (1, 2), (5, 6), (4, 4), (4, 8), (1, 1)) v (a, b)'
         );
-        $this->baseCol = $qr->col(0);
+        $this->baseCol = $rel->col(0);
     }
 
     public function testCount()

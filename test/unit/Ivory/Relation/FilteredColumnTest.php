@@ -11,11 +11,11 @@ class FilteredColumnTest extends \Ivory\IvoryTestCase
     protected function setUp()
     {
         $conn = $this->getIvoryConnection();
-        $qr = new QueryRelation($conn,
+        $rel = $conn->query(
             'SELECT *
              FROM (VALUES (1, 2), (4, 3), (5, 6)) v (a, b)'
         );
-        $this->baseCol = $qr->col(0);
+        $this->baseCol = $rel->col(0);
     }
 
     public function testCount()

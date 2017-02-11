@@ -28,8 +28,8 @@ class MapTest extends \Ivory\IvoryTestCase
             $orderBy = '1';
         }
 
-        return new QueryRelation($conn,
-            "SELECT $distinct
+        return $conn->query(
+            "SELECT %sql:distinct
                     artist.name AS artist,
                     album.year,
                     album.name AS album
@@ -37,7 +37,11 @@ class MapTest extends \Ivory\IvoryTestCase
                   JOIN album_artist ON album_artist.artist_id = artist.id
                   JOIN album ON album.id = album_artist.album_id
              WHERE artist.id IN (1,2,3,4,5)
-             ORDER BY $orderBy, artist.id, album.year, album.name"
+             ORDER BY %sql:order, artist.id, album.year, album.name",
+            [
+                'distinct' => $distinct,
+                'order' => $orderBy,
+            ]
         );
     }
 
