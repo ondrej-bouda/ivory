@@ -38,16 +38,6 @@ class QueryRelation extends RelationBase implements IQueryRelation
         return $this->query;
     }
 
-    public function where($cond, ...$args)
-    {
-        throw new NotImplementedException();
-    }
-
-    public function sort(...$sortExpressions)
-    {
-        throw new NotImplementedException();
-    }
-
     public function col($offsetOrNameOrEvaluator)
     {
         $this->populate();
