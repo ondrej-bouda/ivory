@@ -172,17 +172,38 @@ class ArrayType implements ITotallyOrderedType, INamedType
      */
     public function serializeValue($val)
     {
-        return $this->serializeValueImpl($val);
+        $str = $this->serializeValueImpl($val, $bounds);
+
+        $needsDimDecoration = false;
+        foreach ($bounds as $b) {
+            if ($b[0] != 1) {
+                $needsDimDecoration = true;
+                break;
+            }
+        }
+        if ($needsDimDecoration) {
+            $dimDec = '';
+            foreach ($bounds as $b) {
+                $dimDec .= "[{$b[0]}:{$b[1]}]";
+            }
+            $str = "$dimDec=$str";
+        }
+
+        return sprintf("'%s'::%s.%s[]",
+            $str, // NOTE: literal single quotes in serialized elements are already doubled
+            $this->elemType->getSchemaName(),
+            $this->elemType->getName()
+        );
     }
 
     /**
      * @param array|null $val the value to serialize
+     * @param int[][] $bounds list: for each dimension, a pair of from-to subscripts is mentioned
      * @param int $curDim the current dimension being processed (zero-based)
      * @param int $maxDim the maximal dimension discovered so far
-     * @param int[][] $bounds list: for each dimension, a pair of from-to subscripts is mentioned
      * @return string the PostgreSQL external representation of <tt>$val</tt>
      */
-    private function serializeValueImpl($val, $curDim = 0, &$maxDim = -1, &$bounds = [])
+    private function serializeValueImpl($val, &$bounds = [], $curDim = 0, &$maxDim = -1)
     {
         if ($val === null) {
             return 'NULL';
@@ -224,7 +245,7 @@ class ArrayType implements ITotallyOrderedType, INamedType
             }
 
             if (is_array($v)) {
-                $out .= $this->serializeValueImpl($v, $curDim + 1, $maxDim, $bounds);
+                $out .= $this->serializeValueImpl($v, $bounds, $curDim + 1, $maxDim);
             }
             else {
                 if ($curDim != $maxDim) {
@@ -257,29 +278,6 @@ class ArrayType implements ITotallyOrderedType, INamedType
             }
         }
         $out .= '}';
-
-        if ($curDim == 0) {
-            $needsDimDecoration = false;
-            foreach ($bounds as $b) {
-                if ($b[0] != 1) {
-                    $needsDimDecoration = true;
-                    break;
-                }
-            }
-            if ($needsDimDecoration) {
-                $dimDec = '';
-                foreach ($bounds as $b) {
-                    $dimDec .= "[{$b[0]}:{$b[1]}]";
-                }
-                $out = "$dimDec=$out";
-            }
-
-            $out = sprintf("'%s'::%s.%s[]",
-                $out, // NOTE: literal single quotes in serialized elements are already doubled
-                $this->elemType->getSchemaName(),
-                $this->elemType->getName()
-            );
-        }
 
         return $out;
     }

@@ -47,8 +47,9 @@ class ProjectedRelation extends ProjectedRelationBase
                 if ($repl === null) {
                     $cns = [];
                     foreach ($srcCols as $i => $c) {
-                        if ($c->getName() !== null) {
-                            $cns[$i] = $c->getName();
+                        $name = $c->getName();
+                        if ($name !== null) {
+                            $cns[$i] = $name;
                         }
                     }
                     $matched = preg_grep($pcre, $cns);
