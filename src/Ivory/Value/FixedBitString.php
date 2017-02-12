@@ -35,20 +35,20 @@ class FixedBitString extends BitString
 		$bitsLen = strlen($bits);
 
 		if ($length === null) {
-			return new FixedBitString($bits, $bitsLen);
+			return new FixedBitString($bits);
 		}
 		elseif ($length <= 0) {
 			throw new \InvalidArgumentException('length is non-positive');
 		}
 		elseif ($length == $bitsLen) {
-			return new FixedBitString($bits, $bitsLen);
+			return new FixedBitString($bits);
 		}
 		elseif ($length > $bitsLen) {
-			return new FixedBitString(str_pad($bits, $length, '0'), $length);
+			return new FixedBitString(str_pad($bits, $length, '0'));
 		}
 		else { // $length < $bitsLen
 			trigger_error("Bit string truncated to the length of $length", E_USER_WARNING);
-			return new FixedBitString(substr($bits, 0, $length), $length);
+			return new FixedBitString(substr($bits, 0, $length));
 		}
 	}
 

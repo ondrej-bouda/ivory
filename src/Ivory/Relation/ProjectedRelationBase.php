@@ -4,14 +4,14 @@ namespace Ivory\Relation;
 abstract class ProjectedRelationBase extends StreamlinedRelation
 {
     /** @var Column[] */
-    private $columns;
+    private $projectedColumns;
     /** @var int[] map: column name => offset of the first column of the name */
     private $colNameMap;
 
     public function __construct(IRelation $source, array $columns)
     {
         parent::__construct($source);
-        $this->columns = $columns;
+        $this->projectedColumns = $columns;
 
         $this->colNameMap = [];
         foreach ($columns as $colOffset => $col) {
@@ -107,7 +107,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
 
     public function getColumns()
     {
-        return $this->columns;
+        return $this->projectedColumns;
     }
 
     protected function getColNameMap()
@@ -126,7 +126,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
 
     public function col($offsetOrNameOrEvaluator)
     {
-        return $this->_colImpl($offsetOrNameOrEvaluator, $this->columns, $this->colNameMap, $this);
+        return $this->_colImpl($offsetOrNameOrEvaluator, $this->projectedColumns, $this->colNameMap, $this);
     }
 
     public function getIterator()

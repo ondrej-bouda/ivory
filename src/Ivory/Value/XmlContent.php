@@ -80,10 +80,15 @@ class XmlContent
     {
         $reader = new \XMLReader();
         $reader->xml($xmlStr);
+
         if (!@$reader->read()) {
             return false;
         }
-        while (@$reader->read()) {}
+
+        do {
+            $read = @$reader->read();
+        } while ($read);
+
         return ($reader->depth == 0);
     }
 
