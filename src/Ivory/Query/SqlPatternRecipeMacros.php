@@ -9,14 +9,7 @@ use Ivory\Lang\SqlPattern\SqlPatternPlaceholder;
 use Ivory\Type\ITypeDictionary;
 use Ivory\Utils\StringUtils;
 
-/**
- * Recipe defined by an SQL query string or a parametrized SQL pattern.
- *
- * Note this class is not directly instantiable. Instead, use factory methods on subclasses.
- *
- * @see SqlPattern for thorough details on SQL patterns
- */
-abstract class SqlRecipe
+trait SqlPatternRecipeMacros
 {
     /** @var SqlPattern */
     private $sqlPattern;
@@ -222,20 +215,7 @@ abstract class SqlRecipe
         $this->unsatisfiedParams = array_fill_keys(array_keys($sqlPattern->getNamedPlaceholderMap()), true);
     }
 
-    /**
-     * Sets the value of a parameter in the SQL pattern.
-     *
-     * @param string|int $nameOrPosition name of the named parameter, or (zero-based) position of the positional
-     *                                     parameter, respectively
-     * @param mixed $value value of the parameter;
-     *                     if the parameter is specified explicitly with its type, <tt>$value</tt> must correspond to
-     *                       the type;
-     *                     otherwise, the type of the parameter (and thus the conversion to be used) is inferred from
-     *                       the type of <tt>$value</tt>
-     * @return $this
-     * @throws \InvalidArgumentException when the SQL pattern has no parameter of a given name or position
-     */
-    public function setParam($nameOrPosition, $value) : self
+    public function setParam($nameOrPosition, $value)
     {
         if (isset($this->unsatisfiedParams[$nameOrPosition])) {
             unset($this->unsatisfiedParams[$nameOrPosition]);
@@ -248,13 +228,7 @@ abstract class SqlRecipe
         return $this;
     }
 
-    /**
-     * Sets values of several parameters in the SQL pattern.
-     *
-     * @param array|\Traversable $paramMap map: parameter name (or zero-based position) => parameter value
-     * @return $this
-     */
-    public function setParams($paramMap) : self // PHP 7.1: declare $paramMap as iterable
+    public function setParams($paramMap)
     {
         foreach ($paramMap as $nameOrPosition => $value) {
             $this->setParam($nameOrPosition, $value);
@@ -267,9 +241,6 @@ abstract class SqlRecipe
         return $this->sqlPattern;
     }
 
-    /**
-     * @return array map: parameter name or zero-based position => parameter value
-     */
     public function getParams() : array
     {
         return $this->params;

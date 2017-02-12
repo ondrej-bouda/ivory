@@ -5,8 +5,10 @@ use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Ivory;
+use Ivory\Query\ICommandRecipe;
+use Ivory\Query\IRelationRecipe;
+use Ivory\Query\ISqlPatternRecipe;
 use Ivory\Query\SqlCommandRecipe;
-use Ivory\Query\SqlRecipe;
 use Ivory\Query\SqlRelationRecipe;
 use Ivory\Result\CommandResult;
 use Ivory\Result\CopyInResult;
@@ -31,8 +33,8 @@ class StatementExecution implements IStatementExecution
 
     public function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): IQueryResult
     {
-        if ($sqlFragmentPatternOrRecipe instanceof SqlRecipe) {
-            $recipe = $this->setupSqlRecipe($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
+        if ($sqlFragmentPatternOrRecipe instanceof IRelationRecipe) {
+            $recipe = $this->setupRecipe($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
         }
         else {
             $recipe = SqlRelationRecipe::fromFragments($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
@@ -44,8 +46,8 @@ class StatementExecution implements IStatementExecution
 
     public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): ICommandResult
     {
-        if ($sqlFragmentPatternOrRecipe instanceof SqlRecipe) {
-            $recipe = $this->setupSqlRecipe($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
+        if ($sqlFragmentPatternOrRecipe instanceof ICommandRecipe) {
+            $recipe = $this->setupRecipe($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
         }
         else {
             $recipe = SqlCommandRecipe::fromFragments($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
@@ -55,17 +57,22 @@ class StatementExecution implements IStatementExecution
         return $this->rawCommand($sql);
     }
 
-    private function setupSqlRecipe(SqlRecipe $sqlRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): SqlRecipe
+    private function setupRecipe($recipe, ...$args)
     {
-        if ($fragmentsAndPositionalParamsAndNamedParamsMap) {
-            if (count($fragmentsAndPositionalParamsAndNamedParamsMap) > 1) {
+        if ($args) {
+            if ($recipe instanceof ISqlPatternRecipe) {
+                if (count($args) > 1) {
+                    throw new \InvalidArgumentException('Too many arguments given.');
+                }
+                $namedParamsMap = $args[0];
+                $recipe->setParams($namedParamsMap);
+            }
+            else {
                 throw new \InvalidArgumentException('Too many arguments given.');
             }
-            $namedParamsMap = $fragmentsAndPositionalParamsAndNamedParamsMap[0];
-            $sqlRecipe->setParams($namedParamsMap);
         }
 
-        return $sqlRecipe;
+        return $recipe;
     }
 
     public function rawQuery(string $sqlQuery): IQueryResult
@@ -146,7 +153,7 @@ class StatementExecution implements IStatementExecution
         return $results;
     }
 
-    public function runScript($sqlScript)
+    public function runScript(string $sqlScript)
     {
         $connHandler = $this->connCtl->requireConnection();
 

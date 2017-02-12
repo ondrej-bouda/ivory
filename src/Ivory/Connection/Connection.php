@@ -133,7 +133,7 @@ class Connection implements IConnection
 		return $this->stmtExec->rawMultiStatement($sqlStatements);
 	}
 
-	public function runScript($sqlScript)
+	public function runScript(string $sqlScript)
 	{
 		return $this->stmtExec->runScript($sqlScript);
 	}

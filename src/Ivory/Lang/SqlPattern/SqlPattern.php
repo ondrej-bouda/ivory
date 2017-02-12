@@ -6,7 +6,8 @@ use Ivory\Exception\NoDataException;
 /**
  * An immutable representation of an SQL pattern.
  *
- * This class is not intended for direct construction - instead, use {@link SqlPatternParser} to get an `SqlPattern`.
+ * This class is not intended for direct construction - instead, use {@link SqlPatternParser} to had an `SqlPattern`
+ * created, or {@link \Ivory\Query\SqlRelationRecipe} or {@link \Ivory\Query\SqlCommandRecipe} to use it indirectly.
  *
  * An SQL pattern is a plain SQL string with special placeholders for parameters.
  *

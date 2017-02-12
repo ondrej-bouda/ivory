@@ -3,7 +3,8 @@ namespace Ivory\Connection;
 
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Lang\SqlPattern\SqlPattern;
-use Ivory\Query\SqlRecipe;
+use Ivory\Query\ICommandRecipe;
+use Ivory\Query\IRelationRecipe;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\IQueryResult;
 use Ivory\Result\IResult;
@@ -39,7 +40,7 @@ interface IStatementExecution
      * Queries the database for a relation using an SQL pattern, waits for its execution and returns the resulting
      * relation.
      *
-     * This is an overloaded method. There are two variants:
+     * This is an overloaded method. There are three variants:
      * 1. The first argument is either an SQL pattern string or already parsed {@link SqlPattern} object. Values for all
      *    its positional parameters must follow. Optionally, any number of further SQL patterns (again, as strings or
      *    {@link SqlPattern}s) may be given then, each immediately followed by values for its positional parameters. All
@@ -48,6 +49,7 @@ interface IStatementExecution
      * 2. The first argument is an {@link SqlRecipe} object. No positional arguments are expected in this case, only the
      *    optional map of values for named parameters. As the `SqlRecipe` might have already set all its named
      *    parameters, even this argument might not be necessary.
+     * 3. The first and the only argument is an {@link IRelationRecipe} object.
      *
      * Examples:
      * - `query('SELECT 42')`
@@ -72,7 +74,7 @@ interface IStatementExecution
      * it to <tt>query()</tt>. Another alternative would be to use the {@link dataSource()} method and, again, fill that
      * with parameter values.
      *
-     * @param string|SqlPattern|SqlRecipe $sqlFragmentPatternOrRecipe
+     * @param string|SqlPattern|IRelationRecipe $sqlFragmentPatternOrRecipe
      * @param array ...$fragmentsAndPositionalParamsAndNamedParamsMap
      * @return IQueryResult
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
@@ -83,14 +85,16 @@ interface IStatementExecution
     /**
      * Sends a command to the database using an SQL pattern, waits for its execution and returns the command result.
      *
-     * This is an overloaded method, like {@link query()}. Either an SQL pattern is given along with values for its
-     * parameters, or an {@link SqlRecipe} object is passed.
+     * This is an overloaded method, like {@link query()}. Either:
+     * 1. an SQL pattern is given along with values for its parameters, or
+     * 2. an {@link SqlRecipe} object is passed, optionally with a map of values for named parameters, or
+     * 3. an {@link ICommandRecipe} object is given as the only argument.
      *
      * Note the strict distinction of *queries* and *commands* - see the {@link IStatementExecution} docs. If an SQL
      * query is executed using this method, a result object, reporting as many affected rows as the actual result has,
      * is returned and a warning is issued.
      *
-     * @param string|SqlPattern|SqlRecipe $sqlFragmentPatternOrRecipe
+     * @param string|SqlPattern|ICommandRecipe $sqlFragmentPatternOrRecipe
      * @param array ...$fragmentsAndPositionalParamsAndNamedParamsMap
      * @return ICommandResult
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
@@ -177,7 +181,7 @@ interface IStatementExecution
      * @throws ConnectionException when an error occurred while sending the statements or processing the database
      *                             response
      */
-    function runScript($sqlScript);
+    function runScript(string $sqlScript);
 
     /**
      * @return StatementExceptionFactory the local factory used for emitting exceptions upon statement errors

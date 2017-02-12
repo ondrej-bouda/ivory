@@ -6,6 +6,7 @@ namespace Ivory\Query;
  *
  * {@inheritdoc}
  */
-class SqlRelationRecipe extends SqlRecipe implements IRelationRecipe
+class SqlRelationRecipe extends RelationRecipe implements ISqlPatternRecipe
 {
+    use SqlPatternRecipeMacros;
 }
