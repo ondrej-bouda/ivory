@@ -18,12 +18,12 @@ class CopyControl implements ICopyControl
 
     }
 
-    public function copyToFile($file, $tableOrQuery, $columns = null, $options = [])
+    public function copyToFile($file, $tableOrRecipe, $columns = null, $options = [])
     {
 
     }
 
-    public function copyToProgram($program, $tableOrQuery, $columns = null, $options = [])
+    public function copyToProgram($program, $tableOrRecipe, $columns = null, $options = [])
     {
 
     }

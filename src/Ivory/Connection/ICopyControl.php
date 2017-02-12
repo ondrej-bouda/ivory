@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Connection;
 
-use Ivory\Relation\IQueryRelation;
+use Ivory\Query\IRelationRecipe;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\ICopyInResult;
 
@@ -126,7 +126,7 @@ interface ICopyControl
      *
      * The returned {@link ICopyInResult} object is to be used to pass the actual data and finalize copying.
      *
-     * Until the {@link ICopyInResult::end()} method is called on the result, the connection is blocked.
+     * Until the {@link ICopyInResult::end()} method is called on the returned object, the connection is blocked.
      *
      * @param string $table name of the database table to copy the data to; might be schema-qualified
      * @param string[]|null $columns list of names of columns values of which will be given on the input;
@@ -142,38 +142,38 @@ interface ICopyControl
      *
      * The file must be writable by the PostgreSQL user.
      *
-     * After this method returns, the connection is free to accept any more statements.
+     * After this method returns, the connection is free to accept further statements.
      *
      * @param string $file path name of the output file;
      *                     relative or absolute path interpreted from the viewpoint of the database server
-     * @param string|IQueryRelation $tableOrQuery either an (optionally schema-qualified) table name or relation giving
-     *                                              the data to be copied
+     * @param string|IRelationRecipe $tableOrRecipe either an (optionally schema-qualified) table name or recipe to
+     *                                                relation giving the data to be copied
      * @param string[]|null $columns list of names of columns values of which will be copied to the given file;
      *                               skipping with <tt>null</tt> yields all the table columns in their definition order
      * @param array $options map of options for <tt>COPY</tt>: option (one of {@link ICopyControl} constants) => value;
      *                       see the constants on what values are accepted for which options
      * @return ICommandResult the result of the `COPY` command
      */
-    function copyToFile($file, $tableOrQuery, $columns = null, $options = []);
+    function copyToFile($file, $tableOrRecipe, $columns = null, $options = []);
 
     /**
      * Instructs the database server to copy a database table or query result to the input of a program.
      *
      * The program must be executable by the PostgreSQL user.
      *
-     * After this method returns, the connection is free to accept any more statements.
+     * After this method returns, the connection is free to accept further statements.
      *
      * @param string $program command executed by the database server, the standard input of which will get fed with
      *                          the table or query result data
-     * @param string|IQueryRelation $tableOrQuery either an (optionally schema-qualified) table name or relation giving
-     *                                              the data to be copied
+     * @param string|IRelationRecipe $tableOrRecipe either an (optionally schema-qualified) table name or recipe to
+     *                                                relation giving the data to be copied
      * @param string[]|null $columns list of names of columns values of which will be given to the program;
      *                               skipping with <tt>null</tt> yields all the table columns in their definition order
      * @param array $options map of options for <tt>COPY</tt>: option (one of {@link ICopyControl} constants) => value;
      *                       see the constants on what values are accepted for which options
      * @return ICommandResult the result of the `COPY` command
      */
-    function copyToProgram($program, $tableOrQuery, $columns = null, $options = []);
+    function copyToProgram($program, $tableOrRecipe, $columns = null, $options = []);
 
     /**
      * Copies a database table to an array of data rows, using the {@link ICopyControl::FORMAT_TEXT `TEXT`} format.

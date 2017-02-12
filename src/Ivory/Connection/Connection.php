@@ -161,14 +161,14 @@ class Connection implements IConnection
 		return $this->copyCtl->copyFromInput($table, $columns, $options);
 	}
 
-	public function copyToFile($file, $tableOrQuery, $columns = null, $options = [])
+	public function copyToFile($file, $tableOrRecipe, $columns = null, $options = [])
 	{
-		return $this->copyCtl->copyToFile($file, $tableOrQuery, $columns, $options);
+		return $this->copyCtl->copyToFile($file, $tableOrRecipe, $columns, $options);
 	}
 
-	public function copyToProgram($program, $tableOrQuery, $columns = null, $options = [])
+	public function copyToProgram($program, $tableOrRecipe, $columns = null, $options = [])
 	{
-		return $this->copyCtl->copyToProgram($program, $tableOrQuery, $columns, $options);
+		return $this->copyCtl->copyToProgram($program, $tableOrRecipe, $columns, $options);
 	}
 
 	public function copyToArray($table, $options = [])
