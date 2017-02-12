@@ -14,6 +14,8 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->conn = $this->getIvoryConnection();
     }
 

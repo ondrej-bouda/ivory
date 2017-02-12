@@ -10,6 +10,8 @@ class HstoreTypeTest extends IvoryTestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->hstoreType = new HstoreType('public', 'hstore', $this->getIvoryConnection());
     }
 

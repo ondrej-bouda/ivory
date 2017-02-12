@@ -13,6 +13,8 @@ class CompositeTypeTest extends IvoryTestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->adHocComposite = new AdHocCompositeType('pg_catalog', 'record');
     }
 

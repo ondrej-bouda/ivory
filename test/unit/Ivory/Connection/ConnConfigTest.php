@@ -15,6 +15,8 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->cfg = $this->getIvoryConnection()->getConfig();
         $this->getIvoryConnection()->startTransaction();
     }
@@ -22,6 +24,8 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
     protected function tearDown()
     {
         $this->getIvoryConnection()->rollback();
+
+        parent::tearDown();
     }
 
     public function testSetting()

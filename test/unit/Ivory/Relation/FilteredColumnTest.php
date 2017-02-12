@@ -10,6 +10,8 @@ class FilteredColumnTest extends \Ivory\IvoryTestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $conn = $this->getIvoryConnection();
         $rel = $conn->query(
             'SELECT *

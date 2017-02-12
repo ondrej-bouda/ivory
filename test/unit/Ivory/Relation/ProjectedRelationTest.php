@@ -75,19 +75,19 @@ class ProjectedRelationTest extends \Ivory\IvoryTestCase
     public function testColumnValues()
     {
         $conn = $this->getIvoryConnection();
-        $qr = $conn->query(
+        $rel = $conn->query(
             "SELECT *
              FROM (VALUES ('a', 1), ('b', 3), ('h', 3), ('w', -1)) v (x, n)"
         );
 
-        $this->assertSame([1, 3, 3, -1], $qr->col('n')->toArray());
-        $this->assertSame([1, 3, 3, -1], $qr->col(1)->toArray());
-        $this->assertSame(['a', 'b', 'h', 'w'], $qr->col('x')->toArray());
+        $this->assertSame([1, 3, 3, -1], $rel->col('n')->toArray());
+        $this->assertSame([1, 3, 3, -1], $rel->col(1)->toArray());
+        $this->assertSame(['a', 'b', 'h', 'w'], $rel->col('x')->toArray());
 
-        $this->assertSame([1, 3, 3, -1], $qr->project(['n'])->col('n')->toArray());
-        $this->assertSame([1, 3, 3, -1], $qr->project(['n'])->col(0)->toArray());
+        $this->assertSame([1, 3, 3, -1], $rel->project(['n'])->col('n')->toArray());
+        $this->assertSame([1, 3, 3, -1], $rel->project(['n'])->col(0)->toArray());
         try {
-            $qr->project(['n'])->col('x');
+            $rel->project(['n'])->col('x');
             $this->fail('The "x" column should not be defined on the projection');
         }
         catch (UndefinedColumnException $e) {

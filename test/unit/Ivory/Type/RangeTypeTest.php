@@ -13,6 +13,8 @@ class RangeTypeTest extends IvoryTestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $int = new IntegerType('pg_catalog', 'int4', $this->getIvoryConnection());
         $canonFunc = new ConventionalRangeCanonicalFunc($int);
         $this->intRangeType = new RangeType('pg_catalog', 'int4range', $int, $canonFunc);

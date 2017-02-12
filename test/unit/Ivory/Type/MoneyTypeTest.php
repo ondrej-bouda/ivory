@@ -11,6 +11,8 @@ class MoneyTypeTest extends IvoryTestCase
 {
     protected function setUp()
     {
+        parent::setUp();
+
         $this->getIvoryConnection()->startTransaction();
         $val = (System::isWindows() ? 'Czech_Czech Republic.1250' : 'cs_CZ.utf8');
         $this->getIvoryConnection()->getConfig()->setForTransaction(ConfigParam::LC_MONETARY, $val);
@@ -19,6 +21,8 @@ class MoneyTypeTest extends IvoryTestCase
     protected function tearDown()
     {
         $this->getIvoryConnection()->rollback();
+
+        parent::tearDown();
     }
 
     public function testDelimiter()

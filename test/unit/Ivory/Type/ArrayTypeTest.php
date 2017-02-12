@@ -14,6 +14,8 @@ class ArrayTypeTest extends IvoryTestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $intType = new IntegerType('pg_catalog', 'int4', $this->getIvoryConnection());
         $this->intArrayType = new ArrayType($intType, ',');
 

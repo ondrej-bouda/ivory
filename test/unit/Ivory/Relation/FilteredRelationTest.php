@@ -11,6 +11,8 @@ class FilteredRelationTest extends \Ivory\IvoryTestCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->conn = $this->getIvoryConnection();
     }
 
@@ -65,7 +67,7 @@ class FilteredRelationTest extends \Ivory\IvoryTestCase
     }
 }
 
-class FilteredRelationTestTupleFilter implements ITupleFilter
+class FilteredRelationTestTupleFilter implements ITupleFilter // TODO: rework to anonymous class
 {
     private $mod;
 
