@@ -42,7 +42,20 @@ class FilteredColumnTest extends \Ivory\IvoryTestCase
 
     public function testChaining()
     {
-        $decider = new FilteredColumnTestDecider();
+        $decider = new class implements IValueFilter {
+            private $decided = [];
+
+            public function accept($value)
+            {
+                $this->decided[] = $value;
+                return ($value > 4);
+            }
+
+            public function getDecided()
+            {
+                return $this->decided;
+            }
+        };
         $filtered = $this->baseCol->filter(function ($n) { return $n % 2; })->filter($decider);
 
         $this->assertSame([5], $filtered->toArray());
@@ -72,22 +85,5 @@ class FilteredColumnTest extends \Ivory\IvoryTestCase
         }
         catch (\OutOfBoundsException $e) {
         }
-    }
-}
-
-
-class FilteredColumnTestDecider implements IValueFilter
-{
-    private $decided = [];
-
-    public function accept($value)
-    {
-        $this->decided[] = $value;
-        return ($value > 4);
-    }
-
-    public function getDecided()
-    {
-        return $this->decided;
     }
 }

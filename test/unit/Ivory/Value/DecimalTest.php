@@ -111,7 +111,13 @@ class DecimalTest extends \PHPUnit_Framework_TestCase
 		$this->assertSame('-0.12', Decimal::fromNumber('-.12')->toString());
 
 		$this->assertSame('123456789123456789123456789', Decimal::fromNumber(Decimal::fromNumber('123456789123456789123456789'))->toString());
-		$this->assertSame('42', Decimal::fromNumber(new DecimalTestClass())->toString());
+		$obj = new class {
+            public function __toString()
+            {
+                return '    0042    ';
+            }
+        };
+		$this->assertSame('42', Decimal::fromNumber($obj)->toString());
 
 		$this->assertSame('123400000000000000000000000', Decimal::fromNumber(12.34e25)->toString());
 		$this->assertSame('1234.56', Decimal::fromNumber(123.456e1)->toString());
@@ -521,13 +527,5 @@ class DecimalTest extends \PHPUnit_Framework_TestCase
 			$this->fail('UndefinedOperationException expected');
 		} catch (UndefinedOperationException $e) {
 		}
-	}
-}
-
-class DecimalTestClass
-{
-	public function __toString()
-	{
-		return '    0042    ';
 	}
 }

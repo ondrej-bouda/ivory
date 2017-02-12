@@ -56,28 +56,20 @@ class FilteredRelationTest extends \Ivory\IvoryTestCase
             'SELECT *
              FROM (VALUES (1, 2), (4, 3), (5, 6)) v (a, b)'
         );
-        $filteredMod3 = $rel->filter(new FilteredRelationTestTupleFilter(3));
-        $this->assertSame(2, $filteredMod3->count());
-        $this->assertSame([4, 3], $filteredMod3->tuple(0)->toList());
-        $this->assertSame([5, 6], $filteredMod3->tuple(1)->toList());
 
-        $filteredMod6 = $rel->filter(new FilteredRelationTestTupleFilter(6));
-        $this->assertSame(1, $filteredMod6->count());
-        $this->assertSame([5, 6], $filteredMod6->tuple(0)->toList());
-    }
-}
-
-class FilteredRelationTestTupleFilter implements ITupleFilter // TODO: rework to anonymous class
-{
-    private $mod;
-
-    public function __construct($mod)
-    {
-        $this->mod = $mod;
-    }
-
-    public function accept(ITuple $tuple)
-    {
-        return ($tuple['b'] % $this->mod == 0);
+        $filterMod3 = new class implements ITupleFilter {
+            public function accept(ITuple $tuple)
+            {
+                return ($tuple['b'] % 3 == 0);
+            }
+        };
+        $filtered = $rel->filter($filterMod3);
+        $this->assertSame(
+            [
+                ['a' => 4, 'b' => 3],
+                ['a' => 5, 'b' => 6],
+            ],
+            $filtered->toArray()
+        );
     }
 }
