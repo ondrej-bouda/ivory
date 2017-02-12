@@ -18,9 +18,8 @@ namespace Ivory\Connection;
  * as this feature is known to be neither 100% correct nor especially effective. Use server-side connection pooling
  * instead.
  */
-interface IConnection
-    extends IConnectionControl, ITypeControl, ISessionControl, ITransactionControl, IIPCControl, IStatementExecution,
-            ICopyControl
+interface IConnection extends IConnectionControl, ITypeControl, ISessionControl, ITransactionControl, IIPCControl,
+    IStatementExecution, ICopyControl
 {
     /**
      * @return string name of the connection

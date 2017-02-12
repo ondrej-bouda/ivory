@@ -91,6 +91,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
                     /** @noinspection PhpMissingBreakStatementInspection */
                     case '$':
                         $repl .= '\\';
+                        // no break
                     default:
                         $repl .= $c;
                 }
