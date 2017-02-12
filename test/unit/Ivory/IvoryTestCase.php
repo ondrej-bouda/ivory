@@ -13,7 +13,7 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
     /** @var \PHPUnit_Extensions_Database_DB_IDatabaseConnection instantiated once per test */
     private $phpUnitConn = null;
 
-    /** @var IConnection */
+    /** @var IConnection|null */
     private $ivoryConn = null;
 
     /** @var bool whether in the error-interrupt mode */
@@ -34,6 +34,9 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
         parent::tearDown();
         if (!$this->errorInterrupt) {
             $this->errorInterruptMode();
+        }
+        if ($this->ivoryConn !== null) {
+            $this->ivoryConn->disconnect();
         }
     }
 
