@@ -10,7 +10,6 @@ use Ivory\Value\Box;
 use Ivory\Value\Date;
 use Ivory\Value\PgLogSequenceNumber;
 use Ivory\Value\Point;
-use Ivory\Value\Range;
 use Ivory\Value\TextSearchQuery;
 use Ivory\Value\TextSearchVector;
 use Ivory\Value\Time;
@@ -323,16 +322,9 @@ class RelationTest extends \Ivory\IvoryTestCase
              GROUP BY artist.id
              ORDER BY artist.name"
         );
+        $map = $rel->assoc('artist_name', 'active_years');
 
-        /** @var Range[] $map */
-        $map = [];
-        foreach ($rel as $row) {
-            $map[$row['artist_name']] = $row['active_years'];
-        }
-        // TODO: refactor to the following code after implementing assoc()
-//        $map = $qr->assoc('artist_name', 'active_years');
-
-        $this->assertSame(['Metallica', 'Robbie Williams', 'The Piano Guys', 'Tommy Emmanuel'], array_keys($map));
+        $this->assertSame(['Metallica', 'Robbie Williams', 'The Piano Guys', 'Tommy Emmanuel'], $map->getKeys());
 
         $this->assertSame([1991, 1999], $map['Metallica']->toBounds('[]'));
         $this->assertTrue($map['Robbie Williams']->isEmpty());
