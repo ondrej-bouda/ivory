@@ -14,12 +14,18 @@ namespace Ivory\Connection;
  * thus recommended to start connecting as soon as the connection parameters are known. If synchronous connection is
  * needed, use {@link IConnection::connectWait()} instead of {@link IConnection::connect()}.
  *
- * Note there is no option for using a persistent connection on the PHP side (i.e., those done be {@link pg_pconnect()})
+ * Note there is no option for using a persistent connection on the PHP side (i.e., those done by {@link pg_pconnect()})
  * as this feature is known to be neither 100% correct nor especially effective. Use server-side connection pooling
  * instead.
  */
-interface IConnection extends IConnectionControl, ITypeControl, ISessionControl, ITransactionControl, IIPCControl,
-    IStatementExecution, ICopyControl
+interface IConnection extends
+    IConnectionControl,
+    ITypeControl,
+    ISessionControl,
+    ITransactionControl,
+    IIPCControl,
+    IStatementExecution,
+    ICopyControl
 {
     /**
      * @return string name of the connection
