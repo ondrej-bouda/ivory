@@ -28,9 +28,9 @@ class Path
      *
      * @param Point[]|float[][] $points
      * @param bool $isOpen whether the path is open or closed; {@link Path::OPEN} and {@link Path::CLOSED} may be used
-     * @return Polygon
+     * @return Path
      */
-    public static function fromPoints($points, $isOpen = self::CLOSED)
+    public static function fromPoints($points, $isOpen = self::CLOSED): Path
     {
         if (count($points) == 0) {
             throw new \InvalidArgumentException('points');
