@@ -39,7 +39,7 @@ abstract class StreamlinedRelation extends RelationBase
         return ($this->source instanceof \Iterator ? $this->source : new \IteratorIterator($this->source));
     }
 
-    public function tuple($offset = 0)
+    public function tuple($offset = 0): ITuple
     {
         return $this->source->tuple($offset);
     }

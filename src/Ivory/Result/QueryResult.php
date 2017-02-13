@@ -5,6 +5,7 @@ use Ivory\Exception\NotImplementedException;
 use Ivory\Exception\ResultException;
 use Ivory\Relation\Column;
 use Ivory\Relation\FilteredRelation;
+use Ivory\Relation\ITuple;
 use Ivory\Relation\ProjectedRelation;
 use Ivory\Relation\RelationSeekableIterator;
 use Ivory\Relation\RelationMacros;
@@ -134,7 +135,7 @@ class QueryResult extends Result implements IQueryResult
         throw new NotImplementedException();
     }
 
-    public function tuple($offset = 0)
+    public function tuple($offset = 0): ITuple
     {
         if ($offset >= $this->numRows || $offset < -$this->numRows) {
             throw new \OutOfBoundsException("Offset $offset is out of the result bounds [0,{$this->numRows})");

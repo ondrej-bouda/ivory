@@ -61,13 +61,6 @@ class FloatType extends \Ivory\Type\BaseType implements ITotallyOrderedType
             return -1;
         }
 
-        // TODO PHP 7: use the spaceship operator
-        if ((float)$a < (float)$b) {
-            return -1;
-        } elseif ((float)$a == (float)$b) {
-            return 0;
-        } else {
-            return 1;
-        }
+        return (float)$a <=> (float)$b;
     }
 }

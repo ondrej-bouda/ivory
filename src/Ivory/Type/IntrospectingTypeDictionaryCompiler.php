@@ -219,7 +219,6 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      */
     protected function createBaseType($schemaName, $typeName, ITypeProvider $typeProvider)
     {
-        // PHP 7: abbreviate using ??
         $type = $typeProvider->provideType($schemaName, $typeName);
         if ($type !== null) {
             return $type;

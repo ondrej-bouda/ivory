@@ -39,7 +39,7 @@ class Time extends TimeBase
 
         $hour = $m[1];
         $min = $m[2];
-        $sec = (isset($m[3]) ? $m[3] : 0); // PHP 7: abbreviate using ??
+        $sec = ($m[3] ?? 0);
 
         return self::fromPartsStrict($hour, $min, $sec);
     }

@@ -13,11 +13,9 @@ use Ivory\Type\IDiscreteType;
  */
 class BigIntType extends IntegerType implements IDiscreteType
 {
-    const _PHP_INT_MIN = (PHP_MAJOR_VERSION >= 7 ? PHP_INT_MIN : -PHP_INT_MAX); // PHP 7: refactor out
-
     public function parseValue($str)
     {
-        if ($str > PHP_INT_MAX || $str < self::_PHP_INT_MIN) { // correctness: int does not overflow, but rather gets converted to a float
+        if ($str > PHP_INT_MAX || $str < PHP_INT_MIN) { // correctness: int does not overflow, but rather gets converted to a float
             return $str;
         } else {
             return parent::parseValue($str);
@@ -26,7 +24,7 @@ class BigIntType extends IntegerType implements IDiscreteType
 
     public function serializeValue($val)
     {
-        if ($val > PHP_INT_MAX || $val < self::_PHP_INT_MIN) {
+        if ($val > PHP_INT_MAX || $val < PHP_INT_MIN) {
             if (preg_match('~^\s*-?[0-9]+\s*$~', $val)) {
                 return (string)$val;
             } else {
@@ -42,7 +40,7 @@ class BigIntType extends IntegerType implements IDiscreteType
         if ($a === null || $b === null) {
             return null;
         }
-        if ($a > PHP_INT_MAX || $b > PHP_INT_MAX || $a < self::_PHP_INT_MIN || $b < self::_PHP_INT_MIN) {
+        if ($a > PHP_INT_MAX || $b > PHP_INT_MAX || $a < PHP_INT_MIN || $b < PHP_INT_MIN) {
             return bccomp($a, $b, 0);
         } else {
             return (int)$a - (int)$b;
@@ -54,7 +52,7 @@ class BigIntType extends IntegerType implements IDiscreteType
         if ($value === null) {
             return null;
         }
-        if ($value > PHP_INT_MAX || $value < self::_PHP_INT_MIN) {
+        if ($value > PHP_INT_MAX || $value < PHP_INT_MIN) {
             return bcadd($value, $delta, 0);
         } else {
             return (int)$value + $delta;

@@ -166,7 +166,6 @@ class RangeType implements INamedType, ITotallyOrderedType
             return $cmp;
         }
 
-        // PHP 7: <=> could lead to a more compact form
         if ($aIsInc && $bIsInc) {
             return 0;
         } elseif ($aIsInc) {

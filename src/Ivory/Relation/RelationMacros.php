@@ -17,11 +17,7 @@ trait RelationMacros
 {
     abstract public function project($columns);
 
-    /**
-     * @param int $offset
-     * @return ITuple
-     */
-    abstract public function tuple($offset = 0); // PHP 7: type-hint the return type rather than using PHPDoc
+    abstract public function tuple($offset = 0): ITuple;
 
     abstract function col($offsetOrNameOrEvaluator);
 

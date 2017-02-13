@@ -52,7 +52,7 @@ class FilteredRelation extends StreamlinedRelation
         return count($this->acceptMap);
     }
 
-    public function tuple($offset = 0)
+    public function tuple($offset = 0): ITuple
     {
         $this->populate();
         $effectiveOffset = ($offset >= 0 ? $offset : $this->count() + $offset);

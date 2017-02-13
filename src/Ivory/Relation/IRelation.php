@@ -308,7 +308,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @throws \OutOfBoundsException when this relation has fewer than <tt>$offset+1</tt> tuples, or fewer than
      *                                 <tt>-$tupleOffset</tt> tuples if <tt>$tupleOffset</tt> is negative
      */
-    function tuple($offset = 0);
+    function tuple($offset = 0): ITuple;
 
     /**
      * @param int|string|ITupleEvaluator|\Closure $colOffsetOrNameOrEvaluator

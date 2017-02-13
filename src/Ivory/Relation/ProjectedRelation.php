@@ -86,7 +86,7 @@ class ProjectedRelation extends ProjectedRelationBase
         return $columns;
     }
 
-    public function tuple($offset = 0)
+    public function tuple($offset = 0): ITuple
     {
         $srcTuple = parent::tuple($offset);
 
