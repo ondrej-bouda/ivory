@@ -148,7 +148,7 @@ class SqlPattern
      * Parameter values must be inserted in this string in place of the removed placeholders to form a valid SQL
      * statement. Use {@link fillSql()} or {@link generateSql()} for that.
      */
-    public function getSqlTorso() : string
+    public function getSqlTorso(): string
     {
         return $this->sqlTorso;
     }
@@ -157,7 +157,7 @@ class SqlPattern
      * @return SqlPatternPlaceholder[] list of positional placeholders, in order of appearance, used in the
      *                                       described SQL pattern
      */
-    public function getPositionalPlaceholders() : array
+    public function getPositionalPlaceholders(): array
     {
         return $this->positionalPlaceholders;
     }
@@ -167,7 +167,7 @@ class SqlPattern
      *                                         of all placeholders (in order of appearance) referring to the parameter
      *                                         name
      */
-    public function getNamedPlaceholderMap() : array
+    public function getNamedPlaceholderMap(): array
     {
         return $this->namedPlaceholderMap;
     }
@@ -187,7 +187,7 @@ class SqlPattern
      *                                             value
      * @return string SQL string
      */
-    public function fillSql(array $parameterValueSqlStrings) : string
+    public function fillSql(array $parameterValueSqlStrings): string
     {
         assert(
             !array_diff_key(
@@ -254,7 +254,7 @@ class SqlPattern
      *
      * @throws NoDataException if no encoded value is sent for a yielded parameter
      */
-    public function generateSql() : \Generator
+    public function generateSql(): \Generator
     {
         $result = '';
         $offset = 0;

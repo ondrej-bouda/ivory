@@ -12,11 +12,9 @@ trait TotallyOrderedByPhpOperators
         // PHP 7: use the <=> operator as a shorthand
         if ($a < $b) {
             return -1;
-        }
-        elseif ($a == $b) {
+        } elseif ($a == $b) {
             return 0;
-        }
-        else {
+        } else {
             return 1;
         }
     }

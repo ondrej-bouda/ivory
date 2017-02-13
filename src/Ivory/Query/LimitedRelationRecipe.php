@@ -27,7 +27,7 @@ class LimitedRelationRecipe extends RelationRecipe implements IRelationRecipe
         $this->offset = $offset;
     }
 
-    public function toSql(ITypeDictionary $typeDictionary) : string
+    public function toSql(ITypeDictionary $typeDictionary): string
     {
         $relSql = $this->relRecipe->toSql($typeDictionary);
         return sprintf(

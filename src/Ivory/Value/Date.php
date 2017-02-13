@@ -136,8 +136,7 @@ class Date extends DateBase
 
         if ($month >= 1 && $month <= 12 && $day >= 1 && $day <= 31) { // works even for months without 31 days
             return self::fromISOString(sprintf('%s%04d-%02d-%02d', ($z < 0 ? '-' : ''), abs($z), $month, $day));
-        }
-        else {
+        } else {
             return self::fromISOString(sprintf('%s%04d-01-01', ($z < 0 ? '-' : ''), abs($z)))
                 ->addParts(0, $month - 1, $day - 1);
         }
@@ -178,8 +177,7 @@ class Date extends DateBase
         $date = self::fromISOString(sprintf('%s%04d-%02d-%02d', ($z < 0 ? '-' : ''), abs($z), $month, $day));
         if ($date->format('j') == $day) {
             return $date;
-        }
-        else {
+        } else {
             throw new \OutOfRangeException('$day out of range');
         }
     }
@@ -224,8 +222,7 @@ class Date extends DateBase
     {
         if ($this->inf) {
             return null;
-        }
-        else {
+        } else {
             $z = (int)$this->dt->format('Y');
             return [($z > 0 ? $z : $z - 1), (int)$this->dt->format('n'), (int)$this->dt->format('j')];
         }

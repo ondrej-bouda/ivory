@@ -20,8 +20,7 @@ class EnumType implements INamedType, ITotallyOrderedType
     {
         if ($str === null) {
             return null;
-        }
-        else {
+        } else {
             return $str;
         }
     }
@@ -30,8 +29,7 @@ class EnumType implements INamedType, ITotallyOrderedType
     {
         if ($val === null) {
             return 'NULL';
-        }
-        else {
+        } else {
             if (!isset($this->labelSet[$val])) {
                 $msg = "Value '$val' is not among defined labels of enumeration type {$this->schemaName}.{$this->name}";
                 trigger_error($msg, E_USER_WARNING);

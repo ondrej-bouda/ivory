@@ -50,11 +50,11 @@ class DateTest extends \PHPUnit_Framework_TestCase
     {
         $utc = new \DateTimeZone('UTC');
 
-        $this->assertEquals(self::d(2016,  2, 27), Date::fromDateTime(new \DateTime('2016-02-27', $utc)));
-        $this->assertEquals(self::d(2016,  2, 27), Date::fromDateTime(new \DateTime('2016-02-27 15:48:12.1234', $utc)));
+        $this->assertEquals(self::d(2016, 2, 27), Date::fromDateTime(new \DateTime('2016-02-27', $utc)));
+        $this->assertEquals(self::d(2016, 2, 27), Date::fromDateTime(new \DateTime('2016-02-27 15:48:12.1234', $utc)));
 
-        $this->assertEquals(self::d(2016,  2, 27), Date::fromDateTime(new \DateTimeImmutable('2016-02-27', $utc)));
-        $this->assertEquals(self::d(2016,  2, 27), Date::fromDateTime(new \DateTimeImmutable('2016-02-27 15:48:12.1234', $utc)));
+        $this->assertEquals(self::d(2016, 2, 27), Date::fromDateTime(new \DateTimeImmutable('2016-02-27', $utc)));
+        $this->assertEquals(self::d(2016, 2, 27), Date::fromDateTime(new \DateTimeImmutable('2016-02-27 15:48:12.1234', $utc)));
     }
 
     public function testFromParts()
@@ -70,8 +70,7 @@ class DateTest extends \PHPUnit_Framework_TestCase
         try {
             Date::fromParts(0, 1, 1);
             $this->fail('Year number 0 shall be treated as invalid');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 
@@ -83,43 +82,37 @@ class DateTest extends \PHPUnit_Framework_TestCase
         try {
             Date::fromPartsStrict(2016, 2, 30);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Date::fromPartsStrict(2016, 2, 34);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Date::fromPartsStrict(2016, 14, 0);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Date::fromPartsStrict(2016, 13, -5);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Date::fromPartsStrict(2016, -13, 1);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Date::fromPartsStrict(0, 1, 1);
             $this->fail('Year number 0 shall be treated as invalid');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 
@@ -163,7 +156,10 @@ class DateTest extends \PHPUnit_Framework_TestCase
     public function testToUnixTimestamp()
     {
         $this->assertSame(gmmktime(0, 0, 0, 1, 30, 2016), self::d(2016, 1, 30)->toUnixTimestamp());
-        $this->assertSame(gmmktime(0, 0, 0, 1, 30, 2016), Date::fromUnixTimestamp(gmmktime(12, 55, 0, 1, 30, 2016))->toUnixTimestamp());
+        $this->assertSame(
+            gmmktime(0, 0, 0, 1, 30, 2016),
+            Date::fromUnixTimestamp(gmmktime(12, 55, 0, 1, 30, 2016))->toUnixTimestamp()
+        );
         $this->assertNull(Date::infinity()->toUnixTimestamp());
         $this->assertNull(Date::minusInfinity()->toUnixTimestamp());
     }

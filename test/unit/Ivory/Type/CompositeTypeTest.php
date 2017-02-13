@@ -37,7 +37,7 @@ class CompositeTypeTest extends IvoryTestCase
             $this->adHocComposite->parseValue(<<<'STR'
 (,NULL,"","()",",","1\\2","p q","\"r\"",',"""", \, \a \\ \" \( \) ' )
 STR
-                )->toList()
+            )->toList()
         );
     }
 
@@ -73,9 +73,9 @@ STR
 (NULL,'NULL','','()',',','1\2','p q','"r"','''','"',' , \ " ''')
 STR
             ,
-            $this->adHocComposite->serializeValue($this->val([
-                null, 'NULL', '', '()', ',', '1\\2', 'p q', '"r"', "'", '"', ' , \\ " \''
-            ]))
+            $this->adHocComposite->serializeValue($this->val(
+                [null, 'NULL', '', '()', ',', '1\\2', 'p q', '"r"', "'", '"', ' , \\ " \'']
+            ))
         );
     }
 

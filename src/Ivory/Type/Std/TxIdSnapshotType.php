@@ -17,8 +17,7 @@ class TxIdSnapshotType extends BaseType
     {
         if ($str === null) {
             return null;
-        }
-        else {
+        } else {
             return TxIdSnapshot::fromString($str);
         }
     }

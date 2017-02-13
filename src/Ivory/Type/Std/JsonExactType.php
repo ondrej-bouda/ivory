@@ -21,8 +21,7 @@ class JsonExactType extends JsonType
 
         try {
             return Json::fromEncoded($str);
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->throwInvalidValue($str, $e);
         }
     }

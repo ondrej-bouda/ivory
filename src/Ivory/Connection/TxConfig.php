@@ -41,9 +41,9 @@ class TxConfig
     public function __construct($options = 0)
     {
         $isolationLevel = $options & (
-            self::ISOLATION_SERIALIZABLE | self::ISOLATION_REPEATABLE_READ |
-            self::ISOLATION_READ_COMMITTED | self::ISOLATION_READ_UNCOMMITTED
-        );
+                self::ISOLATION_SERIALIZABLE | self::ISOLATION_REPEATABLE_READ |
+                self::ISOLATION_READ_COMMITTED | self::ISOLATION_READ_UNCOMMITTED
+            );
         if ($isolationLevel != 0) {
             $this->setIsolationLevel($isolationLevel);
         }
@@ -63,11 +63,9 @@ class TxConfig
                 throw new \InvalidArgumentException(__CLASS__ . " options specify both $errorDesc");
             }
             return true;
-        }
-        elseif ($options & $falseBit) {
+        } elseif ($options & $falseBit) {
             return false;
-        }
-        else {
+        } else {
             return null;
         }
     }

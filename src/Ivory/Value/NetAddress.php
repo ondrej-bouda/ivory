@@ -136,8 +136,7 @@ class NetAddress implements IComparable
 
         if ($netmaskLengthOrNetmask === null) {
             $this->netmaskLength = ($this->ipVersion == 6 ? 128 : 32);
-        }
-        else {
+        } else {
             if (filter_var($netmaskLengthOrNetmask, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
                 if ($this->ipVersion == 4) {
                     // taken from http://php.net/manual/en/function.ip2long.php#94787
@@ -148,12 +147,10 @@ class NetAddress implements IComparable
                         throw new \InvalidArgumentException('Invalid netmask');
                     }
                     $this->netmaskLength = 32 - (int)$bits;
-                }
-                else {
+                } else {
                     throw new \InvalidArgumentException('Netmask may only be used for an IPv4 address.');
                 }
-            }
-            else {
+            } else {
                 $this->netmaskLength = filter_var($netmaskLengthOrNetmask, FILTER_VALIDATE_INT);
                 if ($this->netmaskLength === false) {
                     throw new \InvalidArgumentException('$netmaskLengthOrNetmask');
@@ -212,8 +209,7 @@ class NetAddress implements IComparable
     {
         if ($this->ipVersion == 4) {
             return $this->addrStr;
-        }
-        else {
+        } else {
             if (!self::ipv6Support()) {
                 throw new NotImplementedException('PHP must be compiled with IPv6 support');
             }
@@ -259,12 +255,10 @@ class NetAddress implements IComparable
                 if ($czsStart === null) {
                     $czsStart = $i;
                     $czsLen = 1;
-                }
-                else {
+                } else {
                     $czsLen++;
                 }
-            }
-            else {
+            } else {
                 if ($czsStart !== null) {
                     if ($czsLen > $lzsLen) {
                         $lzsStart = $czsStart;
@@ -302,8 +296,7 @@ class NetAddress implements IComparable
     {
         if ($this->ipVersion == 6) {
             return ($this->netmaskLength == 128);
-        }
-        else {
+        } else {
             return ($this->netmaskLength == 32);
         }
     }
@@ -318,8 +311,7 @@ class NetAddress implements IComparable
             $hostPartLen = 32 - $this->netmaskLength;
             $mask = (1 << $hostPartLen) - 1;
             return ((ip2long($this->addrStr) & $mask) == 0);
-        }
-        else {
+        } else {
             $hostPartLen = 128 - $this->netmaskLength;
             $hostPartOctets = (int)floor($hostPartLen / 8);
             $hostPartLeadBits = $hostPartLen % 8;
@@ -436,8 +428,7 @@ class NetAddress implements IComparable
     {
         if ($this->isSingleHost()) {
             return $this->addrStr;
-        }
-        else {
+        } else {
             return $this->toCidrString();
         }
     }
@@ -461,8 +452,7 @@ class NetAddress implements IComparable
     {
         if ($this->ipVersion == 4 || self::ipv6Support()) {
             return inet_pton($this->addrStr);
-        }
-        else {
+        } else {
             throw new NotImplementedException('PHP must be compiled with IPv6 support');
         }
     }
@@ -480,8 +470,7 @@ class NetAddress implements IComparable
     {
         if ($this->ipVersion == 4) {
             return ip2long($this->addrStr);
-        }
-        else {
+        } else {
             throw new \LogicException('IPv6 address cannot be converted to long');
         }
     }

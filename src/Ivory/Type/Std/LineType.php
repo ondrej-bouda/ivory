@@ -43,8 +43,7 @@ class LineType extends CompoundGeometricType
         if (preg_match($re, $str, $m)) {
             try {
                 return Line::fromEquationCoeffs($m[1], $m[2], $m[3]);
-            }
-            catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 $this->throwInvalidValue($str, $e);
             }
         }
@@ -54,8 +53,7 @@ class LineType extends CompoundGeometricType
             /** @var LineSegment $lineSeg */
             $lineSeg = $this->lineSegType->parseValue($str);
             return Line::fromPoints($lineSeg->getStart(), $lineSeg->getEnd());
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->throwInvalidValue($str, $e);
         }
     }
@@ -64,15 +62,13 @@ class LineType extends CompoundGeometricType
     {
         if ($val === null) {
             return 'NULL';
-        }
-        elseif ($val instanceof Line) {
+        } elseif ($val instanceof Line) {
             list($p1, $p2) = $val->getPoints();
             return sprintf('line(%s,%s)',
                 $this->pointType->serializeValue($p1),
                 $this->pointType->serializeValue($p2)
             );
-        }
-        else {
+        } else {
             $this->throwInvalidValue($val);
         }
     }

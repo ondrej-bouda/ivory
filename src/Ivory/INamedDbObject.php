@@ -6,13 +6,13 @@ namespace Ivory;
  */
 interface INamedDbObject
 {
-	/**
-	 * @return string name of this object
-	 */
-	function getName();
+    /**
+     * @return string name of this object
+     */
+    function getName();
 
-	/**
-	 * @return string name of schema this object is defined in
-	 */
-	function getSchemaName();
+    /**
+     * @return string name of schema this object is defined in
+     */
+    function getSchemaName();
 }

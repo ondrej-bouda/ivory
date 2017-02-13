@@ -23,26 +23,22 @@ class XmlContent
         if (is_string($value)) {
             $xmlStr = $value;
             $isDoc = self::isXmlDocument($value);
-        }
-        elseif ($value instanceof XmlContent) {
+        } elseif ($value instanceof XmlContent) {
             return $value;
-        }
-        elseif ($value instanceof \DOMDocument) {
+        } elseif ($value instanceof \DOMDocument) {
             $xmlStr = $value->saveXML();
             if ($xmlStr === false) {
                 throw new \InvalidArgumentException('value');
             }
             $isDoc = true;
-        }
-        elseif ($value instanceof \DOMNode) {
+        } elseif ($value instanceof \DOMNode) {
             $d = $value->ownerDocument->saveXML($value);
             if ($d === false) {
                 throw new \InvalidArgumentException('value');
             }
             $xmlStr = self::getXMLDeclaration($value->ownerDocument) . $d;
             $isDoc = true;
-        }
-        elseif ($value instanceof \DOMNodeList) {
+        } elseif ($value instanceof \DOMNodeList) {
             $xmlStr = ($value->length > 0 ? self::getXMLDeclaration($value->item(0)->ownerDocument) : '');
             foreach ($value as $i => $node) {
                 $n = $node->ownerDocument->saveXML($node);
@@ -52,26 +48,22 @@ class XmlContent
                 $xmlStr .= $n;
             }
             $isDoc = ($value->length == 1);
-        }
-        elseif ($value instanceof \SimpleXMLElement) {
+        } elseif ($value instanceof \SimpleXMLElement) {
             $xmlStr = $value->saveXML();
             if ($xmlStr === false) {
                 throw new \InvalidArgumentException('value');
             }
             $isDoc = true;
-        }
-        elseif (is_object($value)) {
+        } elseif (is_object($value)) {
             $xmlStr = (string)$value;
             $isDoc = self::isXmlDocument($value);
-        }
-        else {
+        } else {
             throw new \InvalidArgumentException('value');
         }
 
         if ($isDoc) {
             return new XmlDocument($xmlStr);
-        }
-        else {
+        } else {
             return new XmlContent($xmlStr);
         }
     }

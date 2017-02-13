@@ -31,26 +31,24 @@ class StatementExecution implements IStatementExecution
         $this->stmtExFactory = new StatementExceptionFactory();
     }
 
-    public function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): IQueryResult
+    public function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): IQueryResult
     {
         if ($sqlFragmentPatternOrRecipe instanceof IRelationRecipe) {
-            $recipe = $this->setupRecipe($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
-        }
-        else {
-            $recipe = SqlRelationRecipe::fromFragments($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
+            $recipe = $this->setupRecipe($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+        } else {
+            $recipe = SqlRelationRecipe::fromFragments($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
         }
 
         $sql = $recipe->toSql($this->typeCtl->getTypeDictionary());
         return $this->rawQuery($sql);
     }
 
-    public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): ICommandResult
+    public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ICommandResult
     {
         if ($sqlFragmentPatternOrRecipe instanceof ICommandRecipe) {
-            $recipe = $this->setupRecipe($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
-        }
-        else {
-            $recipe = SqlCommandRecipe::fromFragments($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap);
+            $recipe = $this->setupRecipe($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+        } else {
+            $recipe = SqlCommandRecipe::fromFragments($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
         }
 
         $sql = $recipe->toSql($this->typeCtl->getTypeDictionary());
@@ -66,8 +64,7 @@ class StatementExecution implements IStatementExecution
                 }
                 $namedParamsMap = $args[0];
                 $recipe->setParams($namedParamsMap);
-            }
-            else {
+            } else {
                 throw new \InvalidArgumentException('Too many arguments given.');
             }
         }
@@ -80,8 +77,7 @@ class StatementExecution implements IStatementExecution
         $result = $this->executeRawStatement($sqlQuery, $resultHandler);
         if ($result instanceof IQueryResult) {
             return $result;
-        }
-        else {
+        } else {
             trigger_error(
                 'The supplied SQL statement was supposed to be a query, but it did not return a result set. ' .
                 'Returning an empty relation. Consider calling command() or rawCommand() instead. ' .
@@ -92,13 +88,12 @@ class StatementExecution implements IStatementExecution
         }
     }
 
-    public function rawCommand(string $sqlCommand) : ICommandResult
+    public function rawCommand(string $sqlCommand): ICommandResult
     {
         $result = $this->executeRawStatement($sqlCommand, $resultHandler);
         if ($result instanceof ICommandResult) {
             return $result;
-        }
-        else {
+        } else {
             trigger_error(
                 'The supplied SQL statement was supposed to be a command, but it returned a result set. ' .
                 'Returning an empty result. Consider calling query() or rawQuery() instead. ' .
@@ -118,8 +113,9 @@ class StatementExecution implements IStatementExecution
         }
 
         // pg_send_query_params(), as opposed to pg_send_query(), prevents $stmt from containing multiple statements
-        $sent = pg_send_query_params($connHandler, $sqlStatement, []); // TODO: consider trapping errors to get more detailed error message
+        $sent = pg_send_query_params($connHandler, $sqlStatement, []);
         if (!$sent) {
+            // TODO: consider trapping errors to get more detailed error message
             throw new ConnectionException('Error sending the query to the database.');
         }
 
@@ -168,7 +164,10 @@ class StatementExecution implements IStatementExecution
 
         $resHandlers = [];
         while (($res = pg_get_result($connHandler)) !== false) {
-            $resHandlers[] = $res; // NOTE: cannot process the result right away - the remaining results must all be read, or they would, in case of error, block the connection from accepting further queries
+            /* NOTE: Cannot process the result right away - the remaining results must all be read, or they would, in
+             * case of error, block the connection from accepting further queries.
+             */
+            $resHandlers[] = $res;
         }
         $results = [];
         foreach ($resHandlers as $resHandler) {
@@ -218,8 +217,7 @@ class StatementExecution implements IStatementExecution
         if ($resNotice !== $connNotice) {
             $this->connCtl->setLastNotice($resNotice);
             return $resNotice;
-        }
-        else {
+        } else {
             return null;
         }
     }

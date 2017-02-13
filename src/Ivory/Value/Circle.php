@@ -23,8 +23,7 @@ class Circle
     {
         if (is_array($center)) {
             $center = Point::fromCoords($center);
-        }
-        elseif (!$center instanceof Point) {
+        } elseif (!$center instanceof Point) {
             throw new \InvalidArgumentException('center');
         }
 

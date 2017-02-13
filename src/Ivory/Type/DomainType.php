@@ -30,8 +30,7 @@ class DomainType implements INamedType, IDiscreteType
     {
         if ($this->baseType instanceof ITotallyOrderedType) {
             return $this->baseType->compareValues($a, $b);
-        }
-        else {
+        } else {
             $msg = "The domain {$this->getSchemaName()}.{$this->getName()} base type is not totally ordered";
             throw new UnsupportedException($msg);
         }
@@ -41,8 +40,7 @@ class DomainType implements INamedType, IDiscreteType
     {
         if ($this->baseType instanceof IDiscreteType) {
             return $this->baseType->step($delta, $value);
-        }
-        else {
+        } else {
             $msg = "The domain {$this->getSchemaName()}.{$this->getName()} base type is not discrete";
             throw new UnsupportedException($msg);
         }

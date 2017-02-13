@@ -75,15 +75,13 @@ class FilteredColumnTest extends \Ivory\IvoryTestCase
         try {
             $filtered->value(2);
             $this->fail();
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
 
         try {
             $filtered->value(-3);
             $this->fail();
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
     }
 }

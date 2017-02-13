@@ -64,13 +64,11 @@ class Column implements \IteratorAggregate, IColumn
             $hasher = new CallbackValueHasher(function ($value) {
                 return (is_int($value) || is_string($value) ? $value : serialize($value));
             });
-        }
-        elseif ($hasher === 1) {
+        } elseif ($hasher === 1) {
             $hasher = new CallbackValueHasher(function ($value) {
                 return 1;
             });
-        }
-        elseif (!$hasher instanceof IValueHasher) {
+        } elseif (!$hasher instanceof IValueHasher) {
             $hasher = new CallbackValueHasher($hasher);
         }
 
@@ -78,13 +76,11 @@ class Column implements \IteratorAggregate, IColumn
             $comparator = new CallbackValueComparator(function ($a, $b) {
                 if (is_object($a) && is_object($b) && $a instanceof IComparable) {
                     return $a->equals($b);
-                }
-                else {
+                } else {
                     return ($a == $b);
                 }
             });
-        }
-        elseif (!$comparator instanceof IValueComparator) {
+        } elseif (!$comparator instanceof IValueComparator) {
             $comparator = new CallbackValueComparator($comparator);
         }
 
@@ -94,8 +90,7 @@ class Column implements \IteratorAggregate, IColumn
             if (!isset($hashTable[$h])) {
                 $hashTable[$h] = [$value];
                 return true;
-            }
-            else {
+            } else {
                 foreach ($hashTable[$h] as $v) {
                     if ($comparator->equal($value, $v)) {
                         return false;

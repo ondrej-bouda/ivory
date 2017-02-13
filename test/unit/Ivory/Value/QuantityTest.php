@@ -39,8 +39,7 @@ class QuantityTest extends \PHPUnit_Framework_TestCase
         try {
             Quantity::fromString('unit');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 
@@ -61,15 +60,13 @@ class QuantityTest extends \PHPUnit_Framework_TestCase
         try {
             Quantity::fromValue('5 apples', 'unit');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             Quantity::fromValue(null, 'unit');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 
@@ -105,43 +102,37 @@ class QuantityTest extends \PHPUnit_Framework_TestCase
         try {
             Quantity::fromValue(42)->convert(Quantity::MILLISECOND);
             $this->fail('\Ivory\UndefinedOperationException expected');
-        }
-        catch (UndefinedOperationException $e) {
+        } catch (UndefinedOperationException $e) {
         }
 
         try {
             Quantity::fromValue(42, Quantity::MILLISECOND)->convert('');
             $this->fail('\Ivory\UndefinedOperationException expected');
-        }
-        catch (UndefinedOperationException $e) {
+        } catch (UndefinedOperationException $e) {
         }
 
         try {
             Quantity::fromValue(42, Quantity::BYTE)->convert(Quantity::MILLISECOND);
             $this->fail('\Ivory\UndefinedOperationException expected');
-        }
-        catch (UndefinedOperationException $e) {
+        } catch (UndefinedOperationException $e) {
         }
 
         try {
             Quantity::fromValue(5, Quantity::MINUTE)->convert(Quantity::TERABYTE);
             $this->fail('\Ivory\UndefinedOperationException expected');
-        }
-        catch (UndefinedOperationException $e) {
+        } catch (UndefinedOperationException $e) {
         }
 
         try {
             Quantity::fromValue(123, 'abc')->convert(Quantity::BYTE);
             $this->fail('\Ivory\UnsupportedException expected');
-        }
-        catch (UnsupportedException $e) {
+        } catch (UnsupportedException $e) {
         }
 
         try {
             Quantity::fromValue(123, Quantity::BYTE)->convert('abc');
             $this->fail('\Ivory\UnsupportedException expected');
-        }
-        catch (UnsupportedException $e) {
+        } catch (UnsupportedException $e) {
         }
     }
 

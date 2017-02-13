@@ -42,10 +42,12 @@ class TypeDictionary implements ITypeDictionary
             if ($searchPathPos !== false) {
                 if (!isset($this->searchedNameCache[$typeName])) {
                     $this->searchedNameCache[$typeName] = $type;
-                }
-                else {
+                } else {
                     // find out whether the schema of $type is more preferred
-                    $cachedPos = array_search($this->searchedNameCache[$typeName]->getSchemaName(), $this->typeSearchPath);
+                    $cachedPos = array_search(
+                        $this->searchedNameCache[$typeName]->getSchemaName(),
+                        $this->typeSearchPath
+                    );
                     if ($cachedPos === false || $cachedPos > $searchPathPos) {
                         $this->searchedNameCache[$typeName] = $type;
                     }
@@ -67,7 +69,7 @@ class TypeDictionary implements ITypeDictionary
     /**
      * @return string[] schema name list
      */
-    public function getTypeSearchPath() : array
+    public function getTypeSearchPath(): array
     {
         return $this->typeSearchPath;
     }
@@ -113,7 +115,7 @@ class TypeDictionary implements ITypeDictionary
         $this->undefinedTypeHandler = $undefinedTypeHandler;
     }
 
-    public function requireTypeByOid($oid) : IType
+    public function requireTypeByOid($oid): IType
     {
         if (isset($this->oidTypeMap[$oid])) {
             return $this->oidTypeMap[$oid];
@@ -129,7 +131,7 @@ class TypeDictionary implements ITypeDictionary
         throw new UndefinedTypeException("There is no type defined for OID $oid");
     }
 
-    public function requireTypeByName(string $typeName, $schemaName = null) : IType
+    public function requireTypeByName(string $typeName, $schemaName = null): IType
     {
         if ($schemaName === null) {
             if (isset($this->nameTypeMap[$typeName])) {
@@ -138,13 +140,11 @@ class TypeDictionary implements ITypeDictionary
             if (isset($this->searchedNameCache[$typeName])) {
                 return $this->searchedNameCache[$typeName];
             }
-        }
-        elseif ($schemaName === false) {
+        } elseif ($schemaName === false) {
             if (isset($this->searchedNameCache[$typeName])) {
                 return $this->searchedNameCache[$typeName];
             }
-        }
-        else {
+        } else {
             if (isset($this->qualNameTypeMap[$schemaName][$typeName])) {
                 return $this->qualNameTypeMap[$schemaName][$typeName];
             }
@@ -164,7 +164,7 @@ class TypeDictionary implements ITypeDictionary
         throw new UndefinedTypeException($msg);
     }
 
-    public function requireTypeByValue($value) : IType
+    public function requireTypeByValue($value): IType
     {
         throw new \Ivory\Exception\NotImplementedException('Ivory is currently not capable of inferring the type converter just from the value.');
         // TODO: Implement TypeDictionary::requireTypeByValue()

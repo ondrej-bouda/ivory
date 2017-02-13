@@ -17,8 +17,7 @@ class TsQueryType extends BaseType
     {
         if ($str === null) {
             return null;
-        }
-        else {
+        } else {
             return TextSearchQuery::fromString($str);
         }
     }

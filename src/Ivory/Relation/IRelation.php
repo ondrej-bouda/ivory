@@ -147,11 +147,11 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *
      * Alternatively to original column names, integers may also be used as rename mapping keys to refer to columns by
      * their zero-based position.
-     * 
+     *
      * The same macros as for the {@link project()} method may be used for pattern-based renaming of several columns at
      * once. In case multiple macros would match a single column, the column gets renamed by the macro which appears
      * first in the `$renamePairs` map.
-     * 
+     *
      * If there are multiple columns matching a macro, or even multiple columns of the same name, they all get renamed.
      *
      * @param string[]|\Traversable $renamePairs old-new name map

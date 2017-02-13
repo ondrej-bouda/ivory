@@ -66,8 +66,7 @@ class TimeTz extends TimeBase
             if ($min > 0 || $sec > 0) {
                 throw new \OutOfRangeException('with hour 24, the minutes and seconds must be zero');
             }
-        }
-        elseif ($hour < 0 || $hour > 24) {
+        } elseif ($hour < 0 || $hour > 24) {
             throw new \OutOfRangeException('hours');
         }
 
@@ -81,11 +80,9 @@ class TimeTz extends TimeBase
 
         if (!isset($m['zone'])) {
             $offset = (new \DateTime())->getOffset();
-        }
-        elseif ($m['zone'] == 'Z') {
+        } elseif ($m['zone'] == 'Z') {
             $offset = 0;
-        }
-        else {
+        } else {
             $offset = $m['offh'] * 60 * 60;
             if (isset($m['offm'])) {
                 $offset += ($m['offh'] >= 0 ? 1 : -1) * $m['offm'] * 60;

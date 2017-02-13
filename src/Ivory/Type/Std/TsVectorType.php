@@ -19,8 +19,7 @@ class TsVectorType extends BaseType
     {
         if ($str === null) {
             return null;
-        }
-        else {
+        } else {
             preg_match_all('~\'((?:[^\']+|\'\')+)\'(?::([\d\w,]+))?~', $str, $matches, PREG_SET_ORDER);
             $lexemes = [];
             foreach ($matches as $m) {
@@ -32,8 +31,7 @@ class TsVectorType extends BaseType
                         $w = ((string)$p !== $pos ? substr($pos, strlen((string)$p)) : self::DEFAULT_WEIGHT);
                         $positions[] = [$p, $w];
                     }
-                }
-                else {
+                } else {
                     $positions = null;
                 }
                 $lexemes[$lex] = $positions;

@@ -28,178 +28,174 @@ use Ivory\Utils\ValueUtils;
  */
 class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
 {
-	/** @var CompositeType type of the composite */
-	private $type;
-	/** @var array list of attribute values */
-	private $values;
+    /** @var CompositeType type of the composite */
+    private $type;
+    /** @var array list of attribute values */
+    private $values;
 
-	/**
-	 * Creates a new composite value out of a list of attributes values.
-	 *
-	 * @param CompositeType $type the type of the value
-	 * @param array $values list of values of corresponding attributes
-	 * @return Composite
-	 */
-	public static function fromList(CompositeType $type, $values)
-	{
-		return new Composite($type, $values);
-	}
+    /**
+     * Creates a new composite value out of a list of attributes values.
+     *
+     * @param CompositeType $type the type of the value
+     * @param array $values list of values of corresponding attributes
+     * @return Composite
+     */
+    public static function fromList(CompositeType $type, $values)
+    {
+        return new Composite($type, $values);
+    }
 
-	/**
-	 * Creates a new composite value out of a map of attribute names to the corresponding values.
-	 *
-	 * Attributes not mentioned in the given map are set to `null`.
-	 *
-	 * @param NamedCompositeType $type the type of the value; must be a named composite type
-	 * @param array $map map: attribute name => value; unspecified attributes get a <tt>null</tt> value
-	 * @return Composite
-	 */
-	public static function fromMap(NamedCompositeType $type, $map)
-	{
-		$values = array_fill(0, count($type->getAttributes()), null);
-		foreach ($map as $k => $v) {
-			$pos = $type->getAttPos($k);
-			if ($pos !== null) {
-				$values[$pos] = $v;
-			}
-			else {
-				$typeName = "{$type->getSchemaName()}.{$type->getName()}";
-				$msg = "Error creating a composite value of type $typeName: key '$k' is undefined";
-				throw new \InvalidArgumentException($msg);
-			}
-		}
-		return new Composite($type, $values);
-	}
+    /**
+     * Creates a new composite value out of a map of attribute names to the corresponding values.
+     *
+     * Attributes not mentioned in the given map are set to `null`.
+     *
+     * @param NamedCompositeType $type the type of the value; must be a named composite type
+     * @param array $map map: attribute name => value; unspecified attributes get a <tt>null</tt> value
+     * @return Composite
+     */
+    public static function fromMap(NamedCompositeType $type, $map)
+    {
+        $values = array_fill(0, count($type->getAttributes()), null);
+        foreach ($map as $k => $v) {
+            $pos = $type->getAttPos($k);
+            if ($pos !== null) {
+                $values[$pos] = $v;
+            } else {
+                $typeName = "{$type->getSchemaName()}.{$type->getName()}";
+                $msg = "Error creating a composite value of type $typeName: key '$k' is undefined";
+                throw new \InvalidArgumentException($msg);
+            }
+        }
+        return new Composite($type, $values);
+    }
 
-	private function __construct(CompositeType $type, $values)
-	{
-		$this->type = $type;
-		$this->values = $values;
-	}
+    private function __construct(CompositeType $type, $values)
+    {
+        $this->type = $type;
+        $this->values = $values;
+    }
 
-	final public function getType()
-	{
-		return $this->type;
-	}
+    final public function getType()
+    {
+        return $this->type;
+    }
 
-	/**
-	 * @param mixed $other
-	 * @return bool whether this and the other composite value are of the identical type and contain the same data
-	 */
-	public function equals($other)
-	{
-		if ($other === null) {
-			return null;
-		}
-		if (get_class($this) != get_class($other)) {
-			return false;
-		}
-		if ($this->type !== $other->type) {
-			return false;
-		}
+    /**
+     * @param mixed $other
+     * @return bool whether this and the other composite value are of the identical type and contain the same data
+     */
+    public function equals($other)
+    {
+        if ($other === null) {
+            return null;
+        }
+        if (get_class($this) != get_class($other)) {
+            return false;
+        }
+        if ($this->type !== $other->type) {
+            return false;
+        }
 
-		return ValueUtils::equals($this->values, $other->values);
-	}
+        return ValueUtils::equals($this->values, $other->values);
+    }
 
-	/**
-	 * @return array list of the elementary values
-	 */
-	public function toList()
-	{
-		return $this->values;
-	}
+    /**
+     * @return array list of the elementary values
+     */
+    public function toList()
+    {
+        return $this->values;
+    }
 
-	/**
-	 * @return array ordered map: attribute name => attribute value
-	 * @throws UnsupportedException if called on a value of an ad hoc composite type, i.e., such that defines no
-	 *                              attributes
-	 */
-	public function toMap()
-	{
-		$attNames = array_keys($this->type->getAttributes());
-		if (!$attNames) {
-			$msg = 'Ad hoc composite type value cannot be converted to map - no attributes are defined';
-			throw new UnsupportedException($msg);
-		}
-		$result = [];
-		foreach ($this->values as $i => $v) {
-			if (isset($attNames[$i])) {
-				$k = $attNames[$i];
-				$result[$k] = $v;
-			}
-		}
-		return $result;
-	}
+    /**
+     * @return array ordered map: attribute name => attribute value
+     * @throws UnsupportedException if called on a value of an ad hoc composite type, i.e., such that defines no
+     *                              attributes
+     */
+    public function toMap()
+    {
+        $attNames = array_keys($this->type->getAttributes());
+        if (!$attNames) {
+            $msg = 'Ad hoc composite type value cannot be converted to map - no attributes are defined';
+            throw new UnsupportedException($msg);
+        }
+        $result = [];
+        foreach ($this->values as $i => $v) {
+            if (isset($attNames[$i])) {
+                $k = $attNames[$i];
+                $result[$k] = $v;
+            }
+        }
+        return $result;
+    }
 
-	//region dynamic properties
+    //region dynamic properties
 
-	/**
-	 * @param string $name attribute name
-	 * @return mixed value of the given attribute, or <tt>null</tt> if no such attribute is defined on this value
-	 */
-	public function __get($name)
-	{
-		$pos = $this->type->getAttPos($name);
-		if ($pos !== null) {
-			return $this->values[$pos];
-		}
-		else {
-			return null;
-		}
-	}
+    /**
+     * @param string $name attribute name
+     * @return mixed value of the given attribute, or <tt>null</tt> if no such attribute is defined on this value
+     */
+    public function __get($name)
+    {
+        $pos = $this->type->getAttPos($name);
+        if ($pos !== null) {
+            return $this->values[$pos];
+        } else {
+            return null;
+        }
+    }
 
-	/**
-	 * @param string $name attribute name
-	 * @return bool whether the attribute is defined on this value
-	 */
-	public function __isset($name)
-	{
-		return ($this->type->getAttPos($name) !== null);
-	}
+    /**
+     * @param string $name attribute name
+     * @return bool whether the attribute is defined on this value
+     */
+    public function __isset($name)
+    {
+        return ($this->type->getAttPos($name) !== null);
+    }
 
-	//endregion
+    //endregion
 
-	//region \IArrayAccess
+    //region \IArrayAccess
 
-	public function offsetExists($offset)
-	{
-		if (filter_var($offset, FILTER_VALIDATE_INT) !== false) {
-			return ($offset < count($this->values));
-		}
-		else {
-			return ($this->type->getAttPos($offset) !== null);
-		}
-	}
+    public function offsetExists($offset)
+    {
+        if (filter_var($offset, FILTER_VALIDATE_INT) !== false) {
+            return ($offset < count($this->values));
+        } else {
+            return ($this->type->getAttPos($offset) !== null);
+        }
+    }
 
-	public function offsetGet($offset)
-	{
-		if (filter_var($offset, FILTER_VALIDATE_INT) !== false) {
-			return $this->values[$offset];
-		}
-		else {
-			return $this->values[$this->type->getAttPos($offset)];
-		}
-	}
+    public function offsetGet($offset)
+    {
+        if (filter_var($offset, FILTER_VALIDATE_INT) !== false) {
+            return $this->values[$offset];
+        } else {
+            return $this->values[$this->type->getAttPos($offset)];
+        }
+    }
 
-	public function offsetSet($offset, $value)
-	{
-		throw new ImmutableException();
-	}
+    public function offsetSet($offset, $value)
+    {
+        throw new ImmutableException();
+    }
 
-	public function offsetUnset($offset)
-	{
-		throw new ImmutableException();
-	}
+    public function offsetUnset($offset)
+    {
+        throw new ImmutableException();
+    }
 
-	//endregion
+    //endregion
 
-	//region \IteratorAggregate
+    //region \IteratorAggregate
 
-	public function getIterator()
-	{
-		$arr = ($this->type->getAttributes() ? $this->toMap() : $this->values);
-		return new \ArrayIterator($arr);
-	}
+    public function getIterator()
+    {
+        $arr = ($this->type->getAttributes() ? $this->toMap() : $this->values);
+        return new \ArrayIterator($arr);
+    }
 
-	//endregion
+    //endregion
 }

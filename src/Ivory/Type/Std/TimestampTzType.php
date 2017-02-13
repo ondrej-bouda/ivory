@@ -44,11 +44,10 @@ class TimestampTzType extends BaseType implements ITotallyOrderedType
                     $longitude = $tz->getLocation()['longitude'];
                     $offset = $longitude * 24 / 360;
                     $abs = abs($offset);
-                    $tzSpec = sprintf('%s%d:%02d', ($offset >= 0 ? '+' : '-'), (int)$abs, (int)(($abs - (int)$abs)*60));
+                    $tzSpec = sprintf('%s%d:%02d', ($offset >= 0 ? '+' : '-'), (int)$abs, (int)(($abs - (int)$abs) * 60));
                     // unfortunately, \DateTimeZone cannot be created with offsets precise to seconds
                     return new \DateTimeZone($tzSpec);
-                }
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     $msg = "Time zone '$timeZone', as configured for the PostgreSQL connection {$connection->getName()}, "
                         . "is unknown to PHP. Falling back to UTC (only relevant for timestamptz values representing "
                         . "very old date/times).";
@@ -63,11 +62,9 @@ class TimestampTzType extends BaseType implements ITotallyOrderedType
     {
         if ($str === null) {
             return null;
-        }
-        elseif ($str == 'infinity') {
+        } elseif ($str == 'infinity') {
             return TimestampTz::infinity();
-        }
-        elseif ($str == '-infinity') {
+        } elseif ($str == '-infinity') {
             return TimestampTz::minusInfinity();
         }
 
@@ -91,17 +88,15 @@ class TimestampTzType extends BaseType implements ITotallyOrderedType
                 preg_match('~^(\d+)/(\d+)/(\d+) (\d+):(\d+):(\d+(?:\.\d+)?) ([^ ]+)( BC)?$~', $str, $matches);
                 if ($dateStyle->getOrder() == DateStyle::ORDER_DMY) {
                     list(, $d, $m, $y, $h, $i, $s, $z) = $matches;
-                }
-                else {
+                } else {
                     list(, $m, $d, $y, $h, $i, $s, $z) = $matches;
                 }
                 break;
             case DateStyle::FORMAT_POSTGRES:
                 preg_match('~^\w{3} (\d+|\w{3}) (\d+|\w{3}) (\d+):(\d+):(\d+(?:\.\d+)?) (\d+) ([^ ]+)( BC)?$~', $str, $matches);
                 if ($dateStyle->getOrder() == DateStyle::ORDER_DMY) {
-                    list(, $d, $ms, $h, $i, $s, $y ,$z) = $matches;
-                }
-                else {
+                    list(, $d, $ms, $h, $i, $s, $y, $z) = $matches;
+                } else {
                     list(, $ms, $d, $h, $i, $s, $y, $z) = $matches;
                 }
                 static $monthNames = [
@@ -140,14 +135,11 @@ class TimestampTzType extends BaseType implements ITotallyOrderedType
                 $val->getOffsetISOString(),
                 ($val->getYear() < 0 ? ' BC' : '')
             );
-        }
-        elseif ($val === TimestampTz::infinity()) {
+        } elseif ($val === TimestampTz::infinity()) {
             return "'infinity'";
-        }
-        elseif ($val === TimestampTz::minusInfinity()) {
+        } elseif ($val === TimestampTz::minusInfinity()) {
             return "'-infinity'";
-        }
-        else {
+        } else {
             throw new \LogicException('A non-finite timezone-aware timestamp not recognized');
         }
     }

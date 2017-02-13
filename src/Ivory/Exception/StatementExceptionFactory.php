@@ -145,8 +145,7 @@ class StatementExceptionFactory
 
         if ($fallbackFactory !== null) {
             return $fallbackFactory->inferExceptionClass($resultHandler);
-        }
-        else {
+        } else {
             return StatementException::class;
         }
     }

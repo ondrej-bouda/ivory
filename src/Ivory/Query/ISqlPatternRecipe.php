@@ -33,10 +33,10 @@ interface ISqlPatternRecipe
      */
     function setParams($paramMap); // PHP 7.1: declare $paramMap as iterable
 
-    function getSqlPattern() : SqlPattern;
+    function getSqlPattern(): SqlPattern;
 
     /**
      * @return array map: parameter name or zero-based position => parameter value
      */
-    function getParams() : array;
+    function getParams(): array;
 }

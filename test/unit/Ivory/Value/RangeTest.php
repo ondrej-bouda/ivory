@@ -122,7 +122,7 @@ class RangeTest extends IvoryTestCase
         $this->assertFalse($this->empty->isSinglePoint());
         $this->assertFalse($this->intRng(1, 4)->isSinglePoint());
         $this->assertTrue($this->intRng(1, 2)->isSinglePoint());
-        $this->assertTrue($this->intRng(PHP_INT_MAX-1, PHP_INT_MAX)->isSinglePoint());
+        $this->assertTrue($this->intRng(PHP_INT_MAX - 1, PHP_INT_MAX)->isSinglePoint());
         $this->assertFalse($this->intRng(null, 1)->isSinglePoint());
         $this->assertFalse($this->intRng(4, null)->isSinglePoint());
         $this->assertFalse($this->intRng(null, null)->isSinglePoint());

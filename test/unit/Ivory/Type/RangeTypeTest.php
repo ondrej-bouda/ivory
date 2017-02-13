@@ -60,6 +60,8 @@ class RangeTypeTest extends IvoryTestCase
         $this->assertSame("pg_catalog.int4range(1,4)", $this->intRangeType->serializeValue($this->intRng(1, 4)));
         $this->assertSame("pg_catalog.int4range(1,NULL)", $this->intRangeType->serializeValue($this->intRng(1, null)));
         $this->assertSame("pg_catalog.int4range(NULL,4)", $this->intRangeType->serializeValue($this->intRng(null, 4)));
-        $this->assertSame("pg_catalog.int4range(NULL,NULL)", $this->intRangeType->serializeValue($this->intRng(null, null)));
+        $this->assertSame("pg_catalog.int4range(NULL,NULL)",
+            $this->intRangeType->serializeValue($this->intRng(null, null))
+        );
     }
 }

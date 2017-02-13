@@ -21,8 +21,7 @@ class CustomSet extends DictionarySet
     {
         if ($converter instanceof IValueHasher) {
             $this->converter = $converter;
-        }
-        else {
+        } else {
             $this->converter = new CallbackValueHasher($converter);
         }
     }

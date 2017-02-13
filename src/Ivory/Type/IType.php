@@ -8,26 +8,26 @@ namespace Ivory\Type;
  */
 interface IType
 {
-	/**
-	 * Parses a value of the represented type from its external representation.
-	 *
-	 * The external representation is given by the output function of the PostgreSQL type this object represents.
-	 * In case `null` is given, `null` is returned.
-	 *
-	 * @todo for performance reasons, extend with optional arguments $offset and $len, limiting the part of the string to consider; trimming could thus be implemented as just shifting these positions
-	 * @param string|null $str
-	 * @return mixed the value parsed from <tt>$str</tt>, or <tt>null</tt> if <tt>$str</tt> is <tt>null</tt>
-	 */
-	function parseValue($str);
+    /**
+     * Parses a value of the represented type from its external representation.
+     *
+     * The external representation is given by the output function of the PostgreSQL type this object represents.
+     * In case `null` is given, `null` is returned.
+     *
+     * @todo for performance reasons, extend with optional arguments $offset and $len, limiting the part of the string to consider; trimming could thus be implemented as just shifting these positions
+     * @param string|null $str
+     * @return mixed the value parsed from <tt>$str</tt>, or <tt>null</tt> if <tt>$str</tt> is <tt>null</tt>
+     */
+    function parseValue($str);
 
-	/**
-	 * Serializes a value of the represented type to a string to be pasted in the SQL query.
-	 *
-	 * In case `null` is given, the `'NULL'` string is returned.
-	 *
-	 * @todo unify whether the result shall contain the typecast or not; whether it is necessary depends on the context, so the output of this method shall probably contain no typecasts - the caller should include it, if required
-	 * @param mixed $val
-	 * @return string
-	 */
-	function serializeValue($val);
+    /**
+     * Serializes a value of the represented type to a string to be pasted in the SQL query.
+     *
+     * In case `null` is given, the `'NULL'` string is returned.
+     *
+     * @todo unify whether the result shall contain the typecast or not; whether it is necessary depends on the context, so the output of this method shall probably contain no typecasts - the caller should include it, if required
+     * @param mixed $val
+     * @return string
+     */
+    function serializeValue($val);
 }

@@ -4,12 +4,12 @@ namespace Ivory\Value;
 /**
  * Representation of a date and time according to the
  * {@link https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar proleptic} Gregorian calendar.
- * 
+ *
  * No timezone information is handled by this class - see {@link TimestampTz} instead.
  *
  * As in PostgreSQL, there are two special date/time values, `-infinity` and `infinity`, representing a date/time
- * respectively before or after any other date/time. There are special factory methods {@link Timestamp::minusInfinity()}
- * and {@link Timestamp::infinity()} for getting these values.
+ * respectively before or after any other date/time. There are special factory methods
+ * {@link Timestamp::minusInfinity()} and {@link Timestamp::infinity()} for getting these values.
  *
  * Besides being {@link IComparable}, the {@link Timestamp} objects may safely be compared using the `<`, `==`, and `>`
  * operators with the expected results.
@@ -31,8 +31,7 @@ class Timestamp extends TimestampBase
     {
         if (PHP_VERSION_ID >= 70100) {
             return new Timestamp(0, new \DateTimeImmutable('now', self::getUTCTimeZone()));
-        }
-        else {
+        } else {
             // up to PHP 7.0, new \DateTimeImmutable('now') had only precision up to seconds
             list($micro, $sec) = explode(' ', microtime());
             $microFrac = substr($micro, 1); // cut off the whole part (always a zero)
@@ -111,8 +110,7 @@ class Timestamp extends TimestampBase
                 '%s%04d-%02d-%02d %02d:%02d:%s',
                 ($z < 0 ? '-' : ''), abs($z), $month, $day, $hour, $minute, self::floatToTwoPlaces($second)
             ));
-        }
-        else {
+        } else {
             return self::fromISOString(sprintf('%s%04d-01-01 00:00:00', ($z < 0 ? '-' : ''), abs($z)))
                 ->addParts(0, $month - 1, $day - 1, $hour, $minute, $second);
         }
@@ -176,8 +174,7 @@ class Timestamp extends TimestampBase
     {
         if ($this->inf) {
             return null;
-        }
-        else {
+        } else {
             $y = (int)$this->dt->format('Y');
             $u = $this->dt->format('u');
             return [

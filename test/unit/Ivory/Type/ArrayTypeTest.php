@@ -39,8 +39,7 @@ class ArrayTypeTest extends IvoryTestCase
         try {
             $this->intArrayType->serializeValue(123);
             $this->fail('InvalidArgumentException expected due to non-array input');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 
@@ -71,15 +70,13 @@ STR
         try {
             $this->intArrayType->serializeValue([[1, 2, 3], null]);
             $this->fail('InvalidArgumentException expected due to non-matching array dimensions');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             $this->intArrayType->serializeValue([[1, 2, 3], 4]);
             $this->fail('InvalidArgumentException expected due to non-matching array dimensions');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 
@@ -93,15 +90,13 @@ STR
         try {
             $this->intArrayType->serializeValue([[1, 2 => 2, 3]]);
             $this->fail('InvalidArgumentException expected due to non-continuous array subscripts');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             $this->intArrayType->serializeValue([[1, -5 => 2, 3]]);
             $this->fail('InvalidArgumentException expected due to non-continuous array subscripts');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 

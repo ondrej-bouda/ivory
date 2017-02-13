@@ -22,8 +22,7 @@ class MapTest extends \Ivory\IvoryTestCase
         if ($distinctFields) {
             $distinct = sprintf('DISTINCT ON (%s)', implode(',', $distinctFields));
             $orderBy = implode(', ', $distinctFields);
-        }
-        else {
+        } else {
             $distinct = '';
             $orderBy = '1';
         }
@@ -69,8 +68,7 @@ class MapTest extends \Ivory\IvoryTestCase
         try {
             $map->get('wheee');
             $this->fail();
-        }
-        catch (\OutOfBoundsException $exception) {
+        } catch (\OutOfBoundsException $exception) {
         }
 
         $this->assertSame('Black Album', $map->maybe('Metallica')->value('album'));
@@ -90,15 +88,13 @@ class MapTest extends \Ivory\IvoryTestCase
         try {
             $map->get('wheee');
             $this->fail();
-        }
-        catch (\OutOfBoundsException $exception) {
+        } catch (\OutOfBoundsException $exception) {
         }
 
         try {
             $map->get('Metallica', 'wheee');
             $this->fail();
-        }
-        catch (\OutOfBoundsException $exception) {
+        } catch (\OutOfBoundsException $exception) {
         }
 
         $this->assertSame('S & M', $map->maybe('Metallica')->maybe(1999)->value('album'));
@@ -137,8 +133,7 @@ class MapTest extends \Ivory\IvoryTestCase
         try {
             $this->fullRel->map(...$mappingCols);
             $this->fail('A warning expected due to multiple tuples mapping to the same key.');
-        }
-        catch (\PHPUnit_Framework_Error_Warning $e) {
+        } catch (\PHPUnit_Framework_Error_Warning $e) {
             $expDesc = implode(', ', $dupKeys);
             $this->assertContains($expDesc, $e->getMessage());
         }

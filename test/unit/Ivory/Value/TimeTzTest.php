@@ -20,29 +20,25 @@ class TimeTzTest extends \PHPUnit_Framework_TestCase
         try {
             TimeTz::fromPartsStrict(24, 0, 0.000001, 0);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             TimeTz::fromPartsStrict(25, 0, 0, 0);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             TimeTz::fromPartsStrict(10, 60, 0, 0);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             TimeTz::fromPartsStrict(10, 59, 61, 0);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
     }
 
@@ -64,29 +60,25 @@ class TimeTzTest extends \PHPUnit_Framework_TestCase
         try {
             TimeTz::fromParts(24, 0, 0.000001, 0);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             TimeTz::fromParts(25, 0, 0, 0);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             TimeTz::fromParts(23, 59, 60.000001, 0);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             TimeTz::fromParts(0, 30, -1800.00001, 0);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
     }
 
@@ -132,57 +124,49 @@ class TimeTzTest extends \PHPUnit_Framework_TestCase
         try {
             TimeTz::fromString('a');
             $this->fail();
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             TimeTz::fromString('25:00:00');
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             TimeTz::fromString('24:00:00.0000001');
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             TimeTz::fromString('14:60:12');
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             TimeTz::fromString('14:60:61.1234');
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             TimeTz::fromString('14:15:00+a');
             $this->fail();
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             TimeTz::fromString('14:15:00+13:5');
             $this->fail();
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             TimeTz::fromString('14:15:00UTC');
             $this->fail();
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 
@@ -249,30 +233,39 @@ class TimeTzTest extends \PHPUnit_Framework_TestCase
 
     public function testToUnixTimestamp()
     {
-        $this->assertSame(gmmktime(8, 9, 10, 1, 1, 1970), self::t(8, 9, 10, 0)->toUnixTimestamp());
-        $this->assertSame(gmmktime(8, 9, 10, 1, 1, 1970) + .1234, self::t(8, 9, 10.1234, 0)->toUnixTimestamp());
-        $this->assertSame(gmmktime(7, 9, 10, 3, 14, 2016), self::t(8, 9, 10, 3600)->toUnixTimestamp('2016-03-14'));
-        $this->assertSame(gmmktime(9, 39, 10, 3, 14, 2016), self::t(8, 9, 10, -5400)->toUnixTimestamp(Date::fromISOString('2016-03-14')));
+        $this->assertSame(
+            gmmktime(8, 9, 10, 1, 1, 1970),
+            self::t(8, 9, 10, 0)->toUnixTimestamp()
+        );
+        $this->assertSame(
+            gmmktime(8, 9, 10, 1, 1, 1970) + .1234,
+            self::t(8, 9, 10.1234, 0)->toUnixTimestamp()
+        );
+        $this->assertSame(
+            gmmktime(7, 9, 10, 3, 14, 2016),
+            self::t(8, 9, 10, 3600)->toUnixTimestamp('2016-03-14')
+        );
+        $this->assertSame(
+            gmmktime(9, 39, 10, 3, 14, 2016),
+            self::t(8, 9, 10, -5400)->toUnixTimestamp(Date::fromISOString('2016-03-14'))
+        );
 
         try {
             self::t(8, 9, 10, 0)->toUnixTimestamp('abc');
             $this->fail();
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             self::t(8, 9, 10, 0)->toUnixTimestamp(Date::infinity());
             $this->fail();
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             self::t(8, 9, 10, 0)->toUnixTimestamp(Date::minusInfinity());
             $this->fail();
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 }

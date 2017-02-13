@@ -88,16 +88,13 @@ class FilteredColumn implements \IteratorAggregate, IColumn
         if ($valueOffset >= 0) {
             if ($valueOffset < $cnt) {
                 return $this->data[$valueOffset];
-            }
-            else {
+            } else {
                 throw new \OutOfBoundsException("The column does not have offset $valueOffset");
             }
-        }
-        else {
+        } else {
             if (-$valueOffset <= $cnt) {
                 return $this->data[$valueOffset + $cnt];
-            }
-            else {
+            } else {
                 throw new \OutOfBoundsException("The column does not have offset $valueOffset");
             }
         }

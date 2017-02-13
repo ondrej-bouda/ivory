@@ -26,8 +26,7 @@ class VoidType extends BaseType implements ITotallyOrderedType
     {
         if ($str === null) {
             return null;
-        }
-        else {
+        } else {
             return self::void();
         }
     }
@@ -36,11 +35,9 @@ class VoidType extends BaseType implements ITotallyOrderedType
     {
         if ($val === null) {
             return 'NULL';
-        }
-        elseif ($val === self::void()) {
+        } elseif ($val === self::void()) {
             return "''::{$this->getSchemaName()}.{$this->getName()}";
-        }
-        else {
+        } else {
             $this->throwInvalidValue($val);
         }
     }

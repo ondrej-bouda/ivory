@@ -25,15 +25,13 @@ class LineSegment
     {
         if (is_array($start)) {
             $start = Point::fromCoords($start);
-        }
-        elseif (!$start instanceof Point) {
+        } elseif (!$start instanceof Point) {
             throw new \InvalidArgumentException('start');
         }
 
         if (is_array($end)) {
             $end = Point::fromCoords($end);
-        }
-        elseif (!$end instanceof Point) {
+        } elseif (!$end instanceof Point) {
             throw new \InvalidArgumentException('end');
         }
 
@@ -69,9 +67,9 @@ class LineSegment
     public function getLength()
     {
         return sqrt(
-            ($this->start->getX() - $this->end->getX())**2
+            ($this->start->getX() - $this->end->getX()) ** 2
             +
-            ($this->start->getY() - $this->end->getY())**2
+            ($this->start->getY() - $this->end->getY()) ** 2
         );
     }
 

@@ -41,8 +41,7 @@ class MoneyTypeTest extends IvoryTestCase
         if (System::isWindows()) {
             $monet = 'Japanese_Japan.932';
             $yenSign = '\\';
-        }
-        else {
+        } else {
             $monet = 'ja_JP.UTF-8';
             $yenSign = '￥';
         }

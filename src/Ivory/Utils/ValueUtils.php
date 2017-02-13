@@ -11,8 +11,7 @@ class ValueUtils
 
         if ($a instanceof IComparable) {
             return $a->equals($b);
-        }
-        elseif (is_array($a)) {
+        } elseif (is_array($a)) {
             if (!is_array($b)) {
                 return false;
             }
@@ -28,8 +27,7 @@ class ValueUtils
                 }
             }
             return true;
-        }
-        else {
+        } else {
             return ($a == $b);
         }
     }

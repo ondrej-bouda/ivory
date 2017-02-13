@@ -73,11 +73,9 @@ class TimestampTz extends TimestampBase
     {
         if ($dateTime instanceof \DateTimeImmutable) {
             return new TimestampTz(0, $dateTime);
-        }
-        elseif ($dateTime instanceof \DateTime) {
+        } elseif ($dateTime instanceof \DateTime) {
             return new TimestampTz(0, \DateTimeImmutable::createFromMutable($dateTime));
-        }
-        else {
+        } else {
             // there should not be any other implementation of \DateTimeInterface, but PHP is not that predictable
             return self::fromParts(
                 $dateTime->format('Y'),
@@ -138,8 +136,7 @@ class TimestampTz extends TimestampBase
                 $tz
             );
             return new TimestampTz(0, $dt);
-        }
-        else {
+        } else {
             $dt = self::isoStringToDateTime(
                 sprintf('%s%04d-01-01 00:00:00', ($z < 0 ? '-' : ''), abs($z)),
                 $tz
@@ -203,21 +200,18 @@ class TimestampTz extends TimestampBase
 
         if (filter_var($timezone, FILTER_VALIDATE_INT) !== false) {
             $tzSpec = ($timezone >= 0 ? '+' : '-') . gmdate('H:i', abs($timezone));
-        }
-        elseif (preg_match('~^([^:]+:\d+):\d+$~', $timezone, $m)) {
+        } elseif (preg_match('~^([^:]+:\d+):\d+$~', $timezone, $m)) {
             $tzSpec = $m[1];
             $msg = "PHP's DateTimeZone is unable to represent GMT offsets with precision to seconds. "
                 . "Cutting '$timezone' to '$tzSpec'";
             trigger_error($msg, E_USER_WARNING);
-        }
-        else {
+        } else {
             $tzSpec = $timezone;
         }
 
         try {
             return new \DateTimeZone($tzSpec);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             throw new \InvalidArgumentException('$timezone', 0, $e);
         }
     }
@@ -247,8 +241,7 @@ class TimestampTz extends TimestampBase
     {
         if ($this->inf) {
             return null;
-        }
-        else {
+        } else {
             $y = (int)$this->dt->format('Y');
             $u = $this->dt->format('u');
             return [

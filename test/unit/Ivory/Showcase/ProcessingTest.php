@@ -146,7 +146,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         );
 
         $abbrCol = $this->teachers->col(function (ITuple $t) {
-            return ($t['abbr'] ?: mb_substr($t['lastname'], 0, 4));
+            return ($t['abbr'] ? : mb_substr($t['lastname'], 0, 4));
         });
         $expected = ['Dtn', 'Tir', 'Fama', 'Hans', 'Shil', 'Love'];
         foreach ($abbrCol as $i => $v) {
@@ -185,7 +185,14 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         $res = $this->rel->project(['lesson_id', 'stat' => 'scheduling_status', '*' => 'teacher_*']);
 
         $this->assertSame(
-            ['lesson_id' => 1, 'stat' => 'scheduled', 'id' => 1, 'firstname' => 'Angus', 'lastname' => 'Deaton', 'abbr' => 'Dtn'],
+            [
+                'lesson_id' => 1,
+                'stat' => 'scheduled',
+                'id' => 1,
+                'firstname' => 'Angus',
+                'lastname' => 'Deaton',
+                'abbr' => 'Dtn',
+            ],
             $res->tuple(0)->toMap()
         );
     }
@@ -203,7 +210,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
     public function testAssocSingleLevel()
     {
         $res = $this->teachers->assoc('id', function (ITuple $t) {
-            return ($t['abbr'] ?: mb_substr($t['lastname'], 0, 4));
+            return ($t['abbr'] ? : mb_substr($t['lastname'], 0, 4));
         });
 
         $this->assertCount(6, $res);
@@ -260,7 +267,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         $jRel = $res['J'];
         $this->assertEquals(
             [
-            	['id' => 2, 'firstname' => 'Jean', 'lastname' => 'Tirole', 'abbr' => 'Tir'],
+                ['id' => 2, 'firstname' => 'Jean', 'lastname' => 'Tirole', 'abbr' => 'Tir'],
             ],
             $jRel->toArray()
         );
@@ -269,9 +276,9 @@ class ProcessingTest extends \Ivory\IvoryTestCase
     public function testMultimapMultiLevel()
     {
         $res = $this->rel->multimap('teacher_id', 'scheduling_status');
-	    $this->assertInstanceOf(IRelationMap::class, $res);
-	    $this->assertInstanceOf(IRelationMap::class, $res[1]);
-	    $this->assertInstanceOf(IRelation::class, $res[1]['actual']);
+        $this->assertInstanceOf(IRelationMap::class, $res);
+        $this->assertInstanceOf(IRelationMap::class, $res[1]);
+        $this->assertInstanceOf(IRelation::class, $res[1]['actual']);
 
         /** @var IRelation $deatonActualLessonRel */
         $deatonActualLessonRel = $res[1]['actual'];
@@ -279,7 +286,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         $this->assertSame('1+1', $deatonActualLessonRel->value('lesson_topic'));
         $this->assertSame(['1+1', '1+2'], $deatonActualLessonRel->col('lesson_topic')->toArray());
 
-	    // Each multimap item is a relation, and as such offers IRelation::col() and other standard relation methods.
+        // Each multimap item is a relation, and as such offers IRelation::col() and other standard relation methods.
         $expectedMap = [
             1 => [ // teacher ID
                 'actual' => ['1+1', '1+2'], // under each scheduling status, we list the lesson topics
@@ -308,10 +315,10 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         ];
         foreach ($res as $teacherId => $lessonsByStatus) {
             foreach ($lessonsByStatus as $status => $lessons) {
-	            $this->assertInstanceOf(IRelation::class, $lessons);
+                $this->assertInstanceOf(IRelation::class, $lessons);
                 /** @var IRelation $lessons */
-	            $lessonTopics = $lessons->col('lesson_topic');
-	            $this->assertSame($expectedMap[$teacherId][$status], $lessonTopics->toArray());
+                $lessonTopics = $lessons->col('lesson_topic');
+                $this->assertSame($expectedMap[$teacherId][$status], $lessonTopics->toArray());
             }
         }
     }

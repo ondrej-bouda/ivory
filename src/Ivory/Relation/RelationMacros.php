@@ -80,26 +80,22 @@ trait RelationMacros
             if (filter_var($offsetOrNameOrEvaluator, FILTER_VALIDATE_INT) !== false) {
                 if (isset($columns[$offsetOrNameOrEvaluator])) {
                     return $columns[$offsetOrNameOrEvaluator];
-                }
-                else {
+                } else {
                     throw new UndefinedColumnException("No column at offset $offsetOrNameOrEvaluator");
                 }
-            }
-            else {
+            } else {
                 if (isset($colNameMap[$offsetOrNameOrEvaluator])) {
                     return $columns[$colNameMap[$offsetOrNameOrEvaluator]];
-                }
-                else {
+                } else {
                     throw new UndefinedColumnException("No column named $offsetOrNameOrEvaluator");
                 }
             }
-        }
-        elseif ($offsetOrNameOrEvaluator instanceof ITupleEvaluator ||
-            $offsetOrNameOrEvaluator instanceof \Closure)
-        {
+        } elseif (
+            $offsetOrNameOrEvaluator instanceof ITupleEvaluator ||
+            $offsetOrNameOrEvaluator instanceof \Closure
+        ) {
             return new Column($relation, $offsetOrNameOrEvaluator, null, null);
-        }
-        else {
+        } else {
             throw new \InvalidArgumentException('$offsetOrNameOrEvaluator');
         }
     }

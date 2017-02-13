@@ -55,8 +55,7 @@ class CherryPickedRelation extends StreamlinedRelation
         if (isset($this->offsetMap[$effectiveOffset])) {
             $sourceOffset = $this->offsetMap[$effectiveOffset];
             return parent::tuple($sourceOffset);
-        }
-        else {
+        } else {
             throw new \OutOfBoundsException("Tuple offset $offset out of the relation bounds");
         }
     }

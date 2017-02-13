@@ -36,8 +36,7 @@ class ConnectionControl implements IConnectionControl
     {
         if ($this->handler === null) {
             return null;
-        }
-        else {
+        } else {
             return (pg_connection_status($this->handler) === PGSQL_CONNECTION_OK);
         }
     }
@@ -46,8 +45,7 @@ class ConnectionControl implements IConnectionControl
     {
         if ($this->handler === null) {
             return null;
-        }
-        else {
+        } else {
             $this->waitForConnection();
             return (pg_connection_status($this->handler) === PGSQL_CONNECTION_OK);
         }
@@ -58,8 +56,7 @@ class ConnectionControl implements IConnectionControl
         if ($this->handler === null) {
             $this->openConnection(PGSQL_CONNECT_ASYNC);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -69,8 +66,7 @@ class ConnectionControl implements IConnectionControl
         if ($this->handler === null) {
             $this->openConnection();
             return true;
-        }
-        else {
+        } else {
             $this->waitForConnection();
             return false;
         }
@@ -132,7 +128,8 @@ class ConnectionControl implements IConnectionControl
                 case PGSQL_POLLING_FAILED:
                     throw new ConnectionException('Failed waiting for connection');
                 case PGSQL_POLLING_READING:
-                    while (!self::isStreamReadable($socket, 1)); // TODO: make the timeout configurable
+                    while (!self::isStreamReadable($socket, 1)) { // TODO: make the timeout configurable
+                    }
                     break;
                 default:
                     usleep(10); // a micro sleep in other polling states seems better than a busy wait

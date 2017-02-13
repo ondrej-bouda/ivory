@@ -16,7 +16,7 @@ interface IRelationRecipe
      * @param ITypeDictionary $typeDictionary
      * @return string SQL query string
      */
-    function toSql(ITypeDictionary $typeDictionary) : string;
+    function toSql(ITypeDictionary $typeDictionary): string;
 
     /**
      * Creates the recipe reduced only to tuples satisfying a given condition.

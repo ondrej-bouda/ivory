@@ -129,8 +129,8 @@ interface ITransactionControl
     /**
      * Rolls back all statements executed after the given savepoint.
      *
-     * All statements are rolled back, including creation of new savepoints. That is, all savepoints established after the
-     * given savepoint are destroyed. The given savepoint itself remains valid, allowing to roll back to it multiple
+     * All statements are rolled back, including creation of new savepoints. That is, all savepoints established after
+     * the given savepoint are destroyed. The given savepoint itself remains valid, allowing to roll back to it multiple
      * times.
      *
      * If no transaction is active, an `InvalidStateException` is thrown. Note this is different from operations

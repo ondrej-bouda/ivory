@@ -44,7 +44,7 @@ class Quantity implements IComparable
         self::GIGABYTE => [self::BYTE, 1024 * 1024 * 1024],
         self::TERABYTE => [self::BYTE, 1024 * 1024 * 1024 * 1024],
 
-        self::MILLISECOND => [self::SECOND, 1/1000],
+        self::MILLISECOND => [self::SECOND, 1 / 1000],
         self::SECOND => [self::SECOND, 1],
         self::MINUTE => [self::SECOND, 60],
         self::HOUR => [self::SECOND, 60 * 60],
@@ -88,8 +88,7 @@ class Quantity implements IComparable
         if (isset($m[3]) && $m[3] !== '') {
             $val .= '.' . preg_replace('~\D+~', '', $m[3]);
             $val = (float)$val;
-        }
-        else {
+        } else {
             $val = (int)$val;
         }
 
@@ -151,8 +150,7 @@ class Quantity implements IComparable
         if ($this->unit == $quantity->unit) {
             $thisNormValue = $this->value;
             $quanNormValue = $quantity->value;
-        }
-        else {
+        } else {
             if (!isset(self::$conversion[$this->unit], self::$conversion[$quantity->unit])) {
                 return false;
             }
@@ -183,8 +181,7 @@ class Quantity implements IComparable
         if (!$this->unit || !$destUnit) {
             if ($this->value == 0) {
                 return new Quantity($this->value, $destUnit);
-            }
-            else {
+            } else {
                 throw new UndefinedOperationException('Conversion from/to dimensionless quantity is undefined.');
             }
         }

@@ -118,8 +118,7 @@ class ConnConfig implements IObservableConnConfig
             }
             if ($res !== false) {
                 return pg_fetch_result($res, 0, 0);
-            }
-            else {
+            } else {
                 return null;
             }
         }
@@ -156,8 +155,7 @@ class ConnConfig implements IObservableConnConfig
         // try exact match first, for performance reasons; hopefully, indexing the type map will not be needed
         if (array_key_exists($propertyName, ConfigParam::TYPEMAP)) {
             $type = ConfigParam::TYPEMAP[$propertyName];
-        }
-        else {
+        } else {
             // okay, try to search for case-insensitive matches
             if ($this->typeCache === null) {
                 $this->typeCache = array_change_key_case(ConfigParam::TYPEMAP, CASE_LOWER);
@@ -180,8 +178,7 @@ class ConnConfig implements IObservableConnConfig
                     $this->typeCache[$propertyName] = $type;
                     $this->typeCache[strtolower($propertyName)] = $type;
                     return ConfigParamType::createValue($type, $row['setting'], $row['unit']);
-                }
-                catch (UnsupportedException $e) {
+                } catch (UnsupportedException $e) {
                     throw new UnsupportedException("Unsupported type of configuration parameter '$propertyName'");
                 }
             }
@@ -199,8 +196,7 @@ class ConnConfig implements IObservableConnConfig
         if ($res !== false) {
             $val = pg_fetch_result($res, 0, 0);
             return ConfigParamType::createValue($type, $val);
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -342,8 +338,7 @@ class ConnConfig implements IObservableConnConfig
         $v = $r->value();
         if (preg_match('~1(\D*)2~', $v, $m)) {
             return $m[1];
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -357,8 +352,7 @@ class ConnConfig implements IObservableConnConfig
             foreach ($parameterName as $pn) {
                 $this->addObserverImpl($observer, $pn);
             }
-        }
-        else {
+        } else {
             $this->addObserverImpl($observer, $parameterName);
         }
     }

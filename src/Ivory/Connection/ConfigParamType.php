@@ -102,8 +102,7 @@ class ConfigParamType
             case self::INTEGER_WITH_UNIT:
                 if ($unit !== null) {
                     return Quantity::fromValue($valueString, $unit);
-                }
-                else {
+                } else {
                     return Quantity::fromString($valueString);
                 }
         }

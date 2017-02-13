@@ -15,8 +15,7 @@ class PolymorphicPseudoType extends BaseType implements ITotallyOrderedType
     {
         if ($str === null) {
             return null;
-        }
-        else {
+        } else {
             throw new InternalException('A non-null value to be parsed for a polymorphic pseudo-type');
         }
     }
@@ -25,8 +24,7 @@ class PolymorphicPseudoType extends BaseType implements ITotallyOrderedType
     {
         if ($val === null) {
             return 'NULL';
-        }
-        else {
+        } else {
             $this->throwInvalidValue($val);
         }
     }

@@ -41,15 +41,13 @@ class PathType extends CompoundGeometricType
             $fragments = explode(',', $pointListStr);
             try {
                 for ($i = 0; $i < count($fragments); $i += 2) {
-                    $points[] = $this->pointType->parseValue($fragments[$i] . ',' . $fragments[$i+1]);
+                    $points[] = $this->pointType->parseValue($fragments[$i] . ',' . $fragments[$i + 1]);
                 }
                 return Path::fromPoints($points, ($isOpen ? Path::OPEN : Path::CLOSED));
-            }
-            catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 $this->throwInvalidValue($str, $e);
             }
-        }
-        else {
+        } else {
             $this->throwInvalidValue($str);
         }
     }
@@ -63,8 +61,7 @@ class PathType extends CompoundGeometricType
         if (!$val instanceof Path) {
             try {
                 $val = Path::fromPoints($val);
-            }
-            catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 $this->throwInvalidValue($val, $e);
             }
         }

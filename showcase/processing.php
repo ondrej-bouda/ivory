@@ -23,7 +23,7 @@ use Ivory\Data\StatementRelation;
  * Hence the lessonperson.schedulingstatus attribute, holding enum values "scheduled" or "actual".
  */
 $rel = new StatementRelation(
-	'SELECT lesson.id AS lesson_id, lesson.name AS lesson_name,
+    'SELECT lesson.id AS lesson_id, lesson.name AS lesson_name,
             lp.schedulingstatus,
 	        p.id AS person_id, p.firstname AS person_firstname, p.lastname AS person_lastname,
 	        p.schedabbr AS person_schedabbr
@@ -31,31 +31,36 @@ $rel = new StatementRelation(
 	      JOIN lessonperson lp ON lp.lesson_id = lesson.id
 	      JOIN person p ON p.id = lp.person_id
 	 WHERE lesson.actual_timerange && %',
-	new DateTimeRange(new \DateTime(), new \DateTime('+1 day'))
+    new DateTimeRange(new \DateTime(), new \DateTime('+1 day'))
 );
 
 // CASE 1; map: lesson ID => row
 $res = $rel->map('lesson_id');
 var_dump($res[4]['lesson_name']); // prints, e.g., "Geometry", which is the name of lesson 4
-var_dump($res[4]['person_lastname']); // prints, e.g., "Brezina", which is the lastname of the last teacher returned for lesson 4
+var_dump($res[4]['person_lastname']); // prints, e.g., "Brezina", which is the lastname of the last teacher returned for
+// lesson 4
 
 // CASE 2; map: lesson ID => map: person ID => person lastname
 $res = $rel->multimap('lesson_id')->map('person_id')->col('person_lastname');
 var_dump($res[4][7]); // prints, e.g., "Brezina", which is the lastname of person 7, who teaches in lesson 4
 
 // CASE 3; map: lesson ID => map: person ID => row only with the scheduling status and person attributes
-$res = $rel->multimap('lesson_id')->map('person_id')->project(['schedulingstatus', 'person_firstname', 'person_lastname', 'person_schedabbr']);
-var_dump($res[4][7]['person_lastname']); // prints, e.g., "Brezina", which is the lastname of person 7, who teaches in lesson 4
+$res = $rel->multimap('lesson_id')
+    ->map('person_id')
+    ->project(['schedulingstatus', 'person_firstname', 'person_lastname', 'person_schedabbr']);
+var_dump($res[4][7]['person_lastname']); // prints, e.g., "Brezina", which is the lastname of person 7, who teaches in
+// lesson 4
 
 // CASE 4; map: lesson ID => map: person ID => user function result
 $res = $rel->map('lesson_id')->map('person_id')->col(function ($row) {
-	return ($row['person_schedabbr'] ? : mb_substr($row['person_lastname'], 0, 4));
+    return ($row['person_schedabbr'] ? : mb_substr($row['person_lastname'], 0, 4));
 });
 var_dump($res[4][7]); // prints, e.g., "Brez", which is the scheduling abbreviation of person 7, who teaches in lesson 4
 
 // CASE 5; map: lesson ID => list: row
 $res = $rel->multimap('lesson_id');
-var_dump($res[4][2]['person_lastname']); // prints, e.g., "Novak", which is the lastname of the third teacher returned for lesson 4
+var_dump($res[4][2]['person_lastname']); // prints, e.g., "Novak", which is the lastname of the third teacher returned
+// for lesson 4
 
 // CASE 6; map: lesson ID => list: person lastname
 $res = $rel->multimap('lesson_id')->col('person_lastname');
@@ -63,14 +68,17 @@ var_dump($res[4][2]); // prints, e.g., "Novak", which is the lastname of the thi
 
 // CASE 7; map: lesson ID => map: scheduling status => map: person ID => person lastname
 $res = $rel->multimap('lesson_id')->multimap('schedulingstatus')->map('person_id')->col('person_lastname');
-var_dump($res[4]['actual'][7]); // prints, e.g., "Brezina", which is the lastname of person 7, who is the actual teacher of lesson 4
+var_dump($res[4]['actual'][7]); // prints, e.g., "Brezina", which is the lastname of person 7, who is the actual
+// teacher of lesson 4
 
 // CASE 8; map: lesson ID => map: scheduling status => list: person ID
 $res = $rel->multimap('lesson_id')->multimap('schedulingstatus')->col('person_id');
 var_dump($res[4]['actual'][1]); // prints, e.g., 89, which is the ID of the second actual teacher returned for lesson 4
 
 // CASE 9; map: lesson ID parity => list: row only with the lesson ID and person ID
-$res = $rel->multimap(function ($row) { return $row['lesson_id'] % 2; })->project(['lesson_id', 'person_id']);
+$res = $rel->multimap(function ($row) {
+    return $row['lesson_id'] % 2;
+})->project(['lesson_id', 'person_id']);
 var_dump($res[1][5]['lesson_id']); // prints, e.g., 631, which is the ID of the sixth returned lesson with odd ID
 
 // CASE 10; map: lesson ID => list of rows with the "actual" scheduling status: person ID
@@ -79,7 +87,8 @@ var_dump($res[4][1]); // prints, e.g., 89, which is the ID of the second actual 
 
 // CASE 11; map: lesson ID => list of rows with odd person ID: person ID
 $res = $rel->multimap('lesson_id')->filter(function ($row) { return $row['person_id'] % 2 == 1; })->col('person_id');
-var_dump($res[4][1]); // prints, e.g., 97, which is the ID of the second teacher returned for lesson 4 who has their person ID odd
+var_dump($res[4][1]); // prints, e.g., 97, which is the ID of the second teacher returned for lesson 4 who has their
+// person ID odd
 
 // CASE 12; equivalent to CASE 11, but specifying the filter sooner, yet on the application side
 $res = $rel->filter(function ($row) { return $row['person_id'] % 2 == 1; })->multimap('lesson_id')->col('person_id');
@@ -97,7 +106,8 @@ var_dump(isset($res[142])); // prints TRUE iff there was at least one row with p
 
 // CASE 16: map: lesson ID => map: scheduling status => map: person ID => TRUE
 $res = $rel->multimap('lesson_id')->multimap('schedulingstatus')->hash('person_id');
-var_dump(isset($res[12]['actual'][142])); // prints TRUE iff there was at least one row with lesson of ID 12 and person of ID 142 in the actual scheduling status
+var_dump(isset($res[12]['actual'][142])); // prints TRUE iff there was at least one row with lesson of ID 12 and person
+// of ID 142 in the actual scheduling status
 
 // note all the above cases are called on a single $rel object; this should be possible - the relation shall create
 //   a new result object with each map()/list()/hash()/filter()/project() call
@@ -113,13 +123,14 @@ var_dump(isset($res[12]['actual'][142])); // prints TRUE iff there was at least 
 //      (foreach ($rel as $row)) shall also use the explicit $rel->getResult(), which is pretty redundant
 
 
-
 // SHORTCUT PROPOSITIONS
 
-// shortcut for CASE 2; consecutive operands of the same processing operation merged into a single operation call (only relevant to map() - other operations are not applicable or appropriate)
+// shortcut for CASE 2; consecutive operands of the same processing operation merged into a single operation call (only
+// relevant to map() - other operations are not applicable or appropriate)
 $res = $rel->map('lesson_id', 'person_id')->col('person_lastname');
 
-// shortcut for CASE 3; projecting all columns with a given prefix using a star - covers the typical naming of columns from multiple tables
+// shortcut for CASE 3; projecting all columns with a given prefix using a star - covers the typical naming of columns
+// from multiple tables
 $res = $rel->multimap('lesson_id')->map('person_id')->project(['schedulingstatus', 'person_*']);
 
 // shortcut for CASE 7; combination of mapping and projection - which is quite typical

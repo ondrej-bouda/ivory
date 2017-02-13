@@ -1,6 +1,7 @@
 <?php
 /**
- * Decide whether methods called on relations shall modify them directly, or rather create a new relation configured appropriately.
+ * Decide whether methods called on relations shall modify them directly, or rather create a new relation configured
+ * appropriately.
  */
 namespace Ivory\Showcase\Issues;
 
@@ -14,14 +15,14 @@ $projected = $personRel->project(['id', 'firstname', 'lastname']);
 // VERSION 1: mutable relations
 
 foreach ($personRel as $row) {
-	print_r($row); // prints just the 'id', 'firstname', and 'lastname' attributes
+    print_r($row); // prints just the 'id', 'firstname', and 'lastname' attributes
 }
 
 
 // VERSION 2: immutable relations
 
 foreach ($personRel as $row) {
-	print_r($row); // prints the whole person row, not just the three attributes
+    print_r($row); // prints the whole person row, not just the three attributes
 }
 
 // VERSION 2a: the project() and similar methods copy the entire object into a new one

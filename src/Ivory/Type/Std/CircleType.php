@@ -31,12 +31,10 @@ class CircleType extends CompoundGeometricType
             try {
                 $center = $this->pointType->parseValue($m[4]);
                 return Circle::fromCoords($center, $m[5]);
-            }
-            catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 $this->throwInvalidValue($str, $e);
             }
-        }
-        else {
+        } else {
             $this->throwInvalidValue($str);
         }
     }
@@ -45,14 +43,12 @@ class CircleType extends CompoundGeometricType
     {
         if ($val === null) {
             return 'NULL';
-        }
-        elseif ($val instanceof Circle) {
+        } elseif ($val instanceof Circle) {
             return sprintf('circle(%s,%s)',
                 $this->pointType->serializeValue($val->getCenter()),
                 $val->getRadius()
             );
-        }
-        else {
+        } else {
             $this->throwInvalidValue($val);
         }
     }

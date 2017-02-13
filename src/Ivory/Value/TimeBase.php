@@ -34,11 +34,9 @@ abstract class TimeBase implements IComparable
 
         if ($s < 0) {
             throw new \OutOfRangeException('The resulting time underruns 00:00:00');
-        }
-        elseif ($s > 24 * 60 * 60) {
+        } elseif ($s > 24 * 60 * 60) {
             throw new \OutOfRangeException('The resulting time exceeds 24:00:00');
-        }
-        else {
+        } else {
             return $s;
         }
     }
@@ -57,8 +55,7 @@ abstract class TimeBase implements IComparable
             if ($minute > 0 || $second > 0) {
                 throw new \OutOfRangeException('with hour 24, the minutes and seconds must be zero');
             }
-        }
-        elseif ($hour < 0 || $hour > 24) {
+        } elseif ($hour < 0 || $hour > 24) {
             throw new \OutOfRangeException('hours');
         }
 
@@ -141,16 +138,14 @@ abstract class TimeBase implements IComparable
     {
         if ($date === null) {
             return $this->sec;
-        }
-        else {
+        } else {
             if (!$date instanceof Date) {
                 $date = Date::fromISOString($date);
             }
             $dayTs = $date->toUnixTimestamp();
             if ($dayTs !== null) {
                 return $dayTs + $this->sec;
-            }
-            else {
+            } else {
                 throw new \InvalidArgumentException('infinite date');
             }
         }

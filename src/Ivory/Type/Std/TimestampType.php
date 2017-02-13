@@ -58,11 +58,9 @@ class TimestampType extends BaseType implements ITotallyOrderedType
     {
         if ($str === null) {
             return null;
-        }
-        elseif ($str == 'infinity') {
+        } elseif ($str == 'infinity') {
             return Timestamp::infinity();
-        }
-        elseif ($str == '-infinity') {
+        } elseif ($str == '-infinity') {
             return Timestamp::minusInfinity();
         }
 
@@ -86,8 +84,7 @@ class TimestampType extends BaseType implements ITotallyOrderedType
                 preg_match('~^(\d+)/(\d+)/(\d+) (\d+):(\d+):(\d+(?:\.\d+)?).*?(BC)?$~', $str, $matches);
                 if ($dateStyle->getOrder() == DateStyle::ORDER_DMY) {
                     list(, $d, $m, $y, $h, $i, $s) = $matches;
-                }
-                else {
+                } else {
                     list(, $m, $d, $y, $h, $i, $s) = $matches;
                 }
                 break;
@@ -95,8 +92,7 @@ class TimestampType extends BaseType implements ITotallyOrderedType
                 preg_match('~^\w{3} (\d+|\w{3}) (\d+|\w{3}) (\d+):(\d+):(\d+(?:\.\d+)?) (\d+).*?(BC)?$~', $str, $matches);
                 if ($dateStyle->getOrder() == DateStyle::ORDER_DMY) {
                     list(, $d, $ms, $h, $i, $s, $y) = $matches;
-                }
-                else {
+                } else {
                     list(, $ms, $d, $h, $i, $s, $y) = $matches;
                 }
                 static $monthNames = [
@@ -131,14 +127,11 @@ class TimestampType extends BaseType implements ITotallyOrderedType
                 ($val->format('u') ? $val->format('.u') : ''),
                 ($val->getYear() < 0 ? ' BC' : '')
             );
-        }
-        elseif ($val === Timestamp::infinity()) {
+        } elseif ($val === Timestamp::infinity()) {
             return "'infinity'";
-        }
-        elseif ($val === Timestamp::minusInfinity()) {
+        } elseif ($val === Timestamp::minusInfinity()) {
             return "'-infinity'";
-        }
-        else {
+        } else {
             throw new \LogicException('A non-finite timestamp not recognized');
         }
     }

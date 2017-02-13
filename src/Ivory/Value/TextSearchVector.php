@@ -91,8 +91,7 @@ class TextSearchVector
         foreach ($matches[0] as $m) {
             if ($m[0] != "'") {
                 $tokens[] = $m;
-            }
-            elseif (strlen($m) > 2) { // ignore just two single quotes not containing anything
+            } elseif (strlen($m) > 2) { // ignore just two single quotes not containing anything
                 $tokens[] = strtr(substr($m, 1, -1), ["''" => "'"]); // cut off the quotes, cut down doubled quotes
             }
         }

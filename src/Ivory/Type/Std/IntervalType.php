@@ -36,8 +36,7 @@ class IntervalType extends BaseType implements ITotallyOrderedType
         if (!$val instanceof TimeInterval) {
             if (is_array($val)) {
                 $val = TimeInterval::fromParts($val);
-            }
-            else {
+            } else {
                 $val = TimeInterval::fromString($val);
             }
         }

@@ -20,29 +20,25 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         try {
             Time::fromPartsStrict(24, 0, 0.000001);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Time::fromPartsStrict(25, 0, 0);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Time::fromPartsStrict(10, 60, 0);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Time::fromPartsStrict(10, 59, 61);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
     }
 
@@ -60,29 +56,25 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         try {
             Time::fromParts(24, 0, 0.000001);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Time::fromParts(25, 0, 0);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Time::fromParts(23, 59, 60.000001);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Time::fromParts(0, 30, -1800.00001);
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
     }
 
@@ -121,36 +113,31 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         try {
             Time::fromString('a');
             $this->fail();
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             Time::fromString('25:00:00');
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Time::fromString('24:00:00.0000001');
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Time::fromString('14:60:12');
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
 
         try {
             Time::fromString('14:60:61.1234');
             $this->fail();
-        }
-        catch (\OutOfRangeException $e) {
+        } catch (\OutOfRangeException $e) {
         }
     }
 
@@ -167,8 +154,14 @@ class TimeTest extends \PHPUnit_Framework_TestCase
 
     public function testFromDateTime()
     {
-        $this->assertEquals(self::t(8, 9, 10), Time::fromDateTime(\DateTime::createFromFormat('H:i:s', '08:09:10')));
-        $this->assertEquals(self::t(8, 9, 10), Time::fromDateTime(new \DateTimeImmutable('@' . gmmktime(8, 9, 10, 3, 14, 2016))));
+        $this->assertEquals(
+            self::t(8, 9, 10),
+            Time::fromDateTime(\DateTime::createFromFormat('H:i:s', '08:09:10'))
+        );
+        $this->assertEquals(
+            self::t(8, 9, 10),
+            Time::fromDateTime(new \DateTimeImmutable('@' . gmmktime(8, 9, 10, 3, 14, 2016)))
+        );
     }
 
     public function testGetters()
@@ -216,22 +209,19 @@ class TimeTest extends \PHPUnit_Framework_TestCase
         try {
             self::t(8, 9, 10)->toUnixTimestamp('abc');
             $this->fail();
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             self::t(8, 9, 10)->toUnixTimestamp(Date::infinity());
             $this->fail();
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             self::t(8, 9, 10)->toUnixTimestamp(Date::minusInfinity());
             $this->fail();
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 }

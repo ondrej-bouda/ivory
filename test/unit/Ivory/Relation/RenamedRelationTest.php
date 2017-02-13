@@ -148,8 +148,7 @@ class RenamedRelationTest extends \Ivory\IvoryTestCase
         try {
             $renamed->col('a');
             $this->fail(UndefinedColumnException::class . ' expected');
-        }
-        catch (UndefinedColumnException $e) {
+        } catch (UndefinedColumnException $e) {
         }
 
         $this->assertSame(

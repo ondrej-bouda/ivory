@@ -80,8 +80,7 @@ class HstoreType extends \Ivory\Type\BaseType
         foreach ($val as $k => $v) {
             if (!$isFirst) {
                 $res .= ',';
-            }
-            else {
+            } else {
                 $isFirst = false;
             }
             $res .= $this->quoteAtom($k) . '=>' . $this->quoteAtom($v);
@@ -93,8 +92,7 @@ class HstoreType extends \Ivory\Type\BaseType
     {
         if ($atom === null) {
             return 'NULL';
-        }
-        else {
+        } else {
             return '"' . strtr($atom, ['"' => '\\"', '\\' => '\\\\']) . '"';
         }
     }
@@ -132,15 +130,12 @@ class HstoreType extends \Ivory\Type\BaseType
                     if ($ch == '"') {
                         $key = '';
                         $state = 1;
-                    }
-                    elseif (ctype_space($ch)) {
+                    } elseif (ctype_space($ch)) {
                         continue 2;
-                    }
-                    elseif (strpos($ctlChars, $ch) === false) {
+                    } elseif (strpos($ctlChars, $ch) === false) {
                         $key = $ch;
                         $state = 3;
-                    }
-                    else {
+                    } else {
                         break 2;
                     }
                     break;
@@ -148,11 +143,9 @@ class HstoreType extends \Ivory\Type\BaseType
                 case 1:
                     if ($ch == '\\') {
                         $state = 2;
-                    }
-                    elseif ($ch == '"') {
+                    } elseif ($ch == '"') {
                         $state = 4;
-                    }
-                    else {
+                    } else {
                         $key .= $ch;
                     }
                     break;
@@ -165,14 +158,11 @@ class HstoreType extends \Ivory\Type\BaseType
                 case 3:
                     if ($ch == '=') {
                         $state = 5;
-                    }
-                    elseif (ctype_space($ch)) {
+                    } elseif (ctype_space($ch)) {
                         $state = 4;
-                    }
-                    elseif (strpos($ctlChars, $ch) === false) {
+                    } elseif (strpos($ctlChars, $ch) === false) {
                         $key .= $ch;
-                    }
-                    else {
+                    } else {
                         break 2;
                     }
                     break;
@@ -180,11 +170,9 @@ class HstoreType extends \Ivory\Type\BaseType
                 case 4:
                     if ($ch == '=') {
                         $state = 5;
-                    }
-                    elseif (ctype_space($ch)) {
+                    } elseif (ctype_space($ch)) {
                         continue 2;
-                    }
-                    else {
+                    } else {
                         break 2;
                     }
                     break;
@@ -192,8 +180,7 @@ class HstoreType extends \Ivory\Type\BaseType
                 case 5:
                     if ($ch == '>') {
                         $state = 6;
-                    }
-                    else {
+                    } else {
                         break 2;
                     }
                     break;
@@ -201,16 +188,13 @@ class HstoreType extends \Ivory\Type\BaseType
                 case 6:
                     if (ctype_space($ch)) {
                         continue 2;
-                    }
-                    elseif ($ch == '"') {
+                    } elseif ($ch == '"') {
                         $val = '';
                         $state = 7;
-                    }
-                    elseif (strpos($ctlChars, $ch) === false) {
+                    } elseif (strpos($ctlChars, $ch) === false) {
                         $val = $ch;
                         $state = 9;
-                    }
-                    else {
+                    } else {
                         break 2;
                     }
                     break;
@@ -218,11 +202,9 @@ class HstoreType extends \Ivory\Type\BaseType
                 case 7:
                     if ($ch == '"') {
                         $state = 10;
-                    }
-                    elseif ($ch == '\\') {
+                    } elseif ($ch == '\\') {
                         $state = 8;
-                    }
-                    else {
+                    } else {
                         $val .= $ch;
                     }
                     break;
@@ -236,14 +218,11 @@ class HstoreType extends \Ivory\Type\BaseType
                     if ($ch == ',') {
                         $result[$key] = (strcasecmp($val, 'NULL') == 0 ? null : $val);
                         $state = 0;
-                    }
-                    elseif (ctype_space($ch)) {
+                    } elseif (ctype_space($ch)) {
                         $state = 10;
-                    }
-                    elseif (strpos($ctlChars, $ch) === false) {
+                    } elseif (strpos($ctlChars, $ch) === false) {
                         $val .= $ch;
-                    }
-                    else {
+                    } else {
                         $state = -1;
                         break 2;
                     }
@@ -253,11 +232,9 @@ class HstoreType extends \Ivory\Type\BaseType
                     if ($ch == ',') {
                         $result[$key] = $val;
                         $state = 0;
-                    }
-                    elseif (ctype_space($ch)) {
+                    } elseif (ctype_space($ch)) {
                         continue 2;
-                    }
-                    else {
+                    } else {
                         $state = -1;
                         break 2;
                     }

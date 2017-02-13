@@ -27,8 +27,7 @@ class IdentifierType implements ITotallyOrderedType
     {
         if ($str === null) {
             return null;
-        }
-        else {
+        } else {
             return $str;
         }
     }
@@ -41,22 +40,21 @@ class IdentifierType implements ITotallyOrderedType
 
         if ($this->needsQuotes($val)) {
             return '"' . str_replace('"', '""', $val) . '"';
-        }
-        else {
+        } else {
             return $val;
         }
     }
 
     public function compareValues($a, $b)
-   	{
-   		if ($a === null || $b === null) {
-   			return null;
-   		}
+    {
+        if ($a === null || $b === null) {
+            return null;
+        }
 
-   		return strcmp((string)$a, (string)$b); // FIXME: use the same comparison as StringType
-   	}
+        return strcmp((string)$a, (string)$b); // FIXME: use the same comparison as StringType
+    }
 
-    private function needsQuotes($val) : bool
+    private function needsQuotes($val): bool
     {
         return !preg_match(
             '~^

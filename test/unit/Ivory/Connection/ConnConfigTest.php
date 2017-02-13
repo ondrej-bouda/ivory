@@ -128,7 +128,8 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
         $this->assertEquals(Date::fromParts(2016, 3, 5), $tuple['d']);
         $this->assertSame('05-03-2016', $tuple['t']);
 
-        $this->cfg->setForTransaction(ConfigParam::DATE_STYLE, 'Postgres, YMD'); // unsupported for DateStyle Postgres, MDY is actually used
+        // YMD is unsupported for DateStyle Postgres, MDY is actually used
+        $this->cfg->setForTransaction(ConfigParam::DATE_STYLE, 'Postgres, YMD');
         /** @var QueryResult $res */
         $res = $this->getIvoryConnection()->rawQuery("SELECT '2016-03-05'::DATE AS d, '2016-03-05'::DATE::TEXT AS t");
         $tuple = $res->tuple();
@@ -184,8 +185,14 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
             $this->assertSame([[ConfigParam::MONEY_DEC_SEP, '.']], $obsSome->fetchObserved());
 
             $this->cfg->setForTransaction(ConfigParam::APPLICATION_NAME, 'Foo');
-            $this->assertSame([], $obsAll->fetchObserved(), 'IConnConfig::setTransaction() should have no effect outside transaction');
-            $this->assertSame([], $obsSome->fetchObserved(), 'IConnConfig::setTransaction() should have no effect outside transaction');
+            $this->assertSame(
+                [], $obsAll->fetchObserved(),
+                'IConnConfig::setTransaction() should have no effect outside transaction'
+            );
+            $this->assertSame(
+                [], $obsSome->fetchObserved(),
+                'IConnConfig::setTransaction() should have no effect outside transaction'
+            );
 
             $this->cfg->resetAll();
             $this->assertSame([ConnConfigTestObserver::RESET], $obsAll->fetchObserved());
@@ -311,8 +318,7 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
                 $conn->rollback();
             }
             $conn->rollbackPreparedTransaction($name);
-        }
-        catch (StatementException $e) {
+        } catch (StatementException $e) {
             if ($e->getSqlState()->getCode() != SqlState::UNDEFINED_OBJECT) {
                 throw $e;
             }

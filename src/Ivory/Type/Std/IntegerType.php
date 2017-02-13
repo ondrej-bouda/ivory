@@ -12,36 +12,34 @@ use Ivory\Type\IDiscreteType;
  */
 class IntegerType extends \Ivory\Type\BaseType implements IDiscreteType
 {
-	public function parseValue($str)
-	{
-		if ($str === null) {
-			return null;
-		}
-		else {
-			return (int)$str;
-		}
-	}
+    public function parseValue($str)
+    {
+        if ($str === null) {
+            return null;
+        } else {
+            return (int)$str;
+        }
+    }
 
-	public function serializeValue($val)
-	{
-		if ($val === null) {
-			return 'NULL';
-		}
-		else {
-			return (int)$val;
-		}
-	}
+    public function serializeValue($val)
+    {
+        if ($val === null) {
+            return 'NULL';
+        } else {
+            return (int)$val;
+        }
+    }
 
-	public function compareValues($a, $b)
-	{
-		if ($a === null || $b === null) {
-			return null;
-		}
-		return (int)$a - (int)$b;
-	}
+    public function compareValues($a, $b)
+    {
+        if ($a === null || $b === null) {
+            return null;
+        }
+        return (int)$a - (int)$b;
+    }
 
-	public function step($delta, $value)
-	{
-		return ($value === null ? null : $value + $delta);
-	}
+    public function step($delta, $value)
+    {
+        return ($value === null ? null : $value + $delta);
+    }
 }

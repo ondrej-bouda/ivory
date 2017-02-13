@@ -87,8 +87,7 @@ abstract class DateBase implements IComparable
         $z = $this->getZeroBasedYear();
         if ($z > 0 || $z === null) {
             return $z;
-        }
-        else {
+        } else {
             return $z - 1;
         }
     }
@@ -132,8 +131,7 @@ abstract class DateBase implements IComparable
     {
         if ($this->inf) {
             return null;
-        }
-        else {
+        } else {
             return $this->dt->format($dateFmt);
         }
     }
@@ -185,12 +183,10 @@ abstract class DateBase implements IComparable
     {
         if ($this->inf) {
             return null;
-        }
-        else {
+        } else {
             if ($timezone === $this->dt->getTimezone()) {
                 return $this->dt;
-            }
-            else {
+            } else {
                 return new \DateTimeImmutable($this->toISOString(), $timezone);
             }
         }
@@ -253,8 +249,7 @@ abstract class DateBase implements IComparable
             if ($resFracSec < 0) {
                 $resFracSec++;
                 $wholeSec--;
-            }
-            elseif ($resFracSec >= 1) {
+            } elseif ($resFracSec >= 1) {
                 $resFracSec--;
                 $wholeSec++;
             }

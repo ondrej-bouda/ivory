@@ -12,11 +12,11 @@ use Ivory\Type\TypeRegister;
  */
 interface ICoreFactory
 {
-    function createTypeRegister() : TypeRegister;
+    function createTypeRegister(): TypeRegister;
 
-    function createConnection(string $connName, ConnectionParameters $params) : IConnection;
+    function createConnection(string $connName, ConnectionParameters $params): IConnection;
 
-    function createSqlPatternParser() : SqlPatternParser;
+    function createSqlPatternParser(): SqlPatternParser;
 
-    function createStatementExceptionFactory() : StatementExceptionFactory;
+    function createStatementExceptionFactory(): StatementExceptionFactory;
 }

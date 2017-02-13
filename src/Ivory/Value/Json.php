@@ -93,8 +93,7 @@ class Json
     {
         if (PHP_VERSION_ID >= 50500) {
             return json_last_error_msg();
-        }
-        else {
+        } else {
             static $messages = [
                 JSON_ERROR_DEPTH => 'Maximum stack depth exceeded',
                 JSON_ERROR_STATE_MISMATCH => 'Underflow or the modes mismatch',

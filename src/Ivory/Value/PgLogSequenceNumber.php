@@ -33,8 +33,7 @@ class PgLogSequenceNumber implements IComparable
         $scanned = sscanf($str, '%X/%X', $hi, $lo);
         if ($scanned == 2) {
             return new PgLogSequenceNumber($hi, $lo);
-        }
-        else {
+        } else {
             throw new \InvalidArgumentException('$str');
         }
     }

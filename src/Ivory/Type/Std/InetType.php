@@ -22,8 +22,7 @@ class InetType extends BaseType
 
         try {
             return NetAddress::fromString($str);
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->throwInvalidValue($str, $e);
         }
     }

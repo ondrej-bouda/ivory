@@ -10,11 +10,11 @@ use Ivory\NamedDbObject;
  */
 class NamedCompositeType extends CompositeType
 {
-	use NamedDbObject;
+    use NamedDbObject;
 
-	public function __construct($schemaName, $name)
-	{
-		parent::__construct();
-		$this->setName($schemaName, $name);
-	}
+    public function __construct($schemaName, $name)
+    {
+        parent::__construct();
+        $this->setName($schemaName, $name);
+    }
 }

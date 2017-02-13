@@ -17,8 +17,12 @@ class RangeType implements INamedType, ITotallyOrderedType
     private $subtype;
     private $canonicalFunc;
 
-    public function __construct($schemaName, $name, ITotallyOrderedType $subtype, IRangeCanonicalFunc $canonicalFunc = null)
-    {
+    public function __construct(
+        $schemaName,
+        $name,
+        ITotallyOrderedType $subtype,
+        IRangeCanonicalFunc $canonicalFunc = null
+    ) {
         $this->setName($schemaName, $name);
         $this->subtype = $subtype;
         $this->canonicalFunc = $canonicalFunc;
@@ -91,8 +95,7 @@ class RangeType implements INamedType, ITotallyOrderedType
         if (!$val instanceof Range) {
             if (is_array($val) && isset($val[0], $val[1]) && count($val) == 2) {
                 $val = Range::createFromBounds($this->subtype, $this->canonicalFunc, $val[0], $val[1], true, true);
-            }
-            else {
+            } else {
                 $message = "Value '$val' is not valid for type {$this->getSchemaName()}.{$this->getName()}";
                 throw new \InvalidArgumentException($message);
             }
@@ -134,19 +137,15 @@ class RangeType implements INamedType, ITotallyOrderedType
         // empty ranges are sorted before all else in PostgreSQL
         if ($a->isEmpty() && $b->isEmpty()) {
             return 0;
-        }
-        elseif ($a->isEmpty()) {
+        } elseif ($a->isEmpty()) {
             return -1;
-        }
-        elseif ($b->isEmpty()) {
+        } elseif ($b->isEmpty()) {
             return 1;
-        }
-        else {
+        } else {
             $cmp = $this->compareBounds(-1, $a->getLower(), $a->isLowerInc(), $b->getLower(), $b->isLowerInc());
             if ($cmp != 0) {
                 return $cmp;
-            }
-            else {
+            } else {
                 return $this->compareBounds(1, $a->getUpper(), $a->isUpperInc(), $b->getUpper(), $b->isUpperInc());
             }
         }
@@ -156,11 +155,9 @@ class RangeType implements INamedType, ITotallyOrderedType
     {
         if ($aVal === null && $bVal === null) {
             return 0;
-        }
-        elseif ($aVal === null) {
+        } elseif ($aVal === null) {
             return 1 * $sgn;
-        }
-        elseif ($bVal === null) {
+        } elseif ($bVal === null) {
             return -1 * $sgn;
         }
 
@@ -172,14 +169,11 @@ class RangeType implements INamedType, ITotallyOrderedType
         // PHP 7: <=> could lead to a more compact form
         if ($aIsInc && $bIsInc) {
             return 0;
-        }
-        elseif ($aIsInc) {
+        } elseif ($aIsInc) {
             return 1 * $sgn;
-        }
-        elseif ($bIsInc) {
+        } elseif ($bIsInc) {
             return -1 * $sgn;
-        }
-        else {
+        } else {
             return 0;
         }
     }

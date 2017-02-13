@@ -12,38 +12,36 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class BinaryType extends \Ivory\Type\BaseType implements ITotallyOrderedType
 {
-	public function parseValue($str)
-	{
-		if ($str === null) {
-			return null;
-		}
+    public function parseValue($str)
+    {
+        if ($str === null) {
+            return null;
+        }
 
-		/* Depending on the PostgreSQL bytea_output configuration parameter, data may be encoded either in the "hex" or
-		 * "escape" format, which may be recognized by the '\x' prefix.
-		 */
-		if (substr($str, 0, 2) == '\\x') {
-			return hex2bin(substr($str, 2));
-		}
-		else {
-			return pg_unescape_bytea($str);
-		}
-	}
+        /* Depending on the PostgreSQL bytea_output configuration parameter, data may be encoded either in the "hex" or
+         * "escape" format, which may be recognized by the '\x' prefix.
+         */
+        if (substr($str, 0, 2) == '\\x') {
+            return hex2bin(substr($str, 2));
+        } else {
+            return pg_unescape_bytea($str);
+        }
+    }
 
-	public function serializeValue($val)
-	{
-		if ($val === null) {
-			return 'NULL';
-		}
-		else {
-			return "E'\\\\x" . bin2hex($val) . "'";
-		}
-	}
+    public function serializeValue($val)
+    {
+        if ($val === null) {
+            return 'NULL';
+        } else {
+            return "E'\\\\x" . bin2hex($val) . "'";
+        }
+    }
 
-	public function compareValues($a, $b)
-	{
-		if ($a === null || $b === null) {
-			return null;
-		}
-		return strcmp((string)$a, (string)$b);
-	}
+    public function compareValues($a, $b)
+    {
+        if ($a === null || $b === null) {
+            return null;
+        }
+        return strcmp((string)$a, (string)$b);
+    }
 }

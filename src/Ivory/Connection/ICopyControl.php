@@ -177,7 +177,7 @@ interface ICopyControl
 
     /**
      * Copies a database table to an array of data rows, using the {@link ICopyControl::FORMAT_TEXT `TEXT`} format.
-     * 
+     *
      * After this method returns, the connection is free to accept any more statements.
      *
      * Compared to other copy methods, the interface of this method is rather limited due to the fact it calls the PHP

@@ -25,7 +25,7 @@ use Ivory\Type\TypeRegister;
  */
 class StdCoreFactory implements ICoreFactory
 {
-    public function createTypeRegister() : TypeRegister
+    public function createTypeRegister(): TypeRegister
     {
         $reg = new TypeRegister();
         $reg->registerTypeLoader(new StdTypeLoader());
@@ -53,17 +53,17 @@ class StdCoreFactory implements ICoreFactory
         return $reg;
     }
 
-    public function createSqlPatternParser() : SqlPatternParser
+    public function createSqlPatternParser(): SqlPatternParser
     {
         return new SqlPatternParser();
     }
 
-    public function createStatementExceptionFactory() : StatementExceptionFactory
+    public function createStatementExceptionFactory(): StatementExceptionFactory
     {
         return new StatementExceptionFactory();
     }
 
-    public function createConnection(string $connName, ConnectionParameters $params) : IConnection
+    public function createConnection(string $connName, ConnectionParameters $params): IConnection
     {
         $conn = new Connection($connName, $params);
 

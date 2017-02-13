@@ -25,6 +25,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
 
     /**
      * Converts a simple macro, as accepted, e.g., by {@link IRelation::project()}, to a PCRE.
+     *
      * @param string $macroPattern the simple macro to convert
      * @param int $starCnt number of star wildcards is stored here
      * @return string PCRE equivalent to <tt>$macroPattern</tt>
@@ -40,8 +41,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
             if ($escaped) {
                 $lastLiteral .= $c;
                 $escaped = false;
-            }
-            else {
+            } else {
                 switch ($c) {
                     case '\\':
                         $escaped = true;
@@ -78,8 +78,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
                 }
                 $repl .= $c;
                 $escaped = false;
-            }
-            else {
+            } else {
                 switch ($c) {
                     case '\\':
                         $escaped = true;

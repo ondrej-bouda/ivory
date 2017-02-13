@@ -25,15 +25,13 @@ class Box
     {
         if (is_array($corner)) {
             $corner = Point::fromCoords($corner);
-        }
-        elseif (!$corner instanceof Point) {
+        } elseif (!$corner instanceof Point) {
             throw new \InvalidArgumentException('corner');
         }
 
         if (is_array($oppositeCorner)) {
             $oppositeCorner = Point::fromCoords($oppositeCorner);
-        }
-        elseif (!$oppositeCorner instanceof Point) {
+        } elseif (!$oppositeCorner instanceof Point) {
             throw new \InvalidArgumentException('oppositeCorner');
         }
 

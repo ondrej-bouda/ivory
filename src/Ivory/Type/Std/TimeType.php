@@ -36,22 +36,17 @@ class TimeType extends BaseType implements ITotallyOrderedType
         if (!$val instanceof Time) {
             if ($val instanceof \DateTimeInterface) {
                 $val = Time::fromDateTime($val);
-            }
-            elseif (is_numeric($val)) {
+            } elseif (is_numeric($val)) {
                 $val = Time::fromUnixTimestamp($val);
-            }
-            elseif (is_string($val)) {
+            } elseif (is_string($val)) {
                 try {
                     $val = Time::fromString($val);
-                }
-                catch (\InvalidArgumentException $e) {
+                } catch (\InvalidArgumentException $e) {
+                    $this->throwInvalidValue($val, $e);
+                } catch (\OutOfRangeException $e) {
                     $this->throwInvalidValue($val, $e);
                 }
-                catch (\OutOfRangeException $e) {
-                    $this->throwInvalidValue($val, $e);
-                }
-            }
-            else {
+            } else {
                 $this->throwInvalidValue($val);
             }
         }

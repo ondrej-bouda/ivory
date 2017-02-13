@@ -46,7 +46,10 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
 
     public function testTypeQualifiedNames()
     {
-        $recip = SqlRelationRecipe::fromPattern('SELECT %pg_catalog.text, %pg_catalog.numeric', "Ivory's escaping", 3.14);
+        $recip = SqlRelationRecipe::fromPattern(
+            'SELECT %pg_catalog.text, %pg_catalog.numeric',
+            "Ivory's escaping", 3.14
+        );
         $sql = $recip->toSql($this->typeDict);
         $this->assertSame("SELECT 'Ivory''s escaping', 3.14", $sql);
     }
@@ -60,7 +63,11 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
 
     public function testArrayTypes()
     {
-        $recip = SqlRelationRecipe::fromPattern('SELECT %pg_catalog.text[], %integer[]', ["Ivory's escaping"], [1 => 4, 5, 2, 3]);
+        $recip = SqlRelationRecipe::fromPattern(
+            'SELECT %pg_catalog.text[], %integer[]',
+            ["Ivory's escaping"],
+            [1 => 4, 5, 2, 3]
+        );
         $this->assertSame(
             "SELECT '[0:0]={\"Ivory''s escaping\"}'::pg_catalog.text[], '{4,5,2,3}'::pg_catalog.int4[]",
             $recip->toSql($this->typeDict)
@@ -99,16 +106,14 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
         try {
             $recip->toSql($this->typeDict);
             $this->fail('%__ivory_test only matches "__ivory_test" schema, no other case variants');
-        }
-        catch (UndefinedTypeException $e) {
+        } catch (UndefinedTypeException $e) {
         }
 
         $recip = SqlRelationRecipe::fromPattern('SELECT %__Ivory_test.d', 42);
         try {
             $recip->toSql($this->typeDict);
             $this->fail('Even %__Ivory_test only matches "__ivory_test" schema - when unquoted, it gets lower-cased');
-        }
-        catch (UndefinedTypeException $e) {
+        } catch (UndefinedTypeException $e) {
         }
 
 
@@ -133,8 +138,7 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
         try {
             $recip->toSql($this->typeDict);
             $this->fail('Type "double precision" (name including the quotes) should have not been recognized as defined.');
-        }
-        catch (UndefinedTypeException $e) {
+        } catch (UndefinedTypeException $e) {
         }
     }
 

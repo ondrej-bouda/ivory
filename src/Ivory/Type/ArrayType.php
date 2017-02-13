@@ -59,7 +59,8 @@ class ArrayType implements ITotallyOrderedType, INamedType
 
         $strOffset = 0;
 
-        for (; isset($str[$strOffset]) && ctype_space($str[$strOffset]); $strOffset++);
+        for (; isset($str[$strOffset]) && ctype_space($str[$strOffset]); $strOffset++) {
+        }
 
         if ($str[$strOffset] == '[') { // explicit bounds specification
             $decorSepPos = strpos($str, '=');
@@ -69,11 +70,11 @@ class ArrayType implements ITotallyOrderedType, INamedType
             if ($decorSepPos === false || !$m) {
                 self::throwArrayParseException($str, 'Invalid array bounds decoration');
             }
-            for ($strOffset = $decorSepPos + 1; isset($str[$strOffset]) && ctype_space($str[$strOffset]); $strOffset++);
+            for ($strOffset = $decorSepPos + 1; isset($str[$strOffset]) && ctype_space($str[$strOffset]); $strOffset++) {
+            }
             $lowerBounds = $m[1];
             unset($m);
-        }
-        else {
+        } else {
             if (trim($str) == '{}') {
                 return [];
             }
@@ -82,11 +83,9 @@ class ArrayType implements ITotallyOrderedType, INamedType
             for ($i = $strOffset; $i < $len; $i++) {
                 if (ctype_space($str[$i])) {
                     continue;
-                }
-                elseif ($str[$i] == '{') {
+                } elseif ($str[$i] == '{') {
                     $dims++;
-                }
-                else {
+                } else {
                     break;
                 }
             }
@@ -128,7 +127,7 @@ class ArrayType implements ITotallyOrderedType, INamedType
                     case '{':
                         $dim++;
                         $keys[$dim] = $lowerBounds[$dim];
-                        $refs[$dim] = &$refs[$dim - 1][$keys[$dim-1]];
+                        $refs[$dim] = &$refs[$dim - 1][$keys[$dim - 1]];
                         $refs[$dim] = [];
                         break;
                     case '}':
@@ -146,14 +145,12 @@ class ArrayType implements ITotallyOrderedType, INamedType
                 $k = $keys[$dim];
                 if (strcasecmp($elem, 'NULL') == 0) {
                     $refs[$dim][$k] = null;
-                }
-                else {
+                } else {
                     $cont = ($elem[0] == '"' ? substr($elem, 1, -1) : $elem);
                     $unEsc = preg_replace('~\\\\(.)~', '$1', $cont);
                     $refs[$dim][$k] = $this->elemType->parseValue($unEsc);
                 }
-            }
-            catch (ParseException $e) {
+            } catch (ParseException $e) {
                 $this->throwParseException($str, 'Error parsing the element value', $strOffset, $e);
             }
             $strOffset += strlen($elem);
@@ -221,8 +218,7 @@ class ArrayType implements ITotallyOrderedType, INamedType
             $maxDim = $curDim;
             $b = ($arr ? [$keys[0], $keys[count($keys) - 1]] : [1, 0]);
             $bounds[$curDim] = $b;
-        }
-        else {
+        } else {
             $b = $bounds[$curDim];
             if ($keys[0] < $b[0] || $keys[count($keys) - 1] > $b[1]) {
                 $msg = "Some array subscripts do not match the bounds of the array: " . print_r($val, true);
@@ -239,15 +235,13 @@ class ArrayType implements ITotallyOrderedType, INamedType
         foreach ($arr as $v) {
             if ($first) {
                 $first = false;
-            }
-            else {
+            } else {
                 $out .= $this->delim;
             }
 
             if (is_array($v)) {
                 $out .= $this->serializeValueImpl($v, $bounds, $curDim + 1, $maxDim);
-            }
-            else {
+            } else {
                 if ($curDim != $maxDim) {
                     $msg = "Some array items do not match the dimensions of the array: " . print_r($val, true);
                     throw new \InvalidArgumentException($msg);
@@ -255,8 +249,7 @@ class ArrayType implements ITotallyOrderedType, INamedType
 
                 if ($v === null) {
                     $valOut = 'NULL';
-                }
-                else {
+                } else {
                     $valOut = $this->elemType->serializeValue($v);
                     /* Trim the single quotes and other decoration - the value will be used inside a string literal.
                        As an optimization, doubled single quotes (meaning the literal single quote) will be preserved
@@ -328,25 +321,20 @@ class ArrayType implements ITotallyOrderedType, INamedType
                 if ($bv !== null) {
                     return -1;
                 }
-            }
-            elseif ($bv === null) {
+            } elseif ($bv === null) {
                 return 1;
-            }
-            elseif (is_array($av)) {
+            } elseif (is_array($av)) {
                 if (is_array($bv)) {
                     $comp = $this->compareValuesImpl($av, $bv);
                     if ($comp) {
                         return $comp;
                     }
-                }
-                else {
+                } else {
                     return 1;
                 }
-            }
-            elseif (is_array($bv)) {
+            } elseif (is_array($bv)) {
                 return -1;
-            }
-            else {
+            } else {
                 /** @var ITotallyOrderedType $et */
                 $et = $this->elemType;
                 $comp = $et->compareValues($av, $bv);
@@ -369,22 +357,17 @@ class ArrayType implements ITotallyOrderedType, INamedType
             $bk = key($bFst);
             if ($ak === null && $bk === null) {
                 return 0;
-            }
-            elseif ($ak === null) {
+            } elseif ($ak === null) {
                 return -1;
-            }
-            elseif ($bk === null) {
+            } elseif ($bk === null) {
                 return 1;
-            }
-            elseif (!is_numeric($ak) || !is_numeric($bk)) {
+            } elseif (!is_numeric($ak) || !is_numeric($bk)) {
                 return 0;
-            }
-            else {
+            } else {
                 $d = $ak - $bk;
                 if ($d) {
                     return $d;
-                }
-                else {
+                } else {
                     $aFst = current($aFst);
                     $bFst = current($bFst);
                 }

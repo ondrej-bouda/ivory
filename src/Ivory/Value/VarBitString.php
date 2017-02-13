@@ -17,66 +17,63 @@ namespace Ivory\Value;
  */
 class VarBitString extends BitString
 {
-	/** @var int|null */
-	private $maxLength;
+    /** @var int|null */
+    private $maxLength;
 
-	/**
-	 * @param string $bits the bit string, i.e., a string of 1's and 0's
-	 * @param int|null $maxLength maximal length of the bit string in bits;
-	 *                            <tt>null</tt> for no limit;
-	 *                            if less than <tt>strlen($bits)</tt>, the bits get truncated on the right and a warning
-	 *                              is issued
-	 * @return VarBitString
-	 * @throws \InvalidArgumentException if <tt>$length</tt> is a non-positive number (PostgreSQL forbids it)
-	 */
-	public static function fromString($bits, $maxLength = null)
-	{
-		$bits = (string)$bits;
+    /**
+     * @param string $bits the bit string, i.e., a string of 1's and 0's
+     * @param int|null $maxLength maximal length of the bit string in bits;
+     *                            <tt>null</tt> for no limit;
+     *                            if less than <tt>strlen($bits)</tt>, the bits get truncated on the right and a warning
+     *                              is issued
+     * @return VarBitString
+     * @throws \InvalidArgumentException if <tt>$length</tt> is a non-positive number (PostgreSQL forbids it)
+     */
+    public static function fromString($bits, $maxLength = null)
+    {
+        $bits = (string)$bits;
 
-		if ($maxLength === null) {
-			return new VarBitString($bits, null);
-		}
-		elseif ($maxLength <= 0) {
-			throw new \InvalidArgumentException('maxLength is non-positive');
-		}
-		elseif ($maxLength < strlen($bits)) {
-			trigger_error("Bit string truncated to the length of $maxLength", E_USER_WARNING);
-			return new VarBitString(substr($bits, 0, $maxLength), $maxLength);
-		}
-		else {
-			return new VarBitString($bits, $maxLength);
-		}
-	}
+        if ($maxLength === null) {
+            return new VarBitString($bits, null);
+        } elseif ($maxLength <= 0) {
+            throw new \InvalidArgumentException('maxLength is non-positive');
+        } elseif ($maxLength < strlen($bits)) {
+            trigger_error("Bit string truncated to the length of $maxLength", E_USER_WARNING);
+            return new VarBitString(substr($bits, 0, $maxLength), $maxLength);
+        } else {
+            return new VarBitString($bits, $maxLength);
+        }
+    }
 
-	/**
-	 * @param string $bits
-	 * @param int|null $maxLength
-	 */
-	protected function __construct($bits, $maxLength)
-	{
-		parent::__construct($bits);
+    /**
+     * @param string $bits
+     * @param int|null $maxLength
+     */
+    protected function __construct($bits, $maxLength)
+    {
+        parent::__construct($bits);
 
-		if ($maxLength !== null && $maxLength < 0) { // NOTE: zero max. length permitted for substr() to calculate correctly
-			throw new \InvalidArgumentException('maxLength is negative');
-		}
-		$this->maxLength = $maxLength;
-	}
+        if ($maxLength !== null && $maxLength < 0) { // NOTE: zero max. length permitted for substr() to calculate correctly
+            throw new \InvalidArgumentException('maxLength is negative');
+        }
+        $this->maxLength = $maxLength;
+    }
 
-	public function equals($other)
-	{
-		$parRes = parent::equals($other);
-		if (!$parRes) {
-			return $parRes;
-		}
-		/** @var VarBitString $other */
-		return ($this->maxLength == $other->maxLength);
-	}
+    public function equals($other)
+    {
+        $parRes = parent::equals($other);
+        if (!$parRes) {
+            return $parRes;
+        }
+        /** @var VarBitString $other */
+        return ($this->maxLength == $other->maxLength);
+    }
 
-	/**
-	 * @return int|null maximal length this bit string might have carried, or <tt>null</tt> for unlimited length
-	 */
-	public function getMaxLength()
-	{
-		return $this->maxLength;
-	}
+    /**
+     * @return int|null maximal length this bit string might have carried, or <tt>null</tt> for unlimited length
+     */
+    public function getMaxLength()
+    {
+        return $this->maxLength;
+    }
 }

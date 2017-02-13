@@ -21,8 +21,7 @@ class UuidType extends BaseType implements ITotallyOrderedType
     {
         if ($str === null) {
             return null;
-        }
-        else {
+        } else {
             return $str;
         }
     }

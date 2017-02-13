@@ -36,22 +36,17 @@ class TimeTzType extends BaseType implements ITotallyOrderedType
         if (!$val instanceof TimeTz) {
             if ($val instanceof \DateTimeInterface) {
                 $val = TimeTz::fromDateTime($val);
-            }
-            elseif (is_numeric($val)) {
+            } elseif (is_numeric($val)) {
                 $val = TimeTz::fromUnixTimestamp($val);
-            }
-            elseif (is_string($val)) {
+            } elseif (is_string($val)) {
                 try {
                     $val = TimeTz::fromString($val);
-                }
-                catch (\InvalidArgumentException $e) {
+                } catch (\InvalidArgumentException $e) {
+                    $this->throwInvalidValue($val, $e);
+                } catch (\OutOfRangeException $e) {
                     $this->throwInvalidValue($val, $e);
                 }
-                catch (\OutOfRangeException $e) {
-                    $this->throwInvalidValue($val, $e);
-                }
-            }
-            else {
+            } else {
                 $this->throwInvalidValue($val);
             }
         }

@@ -32,14 +32,12 @@ class ProjectedRelation extends ProjectedRelationBase
                 }
                 $columns[] = new Column($this, count($this->projectionList), $colName, $srcCols[$value]->getType());
                 $this->projectionList[] = (int)$value;
-            }
-            elseif (is_string($value)) { // column name
+            } elseif (is_string($value)) { // column name
                 if ($value[0] == '/') { // PCRE macro
                     $pcre = $value;
                     $matchAll = true;
                     $repl = ($nameSpecified ? $key : null);
-                }
-                else {
+                } else {
                     $pcre = self::simpleMacroPatternToPcre($value, $starCnt);
                     $matchAll = ($starCnt > 0);
                     $repl = ($nameSpecified ? self::simpleMacroReplacementToPcre($key) : null);
@@ -56,8 +54,7 @@ class ProjectedRelation extends ProjectedRelationBase
                     if (!$matchAll) {
                         $matched = array_slice($matched, 0, 1, true);
                     }
-                }
-                else {
+                } else {
                     $matched = [];
                     foreach ($srcCols as $i => $c) {
                         if ($c->getName() !== null) {
@@ -78,12 +75,10 @@ class ProjectedRelation extends ProjectedRelationBase
                     $columns[] = new Column($this, count($this->projectionList), $cn, $srcCols[$i]->getType());
                     $this->projectionList[] = $i;
                 }
-            }
-            elseif ($value instanceof ITupleEvaluator || $value instanceof \Closure) {
+            } elseif ($value instanceof ITupleEvaluator || $value instanceof \Closure) {
                 $columns[] = new Column($this, $value, $colName, null);
                 $this->projectionList[] = $value;
-            }
-            else {
+            } else {
                 throw new \InvalidArgumentException("Invalid specification of the projection item '$key'");
             }
         }
@@ -94,19 +89,16 @@ class ProjectedRelation extends ProjectedRelationBase
     public function tuple($offset = 0)
     {
         $srcTuple = parent::tuple($offset);
-        
+
         $data = [];
         foreach ($this->projectionList as $i => $spec) {
             if (is_int($spec)) {
                 $data[$i] = $srcTuple[$spec];
-            }
-            elseif ($spec instanceof ITupleEvaluator) {
+            } elseif ($spec instanceof ITupleEvaluator) {
                 $data[$i] = $spec->evaluate($srcTuple);
-            }
-            elseif ($spec instanceof \Closure) {
+            } elseif ($spec instanceof \Closure) {
                 $data[$i] = call_user_func($spec, $srcTuple);
-            }
-            else {
+            } else {
                 throw new InternalException("The type of projection list item $i is not supported");
             }
         }

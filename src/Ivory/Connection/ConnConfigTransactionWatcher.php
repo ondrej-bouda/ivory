@@ -66,7 +66,6 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
     }
 
 
-
     //region ITransactionControlObserver
 
     public function handleTransactionStart()
@@ -94,8 +93,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
     {
         if (isset($properties[self::RESET_ALL])) {
             $this->connConfig->notifyPropertiesReset();
-        }
-        else {
+        } else {
             foreach ($properties as $propName) {
                 $this->connConfig->notifyPropertyChange($propName);
             }

@@ -15,7 +15,7 @@ abstract class VolatilePatternTypeBase extends PatternTypeBase
         $this->conn = $connection;
     }
 
-    protected function getConnection() : IConnection
+    protected function getConnection(): IConnection
     {
         return $this->conn;
     }

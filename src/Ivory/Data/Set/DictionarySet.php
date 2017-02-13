@@ -16,8 +16,7 @@ class DictionarySet implements ISet
     {
         if (is_int($value) || is_string($value)) {
             return $value;
-        }
-        else {
+        } else {
             return serialize($value);
         }
     }

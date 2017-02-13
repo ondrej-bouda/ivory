@@ -40,112 +40,105 @@ use Ivory\Value\Date;
  */
 class DateType extends BaseType implements IDiscreteType
 {
-	use TotallyOrderedByPhpOperators;
+    use TotallyOrderedByPhpOperators;
 
 
-	private $dateStyleRetriever;
+    private $dateStyleRetriever;
 
-	public function __construct($schemaName, $name, IConnection $connection)
-	{
-		parent::__construct($schemaName, $name, $connection);
+    public function __construct($schemaName, $name, IConnection $connection)
+    {
+        parent::__construct($schemaName, $name, $connection);
 
-		$this->dateStyleRetriever = new ConnConfigValueRetriever(
-			$connection->getConfig(), ConfigParam::DATE_STYLE, [DateStyle::class, 'fromString']
-		);
-	}
+        $this->dateStyleRetriever = new ConnConfigValueRetriever(
+            $connection->getConfig(), ConfigParam::DATE_STYLE, [DateStyle::class, 'fromString']
+        );
+    }
 
-	public function parseValue($str)
-	{
-		if ($str === null) {
-			return null;
-		}
-		elseif ($str == 'infinity') {
-			return Date::infinity();
-		}
-		elseif ($str == '-infinity') {
-			return Date::minusInfinity();
-		}
+    public function parseValue($str)
+    {
+        if ($str === null) {
+            return null;
+        } elseif ($str == 'infinity') {
+            return Date::infinity();
+        } elseif ($str == '-infinity') {
+            return Date::minusInfinity();
+        }
 
-		$matched = preg_match('~^(\d+)([-/.])(\d+)(?2)(\d+)(\s+BC)?$~', $str, $m);
-		if (PHP_MAJOR_VERSION >= 7) {
-			assert($matched, new \InvalidArgumentException('$str'));
-		}
-		else {
-			assert($matched);
-		}
+        $matched = preg_match('~^(\d+)([-/.])(\d+)(?2)(\d+)(\s+BC)?$~', $str, $m);
+        if (PHP_MAJOR_VERSION >= 7) {
+            assert($matched, new \InvalidArgumentException('$str'));
+        } else {
+            assert($matched);
+        }
 
-		$p = [];
-		list(, $p[0], $sep, $p[1], $p[2]) = $m;
-		$yearSgn = (isset($m[5]) ? -1 : 1);
+        $p = [];
+        list(, $p[0], $sep, $p[1], $p[2]) = $m;
+        $yearSgn = (isset($m[5]) ? -1 : 1);
 
-		if ($sep == '.') {
-			list($day, $mon, $year) = $p; // German style, no need to look up the settings
-		}
-		else {
-			/** @var DateStyle $dateStyle */
-			$dateStyle = $this->dateStyleRetriever->getValue();
-			$partsOrder = $dateStyle->getOrder();
-			switch ($partsOrder) {
-				case DateStyle::ORDER_DMY:
-					list($day, $mon, $year) = $p;
-					break;
+        if ($sep == '.') {
+            list($day, $mon, $year) = $p; // German style, no need to look up the settings
+        } else {
+            /** @var DateStyle $dateStyle */
+            $dateStyle = $this->dateStyleRetriever->getValue();
+            $partsOrder = $dateStyle->getOrder();
+            switch ($partsOrder) {
+                case DateStyle::ORDER_DMY:
+                    list($day, $mon, $year) = $p;
+                    break;
 
-				case DateStyle::ORDER_MDY:
-					list($mon, $day, $year) = $p;
-					break;
+                case DateStyle::ORDER_MDY:
+                    list($mon, $day, $year) = $p;
+                    break;
 
-				default:
-					trigger_error(
-						"Unexpected year/month/day order '{$partsOrder}', assuming year-month-day",
-						E_USER_WARNING
-					);
-				case DateStyle::ORDER_YMD:
-					list($year, $mon, $day) = $p;
-			}
-		}
+                default:
+                    trigger_error(
+                        "Unexpected year/month/day order '{$partsOrder}', assuming year-month-day",
+                        E_USER_WARNING
+                    );
+                case DateStyle::ORDER_YMD:
+                    list($year, $mon, $day) = $p;
+            }
+        }
 
-		return Date::fromPartsStrict($yearSgn * $year, $mon, $day);
-	}
+        return Date::fromPartsStrict($yearSgn * $year, $mon, $day);
+    }
 
-	public function serializeValue($val)
-	{
-		if ($val === null) {
-			return 'NULL';
-		}
+    public function serializeValue($val)
+    {
+        if ($val === null) {
+            return 'NULL';
+        }
 
-		if (!$val instanceof Date) {
-			$val = (is_numeric($val) ? Date::fromUnixTimestamp($val) : Date::fromISOString($val));
-		}
+        if (!$val instanceof Date) {
+            $val = (is_numeric($val) ? Date::fromUnixTimestamp($val) : Date::fromISOString($val));
+        }
 
-		if ($val->isFinite()) {
-			return sprintf(
-				"'%04d-%02d-%02d%s'",
-				abs($val->getYear()),
-				$val->getMonth(),
-				$val->getDay(),
-				($val->getYear() < 0 ? ' BC' : '')
-			);
-		}
-		elseif ($val === Date::infinity()) {
-			return "'infinity'";
-		}
-		elseif ($val === Date::minusInfinity()) {
-			return "'-infinity'";
-		}
-		else {
-			throw new \LogicException('A non-finite date not recognized');
-		}
-	}
+        if ($val->isFinite()) {
+            return sprintf(
+                "'%04d-%02d-%02d%s'",
+                abs($val->getYear()),
+                $val->getMonth(),
+                $val->getDay(),
+                ($val->getYear() < 0 ? ' BC' : '')
+            );
+        } elseif ($val === Date::infinity()) {
+            return "'infinity'";
+        } elseif ($val === Date::minusInfinity()) {
+            return "'-infinity'";
+        } else {
+            throw new \LogicException('A non-finite date not recognized');
+        }
+    }
 
-	public function step($delta, $value)
-	{
-		if ($value === null) {
-			return null;
-		}
-		if (!$value instanceof Date) {
-			throw new \InvalidArgumentException('$value');
-		}
+    public function step($delta, $value)
+    {
+        if ($value === null) {
+            return null;
+        }
+        if (!$value instanceof Date) {
+            throw new \InvalidArgumentException('$value');
+        }
 
-		return $value->addDay($delta);
-	}
+        return $value->addDay($delta);
+    }
 }

@@ -39,8 +39,7 @@ class HstoreTypeTest extends IvoryTestCase
         try {
             $this->hstoreType->serializeValue('wheee');
             $this->fail('Exception was expected due to invalid value to be serialized to hstore.');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 
@@ -64,8 +63,7 @@ class HstoreTypeTest extends IvoryTestCase
         try {
             $this->hstoreType->parseValue('wheee');
             $this->fail('Exception was expected due to invalid hstore value.');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 

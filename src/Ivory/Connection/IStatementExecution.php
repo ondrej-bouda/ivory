@@ -75,12 +75,12 @@ interface IStatementExecution
      * with parameter values.
      *
      * @param string|SqlPattern|IRelationRecipe $sqlFragmentPatternOrRecipe
-     * @param array ...$fragmentsAndPositionalParamsAndNamedParamsMap
+     * @param array ...$fragmentsAndParams
      * @return IQueryResult
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      */
-    function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): IQueryResult;
+    function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): IQueryResult;
 
     /**
      * Sends a command to the database using an SQL pattern, waits for its execution and returns the command result.
@@ -95,12 +95,12 @@ interface IStatementExecution
      * is returned and a warning is issued.
      *
      * @param string|SqlPattern|ICommandRecipe $sqlFragmentPatternOrRecipe
-     * @param array ...$fragmentsAndPositionalParamsAndNamedParamsMap
+     * @param array ...$fragmentsAndParams
      * @return ICommandResult
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      */
-    function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndPositionalParamsAndNamedParamsMap): ICommandResult;
+    function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ICommandResult;
 
 //    function dataSource(); // TODO
 

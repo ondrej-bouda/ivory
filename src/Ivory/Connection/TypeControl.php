@@ -70,14 +70,11 @@ class TypeControl implements ITypeControl, ITypeProvider
 
             if ($oid !== null) {
                 $type = $dict->requireTypeByOid($oid);
-            }
-            elseif ($typeName !== null) {
+            } elseif ($typeName !== null) {
                 $type = $dict->requireTypeByName($typeName, $schemaName);
-            }
-            elseif ($value !== null) {
+            } elseif ($value !== null) {
                 $type = $dict->requireTypeByValue($value);
-            }
-            else {
+            } else {
                 return null;
             }
 

@@ -57,8 +57,7 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
                         'line' => $errLine,
                         'context' => $errContext,
                     ];
-                }
-                else {
+                } else {
                     call_user_func($this->origErrHandler, $errNo, $errStr, $errFile, $errLine, $errContext);
                 }
             },
@@ -118,7 +117,10 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
     protected function assertErrorsTriggered($count, $expectedErrMsgRegex, $expectedErrType = E_ALL, $message = '')
     {
         for ($i = 1; $i <= $count; $i++) {
-            $this->assertErrorTriggered($expectedErrMsgRegex, $expectedErrType, "$message (error $i of $count expected)");
+            $this->assertErrorTriggered(
+                $expectedErrMsgRegex, $expectedErrType,
+                "$message (error $i of $count expected)"
+            );
         }
     }
 
@@ -149,8 +151,7 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
         for ($i = 1; $i <= $mx; $i <<= 1) {
             if ($errorTypeBitmask & $i) {
                 $contained[] = $i;
-            }
-            else {
+            } else {
                 $absent[] = $i;
             }
         }
@@ -161,8 +162,7 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
                 $absStrs[] = '~' . self::errorTypeToString($t);
             }
             return implode(' & ', $absStrs);
-        }
-        else {
+        } else {
             $contStrs = [];
             foreach ($contained as $t) {
                 $contStrs[] = self::errorTypeToString($t);
@@ -173,7 +173,7 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
 
     private static function errorTypeToString($errorType)
     {
-        return (isset(self::$errorTypes[$errorType]) ? self::$errorTypes[$errorType] : $errorType); // PHP 7: simplify using ??
+        return (self::$errorTypes[$errorType] ?? $errorType);
     }
 
     /**
@@ -273,7 +273,7 @@ CREATE TABLE album_track (
   PRIMARY KEY (album_id, disc_no, track_no)
 );
 SQL
-);
+        );
     }
 
     protected function getDataSet()
@@ -330,15 +330,15 @@ SQL
                 ['album_id' => 2, 'disc_no' => 1, 'track_no' => 9, 'name' => 'Of Wolf And Man'],
                 ['album_id' => 2, 'disc_no' => 1, 'track_no' => 10, 'name' => 'The God That Failed'],
                 ['album_id' => 2, 'disc_no' => 1, 'track_no' => 11, 'name' => 'My Friend of Misery'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 1,  'name' => 'The Struggle Within'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 2,  'name' => 'The Ecstasy Of Gold'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 3,  'name' => 'The Call Of The Ktulu'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 4,  'name' => 'Master Of Puppets'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 5,  'name' => 'Of Wolf And Man'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 6,  'name' => 'The Thing That Should Not Be'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 7,  'name' => 'Fuel'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 8,  'name' => 'The Memory Remains'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 9,  'name' => 'No Leave Clover'],
+                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 1, 'name' => 'The Struggle Within'],
+                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 2, 'name' => 'The Ecstasy Of Gold'],
+                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 3, 'name' => 'The Call Of The Ktulu'],
+                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 4, 'name' => 'Master Of Puppets'],
+                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 5, 'name' => 'Of Wolf And Man'],
+                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 6, 'name' => 'The Thing That Should Not Be'],
+                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 7, 'name' => 'Fuel'],
+                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 8, 'name' => 'The Memory Remains'],
+                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 9, 'name' => 'No Leave Clover'],
                 ['album_id' => 3, 'disc_no' => 1, 'track_no' => 10, 'name' => 'Hero Of The Day'],
                 ['album_id' => 3, 'disc_no' => 1, 'track_no' => 11, 'name' => 'Devil\'s Dance'],
                 ['album_id' => 3, 'disc_no' => 2, 'track_no' => 1, 'name' => 'Nothing Else Matters'],

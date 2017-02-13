@@ -46,8 +46,7 @@ class ConnConfigValueRetriever implements IConfigObserver
         if ($this->observingConfig) {
             $this->cachedValue = $value;
             $this->isCached = true;
-        }
-        else {
+        } else {
             if (!$this->warnedOnPerformancePenalty) {
                 trigger_error(
                     sprintf('Performance penalty: must retrieve the "%s" config value for every single item. Use an %s',

@@ -22,8 +22,7 @@ class MacAddrType extends BaseType
 
         try {
             return MacAddr::fromString($str);
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->throwInvalidValue($str, $e);
         }
     }

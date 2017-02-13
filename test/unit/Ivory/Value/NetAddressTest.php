@@ -40,43 +40,37 @@ class NetAddressTest extends \PHPUnit_Framework_TestCase
         try {
             NetAddress::fromString('1.2.3.4/24', 16);
             $this->fail('\PHPUnit_Framework_Error_Warning expected');
-        }
-        catch (\PHPUnit_Framework_Error_Warning $e) {
+        } catch (\PHPUnit_Framework_Error_Warning $e) {
         }
 
         try {
             NetAddress::fromString(7);
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             NetAddress::fromString('1.2.3.4/8/16');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             NetAddress::fromString('1.2.3.4/33');
             $this->fail('\OutOfBoundsException expected');
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
 
         try {
             NetAddress::fromString('1.2.3.4', -1);
             $this->fail('\OutOfBoundsException expected');
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
 
         try {
             NetAddress::fromString('01.2.3.4');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         $a = NetAddress::fromString('2001:db8::1', 5);
@@ -112,29 +106,25 @@ class NetAddressTest extends \PHPUnit_Framework_TestCase
         try {
             NetAddress::fromString('ABCD::234::');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             NetAddress::fromString('a::', '255.255.255.255');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             NetAddress::fromString('ABCD:234::/129');
             $this->fail('\OutOfBoundsException expected');
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
 
         try {
             NetAddress::fromString(':::');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 
@@ -148,36 +138,31 @@ class NetAddressTest extends \PHPUnit_Framework_TestCase
         try {
             NetAddress::fromCidrString('1.2.3.4');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             NetAddress::fromCidrString('1.2.3.4/33');
             $this->fail('\OutOfBoundsException expected');
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
 
         try {
             NetAddress::fromCidrString(7);
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             NetAddress::fromCidrString('1.2.3.4/8/16');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             NetAddress::fromCidrString('01.2.3.4/24');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         $a = NetAddress::fromCidrString('2001:db8::1/80');
@@ -188,8 +173,7 @@ class NetAddressTest extends \PHPUnit_Framework_TestCase
         try {
             NetAddress::fromCidrString('2001:db8::1');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         $a = NetAddress::fromCidrString('2001:db8::127.0.0.1/120');
@@ -210,22 +194,19 @@ class NetAddressTest extends \PHPUnit_Framework_TestCase
         try {
             NetAddress::fromCidrString('ABCD::234::/123');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             NetAddress::fromCidrString('ABCD:234::/129');
             $this->fail('\OutOfBoundsException expected');
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
 
         try {
             NetAddress::fromCidrString(':::/123');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 
@@ -249,43 +230,37 @@ class NetAddressTest extends \PHPUnit_Framework_TestCase
         try {
             NetAddress::fromByteString(chr(0) . chr(255) . chr(255) . chr(255), '255.112.0.0');
             $this->fail('\InvalidArgumentException expected due to an incorrect netmask');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             NetAddress::fromByteString('');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             NetAddress::fromByteString(127);
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             NetAddress::fromByteString(chr(14));
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
             NetAddress::fromByteString(chr(1) . chr(2) . chr(3) . chr(4), 33);
             $this->fail('\OutOfBoundsException expected');
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
 
         try {
             NetAddress::fromByteString(chr(1) . chr(2) . chr(3) . chr(4) . chr(5));
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
@@ -294,8 +269,7 @@ class NetAddressTest extends \PHPUnit_Framework_TestCase
                 chr(9) . chr(10) . chr(11) . chr(12) . chr(13) . chr(14) . chr(15)
             );
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         $a = NetAddress::fromByteString(
@@ -330,8 +304,7 @@ class NetAddressTest extends \PHPUnit_Framework_TestCase
         try {
             NetAddress::fromByteString(str_repeat(chr(0), 16), '255.255.255.255');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
 
         try {
@@ -341,8 +314,7 @@ class NetAddressTest extends \PHPUnit_Framework_TestCase
                 chr(17)
             );
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 
@@ -378,8 +350,7 @@ class NetAddressTest extends \PHPUnit_Framework_TestCase
             $this->assertSame(4, $a->getIpVersion());
             $this->assertSame('255.255.255.255', $a->getAddressString());
             $this->assertSame(32, $a->getNetmaskLength());
-        }
-        else {
+        } else {
             $a = NetAddress::fromInt(3221234342);
             $this->assertSame(4, $a->getIpVersion());
             $this->assertSame('192.0.34.166', $a->getAddressString());
@@ -394,8 +365,7 @@ class NetAddressTest extends \PHPUnit_Framework_TestCase
         try {
             NetAddress::fromInt('1.2.3.4');
             $this->fail('\InvalidArgumentException expected');
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
     }
 
@@ -551,8 +521,7 @@ class NetAddressTest extends \PHPUnit_Framework_TestCase
         if (System::is32Bit()) {
             $this->assertSame(-1073732954, NetAddress::fromString('192.0.34.166')->toInt());
             $this->assertSame(-1, NetAddress::fromString('255.255.255.255')->toInt());
-        }
-        else {
+        } else {
             $this->assertSame(3221234342, NetAddress::fromString('192.0.34.166')->toInt());
             $this->assertSame(4294967295, NetAddress::fromString('255.255.255.255')->toInt());
         }

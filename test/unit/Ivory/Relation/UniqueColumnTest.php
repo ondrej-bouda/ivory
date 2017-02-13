@@ -63,15 +63,13 @@ class UniqueColumnTest extends \Ivory\IvoryTestCase
         try {
             $parityUniqued->value(2);
             $this->fail();
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
 
         try {
             $parityUniqued->value(-3);
             $this->fail();
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
     }
 }

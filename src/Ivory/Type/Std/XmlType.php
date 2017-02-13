@@ -15,31 +15,29 @@ use Ivory\Value\XmlDocument;
  */
 class XmlType extends \Ivory\Type\BaseType
 {
-	public function parseValue($str)
-	{
-		if ($str === null) {
-			return null;
-		}
-		else {
-			return XmlContent::fromValue($str);
-		}
-	}
+    public function parseValue($str)
+    {
+        if ($str === null) {
+            return null;
+        } else {
+            return XmlContent::fromValue($str);
+        }
+    }
 
-	public function serializeValue($val)
-	{
-		if ($val === null) {
-			return 'NULL';
-		}
+    public function serializeValue($val)
+    {
+        if ($val === null) {
+            return 'NULL';
+        }
 
-		try {
-			$xml = XmlContent::fromValue($val);
-			return sprintf("XMLPARSE(%s '%s')",
-				($xml instanceof XmlDocument ? 'DOCUMENT' : 'CONTENT'),
-				strtr($xml->toString(), ["'" => "''"])
-			);
-		}
-		catch (\InvalidArgumentException $e) {
-			$this->throwInvalidValue($val);
-		}
-	}
+        try {
+            $xml = XmlContent::fromValue($val);
+            return sprintf("XMLPARSE(%s '%s')",
+                ($xml instanceof XmlDocument ? 'DOCUMENT' : 'CONTENT'),
+                strtr($xml->toString(), ["'" => "''"])
+            );
+        } catch (\InvalidArgumentException $e) {
+            $this->throwInvalidValue($val);
+        }
+    }
 }

@@ -27,7 +27,7 @@ trait SqlPatternRecipeMacros
      * @param string $sql SQL string
      * @return static
      */
-    public static function fromSql(string $sql) : self
+    public static function fromSql(string $sql): self
     {
         $sqlPattern = new SqlPattern($sql, [], []);
         return new static($sqlPattern, []);
@@ -58,7 +58,7 @@ trait SqlPatternRecipeMacros
      * @throws \InvalidArgumentException when the number of provided positional parameters differs from the number of
      *                                     positional parameters required by the pattern
      */
-    public static function fromPattern($sqlPattern, ...$positionalParameters) : self
+    public static function fromPattern($sqlPattern, ...$positionalParameters): self
     {
         if (!$sqlPattern instanceof SqlPattern) {
             $parser = \Ivory\Ivory::getSqlPatternParser();
@@ -117,7 +117,7 @@ trait SqlPatternRecipeMacros
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      */
-    public static function fromFragments($fragment, ...$fragmentsAndPositionalParams) : self
+    public static function fromFragments($fragment, ...$fragmentsAndPositionalParams): self
     {
         $overallSqlTorso = '';
         $overallPosPlaceholders = [];
@@ -135,14 +135,14 @@ trait SqlPatternRecipeMacros
                 if (is_string($curFragment)) {
                     $parser = \Ivory\Ivory::getSqlPatternParser();
                     $curFragment = $parser->parse($curFragment);
-                }
-                elseif ((is_array($curFragment) || $curFragment instanceof \Traversable) && // PHP 7.1: is_iterable()
-                    $argsProcessed > 0 && !array_key_exists($argsProcessed, $fragmentsAndPositionalParams))
-                {
+                } elseif (
+                    (is_array($curFragment) || $curFragment instanceof \Traversable) && // PHP 7.1: is_iterable()
+                    $argsProcessed > 0 &&
+                    !array_key_exists($argsProcessed, $fragmentsAndPositionalParams)
+                ) {
                     $namedParamValues = $curFragment;
                     break;
-                }
-                else {
+                } else {
                     $ord = StringUtils::englishOrd($curFragmentNum);
                     throw new \InvalidArgumentException("Invalid type of $ord fragment. Isn't it a misplaced parameter value?");
                 }
@@ -188,8 +188,7 @@ trait SqlPatternRecipeMacros
             $posParams = array_slice($fragmentsAndPositionalParams, $argsProcessed, $plcHdrCnt);
             if (count($posParams) == $plcHdrCnt) {
                 $overallPosParams = array_merge($overallPosParams, $posParams);
-            }
-            else {
+            } else {
                 $ord = StringUtils::englishOrd($curFragmentNum);
                 throw new \InvalidArgumentException("Not enough positional parameters for the $ord fragment");
             }
@@ -219,8 +218,7 @@ trait SqlPatternRecipeMacros
     {
         if (isset($this->unsatisfiedParams[$nameOrPosition])) {
             unset($this->unsatisfiedParams[$nameOrPosition]);
-        }
-        elseif (!array_key_exists($nameOrPosition, $this->params)) {
+        } elseif (!array_key_exists($nameOrPosition, $this->params)) {
             throw new \InvalidArgumentException("The SQL pattern does not have parameter '$nameOrPosition'");
         }
 
@@ -236,12 +234,12 @@ trait SqlPatternRecipeMacros
         return $this;
     }
 
-    public function getSqlPattern() : SqlPattern
+    public function getSqlPattern(): SqlPattern
     {
         return $this->sqlPattern;
     }
 
-    public function getParams() : array
+    public function getParams(): array
     {
         return $this->params;
     }
@@ -252,14 +250,13 @@ trait SqlPatternRecipeMacros
      * @throws InvalidStateException when values for one or more named parameters has not been set
      * @throws UndefinedTypeException when some of the types used in the pattern are not defined
      */
-    public function toSql(ITypeDictionary $typeDictionary) : string
+    public function toSql(ITypeDictionary $typeDictionary): string
     {
         if ($this->unsatisfiedParams) {
             $names = array_keys($this->unsatisfiedParams);
             if (count($names) == 1) {
                 $msg = sprintf('Value for parameter "%s" has not been set.', $names[0]);
-            }
-            else {
+            } else {
                 $msg = sprintf(
                     'Values for parameters %s and "%s" have not been set.',
                     array_map(function ($s) { return "\"$s\""; }, array_slice($names, 0, -1))
@@ -289,14 +286,12 @@ trait SqlPatternRecipeMacros
                     if (!$placeholder->isSchemaNameQuoted()) {
                         $schemaName = mb_strtolower($schemaName); // OPT: SqlPatternPlaceholder might also store the lower-case name, which might be cached
                     }
-                }
-                elseif ($placeholder->isTypeNameQuoted()) {
+                } elseif ($placeholder->isTypeNameQuoted()) {
                     $schemaName = false;
                 }
 
                 $converter = $typeDictionary->requireTypeByName($typeName, $schemaName);
-            }
-            else {
+            } else {
                 $converter = $typeDictionary->requireTypeByValue($value);
             }
             $serializedValue = $converter->serializeValue($value);

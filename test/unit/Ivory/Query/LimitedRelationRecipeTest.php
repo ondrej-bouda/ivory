@@ -31,8 +31,7 @@ class LimitedRelationRecipeTest extends \Ivory\IvoryTestCase
         try {
             $rel->tuple(1);
             $this->fail();
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
 
         $i = 0;
@@ -61,8 +60,7 @@ class LimitedRelationRecipeTest extends \Ivory\IvoryTestCase
         try {
             $rel->tuple(3);
             $this->fail();
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
 
         $i = 0;
@@ -91,8 +89,7 @@ class LimitedRelationRecipeTest extends \Ivory\IvoryTestCase
         try {
             $rel->tuple(2);
             $this->fail();
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
 
         $i = 0;
@@ -120,8 +117,7 @@ class LimitedRelationRecipeTest extends \Ivory\IvoryTestCase
         try {
             $rel->tuple(1);
             $this->fail();
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
 
         $i = 0;
@@ -151,8 +147,7 @@ class LimitedRelationRecipeTest extends \Ivory\IvoryTestCase
         try {
             $rel->tuple(3);
             $this->fail();
-        }
-        catch (\OutOfBoundsException $e) {
+        } catch (\OutOfBoundsException $e) {
         }
 
         $i = 0;

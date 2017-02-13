@@ -49,11 +49,9 @@ class Path
         foreach ($points as $i => $point) {
             if ($point instanceof Point) {
                 $normalized[] = $point;
-            }
-            elseif (is_array($point)) {
+            } elseif (is_array($point)) {
                 $normalized[] = Point::fromCoords($point[0], $point[1]);
-            }
-            else {
+            } else {
                 throw new \InvalidArgumentException("points[$i]");
             }
         }

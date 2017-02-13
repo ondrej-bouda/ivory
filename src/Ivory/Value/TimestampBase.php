@@ -70,8 +70,7 @@ abstract class TimestampBase extends DateBase
     {
         if ($float >= 10) {
             return (string)$float;
-        }
-        else {
+        } else {
             return '0' . (float)$float;
         }
     }
@@ -88,7 +87,7 @@ abstract class TimestampBase extends DateBase
             )
         );
     }
-    
+
     protected static function assertRanges($year, $month, $day, $hour, $minute, $second)
     {
         if ($year == 0) {
@@ -138,11 +137,9 @@ abstract class TimestampBase extends DateBase
     {
         if ($this->inf) {
             return null;
-        }
-        elseif ($this->dt->format('u')) {
+        } elseif ($this->dt->format('u')) {
             return (float)$this->dt->format('s.u');
-        }
-        else {
+        } else {
             return (int)$this->dt->format('s');
         }
     }
@@ -212,6 +209,4 @@ abstract class TimestampBase extends DateBase
     {
         return $this->addPartsImpl(0, 0, 0, 0, 0, $seconds);
     }
-
-
 }

@@ -10,8 +10,7 @@ trait ComparableWithPhpOperators
     {
         if ($object === null) {
             return null;
-        }
-        else {
+        } else {
             return ($this == $object);
         }
     }

@@ -121,7 +121,9 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                         $subtype = $dict->requireTypeByOid($row['parenttype']);
                         if (!$subtype instanceof ITotallyOrderedType) {
                             if ($subtype instanceof UndefinedType) {
-                                $type = new UndefinedType($schemaName, $typeName, $this->connection->getName(), $this->connection);
+                                $type = new UndefinedType(
+                                    $schemaName, $typeName, $this->connection->getName(), $this->connection
+                                );
                                 break;
                             }
 
@@ -141,8 +143,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                                     "range. That might lead to unexpected results, though.";
                                 trigger_error($msg, E_USER_WARNING);
                             }
-                        }
-                        else {
+                        } else {
                             $canonFunc = null;
                         }
                         $type = $this->createRangeType($schemaName, $typeName, $subtype, $canonFunc);
@@ -222,8 +223,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
         $type = $typeProvider->provideType($schemaName, $typeName);
         if ($type !== null) {
             return $type;
-        }
-        else {
+        } else {
             return new UndefinedType($schemaName, $typeName, $this->connection->getName(), $this->connection);
         }
     }
@@ -267,8 +267,12 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      * @param IRangeCanonicalFunc $canonicalFunc the range canonical function
      * @return IType
      */
-    protected function createRangeType($schemaName, $typeName, ITotallyOrderedType $subtype, IRangeCanonicalFunc $canonicalFunc = null)
-    {
+    protected function createRangeType(
+        $schemaName,
+        $typeName,
+        ITotallyOrderedType $subtype,
+        IRangeCanonicalFunc $canonicalFunc = null
+    ) {
         return new RangeType($schemaName, $typeName, $subtype, $canonicalFunc);
     }
 

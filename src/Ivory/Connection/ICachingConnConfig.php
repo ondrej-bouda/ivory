@@ -29,35 +29,35 @@ namespace Ivory\Connection;
  */
 interface ICachingConnConfig extends IConnConfig
 {
-	/**
-	 * Invalidates the cache of configuration values. Next time a configuration option is read, its fresh value is
-	 * queried from the database.
-	 *
-	 * @param string|string[] one or more names of parameters the cached values of which to invalidate;
-	 *                        <tt>null</tt> invalidates everything
-	 */
-	function invalidateCache($paramName = null);
+    /**
+     * Invalidates the cache of configuration values. Next time a configuration option is read, its fresh value is
+     * queried from the database.
+     *
+     * @param string|string[] one or more names of parameters the cached values of which to invalidate;
+     *                        <tt>null</tt> invalidates everything
+     */
+    function invalidateCache($paramName = null);
 
-	/**
-	 * Disables caching of values of a given configuration parameter, or of any configuration parameter.
-	 *
-	 * This is useful for parameters changed indirectly, e.g., using a custom SQL query or within a stored function.
-	 *
-	 * Use {@link enableCaching()} to enable the caching again.
-	 *
-	 * @param string|string[] $paramName one or more names of parameters to disabled caching values of;
-	 *                                   <tt>null</tt> disables the caching altogether
-	 */
-	function disableCaching($paramName = null);
+    /**
+     * Disables caching of values of a given configuration parameter, or of any configuration parameter.
+     *
+     * This is useful for parameters changed indirectly, e.g., using a custom SQL query or within a stored function.
+     *
+     * Use {@link enableCaching()} to enable the caching again.
+     *
+     * @param string|string[] $paramName one or more names of parameters to disabled caching values of;
+     *                                   <tt>null</tt> disables the caching altogether
+     */
+    function disableCaching($paramName = null);
 
-	/**
-	 * Enables caching of configuration parameter values again, after it has been disabled by {@link disableCaching()}.
-	 *
-	 * Note that, if caching was disabled altogether using {@link disableCaching()}, this method will only turn caching
-	 * on for the requested parameters. Others will remain non-cached. To turn caching generally on, use `null` as the
-	 * argument (which is the default).
-	 *
-	 * @param string|string[] $paramName
-	 */
-	function enableCaching($paramName = null);
+    /**
+     * Enables caching of configuration parameter values again, after it has been disabled by {@link disableCaching()}.
+     *
+     * Note that, if caching was disabled altogether using {@link disableCaching()}, this method will only turn caching
+     * on for the requested parameters. Others will remain non-cached. To turn caching generally on, use `null` as the
+     * argument (which is the default).
+     *
+     * @param string|string[] $paramName
+     */
+    function enableCaching($paramName = null);
 }

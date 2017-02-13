@@ -20,8 +20,7 @@ class CachingConnConfig extends ConnConfig implements ICachingConnConfig
     {
         if ($paramName === null) {
             $this->cachedValues = [];
-        }
-        else {
+        } else {
             foreach ((array)$paramName as $pn) {
                 unset($this->cachedValues[$pn]);
             }
@@ -33,13 +32,11 @@ class CachingConnConfig extends ConnConfig implements ICachingConnConfig
         if ($paramName === null) {
             $this->cacheEnabled = false;
             $this->cacheExceptions = [];
-        }
-        elseif ($this->cacheEnabled) {
+        } elseif ($this->cacheEnabled) {
             foreach ((array)$paramName as $pn) {
                 $this->cacheExceptions[$pn] = true;
             }
-        }
-        else {
+        } else {
             foreach ((array)$paramName as $pn) {
                 unset($this->cacheExceptions[$pn]);
             }
@@ -53,13 +50,11 @@ class CachingConnConfig extends ConnConfig implements ICachingConnConfig
         if ($paramName === null) {
             $this->cacheEnabled = true;
             $this->cacheExceptions = [];
-        }
-        elseif (!$this->cacheEnabled) {
+        } elseif (!$this->cacheEnabled) {
             foreach ((array)$paramName as $pn) {
                 $this->cacheExceptions[$pn] = true;
             }
-        }
-        else {
+        } else {
             foreach ((array)$paramName as $pn) {
                 unset($this->cacheExceptions[$pn]);
             }

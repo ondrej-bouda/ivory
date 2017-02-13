@@ -198,20 +198,16 @@ class TimeInterval implements IComparable
             $timeDelimPos = strpos($str, 'T');
             if (!$timeDelimPos) {
                 $parts = self::parseIsoDateStr(substr($str, 1));
-            }
-            elseif ($timeDelimPos == 1) {
+            } elseif ($timeDelimPos == 1) {
                 $parts = self::parseTimeStr($str, 2);
-            }
-            else {
+            } else {
                 $parts = self::parseIsoDateStr(substr($str, 1, $timeDelimPos - 1)) +
                     self::parseTimeStr($str, $timeDelimPos + 1);
             }
-        }
-        elseif ($str[0] == '@') {
+        } elseif ($str[0] == '@') {
             // verbose PostgreSQL format
             $parts = self::parsePostgresqlStr($str, 1);
-        }
-        elseif (preg_match('~^(?:(-)?(\d+)-(\d+))?\s*(-?\d+)??\s*(-?\d+(?::\d+(?::\d+(?:\.\d+)?)?)?)?$~', $str, $m)) {
+        } elseif (preg_match('~^(?:(-)?(\d+)-(\d+))?\s*(-?\d+)??\s*(-?\d+(?::\d+(?::\d+(?:\.\d+)?)?)?)?$~', $str, $m)) {
             // sql format
             $parts = (isset($m[5]) ? self::parseTimeStr($m[5], 0, false) : []);
             if (!empty($m[2]) || !empty($m[3])) {
@@ -222,8 +218,7 @@ class TimeInterval implements IComparable
             if (!empty($m[4])) {
                 $parts[self::DAY] = (int)$m[4];
             }
-        }
-        else {
+        } else {
             // PostgreSQL format
             $parts = self::parsePostgresqlStr($str);
         }
@@ -239,13 +234,12 @@ class TimeInterval implements IComparable
                 self::MONTH => (int)$m[2],
                 self::DAY => (int)$m[3],
             ];
-        }
-        else {
+        } else {
             $parts = [];
             preg_match_all('~(-?\d+(?:\.\d+)?)([YMDW])~', $str, $matches, PREG_SET_ORDER);
             static $units = ['Y' => self::YEAR, 'M' => self::MONTH, 'D' => self::DAY, 'W' => self::WEEK];
             foreach ($matches as $m) {
-                $parts[ $units[$m[2]] ] = (float)$m[1];
+                $parts[$units[$m[2]]] = (float)$m[1];
             }
             return $parts;
         }
@@ -266,19 +260,17 @@ class TimeInterval implements IComparable
                     self::MINUTE => $sgn * $m[2],
                     self::SECOND => $sgn * (isset($m[3]) ? (float)$m[3] : 0),
                 ];
-            }
-            else {
+            } else {
                 return [
                     self::SECOND => (float)$m[1],
                 ];
             }
-        }
-        else {
+        } else {
             $parts = [];
             preg_match_all('~(-?\d+(?:\.\d+)?)([HMS])~', $str, $matches, PREG_SET_ORDER, $offset);
             static $units = ['H' => self::HOUR, 'M' => self::MINUTE, 'S' => self::SECOND];
             foreach ($matches as $m) {
-                $parts[ $units[$m[2]] ] = (float)$m[1];
+                $parts[$units[$m[2]]] = (float)$m[1];
             }
             return $parts;
         }

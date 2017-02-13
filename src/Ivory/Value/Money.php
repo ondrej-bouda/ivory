@@ -14,25 +14,25 @@ namespace Ivory\Value;
  */
 class Money
 {
-	private $amount;
-	private $unit;
+    private $amount;
+    private $unit;
 
 
-	/**
-	 * @param string $moneyStr the money quantity as a string;
-	 *                         the value must use <tt>$decimalSeparator</tt> as the decimal separator, but may use any
-	 *                           thousands separators;
-	 *                         the unit may occur either before or after the actual value, or not at all;
-	 *                         whitespace is ignored altogether except for the unit
-	 * @param string $decimalSeparator
-	 * @return Money the representation of the given quantity
-	 * @throws \InvalidArgumentException if the string does not conform to the recognized syntax (which is iff it does
-	 *                                     not contain any decimal digit)
-	 */
-	public static function fromString($moneyStr, $decimalSeparator)
-	{
-		$ds = preg_quote($decimalSeparator, '~');
-		$re = '~^ \s*
+    /**
+     * @param string $moneyStr the money quantity as a string;
+     *                         the value must use <tt>$decimalSeparator</tt> as the decimal separator, but may use any
+     *                           thousands separators;
+     *                         the unit may occur either before or after the actual value, or not at all;
+     *                         whitespace is ignored altogether except for the unit
+     * @param string $decimalSeparator
+     * @return Money the representation of the given quantity
+     * @throws \InvalidArgumentException if the string does not conform to the recognized syntax (which is iff it does
+     *                                     not contain any decimal digit)
+     */
+    public static function fromString($moneyStr, $decimalSeparator)
+    {
+        $ds = preg_quote($decimalSeparator, '~');
+        $re = '~^ \s*
                 (\D+?)?                             # optional unit before the amount
                 \s*
                 (\d(?:[^' . $ds . '\d]*\d+)*)       # the integer part of the amount
@@ -42,56 +42,56 @@ class Money
                 \s*
                 $~x';
 
-		if (!preg_match($re, $moneyStr, $m)) {
-			throw new \InvalidArgumentException('$moneyStr');
-		}
+        if (!preg_match($re, $moneyStr, $m)) {
+            throw new \InvalidArgumentException('$moneyStr');
+        }
 
-		$amount = preg_replace('~\D+~', '', $m[2]);
-		if (isset($m[3]) && $m[3] !== '') {
-			$amount .= '.' . preg_replace('~\D+~', '', $m[3]);
-		}
+        $amount = preg_replace('~\D+~', '', $m[2]);
+        if (isset($m[3]) && $m[3] !== '') {
+            $amount .= '.' . preg_replace('~\D+~', '', $m[3]);
+        }
 
-		$decimal = Decimal::fromNumber($amount);
-		$unit = ($m[1] !== '' ? $m[1] : (isset($m[4]) && $m[4] !== '' ? $m[4] : null));
+        $decimal = Decimal::fromNumber($amount);
+        $unit = ($m[1] !== '' ? $m[1] : (isset($m[4]) && $m[4] !== '' ? $m[4] : null));
 
-		return new Money($decimal, $unit);
-	}
+        return new Money($decimal, $unit);
+    }
 
-	public static function fromNumber($amount, $unit = null)
-	{
-		$decimal = Decimal::fromNumber($amount);
-		if ($decimal->isNaN()) {
-			throw new \InvalidArgumentException('$amount cannot be NaN');
-		}
+    public static function fromNumber($amount, $unit = null)
+    {
+        $decimal = Decimal::fromNumber($amount);
+        if ($decimal->isNaN()) {
+            throw new \InvalidArgumentException('$amount cannot be NaN');
+        }
 
-		return new Money($decimal, $unit);
-	}
+        return new Money($decimal, $unit);
+    }
 
 
-	private function __construct($amount, $unit)
-	{
-		$this->amount = $amount;
-		$this->unit = $unit;
-	}
+    private function __construct($amount, $unit)
+    {
+        $this->amount = $amount;
+        $this->unit = $unit;
+    }
 
-	/**
-	 * @return Decimal
-	 */
-	public function getAmount()
-	{
-		return $this->amount;
-	}
+    /**
+     * @return Decimal
+     */
+    public function getAmount()
+    {
+        return $this->amount;
+    }
 
-	/**
-	 * @return string|null the money unit (e.g., <tt>$</tt>), or <tt>null</tt> if no unit is specified for this amount
-	 */
-	public function getUnit()
-	{
-		return $this->unit;
-	}
+    /**
+     * @return string|null the money unit (e.g., <tt>$</tt>), or <tt>null</tt> if no unit is specified for this amount
+     */
+    public function getUnit()
+    {
+        return $this->unit;
+    }
 
-	public function __toString()
-	{
-		return "{$this->amount} " . ($this->unit === null ? '(no unit)' : $this->unit);
-	}
+    public function __toString()
+    {
+        return "{$this->amount} " . ($this->unit === null ? '(no unit)' : $this->unit);
+    }
 }

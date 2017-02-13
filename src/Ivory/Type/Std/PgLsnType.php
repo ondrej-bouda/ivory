@@ -21,8 +21,7 @@ class PgLsnType extends BaseType implements ITotallyOrderedType
     {
         if ($str === null) {
             return null;
-        }
-        else {
+        } else {
             return PgLogSequenceNumber::fromString($str);
         }
     }

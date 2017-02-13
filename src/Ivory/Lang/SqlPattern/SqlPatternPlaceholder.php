@@ -38,7 +38,7 @@ class SqlPatternPlaceholder
      * @return int $offset byte offset where is the place in the {@link SqlPattern::toSql() parsed SQL} to insert value
      *                       for the placeholder
      */
-    public function getOffset() : int
+    public function getOffset(): int
     {
         return $this->offset;
     }
@@ -62,7 +62,7 @@ class SqlPatternPlaceholder
     /**
      * @return bool whether the type name is quoted (which might make a difference - e.g., int vs. "int")
      */
-    public function isTypeNameQuoted() : bool
+    public function isTypeNameQuoted(): bool
     {
         return $this->typeNameQuoted;
     }
@@ -79,7 +79,7 @@ class SqlPatternPlaceholder
     /**
      * @return bool whether the schema name is quoted (which might make a difference - e.g., MySchema vs. "MySchema")
      */
-    public function isSchemaNameQuoted() : bool
+    public function isSchemaNameQuoted(): bool
     {
         return $this->schemaNameQuoted;
     }

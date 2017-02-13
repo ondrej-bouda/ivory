@@ -20,8 +20,7 @@ abstract class JsonType extends BaseType
         if (!$val instanceof Json) {
             try {
                 $val = Json::fromValue($val);
-            }
-            catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 $this->throwInvalidValue($val, $e);
             }
         }

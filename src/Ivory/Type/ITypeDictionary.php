@@ -12,7 +12,7 @@ interface ITypeDictionary
      * @return IType
      * @throws UndefinedTypeException if no type of the given OID is found
      */
-    function requireTypeByOid($oid) : IType;
+    function requireTypeByOid($oid): IType;
 
     /**
      * Searches the dictionary for a type converter according to the given type name or abbreviation.
@@ -25,7 +25,7 @@ interface ITypeDictionary
      * @return IType
      * @throws UndefinedTypeException if no type of the given name is found
      */
-    function requireTypeByName(string $typeName, $schemaName = null) : IType;
+    function requireTypeByName(string $typeName, $schemaName = null): IType;
 
     /**
      * Searches the dictionary for a type converter the most suitable for converting the given value.
@@ -34,5 +34,5 @@ interface ITypeDictionary
      * @return IType
      * @throws UndefinedTypeException if no type capable of converting the given value is found
      */
-    function requireTypeByValue($value) : IType;
+    function requireTypeByValue($value): IType;
 }

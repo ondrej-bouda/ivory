@@ -11,14 +11,14 @@ class SqlPatternParser
      * @param string $sqlPattern
      * @return SqlPattern
      */
-    public function parse(string $sqlPattern) : SqlPattern
+    public function parse(string $sqlPattern): SqlPattern
     {
-	    $positionalPlaceholders = [];
-	    $namedPlaceholderMap = [];
-	    $rawOffsetDelta = 0;
+        $positionalPlaceholders = [];
+        $namedPlaceholderMap = [];
+        $rawOffsetDelta = 0;
 
-	    $sqlTorso = StringUtils::pregReplaceCallbackWithOffset(
-	    	'~
+        $sqlTorso = StringUtils::pregReplaceCallbackWithOffset(
+            '~
 	    	  %                                             # the percent sign introducing the sequence
 	    	  (?: (?! % )                                   # anything but another percent sign -> placeholder
 	    	      (?:                                       #   optional type specification
@@ -45,21 +45,20 @@ class SqlPatternParser
 	    	    ( % )                                       # another percent sign -> literal %
 	    	  )
 	    	 ~xu',
-		    function ($matchWithOffsets) use (&$positionalPlaceholders, &$namedPlaceholderMap, &$rawOffsetDelta) {
-			    if (isset($matchWithOffsets[6])) {
-				    $rawOffsetDelta--; // put one character instead of two
-				    return '%';
-			    }
+            function ($matchWithOffsets) use (&$positionalPlaceholders, &$namedPlaceholderMap, &$rawOffsetDelta) {
+                if (isset($matchWithOffsets[6])) {
+                    $rawOffsetDelta--; // put one character instead of two
+                    return '%';
+                }
 
                 $offset = $matchWithOffsets[0][1] + $rawOffsetDelta;
 
-			    if (strlen(($matchWithOffsets[3][0] ?? '')) > 0) {
-			        $schemaName = null;
-			        $schemaNameQuoted = false;
+                if (strlen(($matchWithOffsets[3][0] ?? '')) > 0) {
+                    $schemaName = null;
+                    $schemaNameQuoted = false;
                     $typeName = $matchWithOffsets[3][0];
                     $typeNameQuoted = false;
-                }
-                else {
+                } else {
                     $schemaItem = (!empty($matchWithOffsets[1][0]) ? $matchWithOffsets[1][0] : null); // correctness: empty() is OK as the schema name may not be "0"
                     $schemaName = $this->unquoteString($schemaItem, $schemaNameQuoted);
                     $typeItem = (!empty($matchWithOffsets[2][0]) ? $matchWithOffsets[2][0] : null); // correctness: empty() is OK as the type name may not be "0"
@@ -71,24 +70,27 @@ class SqlPatternParser
                 }
                 if (isset($matchWithOffsets[5])) {
                     $name = $matchWithOffsets[5][0];
-                    $plcHld = new SqlPatternPlaceholder($offset, $name, $typeName, $typeNameQuoted, $schemaName, $schemaNameQuoted);
+                    $plcHld = new SqlPatternPlaceholder(
+                        $offset, $name, $typeName, $typeNameQuoted, $schemaName, $schemaNameQuoted
+                    );
                     if (!isset($namedPlaceholderMap[$name])) {
                         $namedPlaceholderMap[$name] = [];
                     }
                     $namedPlaceholderMap[$name][] = $plcHld;
-                }
-                else {
+                } else {
                     $pos = count($positionalPlaceholders);
-                    $plcHld = new SqlPatternPlaceholder($offset, $pos, $typeName, $typeNameQuoted, $schemaName, $schemaNameQuoted);
+                    $plcHld = new SqlPatternPlaceholder(
+                        $offset, $pos, $typeName, $typeNameQuoted, $schemaName, $schemaNameQuoted
+                    );
                     $positionalPlaceholders[] = $plcHld;
                 }
                 $rawOffsetDelta -= strlen($matchWithOffsets[0][0]); // put no characters instead of the whole match
                 return '';
-		    },
-		    $sqlPattern
-	    );
+            },
+            $sqlPattern
+        );
 
-	    return new SqlPattern($sqlTorso, $positionalPlaceholders, $namedPlaceholderMap);
+        return new SqlPattern($sqlTorso, $positionalPlaceholders, $namedPlaceholderMap);
     }
 
     private function unquoteString($str, &$quoted = null)
@@ -97,8 +99,7 @@ class SqlPatternParser
             assert($str[strlen($str) - 1] == '"');
             $quoted = true;
             return str_replace('""', '"', substr($str, 1, -1));
-        }
-        else {
+        } else {
             $quoted = false;
             return $str;
         }

@@ -100,8 +100,7 @@ class TypeRegister
                 }
             }
             return $existed;
-        }
-        else {
+        } else {
             $schemaName = $schemaNameOrTypeConverter;
             $existed = isset($this->types[$schemaName][$typeName]);
             unset($this->types[$schemaName][$typeName]);
@@ -122,8 +121,7 @@ class TypeRegister
         if ($pos === false) {
             $this->typeLoaders[] = $typeLoader;
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -141,8 +139,7 @@ class TypeRegister
         if ($pos !== false) {
             array_splice($this->typeLoaders, $pos, 1);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -158,8 +155,12 @@ class TypeRegister
      * @param ITotallyOrderedType $subtype function argument type
      * @param IRangeCanonicalFunc $func the function to register
      */
-    public function registerRangeCanonicalFunc($schemaName, $funcName, ITotallyOrderedType $subtype, IRangeCanonicalFunc $func)
-    {
+    public function registerRangeCanonicalFunc(
+        $schemaName,
+        $funcName,
+        ITotallyOrderedType $subtype,
+        IRangeCanonicalFunc $func
+    ) {
         if (!isset($this->rangeCanonFuncs[$schemaName])) {
             $this->rangeCanonFuncs[$schemaName] = [];
         }
@@ -188,8 +189,11 @@ class TypeRegister
      *                                    is provided in the first argument
      * @return bool whether the function has actually been unregistered (<tt>false</tt> if it was not registered)
      */
-    public function unregisterRangeCanonicalFunc($schemaNameOrFunc, $funcName = null, ITotallyOrderedType $subtype = null)
-    {
+    public function unregisterRangeCanonicalFunc(
+        $schemaNameOrFunc,
+        $funcName = null,
+        ITotallyOrderedType $subtype = null
+    ) {
         if ($schemaNameOrFunc instanceof IRangeCanonicalFunc) {
             if ($funcName !== null) {
                 $msg = sprintf(
@@ -225,15 +229,13 @@ class TypeRegister
                 }
             }
             return $existed;
-        }
-        else {
+        } else {
             $schemaName = $schemaNameOrFunc;
             if ($subtype === null) {
                 $existed = isset($this->rangeCanonFuncs[$schemaName][$funcName]);
                 unset($this->rangeCanonFuncs[$schemaName][$funcName]);
                 return $existed;
-            }
-            else {
+            } else {
                 $h = spl_object_hash($subtype);
                 $existed = isset($this->rangeCanonFuncs[$schemaName][$funcName][$h]);
                 unset($this->rangeCanonFuncs[$schemaName][$funcName][$h]);
@@ -255,8 +257,7 @@ class TypeRegister
         if ($pos === false) {
             $this->rangeCanonFuncProviders[] = $provider;
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -274,8 +275,7 @@ class TypeRegister
         if ($pos !== false) {
             array_splice($this->rangeCanonFuncProviders, $pos, 1);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }

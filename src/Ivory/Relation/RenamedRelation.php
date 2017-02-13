@@ -10,7 +10,7 @@ class RenamedRelation extends ProjectedRelationBase
 
     private static function defineColumns(IRelation $source, $renamePairs)
     {
-        /** @var string[] $pcres list of PCREs for renaming columns*/
+        /** @var string[] $pcres list of PCREs for renaming columns */
         $pcres = [];
         /** @var string[] $repls list of replacements for the corresponding PCREs */
         $repls = [];
@@ -20,11 +20,9 @@ class RenamedRelation extends ProjectedRelationBase
             if ($orig[0] == '/') {
                 $pcres[] = $orig;
                 $repls[] = $new;
-            }
-            elseif (is_int($orig) || filter_var((string)$orig, FILTER_VALIDATE_INT)) {
+            } elseif (is_int($orig) || filter_var((string)$orig, FILTER_VALIDATE_INT)) {
                 $byOffset[$orig] = $new;
-            }
-            else {
+            } else {
                 $pcres[] = self::simpleMacroPatternToPcre($orig);
                 $repls[] = self::simpleMacroReplacementToPcre($new);
             }
@@ -35,8 +33,7 @@ class RenamedRelation extends ProjectedRelationBase
             $origName = $col->getName();
             if (isset($byOffset[$colOffset])) {
                 $newName = $byOffset[$colOffset];
-            }
-            else {
+            } else {
                 $newName = $origName;
                 foreach ($pcres as $i => $pcre) {
                     $newName = preg_replace($pcre, $repls[$i], (string)$origName, -1, $replaced);

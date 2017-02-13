@@ -82,27 +82,21 @@ class Tuple implements \Iterator, ITuple
             if (filter_var($colOffsetOrNameOrEvaluator, FILTER_VALIDATE_INT) !== false) {
                 if (isset($this->data[$colOffsetOrNameOrEvaluator])) {
                     return $this->data[$colOffsetOrNameOrEvaluator];
-                }
-                else {
+                } else {
                     throw new UndefinedColumnException("No column at offset $colOffsetOrNameOrEvaluator");
                 }
-            }
-            else {
+            } else {
                 if (isset($this->colNameMap[$colOffsetOrNameOrEvaluator])) {
                     return $this->data[$this->colNameMap[$colOffsetOrNameOrEvaluator]];
-                }
-                else {
+                } else {
                     throw new UndefinedColumnException("No column named $colOffsetOrNameOrEvaluator");
                 }
             }
-        }
-        elseif ($colOffsetOrNameOrEvaluator instanceof ITupleEvaluator) {
+        } elseif ($colOffsetOrNameOrEvaluator instanceof ITupleEvaluator) {
             return $colOffsetOrNameOrEvaluator->evaluate($this);
-        }
-        elseif ($colOffsetOrNameOrEvaluator instanceof \Closure) {
+        } elseif ($colOffsetOrNameOrEvaluator instanceof \Closure) {
             return call_user_func($colOffsetOrNameOrEvaluator, $this);
-        }
-        else {
+        } else {
             throw new \InvalidArgumentException('$colOffsetOrNameOrEvaluator');
         }
     }
@@ -120,8 +114,7 @@ class Tuple implements \Iterator, ITuple
     {
         if (isset($this->colNameMap[$name])) {
             return $this->data[$this->colNameMap[$name]];
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -139,8 +132,7 @@ class Tuple implements \Iterator, ITuple
     {
         if (filter_var($offset, FILTER_VALIDATE_INT) !== false) {
             return array_key_exists($offset, $this->data);
-        }
-        else {
+        } else {
             return isset($this->colNameMap[$offset]);
         }
     }
@@ -149,15 +141,13 @@ class Tuple implements \Iterator, ITuple
     {
         if (filter_var($offset, FILTER_VALIDATE_INT) !== false) {
             $key = $offset;
-        }
-        else {
+        } else {
             $key = $this->colNameMap[$offset];
         }
 
         if (array_key_exists($key, $this->data)) {
             return $this->data[$key];
-        }
-        else {
+        } else {
             trigger_error("Undefined offset `$offset` for the tuple");
             return null;
         }

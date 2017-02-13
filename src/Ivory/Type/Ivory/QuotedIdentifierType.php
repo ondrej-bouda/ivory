@@ -22,8 +22,7 @@ class QuotedIdentifierType implements ITotallyOrderedType
     {
         if ($str === null) {
             return null;
-        }
-        else {
+        } else {
             return $str;
         }
     }
@@ -38,10 +37,10 @@ class QuotedIdentifierType implements ITotallyOrderedType
     }
 
     public function compareValues($a, $b)
-   	{
-   		if ($a === null || $b === null) {
-   			return null;
-   		}
-   		return strcmp((string)$a, (string)$b); // FIXME: use the same comparison as StringType
-   	}
+    {
+        if ($a === null || $b === null) {
+            return null;
+        }
+        return strcmp((string)$a, (string)$b); // FIXME: use the same comparison as StringType
+    }
 }

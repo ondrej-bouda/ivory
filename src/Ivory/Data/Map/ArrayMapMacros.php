@@ -76,8 +76,7 @@ trait ArrayMapMacros
         if (count($key) == 1) {
             unset($this->map[$k]);
             return true;
-        }
-        else {
+        } else {
             $inner = $this->map[$k];
             if (!$this->isNestedMap($inner)) {
                 throw new \InvalidArgumentException("Invalid key `$k`");

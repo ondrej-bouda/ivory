@@ -32,12 +32,10 @@ class BoxType extends CompoundGeometricType
                 $corner = $this->pointType->parseValue($m[2]);
                 $oppositeCorner = $this->pointType->parseValue($m[3]);
                 return Box::fromOppositeCorners($corner, $oppositeCorner);
-            }
-            catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 $this->throwInvalidValue($str, $e);
             }
-        }
-        else {
+        } else {
             $this->throwInvalidValue($str);
         }
     }
@@ -46,14 +44,12 @@ class BoxType extends CompoundGeometricType
     {
         if ($val === null) {
             return 'NULL';
-        }
-        elseif ($val instanceof Box) {
+        } elseif ($val instanceof Box) {
             return sprintf('box(%s,%s)',
                 $this->pointType->serializeValue($val->getUpperRight()),
                 $this->pointType->serializeValue($val->getLowerLeft())
             );
-        }
-        else {
+        } else {
             $this->throwInvalidValue($val);
         }
     }

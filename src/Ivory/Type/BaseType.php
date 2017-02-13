@@ -6,24 +6,24 @@ use Ivory\NamedDbObject;
 
 abstract class BaseType implements INamedType
 {
-	use NamedDbObject;
+    use NamedDbObject;
 
-	private $connection;
+    private $connection;
 
-	public function __construct($schemaName, $name, IConnection $connection)
-	{
-		$this->setName($schemaName, $name);
-		$this->connection = $connection;
-	}
+    public function __construct($schemaName, $name, IConnection $connection)
+    {
+        $this->setName($schemaName, $name);
+        $this->connection = $connection;
+    }
 
-	final protected function getConnection()
-	{
-		return $this->connection;
-	}
+    final protected function getConnection()
+    {
+        return $this->connection;
+    }
 
-	protected function throwInvalidValue($str, \Exception $cause = null)
-	{
-		$message = "Value '$str' is not valid for type {$this->schemaName}.{$this->name}";
-		throw new \InvalidArgumentException($message, 0, $cause);
-	}
+    protected function throwInvalidValue($str, \Exception $cause = null)
+    {
+        $message = "Value '$str' is not valid for type {$this->schemaName}.{$this->name}";
+        throw new \InvalidArgumentException($message, 0, $cause);
+    }
 }

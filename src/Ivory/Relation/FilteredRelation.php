@@ -20,11 +20,9 @@ class FilteredRelation extends StreamlinedRelation
 
         if ($decider instanceof \Closure) {
             $this->decider = new CallbackTupleFilter($decider);
-        }
-        elseif ($decider instanceof ITupleFilter) {
+        } elseif ($decider instanceof ITupleFilter) {
             $this->decider = $decider;
-        }
-        else {
+        } else {
             throw new \InvalidArgumentException('$decider');
         }
     }
@@ -60,8 +58,7 @@ class FilteredRelation extends StreamlinedRelation
         $effectiveOffset = ($offset >= 0 ? $offset : $this->count() + $offset);
         if (isset($this->acceptMap[$effectiveOffset])) {
             return parent::tuple($this->acceptMap[$effectiveOffset]);
-        }
-        else {
+        } else {
             throw new \OutOfBoundsException("Tuple offset $offset out of the relation bounds");
         }
     }

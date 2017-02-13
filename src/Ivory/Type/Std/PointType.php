@@ -17,15 +17,13 @@ class PointType extends BaseType implements ITotallyOrderedType
 {
     public function parseValue($str)
     {
+        $coordsRe = '~^ \s* (\()? \s* ([0-9.e+-]+) \s* , \s* ([0-9.e+-]+) \s* (?(1)\)) \s* $~ix';
+
         if ($str === null) {
             return null;
-        }
-        elseif (preg_match('~^ \s* (\()? \s* ([0-9.e+-]+) \s* , \s* ([0-9.e+-]+) \s* (?(1)\)) \s* $~ix', $str, $m) &&
-                is_numeric($m[2]) && is_numeric($m[3]))
-        {
+        } elseif (preg_match($coordsRe, $str, $m) && is_numeric($m[2]) && is_numeric($m[3])) {
             return Point::fromCoords($m[2], $m[3]);
-        }
-        else {
+        } else {
             $this->throwInvalidValue($str);
         }
     }
@@ -38,8 +36,7 @@ class PointType extends BaseType implements ITotallyOrderedType
 
         if (is_array($val)) {
             $val = Point::fromCoords($val);
-        }
-        elseif (!$val instanceof Point) {
+        } elseif (!$val instanceof Point) {
             $this->throwInvalidValue($val);
         }
 
@@ -54,15 +51,13 @@ class PointType extends BaseType implements ITotallyOrderedType
 
         if (is_array($a)) {
             $a = Point::fromCoords($a);
-        }
-        elseif (!$a instanceof Point) {
+        } elseif (!$a instanceof Point) {
             throw new IncomparableException('$a is not a ' . Point::class);
         }
 
         if (is_array($b)) {
             $b = Point::fromCoords($b);
-        }
-        elseif (!$b instanceof Point) {
+        } elseif (!$b instanceof Point) {
             throw new IncomparableException('$b is not a ' . Point::class);
         }
 
@@ -72,8 +67,7 @@ class PointType extends BaseType implements ITotallyOrderedType
         $xComp = FloatType::compareFloats($ac[0], $bc[0]);
         if ($xComp !== 0) {
             return $xComp;
-        }
-        else {
+        } else {
             return FloatType::compareFloats($ac[1], $bc[1]);
         }
     }

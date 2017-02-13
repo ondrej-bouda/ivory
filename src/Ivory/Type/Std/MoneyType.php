@@ -45,8 +45,7 @@ class MoneyType extends BaseType implements ITotallyOrderedType
         $decSep = $this->decSepRetriever->getValue();
         try {
             return Money::fromString($str, $decSep);
-        }
-        catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->throwInvalidValue($str, $e);
         }
     }
@@ -59,17 +58,13 @@ class MoneyType extends BaseType implements ITotallyOrderedType
 
         if ($val instanceof Money) {
             $str = $val->getAmount()->toString();
-        }
-        elseif ($val instanceof Decimal) {
+        } elseif ($val instanceof Decimal) {
             $str = $val->toString();
-        }
-        elseif (is_int($val) || is_float($val) || filter_var($val, FILTER_VALIDATE_FLOAT)) {
+        } elseif (is_int($val) || is_float($val) || filter_var($val, FILTER_VALIDATE_FLOAT)) {
             $str = (string)$val;
-        }
-        elseif (is_string($val)) {
+        } elseif (is_string($val)) {
             $str = Money::fromString($val, '.')->getAmount()->toString();
-        }
-        else {
+        } else {
             $this->throwInvalidValue($val);
         }
 
