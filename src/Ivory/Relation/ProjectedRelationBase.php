@@ -6,18 +6,18 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
     /** @var Column[] */
     private $projectedColumns;
     /** @var int[] map: column name => offset of the first column of the name */
-    private $colNameMap;
+    private $projectedColNameMap;
 
     public function __construct(IRelation $source, array $columns)
     {
         parent::__construct($source);
         $this->projectedColumns = $columns;
 
-        $this->colNameMap = [];
+        $this->projectedColNameMap = [];
         foreach ($columns as $colOffset => $col) {
             $colName = $col->getName();
-            if (strlen($colName) > 0 && !isset($this->colNameMap[$colName])) {
-                $this->colNameMap[$colName] = $colOffset;
+            if (strlen($colName) > 0 && !isset($this->projectedColNameMap[$colName])) {
+                $this->projectedColNameMap[$colName] = $colOffset;
             }
         }
     }
@@ -111,7 +111,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
 
     protected function getColNameMap()
     {
-        return $this->colNameMap;
+        return $this->projectedColNameMap;
     }
 
     public function populate()
@@ -125,7 +125,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
 
     public function col($offsetOrNameOrEvaluator): IColumn
     {
-        return $this->_colImpl($offsetOrNameOrEvaluator, $this->projectedColumns, $this->colNameMap, $this);
+        return $this->_colImpl($offsetOrNameOrEvaluator, $this->projectedColumns, $this->projectedColNameMap, $this);
     }
 
     public function getIterator()

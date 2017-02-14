@@ -69,7 +69,11 @@ class Column implements \IteratorAggregate, IColumn
                 return 1;
             });
         } elseif (!$hasher instanceof IValueHasher) {
-            $hasher = new CallbackValueHasher($hasher);
+            if (is_callable($hasher)) {
+                $hasher = new CallbackValueHasher($hasher);
+            } else {
+                throw new \InvalidArgumentException('$hasher');
+            }
         }
 
         if ($comparator === null) {
