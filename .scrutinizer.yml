@@ -30,6 +30,9 @@ coding_style:
         spaces:
             around_operators:
                 concatenation: true
+            before_parentheses:
+                closure_definition: true
             other:
                 after_type_cast: false
+
 build: true
