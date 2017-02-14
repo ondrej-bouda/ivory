@@ -9,5 +9,5 @@ interface ITupleFilter
      * @param ITuple $tuple tuple to decide
      * @return bool <tt>true</tt> if <tt>$tuple</tt> passes this filter, <tt>false</tt> if not
      */
-    function accept(ITuple $tuple);
+    function accept(ITuple $tuple): bool;
 }

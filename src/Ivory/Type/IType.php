@@ -29,5 +29,5 @@ interface IType
      * @param mixed $val
      * @return string
      */
-    function serializeValue($val);
+    function serializeValue($val): string;
 }

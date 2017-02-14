@@ -115,14 +115,14 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
         $this->tailIdx = null;
     }
 
-    public function handleSavepointSaved($name)
+    public function handleSavepointSaved(string $name)
     {
         $this->bySavepoint[$this->tailIdx]['name'] = $name;
         $this->tailIdx++;
         $this->bySavepoint[$this->tailIdx] = self::$emptyStruct;
     }
 
-    public function handleSavepointReleased($name)
+    public function handleSavepointReleased(string $name)
     {
         $idx = $this->findSavepoint($name);
         if ($idx === null) {
@@ -138,7 +138,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
         $this->tailIdx = $idx;
     }
 
-    public function handleRollbackToSavepoint($name)
+    public function handleRollbackToSavepoint(string $name)
     {
         $idx = $this->findSavepoint($name);
         if ($idx === null) {
@@ -166,17 +166,17 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
         return null;
     }
 
-    public function handleTransactionPrepared($name)
+    public function handleTransactionPrepared(string $name)
     {
         $this->handleTransactionCommit();
     }
 
-    public function handlePreparedTransactionCommit($name)
+    public function handlePreparedTransactionCommit(string $name)
     {
         // NOTE: does not affect the properties
     }
 
-    public function handlePreparedTransactionRollback($name)
+    public function handlePreparedTransactionRollback(string $name)
     {
         // NOTE: does not affect the properties
     }

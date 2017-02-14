@@ -3,7 +3,10 @@ namespace Ivory\Connection;
 
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Result\ICommandResult;
+use Ivory\Result\ICopyInResult;
 use Ivory\Result\IQueryResult;
+use Ivory\Type\ITypeDictionary;
+use Ivory\Type\TypeRegister;
 use Ivory\Utils\NotSerializable;
 
 // TODO: consider renaming to Database or Session or... - to reflect it is mere a facade, the single entry point
@@ -29,7 +32,7 @@ class Connection implements IConnection
      *                                                    or a URL for {@link ConnectionParameters::fromUrl()},
      *                                                    or a PostgreSQL connection string (see {@link pg_connect()})
      */
-    public function __construct($name, $params)
+    public function __construct(string $name, $params)
     {
         $this->name = $name;
         $this->connCtl = new ConnectionControl($params); // TODO: extract all usages of ConnectionControl::requireConnection() - consider introducing an interface specifying the method, named like PGSQLDriver or ConnectionManager or ConnectionPool
@@ -41,12 +44,12 @@ class Connection implements IConnection
         $this->config = new ConnConfig($this->connCtl, $this->stmtExec, $this->txCtl);
     }
 
-    final public function getName()
+    final public function getName(): string
     {
         return $this->name;
     }
 
-    final public function getConfig()
+    final public function getConfig(): IConnConfig
     {
         return $this->config;
     }
@@ -54,7 +57,7 @@ class Connection implements IConnection
 
     //region Connection Control
 
-    public function getParameters()
+    public function getParameters(): ConnectionParameters
     {
         return $this->connCtl->getParameters();
     }
@@ -69,17 +72,17 @@ class Connection implements IConnection
         return $this->connCtl->isConnectedWait();
     }
 
-    public function connect()
+    public function connect(): bool
     {
         return $this->connCtl->connect();
     }
 
-    public function connectWait()
+    public function connectWait(): bool
     {
         return $this->connCtl->connectWait();
     }
 
-    public function disconnect()
+    public function disconnect(): bool
     {
         return $this->connCtl->disconnect();
     }
@@ -88,12 +91,12 @@ class Connection implements IConnection
 
     //region Type Control
 
-    public function getTypeRegister()
+    public function getTypeRegister(): TypeRegister
     {
         return $this->typeCtl->getTypeRegister();
     }
 
-    public function getTypeDictionary()
+    public function getTypeDictionary(): ITypeDictionary
     {
         return $this->typeCtl->getTypeDictionary();
     }
@@ -146,32 +149,32 @@ class Connection implements IConnection
 
     //region Copy Control
 
-    public function copyFromFile($file, $table, $columns = null, $options = [])
+    public function copyFromFile(string $file, string $table, $columns = null, $options = []): ICommandResult
     {
         return $this->copyCtl->copyFromFile($file, $table, $columns, $options);
     }
 
-    public function copyFromProgram($program, $table, $columns = null, $options = [])
+    public function copyFromProgram(string $program, string $table, $columns = null, $options = []): ICommandResult
     {
         return $this->copyCtl->copyFromProgram($program, $table, $columns, $options);
     }
 
-    public function copyFromInput($table, $columns = null, $options = [])
+    public function copyFromInput(string $table, $columns = null, $options = []): ICopyInResult
     {
         return $this->copyCtl->copyFromInput($table, $columns, $options);
     }
 
-    public function copyToFile($file, $tableOrRecipe, $columns = null, $options = [])
+    public function copyToFile(string $file, $tableOrRecipe, $columns = null, $options = []): ICommandResult
     {
         return $this->copyCtl->copyToFile($file, $tableOrRecipe, $columns, $options);
     }
 
-    public function copyToProgram($program, $tableOrRecipe, $columns = null, $options = [])
+    public function copyToProgram(string $program, $tableOrRecipe, $columns = null, $options = []): ICommandResult
     {
         return $this->copyCtl->copyToProgram($program, $tableOrRecipe, $columns, $options);
     }
 
-    public function copyToArray($table, $options = [])
+    public function copyToArray(string $table, $options = [])
     {
         return $this->copyCtl->copyToArray($table, $options);
     }
@@ -180,12 +183,12 @@ class Connection implements IConnection
 
     //region Transaction Control
 
-    public function inTransaction()
+    public function inTransaction(): bool
     {
         return $this->txCtl->inTransaction();
     }
 
-    public function startTransaction($transactionOptions = 0)
+    public function startTransaction($transactionOptions = 0): bool
     {
         return $this->txCtl->startTransaction($transactionOptions);
     }
@@ -200,32 +203,32 @@ class Connection implements IConnection
         $this->txCtl->setupSubsequentTransactions($transactionOptions);
     }
 
-    public function commit()
+    public function commit(): bool
     {
         return $this->txCtl->commit();
     }
 
-    public function rollback()
+    public function rollback(): bool
     {
         return $this->txCtl->rollback();
     }
 
-    public function savepoint($name)
+    public function savepoint(string $name)
     {
         $this->txCtl->savepoint($name);
     }
 
-    public function rollbackToSavepoint($name)
+    public function rollbackToSavepoint(string $name)
     {
         $this->txCtl->rollbackToSavepoint($name);
     }
 
-    public function releaseSavepoint($name)
+    public function releaseSavepoint(string $name)
     {
         $this->txCtl->releaseSavepoint($name);
     }
 
-    public function setTransactionSnapshot($snapshotId)
+    public function setTransactionSnapshot(string $snapshotId): bool
     {
         return $this->txCtl->setTransactionSnapshot($snapshotId);
     }
@@ -235,22 +238,22 @@ class Connection implements IConnection
         return $this->txCtl->exportTransactionSnapshot();
     }
 
-    public function prepareTransaction($name)
+    public function prepareTransaction(string $name): bool
     {
         return $this->txCtl->prepareTransaction($name);
     }
 
-    public function commitPreparedTransaction($name)
+    public function commitPreparedTransaction(string $name)
     {
         $this->txCtl->commitPreparedTransaction($name);
     }
 
-    public function rollbackPreparedTransaction($name)
+    public function rollbackPreparedTransaction(string $name)
     {
         $this->txCtl->rollbackPreparedTransaction($name);
     }
 
-    public function listPreparedTransactions()
+    public function listPreparedTransactions(): IQueryResult
     {
         return $this->txCtl->listPreparedTransactions();
     }
@@ -259,22 +262,22 @@ class Connection implements IConnection
 
     //region IPC Control
 
-    public function getBackendPID()
+    public function getBackendPID(): int
     {
         return $this->ipcCtl->getBackendPID();
     }
 
-    public function notify($channel, $payload = null)
+    public function notify(string $channel, string $payload = null)
     {
         $this->ipcCtl->notify($channel, $payload);
     }
 
-    public function listen($channel)
+    public function listen(string $channel)
     {
         $this->ipcCtl->listen($channel);
     }
 
-    public function unlisten($channel)
+    public function unlisten(string $channel)
     {
         $this->ipcCtl->unlisten($channel);
     }

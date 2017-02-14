@@ -10,7 +10,7 @@ trait NamedDbObject
      * @param string $schemaName
      * @param string $name
      */
-    protected function setName($schemaName, $name)
+    protected function setName(string $schemaName, string $name)
     {
         $this->schemaName = $schemaName;
         $this->name = $name;
@@ -19,7 +19,7 @@ trait NamedDbObject
     /**
      * @return string name of schema this object is defined in
      */
-    final public function getSchemaName()
+    final public function getSchemaName(): string
     {
         return $this->schemaName;
     }
@@ -27,7 +27,7 @@ trait NamedDbObject
     /**
      * @return string name of this object
      */
-    final public function getName()
+    final public function getName(): string
     {
         return $this->name;
     }

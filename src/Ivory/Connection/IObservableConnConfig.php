@@ -50,7 +50,7 @@ interface IObservableConnConfig extends IConnConfig
      * @param string $parameterName name of the parameter
      * @param bool|float|int|Quantity|string|null $newValue the new value; if not given, it gets queried automatically
      */
-    function notifyPropertyChange($parameterName, $newValue = null);
+    function notifyPropertyChange(string $parameterName, $newValue = null);
 
     /**
      * Tells all observers of any property that any property might have changed its value.

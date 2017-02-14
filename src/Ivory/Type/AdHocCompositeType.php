@@ -16,9 +16,10 @@ class AdHocCompositeType extends CompositeType
 {
     use NamedDbObject;
 
-    public function __construct($schemaName, $typeName)
+    public function __construct(string $schemaName, string $typeName)
     {
         parent::__construct();
+
         $this->setName($schemaName, $typeName);
     }
 }

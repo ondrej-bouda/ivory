@@ -13,5 +13,5 @@ interface IDiscreteType extends ITotallyOrderedType
      *               <tt>null</tt> iff <tt>$value</tt> is <tt>null</tt>
      * @throws \InvalidArgumentException if <tt>$value</tt> is of a wrong type
      */
-    function step($delta, $value);
+    function step(int $delta, $value);
 }

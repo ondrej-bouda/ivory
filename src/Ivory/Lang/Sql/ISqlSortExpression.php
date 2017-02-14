@@ -12,10 +12,10 @@ interface ISqlSortExpression extends ISqlExpression
     /**
      * @return ISqlExpression the expression according to which to sort
      */
-    function getExpression();
+    function getExpression(): ISqlExpression;
 
     /**
      * @return string the sorting direction; either {@link ISqlSortExpression::ASC} or {@link ISqlSortExpression::DESC}
      */
-    function getDirection();
+    function getDirection(): string;
 }

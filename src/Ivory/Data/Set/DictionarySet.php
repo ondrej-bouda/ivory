@@ -23,7 +23,7 @@ class DictionarySet implements ISet
 
     //region ISet
 
-    public function contains($value)
+    public function contains($value): bool
     {
         $key = $this->computeKey($value);
         return isset($this->data[$key]);

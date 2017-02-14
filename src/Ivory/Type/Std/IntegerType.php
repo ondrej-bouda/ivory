@@ -21,7 +21,7 @@ class IntegerType extends \Ivory\Type\BaseType implements IDiscreteType
         }
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';
@@ -38,7 +38,7 @@ class IntegerType extends \Ivory\Type\BaseType implements IDiscreteType
         return (int)$a - (int)$b;
     }
 
-    public function step($delta, $value)
+    public function step(int $delta, $value)
     {
         return ($value === null ? null : $value + $delta);
     }

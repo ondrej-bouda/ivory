@@ -123,7 +123,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
     {
     }
 
-    public function col($offsetOrNameOrEvaluator)
+    public function col($offsetOrNameOrEvaluator): IColumn
     {
         return $this->_colImpl($offsetOrNameOrEvaluator, $this->projectedColumns, $this->colNameMap, $this);
     }

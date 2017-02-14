@@ -49,7 +49,7 @@ class CherryPickedRelation extends StreamlinedRelation
         return count($this->offsetMap);
     }
 
-    public function tuple($offset = 0): ITuple
+    public function tuple(int $offset = 0): ITuple
     {
         $effectiveOffset = ($offset >= 0 ? $offset : $this->count() + $offset);
         if (isset($this->offsetMap[$effectiveOffset])) {

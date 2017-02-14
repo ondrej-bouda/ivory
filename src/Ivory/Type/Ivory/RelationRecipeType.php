@@ -13,7 +13,7 @@ use Ivory\Query\IRelationRecipe;
  */
 class RelationRecipeType extends VolatilePatternTypeBase
 {
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if (!$val instanceof IRelationRecipe) {
             throw new \InvalidArgumentException('Expecting an ' . IRelationRecipe::class . ' object');

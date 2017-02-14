@@ -32,7 +32,7 @@ class IdentifierType implements ITotallyOrderedType
         }
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             throw new \InvalidArgumentException('Expecting an identifier, NULL encountered.');

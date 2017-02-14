@@ -19,14 +19,14 @@ class TransactionControl implements IObservableTransactionControl
         $this->stmtExec = $stmtExec;
     }
 
-    public function inTransaction()
+    public function inTransaction(): bool
     {
         $connHandler = $this->connCtl->requireConnection();
         $txStat = pg_transaction_status($connHandler);
         return ($txStat == PGSQL_TRANSACTION_INTRANS || $txStat == PGSQL_TRANSACTION_INERROR);
     }
 
-    public function startTransaction($transactionOptions = 0)
+    public function startTransaction($transactionOptions = 0): bool
     {
         if ($this->inTransaction()) {
             trigger_error('A transaction is already active, cannot start a new one.', E_USER_WARNING);
@@ -87,7 +87,7 @@ class TransactionControl implements IObservableTransactionControl
         return implode(' ', $clauses);
     }
 
-    public function commit()
+    public function commit(): bool
     {
         if (!$this->inTransaction()) {
             trigger_error('No transaction is active, nothing to commit.', E_USER_WARNING);
@@ -99,7 +99,7 @@ class TransactionControl implements IObservableTransactionControl
         return true;
     }
 
-    public function rollback()
+    public function rollback(): bool
     {
         if (!$this->inTransaction()) {
             trigger_error('No transaction is active, nothing to roll back.', E_USER_WARNING);
@@ -111,17 +111,17 @@ class TransactionControl implements IObservableTransactionControl
         return true;
     }
 
-    private function quoteIdent($ident) // FIXME: revise; move where appropriate
+    private function quoteIdent(string $ident) // FIXME: revise; move where appropriate
     {
         return '"' . strtr($ident, ['"' => '""']) . '"';
     }
 
-    private function quoteString($str) // FIXME: revise; move where appropriate
+    private function quoteString(string $str) // FIXME: revise; move where appropriate
     {
         return "'" . pg_escape_string($this->connCtl->requireConnection(), $str) . "'";
     }
 
-    public function savepoint($name)
+    public function savepoint(string $name)
     {
         if (!$this->inTransaction()) {
             throw new InvalidStateException('No transaction is active, cannot create any savepoint.');
@@ -131,7 +131,7 @@ class TransactionControl implements IObservableTransactionControl
         $this->notifySavepointSaved($name);
     }
 
-    public function rollbackToSavepoint($name)
+    public function rollbackToSavepoint(string $name)
     {
         if (!$this->inTransaction()) {
             throw new InvalidStateException('No transaction is active, cannot roll back to any savepoint.');
@@ -141,7 +141,7 @@ class TransactionControl implements IObservableTransactionControl
         $this->notifyRollbackToSavepoint($name);
     }
 
-    public function releaseSavepoint($name)
+    public function releaseSavepoint(string $name)
     {
         if (!$this->inTransaction()) {
             throw new InvalidStateException('No transaction is active, cannot release any savepoint.');
@@ -151,7 +151,7 @@ class TransactionControl implements IObservableTransactionControl
         $this->notifySavepointReleased($name);
     }
 
-    public function setTransactionSnapshot($snapshotId)
+    public function setTransactionSnapshot(string $snapshotId): bool
     {
         if (!$this->inTransaction()) {
             trigger_error('No transaction is active, cannot set the transaction snapshot.', E_USER_WARNING);
@@ -174,7 +174,7 @@ class TransactionControl implements IObservableTransactionControl
         return $r->value();
     }
 
-    public function prepareTransaction($name)
+    public function prepareTransaction(string $name): bool
     {
         if (!$this->inTransaction()) {
             trigger_error('No transaction is active, nothing to prepare.', E_USER_WARNING);
@@ -186,7 +186,7 @@ class TransactionControl implements IObservableTransactionControl
         return true;
     }
 
-    public function commitPreparedTransaction($name)
+    public function commitPreparedTransaction(string $name)
     {
         if ($this->inTransaction()) {
             throw new InvalidStateException('Cannot commit a prepared transaction while inside another transaction.');
@@ -196,7 +196,7 @@ class TransactionControl implements IObservableTransactionControl
         $this->notifyPreparedTransactionCommit($name);
     }
 
-    public function rollbackPreparedTransaction($name)
+    public function rollbackPreparedTransaction(string $name)
     {
         if ($this->inTransaction()) {
             throw new InvalidStateException('Cannot rollback a prepared transaction while inside another transaction.');
@@ -206,7 +206,7 @@ class TransactionControl implements IObservableTransactionControl
         $this->notifyPreparedTransactionRollback($name);
     }
 
-    public function listPreparedTransactions()
+    public function listPreparedTransactions(): IQueryResult
     {
         return $this->stmtExec->rawQuery('SELECT * FROM pg_catalog.pg_prepared_xacts');
     }
@@ -252,42 +252,42 @@ class TransactionControl implements IObservableTransactionControl
         }
     }
 
-    public function notifySavepointSaved($name)
+    public function notifySavepointSaved(string $name)
     {
         foreach ($this->observers as $observer) {
             $observer->handleSavepointSaved($name);
         }
     }
 
-    public function notifySavepointReleased($name)
+    public function notifySavepointReleased(string $name)
     {
         foreach ($this->observers as $observer) {
             $observer->handleSavepointReleased($name);
         }
     }
 
-    public function notifyRollbackToSavepoint($name)
+    public function notifyRollbackToSavepoint(string $name)
     {
         foreach ($this->observers as $observer) {
             $observer->handleRollbackToSavepoint($name);
         }
     }
 
-    public function notifyTransactionPrepared($name)
+    public function notifyTransactionPrepared(string $name)
     {
         foreach ($this->observers as $observer) {
             $observer->handleTransactionPrepared($name);
         }
     }
 
-    public function notifyPreparedTransactionCommit($name)
+    public function notifyPreparedTransactionCommit(string $name)
     {
         foreach ($this->observers as $observer) {
             $observer->handlePreparedTransactionCommit($name);
         }
     }
 
-    public function notifyPreparedTransactionRollback($name)
+    public function notifyPreparedTransactionRollback(string $name)
     {
         foreach ($this->observers as $observer) {
             $observer->handlePreparedTransactionRollback($name);

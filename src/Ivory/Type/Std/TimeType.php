@@ -27,7 +27,7 @@ class TimeType extends BaseType implements ITotallyOrderedType
         return Time::fromString($str);
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';

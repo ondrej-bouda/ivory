@@ -54,33 +54,33 @@ class FilteredColumn implements \IteratorAggregate, IColumn
         return $this->baseCol->getType();
     }
 
-    public function renameTo($newName)
+    public function renameTo(string $newName): IColumn
     {
         return new FilteredColumn($this->baseCol->renameTo($newName), $this->decider);
     }
 
-    public function bindToRelation(IRelation $relation)
+    public function bindToRelation(IRelation $relation): IColumn
     {
         return new FilteredColumn($this->baseCol->bindToRelation($relation), $this->decider);
     }
 
-    public function filter($decider)
+    public function filter($decider): IColumn
     {
         return new FilteredColumn($this, $decider);
     }
 
-    public function uniq($hasher = null, $comparator = null)
+    public function uniq($hasher = null, $comparator = null): IColumn
     {
         return new FilteredColumn($this->baseCol->uniq($hasher, $comparator), $this->decider);
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         $this->populate();
         return $this->data;
     }
 
-    public function value($valueOffset = 0)
+    public function value(int $valueOffset = 0)
     {
         $this->populate();
         $cnt = count($this->data);

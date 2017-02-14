@@ -27,7 +27,7 @@ class IntervalType extends BaseType implements ITotallyOrderedType
         return TimeInterval::fromString($str);
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';

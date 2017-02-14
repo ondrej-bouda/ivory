@@ -8,7 +8,7 @@ interface IIPCControl
      *
      * @return int
      */
-    function getBackendPID();
+    function getBackendPID(): int;
 
     /**
      * Notifies all listeners of a given channel.
@@ -20,7 +20,7 @@ interface IIPCControl
      * @param string|null $payload optional payload to send along with the notification;
      *                             note the maximal accepted length depends on the database configuration
      */
-    function notify($channel, $payload = null);
+    function notify(string $channel, string $payload = null);
 
     /**
      * Starts listening to the specified channel.
@@ -30,7 +30,7 @@ interface IIPCControl
      *
      * @param string $channel name of channel to listen to
      */
-    function listen($channel);
+    function listen(string $channel);
 
     /**
      * Stops listening to the specified channel.
@@ -39,7 +39,7 @@ interface IIPCControl
      *
      * @param string $channel name of channel to stop listening to
      */
-    function unlisten($channel);
+    function unlisten(string $channel);
 
     /**
      * Stops listening to any channel.

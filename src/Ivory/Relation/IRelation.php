@@ -37,10 +37,10 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                  an {@link ITupleFilter} gets called its {@link ITupleFilter::accept()} method;
      *                                  a <tt>Closure</tt> is given one {@link ITuple} argument and is expected to
      *                                    return <tt>true</tt> or <tt>false</tt> telling whether the tuple is allowed
-     * @return static relation containing only those tuples from this relation, in their original order, which are
+     * @return IRelation relation containing only those tuples from this relation, in their original order, which are
      *                   accepted by <tt>$decider</tt>
      */
-    function filter($decider);
+    function filter($decider): IRelation;
 
     /**
      * Makes up a relation from this relation by redefining its columns.
@@ -118,11 +118,11 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                  the specification of new columns;
      *                                  if a <tt>Traversable</tt> object is given, it is guaranteed to be traversed only
      *                                    once
-     * @return static a new relation with columns according to the <tt>$columns</tt> specification
+     * @return IRelation a new relation with columns according to the <tt>$columns</tt> specification
      * @throw UndefinedColumnException if any <tt>$columns</tt> item refers to an undefined column; this also includes
      *                                   macros - each macro must refer to at least one column
      */
-    function project($columns); // TODO: decide whether it is rather expected to interpret the key and values the other way round (see the ProcessingTest)
+    function project($columns): IRelation; // TODO: decide whether it is rather expected to interpret the key and values the other way round (see the ProcessingTest)
 
     /**
      * Extends this relation with some extra columns.
@@ -136,9 +136,9 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                  the specification of the extra columns;
      *                                  if a <tt>Traversable</tt> object is given, it is guaranteed to be traversed only
      *                                    once
-     * @return static the same relation as this one, extended with extra columns
+     * @return IRelation the same relation as this one, extended with extra columns
      */
-    function extend($extraColumns);
+    function extend($extraColumns): IRelation;
 
     /**
      * Renames some columns in this relation.
@@ -155,9 +155,9 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * If there are multiple columns matching a macro, or even multiple columns of the same name, they all get renamed.
      *
      * @param string[]|\Traversable $renamePairs old-new name map
-     * @return static the same relation as this one except that columns in <tt>$renamePairs</tt> are renamed
+     * @return IRelation the same relation as this one except that columns in <tt>$renamePairs</tt> are renamed
      */
-    function rename($renamePairs);
+    function rename($renamePairs): IRelation;
 
     /**
      * Projects a single column from this relation.
@@ -172,7 +172,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @return IColumn
      * @throws UndefinedColumnException if no column matches the specification
      */
-    function col($offsetOrNameOrEvaluator);
+    function col($offsetOrNameOrEvaluator): IColumn;
 
     /**
      * Associates values of one column by (combinations of) values of one or more columns.
@@ -195,7 +195,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @return IValueMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
-    function assoc($col1, $col2, ...$moreCols);
+    function assoc($col1, $col2, ...$moreCols): IValueMap;
 
     /**
      * Maps the tuples of this relation by one or more dimensions of keys.
@@ -222,7 +222,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @return ITupleMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
-    function map($mappingCol, ...$moreMappingCols);
+    function map($mappingCol, ...$moreMappingCols): ITupleMap;
 
     /**
      * Divides this relation to several relations mapped by one or more keys.
@@ -240,7 +240,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @return IRelationMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      */
-    function multimap($mappingCol, ...$moreMappingCols);
+    function multimap($mappingCol, ...$moreMappingCols): IRelationMap;
 
     /**
      * Makes a set of values of a column which is able to tell whether there was at least one tuple with the value of
@@ -257,7 +257,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @return ISet <tt>$set</tt>, or a newly created set
      * @throws UndefinedColumnException if no column matches the specification
      */
-    function toSet($colOffsetOrNameOrEvaluator, ISet $set = null);
+    function toSet($colOffsetOrNameOrEvaluator, ISet $set = null): ISet;
 
     /**
      * Reduces the relation only to unique tuples.
@@ -286,9 +286,9 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                    return <tt>true</tt> if it considers the tuples equivalent, or <tt>false</tt>
      *                                    otherwise.
      *                                  If not given, the default comparator provided by the implementing class is used.
-     * @return static
+     * @return IRelation
      */
-    function uniq($hasher = null, $comparator = null); // TODO: test & implement
+    function uniq($hasher = null, $comparator = null): IRelation; // TODO: test & implement
 
     /**
      * @return array[] list of associative arrays, each representing one tuple of this relation (in the original order);
@@ -297,7 +297,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                   exported to the result, the others are ignored ({@link rename()} may be used to name the
      *                   colliding columns differently)
      */
-    function toArray();
+    function toArray(): array;
 
     /**
      * Retrieves a single tuple from this relation.
@@ -308,7 +308,7 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      * @throws \OutOfBoundsException when this relation has fewer than <tt>$offset+1</tt> tuples, or fewer than
      *                                 <tt>-$tupleOffset</tt> tuples if <tt>$tupleOffset</tt> is negative
      */
-    function tuple($offset = 0): ITuple;
+    function tuple(int $offset = 0): ITuple;
 
     /**
      * @param int|string|ITupleEvaluator|\Closure $colOffsetOrNameOrEvaluator
@@ -321,5 +321,5 @@ interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
      *                                 <tt>-$tupleOffset</tt> tuples if <tt>$tupleOffset</tt> is negative
      * @throws UndefinedColumnException if no column matches the specification
      */
-    function value($colOffsetOrNameOrEvaluator = 0, $tupleOffset = 0);
+    function value($colOffsetOrNameOrEvaluator = 0, int $tupleOffset = 0);
 }

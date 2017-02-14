@@ -10,7 +10,7 @@ abstract class BaseType implements INamedType
 
     private $connection;
 
-    public function __construct($schemaName, $name, IConnection $connection)
+    public function __construct(string $schemaName, string $name, IConnection $connection)
     {
         $this->setName($schemaName, $name);
         $this->connection = $connection;

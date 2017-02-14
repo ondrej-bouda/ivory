@@ -19,7 +19,7 @@ interface ITransactionControl
      *
      * @return bool <tt>true</tt> iff a transaction is active
      */
-    function inTransaction();
+    function inTransaction(): bool;
 
     /**
      * Begins a new transaction.
@@ -34,7 +34,7 @@ interface ITransactionControl
      * @return bool <tt>true</tt> if a new transaction has actually been started,
      *              <tt>false</tt> if another transaction is already active and thus this was a no-op
      */
-    function startTransaction($transactionOptions = 0);
+    function startTransaction($transactionOptions = 0): bool;
 
     /**
      * Sets up the current transaction according to the given options.
@@ -73,7 +73,7 @@ interface ITransactionControl
      * @return bool <tt>true</tt> if the transaction snapshot has actually been imported,
      *              <tt>false</tt> if no transaction was active and thus this was a no-op
      */
-    function setTransactionSnapshot($snapshotId);
+    function setTransactionSnapshot(string $snapshotId): bool;
 
     /**
      * Saves the current transaction snapshot and returns its identifier for a later use to
@@ -96,7 +96,7 @@ interface ITransactionControl
      * @return bool <tt>true</tt> if the transaction has actually been committed,
      *              <tt>false</tt> if no transaction was active and thus this was a no-op
      */
-    function commit();
+    function commit(): bool;
 
     /**
      * Rolls back the active transaction.
@@ -106,7 +106,7 @@ interface ITransactionControl
      * @return bool <tt>true</tt> if the transaction has actually been rolled back,
      *              <tt>false</tt> if no transaction was active and thus this was a no-op
      */
-    function rollback();
+    function rollback(): bool;
 
     /**
      * Defines a new savepoint within the active transaction.
@@ -124,7 +124,7 @@ interface ITransactionControl
      * @param string $name name for the new savepoint
      * @throws InvalidStateException when not inside a transaction
      */
-    function savepoint($name);
+    function savepoint(string $name);
 
     /**
      * Rolls back all statements executed after the given savepoint.
@@ -147,7 +147,7 @@ interface ITransactionControl
      * @throws InvalidStateException when not inside a transaction,
      *                               or if trying to roll back to an undefined savepoint
      */
-    function rollbackToSavepoint($name);
+    function rollbackToSavepoint(string $name);
 
     /**
      * Destroys the given savepoint, and all savepoints established after it. Thus, it is not possible to roll back to
@@ -162,7 +162,7 @@ interface ITransactionControl
      *                               or if trying to release an undefined savepoint,
      *                               or if the transaction is in an aborted state
      */
-    function releaseSavepoint($name);
+    function releaseSavepoint(string $name);
 
     /**
      * Prepares the current transaction for a two-phase commit.
@@ -184,7 +184,7 @@ interface ITransactionControl
      * @return bool <tt>true</tt> if the transaction has actually been prepared,
      *              <tt>false</tt> if no transaction was active and thus this was a no-op
      */
-    function prepareTransaction($name);
+    function prepareTransaction(string $name): bool;
 
     /**
      * Commits a transaction prepared for a two-phase commit.
@@ -196,7 +196,7 @@ interface ITransactionControl
      * @param string $name name of the prepared transaction
      * @throws InvalidStateException when inside a transaction
      */
-    function commitPreparedTransaction($name);
+    function commitPreparedTransaction(string $name);
 
     /**
      * Rolls back a transaction prepared for a two-phase commit.
@@ -208,7 +208,7 @@ interface ITransactionControl
      * @param string $name name of the prepared transaction
      * @throws InvalidStateException when inside a transaction
      */
-    function rollbackPreparedTransaction($name);
+    function rollbackPreparedTransaction(string $name);
 
     /**
      * Lists all transactions which are currently prepared for a two-phase commit.
@@ -218,5 +218,5 @@ interface ITransactionControl
      * @return IQueryResult result of query to all columns of
      *                        {@link http://www.postgresql.org/docs/9.4/static/view-pg-prepared-xacts.html <tt>pg_catalog.pg_prepared_xacts</tt>}
      */
-    function listPreparedTransactions();
+    function listPreparedTransactions(): IQueryResult;
 }

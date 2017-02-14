@@ -42,30 +42,30 @@ interface IObservableTransactionControl extends ITransactionControl
     /**
      * @param string $name name of the savepoint to be notified as saved
      */
-    function notifySavepointSaved($name);
+    function notifySavepointSaved(string $name);
 
     /**
      * @param string $name name of the savepoint to be notified as released
      */
-    function notifySavepointReleased($name);
+    function notifySavepointReleased(string $name);
 
     /**
      * @param string $name name of the savepoint to be notified as rolled back
      */
-    function notifyRollbackToSavepoint($name);
+    function notifyRollbackToSavepoint(string $name);
 
     /**
      * @param string $name name of the transaction to be notified as prepared
      */
-    function notifyTransactionPrepared($name);
+    function notifyTransactionPrepared(string $name);
 
     /**
      * @param string $name name of the prepared transaction to be notified as committed
      */
-    function notifyPreparedTransactionCommit($name);
+    function notifyPreparedTransactionCommit(string $name);
 
     /**
      * @param string $name name of the prepared transaction to be notified as rolled back
      */
-    function notifyPreparedTransactionRollback($name);
+    function notifyPreparedTransactionRollback(string $name);
 }

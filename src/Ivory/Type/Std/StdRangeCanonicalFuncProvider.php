@@ -16,7 +16,7 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class StdRangeCanonicalFuncProvider implements IRangeCanonicalFuncProvider
 {
-    public function provideCanonicalFunc($schemaName, $funcName, ITotallyOrderedType $subtype)
+    public function provideCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype)
     {
         if ($schemaName != 'pg_catalog') {
             return null;

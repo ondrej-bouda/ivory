@@ -29,19 +29,19 @@ class ArrayType implements ITotallyOrderedType, INamedType
     private $delim;
     private $elemNeedsQuotesRegex;
 
-    public function __construct(INamedType $elemType, $delimiter)
+    public function __construct(INamedType $elemType, string $delimiter)
     {
         $this->elemType = $elemType;
         $this->delim = $delimiter;
         $this->elemNeedsQuotesRegex = '~[{}\\s"\\\\' . preg_quote($delimiter, '~') . ']|^NULL$|^$~i';
     }
 
-    public function getSchemaName()
+    public function getSchemaName(): string
     {
         return $this->elemType->getSchemaName();
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->elemType->getName() . '[]';
     }
@@ -167,7 +167,7 @@ class ArrayType implements ITotallyOrderedType, INamedType
      *
      * @todo eliminate recursion, process multidimensional arrays using iteration instead
      */
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         $str = $this->serializeValueImpl($val, $bounds);
 

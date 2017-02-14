@@ -280,7 +280,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      * @param string $delimiter
      * @return IType
      */
-    protected function createArrayType(INamedType $elemType, $delimiter)
+    protected function createArrayType(INamedType $elemType, string $delimiter)
     {
         return new ArrayType($elemType, $delimiter);
     }

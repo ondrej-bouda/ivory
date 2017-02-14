@@ -8,9 +8,9 @@ interface ITypeProvider
      *
      * @param string $schemaName name of the PostgreSQL schema to get the converter for
      * @param string $typeName name of the PostgreSQL type to get the converter for
-     * @return IType converter for the requested type, or <tt>null</tt> if no corresponding type is registered
+     * @return IType|null converter for the requested type, or <tt>null</tt> if no corresponding type is registered
      */
-    function provideType($schemaName, $typeName);
+    function provideType(string $schemaName, string $typeName);
 
     /**
      * Provides the implementation of the range canonical function, using the local and the global type register.
@@ -21,5 +21,5 @@ interface ITypeProvider
      * @return IRangeCanonicalFunc|null implementation of the requested canonical function, or <tt>null</tt> if no
      *                                    corresponding implementation is registered
      */
-    function provideRangeCanonicalFunc($schemaName, $funcName, ITotallyOrderedType $subtype);
+    function provideRangeCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype);
 }

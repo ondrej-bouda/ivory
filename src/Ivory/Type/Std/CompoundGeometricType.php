@@ -16,6 +16,6 @@ abstract class CompoundGeometricType extends BaseType
     {
         parent::__construct($schemaName, $name, $connection);
 
-        $this->pointType = new PointType(null, null, $connection);
+        $this->pointType = new PointType($schemaName, $name . '@' . PointType::class, $connection);
     }
 }

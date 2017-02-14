@@ -23,40 +23,40 @@ interface ITransactionControlObserver
      *
      * @param string $name name of the savepoint
      */
-    function handleSavepointSaved($name);
+    function handleSavepointSaved(string $name);
 
     /**
      * Called upon releasing a savepoint.
      *
      * @param string $name name of the released savepoint
      */
-    function handleSavepointReleased($name);
+    function handleSavepointReleased(string $name);
 
     /**
      * Called upon rolling back to a savepoint.
      *
      * @param string $name name of the savepoint rolled back to
      */
-    function handleRollbackToSavepoint($name);
+    function handleRollbackToSavepoint(string $name);
 
     /**
      * Called after a transaction gets prepared for a two-phase commit.
      *
      * @param string $name name of the prepared transaction
      */
-    function handleTransactionPrepared($name);
+    function handleTransactionPrepared(string $name);
 
     /**
      * Called upon committing a prepared transaction.
      *
      * @param string $name name of the prepared transaction
      */
-    function handlePreparedTransactionCommit($name);
+    function handlePreparedTransactionCommit(string $name);
 
     /**
      * Called upon rollback of a prepared transaction.
      *
      * @param string $name name of the prepared transaction
      */
-    function handlePreparedTransactionRollback($name);
+    function handlePreparedTransactionRollback(string $name);
 }

@@ -59,7 +59,7 @@ class Tuple implements \Iterator, ITuple
 
     //region ITuple
 
-    public function toMap()
+    public function toMap(): array
     {
         // TODO: benchmark which is faster, perhaps with some expressions precomputed and passed to the constructor...
 //        return array_combine(array_keys($this->colNameMap), array_intersect_key($this->data, $this->colNameMap));
@@ -71,7 +71,7 @@ class Tuple implements \Iterator, ITuple
         return $res;
     }
 
-    public function toList()
+    public function toList(): array
     {
         return $this->data;
     }

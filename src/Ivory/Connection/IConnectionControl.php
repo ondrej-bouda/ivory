@@ -8,7 +8,7 @@ interface IConnectionControl
     /**
      * @return ConnectionParameters parameters for establishing the connection
      */
-    function getParameters();
+    function getParameters(): ConnectionParameters;
 
     /**
      * Finds out whether the connection is established in the moment.
@@ -50,7 +50,7 @@ interface IConnectionControl
      *              <tt>false</tt> if the connection has already been open or started opening and thus this was a no-op
      * @throws ConnectionException on error connecting to the database
      */
-    function connect();
+    function connect(): bool;
 
     /**
      * Establishes a connection with the database and waits for the connection to be established.
@@ -69,7 +69,7 @@ interface IConnectionControl
      *              <tt>false</tt> if the connection has already been open and thus this was a no-op
      * @throws ConnectionException on error connecting to the database
      */
-    function connectWait();
+    function connectWait(): bool;
 
     /**
      * Closes the connection (if any).
@@ -82,5 +82,5 @@ interface IConnectionControl
      *              <tt>false</tt> if no connection was established and thus this was a no-op
      * @throws ConnectionException on error closing the connection
      */
-    function disconnect();
+    function disconnect(): bool;
 }

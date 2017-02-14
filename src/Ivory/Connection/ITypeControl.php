@@ -9,12 +9,12 @@ interface ITypeControl
     /**
      * @return TypeRegister the type register local to this connection
      */
-    function getTypeRegister();
+    function getTypeRegister(): TypeRegister;
 
     /**
      * @return ITypeDictionary type dictionary valid for this connection
      */
-    function getTypeDictionary();
+    function getTypeDictionary(): ITypeDictionary;
 
     /**
      * Flushes the type dictionary currently in use, leading to loading a fresh new type dictionary.

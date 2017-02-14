@@ -13,22 +13,22 @@ abstract class RelationBase implements \IteratorAggregate, IRelation
     }
 
 
-    public function filter($decider)
+    public function filter($decider): IRelation
     {
         return new FilteredRelation($this, $decider);
     }
 
-    public function project($columns)
+    public function project($columns): IRelation
     {
         return new ProjectedRelation($this, $columns);
     }
 
-    public function rename($renamePairs)
+    public function rename($renamePairs): IRelation
     {
         return new RenamedRelation($this, $renamePairs);
     }
 
-    public function uniq($hasher = null, $comparator = null)
+    public function uniq($hasher = null, $comparator = null): IRelation
     {
         throw new NotImplementedException();
     }

@@ -10,7 +10,7 @@ class DomainType implements INamedType, IDiscreteType
 
     private $baseType;
 
-    public function __construct($schemaName, $typeName, IType $baseType)
+    public function __construct(string $schemaName, string $typeName, IType $baseType)
     {
         $this->setName($schemaName, $typeName);
         $this->baseType = $baseType;
@@ -21,7 +21,7 @@ class DomainType implements INamedType, IDiscreteType
         return $this->baseType->parseValue($str);
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         return $this->baseType->serializeValue($val);
     }
@@ -36,7 +36,7 @@ class DomainType implements INamedType, IDiscreteType
         }
     }
 
-    public function step($delta, $value)
+    public function step(int $delta, $value)
     {
         if ($this->baseType instanceof IDiscreteType) {
             return $this->baseType->step($delta, $value);

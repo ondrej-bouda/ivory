@@ -14,7 +14,7 @@ class CopyInResult extends Result implements ICopyInResult
         $this->connHandler = $connHandler;
     }
 
-    public function putLine($line)
+    public function putLine(string $line)
     {
         $res = pg_put_line($this->connHandler, $line);
         if ($res === false) {

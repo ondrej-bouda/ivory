@@ -43,22 +43,22 @@ class Column implements \IteratorAggregate, IColumn
         return $this->type;
     }
 
-    public function renameTo($newName)
+    public function renameTo(string $newName): IColumn
     {
         return new Column($this->relation, $this->colDef, $newName, $this->type);
     }
 
-    public function bindToRelation(IRelation $relation)
+    public function bindToRelation(IRelation $relation): IColumn
     {
         return new Column($relation, $this->colDef, $this->name, $this->type);
     }
 
-    public function filter($decider)
+    public function filter($decider): IColumn
     {
         return new FilteredColumn($this, $decider);
     }
 
-    public function uniq($hasher = null, $comparator = null)
+    public function uniq($hasher = null, $comparator = null): IColumn
     {
         if ($hasher === null) {
             $hasher = new CallbackValueHasher(function ($value) {
@@ -102,12 +102,12 @@ class Column implements \IteratorAggregate, IColumn
         });
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return iterator_to_array($this, false);
     }
 
-    public function value($valueOffset = 0)
+    public function value(int $valueOffset = 0)
     {
         return $this->relation->value($this->colDef, $valueOffset);
     }

@@ -24,7 +24,7 @@ interface IWritableTupleMap extends ITupleMap
      * @return bool <tt>true</tt> if there was no entry under <tt>$key</tt> and thus <tt>$entry</tt> has been put into
      *                the map, or <tt>false</tt> if there already was an entry and thus this was a no-op
      */
-    function putIfNotExists($key, $entry);
+    function putIfNotExists($key, $entry): bool;
 
     /**
      * Removes a map entry (either an {@link ITuple} or {@link ITupleMap}) under a given key or series of keys.
@@ -32,5 +32,5 @@ interface IWritableTupleMap extends ITupleMap
      * @param array ...$key
      * @return bool <tt>true</tt> if the entry has been removed, <tt>false</tt> if there was no such entry
      */
-    function remove(...$key);
+    function remove(...$key): bool;
 }

@@ -26,7 +26,7 @@ class DecimalType extends \Ivory\Type\BaseType implements ITotallyOrderedType
         return Decimal::fromNumber($str);
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';

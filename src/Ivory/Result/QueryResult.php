@@ -5,6 +5,8 @@ use Ivory\Exception\NotImplementedException;
 use Ivory\Exception\ResultException;
 use Ivory\Relation\Column;
 use Ivory\Relation\FilteredRelation;
+use Ivory\Relation\IColumn;
+use Ivory\Relation\IRelation;
 use Ivory\Relation\ITuple;
 use Ivory\Relation\ProjectedRelation;
 use Ivory\Relation\RelationSeekableIterator;
@@ -110,32 +112,32 @@ class QueryResult extends Result implements IQueryResult
         return $this->columns;
     }
 
-    public function filter($decider)
+    public function filter($decider): IRelation
     {
         return new FilteredRelation($this, $decider);
     }
 
-    public function project($columns)
+    public function project($columns): IRelation
     {
         return new ProjectedRelation($this, $columns);
     }
 
-    public function rename($renamePairs)
+    public function rename($renamePairs): IRelation
     {
         return new RenamedRelation($this, $renamePairs);
     }
 
-    public function col($offsetOrNameOrEvaluator)
+    public function col($offsetOrNameOrEvaluator): IColumn
     {
         return $this->_colImpl($offsetOrNameOrEvaluator, $this->columns, $this->colNameMap, $this);
     }
 
-    public function uniq($hasher = null, $comparator = null)
+    public function uniq($hasher = null, $comparator = null): IRelation
     {
         throw new NotImplementedException();
     }
 
-    public function tuple($offset = 0): ITuple
+    public function tuple(int $offset = 0): ITuple
     {
         if ($offset >= $this->numRows || $offset < -$this->numRows) {
             throw new \OutOfBoundsException("Offset $offset is out of the result bounds [0,{$this->numRows})");

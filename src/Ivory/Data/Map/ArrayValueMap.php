@@ -13,7 +13,7 @@ class ArrayValueMap implements \IteratorAggregate, IWritableValueMap
 
     //region ArrayMapMacros
 
-    protected function isNestedMap($entry)
+    protected function isNestedMap($entry): bool
     {
         return ($entry instanceof IValueMap);
     }

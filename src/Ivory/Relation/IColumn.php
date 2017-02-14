@@ -30,15 +30,15 @@ interface IColumn extends \Traversable, \Countable, ICachingDataProcessor
 
     /**
      * @param string $newName
-     * @return static a new column - copy of this column - with the given name
+     * @return IColumn a new column - copy of this column - with the given name
      */
-    function renameTo($newName);
+    function renameTo(string $newName): IColumn;
 
     /**
      * @param IRelation $relation the new relation to bind the column to
-     * @return static a new column - copy of this column - binded to the given relation
+     * @return IColumn a new column - copy of this column - binded to the given relation
      */
-    function bindToRelation(IRelation $relation);
+    function bindToRelation(IRelation $relation): IColumn;
 
     /**
      * Reduces the column data only to values satisfying a given filter.
@@ -51,7 +51,7 @@ interface IColumn extends \Traversable, \Countable, ICachingDataProcessor
      * @return IColumn column containing only those values from this column, in their original order, which are accepted
      *                   by <tt>$decider</tt>
      */
-    function filter($decider);
+    function filter($decider): IColumn;
 
     /**
      * Reduces the column only to unique values.
@@ -82,12 +82,12 @@ interface IColumn extends \Traversable, \Countable, ICachingDataProcessor
      *                                  if not given, the default comparator provided by the implementing class is used
      * @return IColumn
      */
-    function uniq($hasher = null, $comparator = null);
+    function uniq($hasher = null, $comparator = null): IColumn;
 
     /**
      * @return array list of values of this column, in their original order
      */
-    function toArray();
+    function toArray(): array;
 
     /**
      * @param int $valueOffset zero-based offset of the value to get;
@@ -96,5 +96,5 @@ interface IColumn extends \Traversable, \Countable, ICachingDataProcessor
      * @throws \OutOfBoundsException when this column has fewer than <tt>$valueOffset+1</tt> values, or fewer than
      *                                 <tt>-$valueOffset</tt> tuples if <tt>$valueOffset</tt> is negative
      */
-    function value($valueOffset = 0);
+    function value(int $valueOffset = 0);
 }

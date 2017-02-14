@@ -65,7 +65,7 @@ class HstoreType extends \Ivory\Type\BaseType
         return $result;
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';

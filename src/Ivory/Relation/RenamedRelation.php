@@ -51,7 +51,7 @@ class RenamedRelation extends ProjectedRelationBase
         return $columns;
     }
 
-    public function tuple($offset = 0): ITuple
+    public function tuple(int $offset = 0): ITuple
     {
         $tuple = parent::tuple($offset);
         return new Tuple($tuple->toList(), $this->getColumns(), $this->getColNameMap());

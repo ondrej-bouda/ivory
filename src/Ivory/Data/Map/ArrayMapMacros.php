@@ -7,7 +7,7 @@ trait ArrayMapMacros
     private $map = [];
 
 
-    abstract protected function isNestedMap($entry);
+    abstract protected function isNestedMap($entry): bool;
 
     //region map operations
 
@@ -54,7 +54,7 @@ trait ArrayMapMacros
         $this->map[$key] = $entry;
     }
 
-    public function putIfNotExists($key, $entry)
+    public function putIfNotExists($key, $entry): bool
     {
         if (isset($this->map[$key])) {
             return false;
@@ -63,7 +63,7 @@ trait ArrayMapMacros
         return true;
     }
 
-    public function remove(...$key)
+    public function remove(...$key): bool
     {
         if (!$key) {
             throw new \InvalidArgumentException('empty $key');

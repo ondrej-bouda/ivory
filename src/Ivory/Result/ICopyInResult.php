@@ -16,7 +16,7 @@ interface ICopyInResult extends IResult
      * @param string $line line of data; a complete line must be terminated with the newline character
      * @throws ConnectionException if the connection got closed or broken
      */
-    function putLine($line);
+    function putLine(string $line);
 
     /**
      * Finalizes copying data to the database.

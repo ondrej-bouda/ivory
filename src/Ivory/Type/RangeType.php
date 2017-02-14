@@ -18,8 +18,8 @@ class RangeType implements INamedType, ITotallyOrderedType
     private $canonicalFunc;
 
     public function __construct(
-        $schemaName,
-        $name,
+        string $schemaName,
+        string $name,
         ITotallyOrderedType $subtype,
         IRangeCanonicalFunc $canonicalFunc = null
     ) {
@@ -86,7 +86,7 @@ class RangeType implements INamedType, ITotallyOrderedType
         return $this->subtype->parseValue($unescaped);
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';

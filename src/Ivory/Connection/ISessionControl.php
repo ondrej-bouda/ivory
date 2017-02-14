@@ -6,5 +6,5 @@ interface ISessionControl
     /**
      * @return IConnConfig runtime configuration of the connection
      */
-    function getConfig();
+    function getConfig(): IConnConfig;
 }

@@ -3,6 +3,7 @@ namespace Ivory\Connection;
 
 use Ivory\Ivory;
 use Ivory\Type\ITotallyOrderedType;
+use Ivory\Type\ITypeDictionary;
 use Ivory\Type\ITypeDictionaryUndefinedHandler;
 use Ivory\Type\ITypeProvider;
 use Ivory\Type\TypeDictionary;
@@ -27,12 +28,12 @@ class TypeControl implements ITypeControl, ITypeProvider
 
     //region ITypeControl
 
-    public function getTypeRegister()
+    public function getTypeRegister(): TypeRegister
     {
         return $this->typeRegister;
     }
 
-    public function getTypeDictionary()
+    public function getTypeDictionary(): ITypeDictionary
     {
         if ($this->typeDictionary === null) {
             $this->typeDictionary = new TypeDictionary(); // TODO: instead of empty dictionary, use a cached dictionary; for getting a cached dictionary, use TypeDictionary::export()
@@ -109,7 +110,7 @@ class TypeControl implements ITypeControl, ITypeProvider
 
     //region ITypeProvider
 
-    public function provideType($schemaName, $typeName)
+    public function provideType(string $schemaName, string $typeName)
     {
         $localReg = $this->getTypeRegister();
         $globalReg = Ivory::getTypeRegister();
@@ -127,7 +128,7 @@ class TypeControl implements ITypeControl, ITypeProvider
         return null;
     }
 
-    public function provideRangeCanonicalFunc($schemaName, $funcName, ITotallyOrderedType $subtype)
+    public function provideRangeCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype)
     {
         $localReg = $this->getTypeRegister();
         $globalReg = Ivory::getTypeRegister();

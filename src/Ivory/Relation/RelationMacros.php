@@ -3,6 +3,9 @@ namespace Ivory\Relation;
 
 use Ivory\Data\Map\ArrayRelationMap;
 use Ivory\Data\Map\ArrayValueMap;
+use Ivory\Data\Map\IRelationMap;
+use Ivory\Data\Map\ITupleMap;
+use Ivory\Data\Map\IValueMap;
 use Ivory\Data\Map\IWritableValueMap;
 use Ivory\Data\Set\DictionarySet;
 use Ivory\Data\Set\ISet;
@@ -15,11 +18,11 @@ use Ivory\Data\Map\ArrayTupleMap;
  */
 trait RelationMacros
 {
-    abstract public function project($columns);
+    abstract public function project($columns): IRelation;
 
-    abstract public function tuple($offset = 0): ITuple;
+    abstract public function tuple(int $offset = 0): ITuple;
 
-    abstract function col($offsetOrNameOrEvaluator);
+    abstract function col($offsetOrNameOrEvaluator): IColumn;
 
 
     protected static function computeColNameMap(IRelation $relation)
@@ -34,7 +37,7 @@ trait RelationMacros
         return $result;
     }
 
-    public function toSet($colOffsetOrNameOrEvaluator, ISet $set = null)
+    public function toSet($colOffsetOrNameOrEvaluator, ISet $set = null): ISet
     {
         if ($set === null) {
             $set = new DictionarySet();
@@ -47,7 +50,7 @@ trait RelationMacros
         return $set;
     }
 
-    final public function extend($extraColumns)
+    final public function extend($extraColumns): IRelation
     {
         if ($extraColumns instanceof \Traversable) {
             $extraColumns = iterator_to_array($extraColumns);
@@ -56,7 +59,7 @@ trait RelationMacros
         return $this->project(array_merge(['*'], $extraColumns));
     }
 
-    final public function toArray()
+    final public function toArray(): array
     {
         $result = [];
         foreach ($this as $tuple) { /** @var ITuple $tuple */
@@ -65,7 +68,7 @@ trait RelationMacros
         return $result;
     }
 
-    final public function value($colOffsetOrNameOrEvaluator = 0, $tupleOffset = 0)
+    final public function value($colOffsetOrNameOrEvaluator = 0, int $tupleOffset = 0)
     {
         return $this->tuple($tupleOffset)->value($colOffsetOrNameOrEvaluator);
     }
@@ -96,7 +99,7 @@ trait RelationMacros
         }
     }
 
-    public function assoc($col1, $col2, ...$moreCols)
+    public function assoc($col1, $col2, ...$moreCols): IValueMap
     {
         return $this->assocImpl(
             function () {
@@ -107,7 +110,7 @@ trait RelationMacros
         );
     }
 
-    public function map($mappingCol, ...$moreMappingCols)
+    public function map($mappingCol, ...$moreMappingCols): ITupleMap
     {
         return $this->assocImpl(
             function () {
@@ -118,7 +121,7 @@ trait RelationMacros
         );
     }
 
-    public function multimap($mappingCol, ...$moreMappingCols)
+    public function multimap($mappingCol, ...$moreMappingCols): IRelationMap
     {
         $mappingCols = array_merge([$mappingCol], $moreMappingCols);
         $multiDimKeyCols = array_slice($mappingCols, 0, -1);
@@ -154,7 +157,7 @@ trait RelationMacros
      * @param \Closure $emptyMapFactory closure creating an empty map for storing the data
      * @param bool $lastForValues whether the last of <tt>$cols</tt> shall be used for mapped values
      * @param array $cols
-     * @return IWritableValueMap
+     * @return IWritableValueMap|ITupleMap
      */
     private function assocImpl($emptyMapFactory, $lastForValues, $cols)
     {

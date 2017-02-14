@@ -14,7 +14,7 @@ interface ISet extends \Countable
      * @param mixed $value value to check presence of
      * @return bool <tt>true</tt> iff this set contains the <tt>$value</tt>
      */
-    function contains($value);
+    function contains($value): bool;
 
     /**
      * @param mixed $value value to add to the set

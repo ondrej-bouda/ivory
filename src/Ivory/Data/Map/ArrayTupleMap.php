@@ -13,7 +13,7 @@ class ArrayTupleMap implements \IteratorAggregate, IWritableTupleMap
 
     //region ArrayMapMacros
 
-    protected function isNestedMap($entry)
+    protected function isNestedMap($entry): bool
     {
         return ($entry instanceof ITupleMap);
     }

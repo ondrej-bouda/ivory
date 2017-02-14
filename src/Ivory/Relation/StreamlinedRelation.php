@@ -39,12 +39,12 @@ abstract class StreamlinedRelation extends RelationBase
         return ($this->source instanceof \Iterator ? $this->source : new \IteratorIterator($this->source));
     }
 
-    public function tuple($offset = 0): ITuple
+    public function tuple(int $offset = 0): ITuple
     {
         return $this->source->tuple($offset);
     }
 
-    public function col($offsetOrNameOrEvaluator)
+    public function col($offsetOrNameOrEvaluator): IColumn
     {
         return $this->_colImpl($offsetOrNameOrEvaluator, $this->getColumns(), $this->getColNameMap(), $this);
     }

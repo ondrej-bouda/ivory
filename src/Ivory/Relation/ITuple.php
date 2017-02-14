@@ -36,14 +36,14 @@ interface ITuple extends \ArrayAccess, \Traversable, IComparable // TODO: test I
      *
      * @return array map: column name => value
      */
-    function toMap();
+    function toMap(): array;
 
     /**
      * Converts the tuple to a list of values from the individual columns.
      *
      * @return array list of values of this tuple
      */
-    function toList();
+    function toList(): array;
 
     /**
      * @param int|string|ITupleEvaluator|\Closure $colOffsetOrNameOrEvaluator

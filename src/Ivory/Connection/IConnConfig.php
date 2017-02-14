@@ -48,13 +48,13 @@ interface IConnConfig
      * @return bool|float|int|Quantity|string|null current value of the requested option, or <tt>null</tt> if no such
      *                                               option has been defined yet
      */
-    function get($propertyName);
+    function get(string $propertyName);
 
     /**
      * @param string $propertyName name of a configuration option
      * @return bool whether the option is defined
      */
-    function defined($propertyName);
+    function defined(string $propertyName): bool;
 
     /**
      * Sets the specified option to the given value with validity until the end of the transaction. Once the transaction
@@ -67,7 +67,7 @@ interface IConnConfig
      * @param bool|string|int|float|Quantity $value the new value, or {@link IConnConfig::DEFAULT_VALUE} to use the
      *                                                option's default
      */
-    function setForTransaction($propertyName, $value);
+    function setForTransaction(string $propertyName, $value);
 
     /**
      * Sets the specified option to the given value with validity until the connection is closed.
@@ -78,7 +78,7 @@ interface IConnConfig
      * @param bool|string|int|float|Quantity $value the new value, or {@link IConnConfig::DEFAULT_VALUE} to use the
      *                                                option's default
      */
-    function setForSession($propertyName, $value);
+    function setForSession(string $propertyName, $value);
 
     /**
      * Resets the values of all options to their current defaults.
@@ -90,12 +90,12 @@ interface IConnConfig
     /**
      * @return TxConfig transaction parameters of the current transaction
      */
-    function getTxConfig();
+    function getTxConfig(): TxConfig;
 
     /**
      * @return TxConfig default transaction parameters for new transactions
      */
-    function getDefaultTxConfig();
+    function getDefaultTxConfig(): TxConfig;
 
     /**
      * @return string[] the effective search path - the explicit search path combined with the implicit schemas
@@ -104,7 +104,8 @@ interface IConnConfig
     function getEffectiveSearchPath();
 
     /**
-     * @return string currently configured decimal separator used in values of type <tt>money</tt>
+     * @return string currently configured decimal separator used in values of type <tt>money</tt>;
+     *                note this might even be an empty string if the currently configured currency has no decimal places
      */
-    function getMoneyDecimalSeparator();
+    function getMoneyDecimalSeparator(): string;
 }

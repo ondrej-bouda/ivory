@@ -10,7 +10,7 @@ class EnumType implements INamedType, ITotallyOrderedType
 
     private $labelSet;
 
-    public function __construct($schemaName, $typeName, $labels)
+    public function __construct(string $schemaName, string $typeName, $labels)
     {
         $this->setName($schemaName, $typeName);
         $this->labelSet = array_flip($labels);
@@ -25,7 +25,7 @@ class EnumType implements INamedType, ITotallyOrderedType
         }
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';

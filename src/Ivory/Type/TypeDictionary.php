@@ -115,7 +115,7 @@ class TypeDictionary implements ITypeDictionary
         $this->undefinedTypeHandler = $undefinedTypeHandler;
     }
 
-    public function requireTypeByOid($oid): IType
+    public function requireTypeByOid(int $oid): IType
     {
         if (isset($this->oidTypeMap[$oid])) {
             return $this->oidTypeMap[$oid];

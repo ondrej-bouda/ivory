@@ -22,7 +22,7 @@ abstract class Result implements IResult
         return $this->lastNotice;
     }
 
-    final public function getCommandTag()
+    final public function getCommandTag(): string
     {
         return pg_result_status($this->handler, PGSQL_STATUS_STRING);
     }

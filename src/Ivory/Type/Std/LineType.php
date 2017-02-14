@@ -22,7 +22,7 @@ class LineType extends CompoundGeometricType
     {
         parent::__construct($schemaName, $name, $connection);
 
-        $this->lineSegType = new LineSegmentType(null, null, $connection);
+        $this->lineSegType = new LineSegmentType($schemaName, $name . '@' . LineSegmentType::class, $connection);
     }
 
 
@@ -58,7 +58,7 @@ class LineType extends CompoundGeometricType
         }
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';

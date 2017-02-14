@@ -18,7 +18,7 @@ class ConventionalRangeCanonicalFunc implements IRangeCanonicalFunc
         $this->subtype = $subtype;
     }
 
-    public function canonicalize($lower, $lowerInc, $upper, $upperInc)
+    public function canonicalize($lower, bool $lowerInc, $upper, bool $upperInc): array
     {
         if ($lower !== null && !$lowerInc) {
             $lower = $this->subtype->step(1, $lower);

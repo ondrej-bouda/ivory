@@ -39,7 +39,7 @@ class CircleType extends CompoundGeometricType
         }
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';

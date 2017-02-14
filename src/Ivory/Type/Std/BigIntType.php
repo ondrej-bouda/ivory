@@ -22,7 +22,7 @@ class BigIntType extends IntegerType implements IDiscreteType
         }
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val > PHP_INT_MAX || $val < PHP_INT_MIN) {
             if (preg_match('~^\s*-?[0-9]+\s*$~', $val)) {
@@ -47,7 +47,7 @@ class BigIntType extends IntegerType implements IDiscreteType
         }
     }
 
-    public function step($delta, $value)
+    public function step(int $delta, $value)
     {
         if ($value === null) {
             return null;

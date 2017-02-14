@@ -6,5 +6,5 @@ interface ISqlExpression
     /**
      * @return string the SQL expression string
      */
-    function getSql();
+    function getSql(): string;
 }

@@ -10,7 +10,7 @@ namespace Ivory\Type\Ivory;
  */
 class SqlType extends PatternTypeBase
 {
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             throw new \InvalidArgumentException('Expecting an SQL string, NULL encountered.');

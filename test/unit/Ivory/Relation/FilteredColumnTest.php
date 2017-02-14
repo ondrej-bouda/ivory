@@ -45,7 +45,7 @@ class FilteredColumnTest extends \Ivory\IvoryTestCase
         $decider = new class implements IValueFilter {
             private $decided = [];
 
-            public function accept($value)
+            public function accept($value): bool
             {
                 $this->decided[] = $value;
                 return ($value > 4);

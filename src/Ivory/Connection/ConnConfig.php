@@ -97,7 +97,7 @@ class ConnConfig implements IObservableConnConfig
         $this->typeCache = null;
     }
 
-    public function get($propertyName)
+    public function get(string $propertyName)
     {
         if (self::isCustomOption($propertyName)) {
             /* Custom options are always of type string, no need to even worry about the type.
@@ -205,18 +205,18 @@ class ConnConfig implements IObservableConnConfig
      * @param string $propertyName
      * @return bool whether the requested property is a custom option
      */
-    private static function isCustomOption($propertyName)
+    private static function isCustomOption(string $propertyName): bool
     {
         // see http://www.postgresql.org/docs/9.4/static/runtime-config-custom.html
         return (strpos($propertyName, '.') !== false);
     }
 
-    public function defined($propertyName)
+    public function defined(string $propertyName): bool
     {
         return ($this->get($propertyName) !== null);
     }
 
-    public function setForTransaction($propertyName, $value)
+    public function setForTransaction(string $propertyName, $value)
     {
         if (!$this->txCtl->inTransaction()) {
             return; // setting the option would have no effect as the implicit transaction would end immediately
@@ -229,7 +229,7 @@ class ConnConfig implements IObservableConnConfig
         $this->notifyPropertyChange($propertyName, $value);
     }
 
-    public function setForSession($propertyName, $value)
+    public function setForSession(string $propertyName, $value)
     {
         $connHandler = $this->connCtl->requireConnection();
         pg_query_params($connHandler, 'SELECT pg_catalog.set_config($1, $2, FALSE)', [$propertyName, $value]);
@@ -247,7 +247,7 @@ class ConnConfig implements IObservableConnConfig
         $this->notifyPropertiesReset();
     }
 
-    public function getTxConfig()
+    public function getTxConfig(): TxConfig
     {
         return self::createTxConfig(
             $this->transaction_isolation,
@@ -256,7 +256,7 @@ class ConnConfig implements IObservableConnConfig
         );
     }
 
-    public function getDefaultTxConfig()
+    public function getDefaultTxConfig(): TxConfig
     {
         return self::createTxConfig(
             $this->get(ConfigParam::DEFAULT_TRANSACTION_ISOLATION),
@@ -302,7 +302,7 @@ class ConnConfig implements IObservableConnConfig
                         $this->refresher = $refresher;
                     }
 
-                    public function handlePropertyChange($propertyName, $newValue)
+                    public function handlePropertyChange(string $propertyName, $newValue)
                     {
                         call_user_func($this->refresher);
                     }
@@ -331,7 +331,7 @@ class ConnConfig implements IObservableConnConfig
         }
     }
 
-    public function getMoneyDecimalSeparator()
+    public function getMoneyDecimalSeparator(): string
     {
         /** @var IQueryResult $r */
         $r = $this->stmtExec->rawQuery('SELECT 1.2::money::text');
@@ -339,7 +339,7 @@ class ConnConfig implements IObservableConnConfig
         if (preg_match('~1(\D*)2~', $v, $m)) {
             return $m[1];
         } else {
-            return null;
+            return '';
         }
     }
 
@@ -382,7 +382,7 @@ class ConnConfig implements IObservableConnConfig
         $this->observers = [];
     }
 
-    public function notifyPropertyChange($parameterName, $newValue = null)
+    public function notifyPropertyChange(string $parameterName, $newValue = null)
     {
         if ($newValue === null) {
             $newValue = $this->get($parameterName);

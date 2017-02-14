@@ -26,7 +26,7 @@ class PgLsnType extends BaseType implements ITotallyOrderedType
         }
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';

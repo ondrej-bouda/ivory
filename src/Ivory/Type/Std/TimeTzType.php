@@ -27,7 +27,7 @@ class TimeTzType extends BaseType implements ITotallyOrderedType
         return TimeTz::fromString($str);
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';

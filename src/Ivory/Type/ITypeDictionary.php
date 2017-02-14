@@ -12,7 +12,7 @@ interface ITypeDictionary
      * @return IType
      * @throws UndefinedTypeException if no type of the given OID is found
      */
-    function requireTypeByOid($oid): IType;
+    function requireTypeByOid(int $oid): IType;
 
     /**
      * Searches the dictionary for a type converter according to the given type name or abbreviation.

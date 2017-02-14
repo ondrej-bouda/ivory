@@ -58,7 +58,7 @@ class FilteredRelationTest extends \Ivory\IvoryTestCase
         );
 
         $filterMod3 = new class implements ITupleFilter {
-            public function accept(ITuple $tuple)
+            public function accept(ITuple $tuple): bool
             {
                 return ($tuple['b'] % 3 == 0);
             }

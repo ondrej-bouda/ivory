@@ -10,7 +10,7 @@ class CachingConnConfig extends ConnConfig implements ICachingConnConfig
     private $cachedValues = [];
 
 
-    public function get($propertyName)
+    public function get(string $propertyName)
     {
         // FIXME: override - actually implement the caching; use ConnConfigValueRetriever
         return parent::get($propertyName);

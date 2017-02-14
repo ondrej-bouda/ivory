@@ -139,7 +139,7 @@ abstract class CompositeType implements INamedType, ITotallyOrderedType
         return Composite::fromList($this, $values);
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';

@@ -103,7 +103,7 @@ class DateType extends BaseType implements IDiscreteType
         return Date::fromPartsStrict($yearSgn * $year, $mon, $day);
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';
@@ -130,7 +130,7 @@ class DateType extends BaseType implements IDiscreteType
         }
     }
 
-    public function step($delta, $value)
+    public function step(int $delta, $value)
     {
         if ($value === null) {
             return null;

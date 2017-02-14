@@ -30,7 +30,7 @@ interface IConnection extends
     /**
      * @return string name of the connection
      */
-    function getName();
+    function getName(): string;
 }
 
 // TODO: do not extend the whole interfaces - some methods are unnecessary to the public, e.g., getTypeDictionary()

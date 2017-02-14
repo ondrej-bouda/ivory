@@ -27,7 +27,7 @@ class ConnectionControl implements IConnectionControl
     }
 
 
-    final public function getParameters()
+    final public function getParameters(): ConnectionParameters
     {
         return $this->params;
     }
@@ -51,7 +51,7 @@ class ConnectionControl implements IConnectionControl
         }
     }
 
-    public function connect()
+    public function connect(): bool
     {
         if ($this->handler === null) {
             $this->openConnection(PGSQL_CONNECT_ASYNC);
@@ -61,7 +61,7 @@ class ConnectionControl implements IConnectionControl
         }
     }
 
-    public function connectWait()
+    public function connectWait(): bool
     {
         if ($this->handler === null) {
             $this->openConnection();
@@ -72,7 +72,7 @@ class ConnectionControl implements IConnectionControl
         }
     }
 
-    public function disconnect()
+    public function disconnect(): bool
     {
         if ($this->handler === null) {
             return false;

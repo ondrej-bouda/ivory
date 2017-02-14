@@ -24,7 +24,7 @@ class XmlType extends \Ivory\Type\BaseType
         }
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';

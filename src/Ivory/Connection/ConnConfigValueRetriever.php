@@ -70,7 +70,7 @@ class ConnConfigValueRetriever implements IConfigObserver
 
     //region IObservableConnConfig
 
-    public function handlePropertyChange($propertyName, $newValue)
+    public function handlePropertyChange(string $propertyName, $newValue)
     {
         if ($this->valueProcessor !== null) {
             $newValue = call_user_func($this->valueProcessor, $newValue);

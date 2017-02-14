@@ -8,7 +8,7 @@ use Ivory\Type\AdHocCompositeType;
  */
 class StdTypeLoader implements \Ivory\Type\ITypeLoader
 {
-    public function loadType($schemaName, $typeName, \Ivory\Connection\IConnection $connection)
+    public function loadType(string $schemaName, string $typeName, \Ivory\Connection\IConnection $connection)
     {
         switch ($schemaName) {
             case 'pg_catalog':

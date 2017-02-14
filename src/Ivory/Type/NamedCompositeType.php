@@ -12,9 +12,10 @@ class NamedCompositeType extends CompositeType
 {
     use NamedDbObject;
 
-    public function __construct($schemaName, $name)
+    public function __construct(string $schemaName, string $name)
     {
         parent::__construct();
+
         $this->setName($schemaName, $name);
     }
 }

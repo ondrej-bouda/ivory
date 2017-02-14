@@ -20,27 +20,27 @@ trait TransactionControlObserverBaseTrait
     {
     }
 
-    public function handleSavepointSaved($name)
+    public function handleSavepointSaved(string $name)
     {
     }
 
-    public function handleSavepointReleased($name)
+    public function handleSavepointReleased(string $name)
     {
     }
 
-    public function handleRollbackToSavepoint($name)
+    public function handleRollbackToSavepoint(string $name)
     {
     }
 
-    public function handleTransactionPrepared($name)
+    public function handleTransactionPrepared(string $name)
     {
     }
 
-    public function handlePreparedTransactionCommit($name)
+    public function handlePreparedTransactionCommit(string $name)
     {
     }
 
-    public function handlePreparedTransactionRollback($name)
+    public function handlePreparedTransactionRollback(string $name)
     {
     }
 }

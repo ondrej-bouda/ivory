@@ -9,10 +9,10 @@ interface INamedDbObject
     /**
      * @return string name of this object
      */
-    function getName();
+    function getName(): string;
 
     /**
      * @return string name of schema this object is defined in
      */
-    function getSchemaName();
+    function getSchemaName(): string;
 }

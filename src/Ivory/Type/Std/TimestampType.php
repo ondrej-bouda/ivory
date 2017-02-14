@@ -109,7 +109,7 @@ class TimestampType extends BaseType implements ITotallyOrderedType
         return Timestamp::fromParts($y, $m, $d, $h, $i, $s);
     }
 
-    public function serializeValue($val)
+    public function serializeValue($val): string
     {
         if ($val === null) {
             return 'NULL';

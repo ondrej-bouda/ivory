@@ -22,5 +22,5 @@ interface IRangeCanonicalFunc
      * @param bool $upperInc whether the upper bound is inclusive
      * @return array quadruplet (lower, lowerInc, upper, upperInc) representing the canonical form of the range
      */
-    function canonicalize($lower, $lowerInc, $upper, $upperInc);
+    function canonicalize($lower, bool $lowerInc, $upper, bool $upperInc): array;
 }

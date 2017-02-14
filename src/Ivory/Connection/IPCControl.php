@@ -12,22 +12,22 @@ class IPCControl implements IIPCControl
     }
 
 
-    public function getBackendPID()
+    public function getBackendPID(): int
     {
         return pg_get_pid($this->connCtl->requireConnection());
     }
 
-    public function notify($channel, $payload = null)
+    public function notify(string $channel, string $payload = null)
     {
         // TODO: Implement notify() method.
     }
 
-    public function listen($channel)
+    public function listen(string $channel)
     {
         // TODO: Implement listen() method.
     }
 
-    public function unlisten($channel)
+    public function unlisten(string $channel)
     {
         // TODO: Implement unlisten() method.
     }
