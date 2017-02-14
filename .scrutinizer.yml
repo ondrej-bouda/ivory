@@ -1,10 +1,35 @@
 filter:
     excluded_paths:
-        - 'test/*'
         - 'sandpit/*'
         - 'showcase/*'
-
+        - 'test/*'
 checks:
     php:
-        code_rating: true
-        duplication: true
+        uppercase_constants: true
+        simplify_boolean_return: true
+        return_doc_comments: true
+        properties_in_camelcaps: true
+        parameters_in_camelcaps: true
+        parameter_doc_comments: true
+        overriding_parameter: false
+        optional_parameters_at_the_end: true
+        newline_at_end_of_file: true
+        function_in_camel_caps: true
+        encourage_single_quotes: true
+        classes_in_camel_caps: true
+        check_method_contracts:
+            verify_interface_like_constraints: true
+            verify_documented_constraints: true
+            verify_parent_constraints: true
+        avoid_perl_style_comments: true
+        avoid_multiple_statements_on_same_line: true
+        align_assignments: true
+
+coding_style:
+    php:
+        spaces:
+            around_operators:
+                concatenation: true
+            other:
+                after_type_cast: false
+build: true
