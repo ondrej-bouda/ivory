@@ -73,7 +73,7 @@ class RangeType implements INamedType, ITotallyOrderedType
         return Range::createFromBounds($this->subtype, $this->canonicalFunc, $lower, $upper, $lowerInc, $upperInc);
     }
 
-    private function parseBoundStr($str)
+    private function parseBoundStr(string $str)
     {
         if (strlen($str) == 0) {
             return null;
@@ -151,7 +151,7 @@ class RangeType implements INamedType, ITotallyOrderedType
         }
     }
 
-    private function compareBounds($sgn, $aVal, $aIsInc, $bVal, $bIsInc)
+    private function compareBounds(int $sgn, $aVal, $aIsInc, $bVal, $bIsInc): int
     {
         if ($aVal === null && $bVal === null) {
             return 0;

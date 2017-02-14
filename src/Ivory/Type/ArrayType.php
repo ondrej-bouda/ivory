@@ -200,7 +200,7 @@ class ArrayType implements ITotallyOrderedType, INamedType
      * @param int $maxDim the maximal dimension discovered so far
      * @return string the PostgreSQL external representation of <tt>$val</tt>
      */
-    private function serializeValueImpl($val, &$bounds = [], $curDim = 0, &$maxDim = -1)
+    private function serializeValueImpl($val, &$bounds = [], int $curDim = 0, int &$maxDim = -1): string
     {
         if ($val === null) {
             return 'NULL';
@@ -275,7 +275,7 @@ class ArrayType implements ITotallyOrderedType, INamedType
         return $out;
     }
 
-    private static function throwArrayParseException($str, $errMsg = null, $offset = null)
+    private static function throwArrayParseException(string $str, string $errMsg = null, int $offset = null)
     {
         $msg = "Value '$str' is not valid for an array";
         if (strlen($errMsg) > 0) {
@@ -284,8 +284,12 @@ class ArrayType implements ITotallyOrderedType, INamedType
         throw new ParseException($msg, $offset);
     }
 
-    private function throwParseException($str, $errMsg = null, $offset = null, $cause = null)
-    {
+    private function throwParseException(
+        string $str,
+        string $errMsg = null,
+        int $offset = null,
+        \Exception $cause = null
+    ) {
         $elemTypeName = $this->elemType->getSchemaName() . '.' . $this->elemType->getName();
         $msg = "Value '$str' is not valid for an array of type $elemTypeName";
         if (strlen($errMsg) > 0) {
