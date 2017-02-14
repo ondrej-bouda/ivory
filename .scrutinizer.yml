@@ -34,4 +34,7 @@ coding_style:
             other:
                 after_type_cast: false
 
-build: true
+build:
+    tests:
+        override:
+            - phpcs-run
