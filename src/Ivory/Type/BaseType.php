@@ -16,12 +16,12 @@ abstract class BaseType implements INamedType
         $this->connection = $connection;
     }
 
-    final protected function getConnection()
+    final protected function getConnection(): IConnection
     {
         return $this->connection;
     }
 
-    protected function throwInvalidValue($str, \Exception $cause = null)
+    protected function throwInvalidValue(string $str, \Exception $cause = null)
     {
         $message = "Value '$str' is not valid for type {$this->schemaName}.{$this->name}";
         throw new \InvalidArgumentException($message, 0, $cause);

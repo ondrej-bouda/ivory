@@ -35,8 +35,9 @@ abstract class CompositeType implements INamedType, ITotallyOrderedType
      *
      * @param string $attName
      * @param IType $attType
+     * @return $this
      */
-    public function addAttribute($attName, IType $attType)
+    public function addAttribute(string $attName, IType $attType): self
     {
         if ((string)$attName == '') {
             $typeName = "{$this->getSchemaName()}.{$this->getName()}";
@@ -49,6 +50,8 @@ abstract class CompositeType implements INamedType, ITotallyOrderedType
         }
         $this->attributes[$attName] = $attType;
         $this->attNameMap[$attName] = count($this->attNameMap);
+
+        return $this;
     }
 
     /**
@@ -63,9 +66,9 @@ abstract class CompositeType implements INamedType, ITotallyOrderedType
      * @param string $attName name of an attribute, previously defined by {@link addAttribute()}
      * @return int|null zero-based position of the given attribute, or <tt>null</tt> if no such attribute is defined
      */
-    public function getAttPos($attName)
+    public function getAttPos(string $attName)
     {
-        return (isset($this->attNameMap[$attName]) ? $this->attNameMap[$attName] : null);
+        return ($this->attNameMap[$attName] ?? null);
     }
 
     public function parseValue($str)
@@ -176,7 +179,7 @@ abstract class CompositeType implements INamedType, ITotallyOrderedType
         return self::serializeItems($items);
     }
 
-    private static function serializeItems($items)
+    private static function serializeItems($items): string
     {
         $res = '(' . implode(',', $items) . ')';
         if (count($items) < 2) {

@@ -18,7 +18,7 @@ class ConfigParamType
     const REAL = 5;
     const ENUM = 6;
 
-    public static function fromPostgreSQLName($varTypeName, $withUnit)
+    public static function fromPostgreSQLName(string $varTypeName, bool $withUnit): int
     {
         switch (strtolower($varTypeName)) {
             case 'string':
@@ -36,7 +36,7 @@ class ConfigParamType
         }
     }
 
-    public static function detectType($typeName, $valueString, $unit = null)
+    public static function detectType(string $typeName, $valueString, string $unit = null): int
     {
         $withUnit = ($unit || !is_numeric($valueString));
         return self::fromPostgreSQLName($typeName, $withUnit);
@@ -45,12 +45,12 @@ class ConfigParamType
     /**
      * @param int|string $type type to create the value as;
      *                         one of the {@link ConfigParamType} constants or the PostgreSQL vartype name
-     * @param string $valueString the string representation of the value
+     * @param string|null $valueString the string representation of the value
      * @param string|null $unit unit for case a type with a unit is given;
      *                          <tt>null</tt> to take it from <tt>$valueString</tt> if relevant
      * @return bool|string|int|double|Quantity|null <tt>null</tt> iff <tt>$valueString</tt> is <tt>null</tt>
      */
-    public static function createValue($type, $valueString, $unit = null)
+    public static function createValue($type, $valueString, string $unit = null)
     {
         if ($valueString === null) {
             return null;

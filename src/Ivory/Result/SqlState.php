@@ -249,12 +249,12 @@ class SqlState
      * @param string $code SQL STATE code; one of {@link SqlState} constants
      * @return SqlState
      */
-    public static function fromCode($code)
+    public static function fromCode(string $code): SqlState
     {
         return new SqlState($code);
     }
 
-    private function __construct($code)
+    private function __construct(string $code)
     {
         $this->code = $code;
     }
@@ -262,7 +262,7 @@ class SqlState
     /**
      * @return string the SQL STATE code; one of {@link SqlState} constants
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -270,7 +270,7 @@ class SqlState
     /**
      * @return string the class of the SQL STATE; one of {@link SqlStateClass} constants
      */
-    public function getClass()
+    public function getClass(): string
     {
         return substr($this->code, 0, 2);
     }

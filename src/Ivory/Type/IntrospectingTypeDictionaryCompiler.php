@@ -195,7 +195,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
         }
     }
 
-    private function query($query, $errorDesc)
+    private function query(string $query, string $errorDesc): \Generator
     {
         $result = pg_query($this->connHandler, $query);
         if (!is_resource($result)) {
@@ -217,7 +217,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      * @param ITypeProvider $typeProvider
      * @return IType
      */
-    protected function createBaseType($schemaName, $typeName, ITypeProvider $typeProvider)
+    protected function createBaseType(string $schemaName, string $typeName, ITypeProvider $typeProvider): IType
     {
         $type = $typeProvider->provideType($schemaName, $typeName);
         if ($type !== null) {
@@ -232,7 +232,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      * @param string $typeName
      * @return IType
      */
-    protected function createCompositeType($schemaName, $typeName)
+    protected function createCompositeType(string $schemaName, string $typeName): IType
     {
         return new NamedCompositeType($schemaName, $typeName);
     }
@@ -243,7 +243,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      * @param IType $baseType the domain base type
      * @return IType
      */
-    protected function createDomainType($schemaName, $typeName, IType $baseType)
+    protected function createDomainType(string $schemaName, string $typeName, IType $baseType): IType
     {
         return new DomainType($schemaName, $typeName, $baseType);
     }
@@ -254,7 +254,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      * @param string[] $labels list of enumeration labels in the definition order
      * @return IType
      */
-    private function createEnumType($schemaName, $typeName, $labels)
+    private function createEnumType(string $schemaName, string $typeName, $labels):IType
     {
         return new EnumType($schemaName, $typeName, $labels);
     }
@@ -267,11 +267,11 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      * @return IType
      */
     protected function createRangeType(
-        $schemaName,
-        $typeName,
+        string $schemaName,
+        string $typeName,
         ITotallyOrderedType $subtype,
         IRangeCanonicalFunc $canonicalFunc = null
-    ) {
+    ): IType {
         return new RangeType($schemaName, $typeName, $subtype, $canonicalFunc);
     }
 
@@ -280,7 +280,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      * @param string $delimiter
      * @return IType
      */
-    protected function createArrayType(INamedType $elemType, string $delimiter)
+    protected function createArrayType(INamedType $elemType, string $delimiter): IType
     {
         return new ArrayType($elemType, $delimiter);
     }

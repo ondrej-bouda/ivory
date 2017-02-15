@@ -14,7 +14,7 @@ class FilteredRelation extends StreamlinedRelation
      * @param IRelation $source
      * @param ITupleFilter|\Closure $decider
      */
-    public function __construct($source, $decider)
+    public function __construct(IRelation $source, $decider)
     {
         parent::__construct($source);
 

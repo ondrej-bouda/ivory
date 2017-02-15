@@ -45,6 +45,6 @@ class IPCControl implements IIPCControl
         if ($res === false) {
             return null;
         }
-        return new Notification($res['message'], $res['pid'], $res['payload']);
+        return new Notification($res['message'], $res['pid'], (string)$res['payload']);
     }
 }

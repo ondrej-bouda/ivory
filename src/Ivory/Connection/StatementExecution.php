@@ -183,7 +183,7 @@ class StatementExecution implements IStatementExecution
      * @return IResult
      * @throws StatementException upon an SQL statement error
      */
-    private function processResult($connHandler, $resHandler, $query)
+    private function processResult($connHandler, $resHandler, string $query): IResult
     {
         $notice = $this->getLastResultNotice();
         $stat = pg_result_status($resHandler);

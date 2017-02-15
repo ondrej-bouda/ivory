@@ -30,7 +30,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
      * @param int $starCnt number of star wildcards is stored here
      * @return string PCRE equivalent to <tt>$macroPattern</tt>
      */
-    protected static function simpleMacroPatternToPcre($macroPattern, &$starCnt = null)
+    protected static function simpleMacroPatternToPcre(string $macroPattern, int &$starCnt = null): string
     {
         $starCnt = 0;
         $pcre = '/^';
@@ -65,7 +65,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
         return $pcre;
     }
 
-    protected static function simpleMacroReplacementToPcre($macroReplacement)
+    protected static function simpleMacroReplacementToPcre(string $macroReplacement): string
     {
         $repl = '';
         $stars = 0;

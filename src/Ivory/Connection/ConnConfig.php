@@ -41,8 +41,8 @@ class ConnConfig implements IObservableConnConfig
     private $typeCache = null;
     /** @var string[]|null */
     private $effectiveSearchPathCache = null;
-    /** @var IConfigObserver[][] map: parameter name or <tt>null</tt> => list of observers registered for changes of the
-     *                             parameter (or any parameter for <tt>null</tt> entry) */
+    /** @var IConfigObserver[][] map: parameter name or <tt>''</tt> => list of observers registered for changes of the
+     *                             parameter (or any parameter for <tt>''</tt> (empty string) entry) */
     private $observers = [];
 
 
@@ -265,7 +265,7 @@ class ConnConfig implements IObservableConnConfig
         );
     }
 
-    private static function createTxConfig($isolationLevel, $readOnly, $deferrable)
+    private static function createTxConfig(string $isolationLevel, $readOnly, $deferrable)
     {
         $txConf = new TxConfig();
         $txConf->setReadOnly($readOnly);
@@ -353,11 +353,11 @@ class ConnConfig implements IObservableConnConfig
                 $this->addObserverImpl($observer, $pn);
             }
         } else {
-            $this->addObserverImpl($observer, $parameterName);
+            $this->addObserverImpl($observer, (string)$parameterName); // null is represented by an empty string
         }
     }
 
-    private function addObserverImpl(IConfigObserver $observer, $parameterName)
+    private function addObserverImpl(IConfigObserver $observer, string $parameterName)
     {
         if (!isset($this->observers[$parameterName])) {
             $this->observers[$parameterName] = [];

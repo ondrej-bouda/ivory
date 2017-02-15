@@ -1,17 +1,19 @@
 <?php
 namespace Ivory\Data;
 
+use Ivory\Connection\IConnection;
+
 class Relation
 {
-    /** @var \Ivory\Connection\IConnection */
+    /** @var IConnection */
     private $connection = null;
 
-    public function setConnection(\Ivory\Connection\IConnection $connection)
+    public function setConnection(IConnection $connection)
     {
         $this->connection = $connection;
     }
 
-    public function getConnection()
+    public function getConnection(): IConnection
     {
         if ($this->connection === null) {
             $this->connection = \Ivory\Ivory::getConnection();

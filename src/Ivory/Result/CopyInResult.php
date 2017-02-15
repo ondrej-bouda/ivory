@@ -7,7 +7,7 @@ class CopyInResult extends Result implements ICopyInResult
 {
     private $connHandler;
 
-    public function __construct($connHandler, $resultHandler, $lastNotice = null)
+    public function __construct($connHandler, $resultHandler, string $lastNotice = null)
     {
         parent::__construct($resultHandler, $lastNotice);
 

@@ -48,7 +48,7 @@ class TransactionControl implements IObservableTransactionControl
         $this->stmtExec->rawCommand('SET SESSION CHARACTERISTICS AS TRANSACTION ' . $this->txConfigToSql($transactionOptions));
     }
 
-    private function txConfigToSql($transactionOptions)
+    private function txConfigToSql($transactionOptions): string
     {
         $opts = ($transactionOptions instanceof TxConfig ? $transactionOptions : new TxConfig($transactionOptions));
 

@@ -20,7 +20,7 @@ class UndefinedType extends BaseType
      * @param string $connName name of Ivory connection for which the object is to be created (for reporting purposes)
      * @param IConnection $connection
      */
-    public function __construct($schemaName, $name, $connName, IConnection $connection)
+    public function __construct(string $schemaName, string $name, string $connName, IConnection $connection)
     {
         parent::__construct($schemaName, $name, $connection);
         $this->connName = $connName;

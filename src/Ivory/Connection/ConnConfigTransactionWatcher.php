@@ -44,14 +44,14 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
     }
 
 
-    public function handleSetForTransaction($propertyName)
+    public function handleSetForTransaction(string $propertyName)
     {
         if ($this->inTrans) {
             $this->bySavepoint[$this->tailIdx][self::SCOPE_TRANSACTION][strtolower($propertyName)] = $propertyName;
         }
     }
 
-    public function handleSetForSession($propertyName)
+    public function handleSetForSession(string $propertyName)
     {
         if ($this->inTrans) {
             $this->bySavepoint[$this->tailIdx][self::SCOPE_SESSION][strtolower($propertyName)] = $propertyName;
@@ -156,7 +156,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
         $this->handlePropertyChanges($rolledBack);
     }
 
-    private function findSavepoint($name)
+    private function findSavepoint(string $name)
     {
         for ($idx = $this->tailIdx - 1; $idx >= 0; $idx--) {
             if ($this->bySavepoint[$idx]['name'] == $name) {

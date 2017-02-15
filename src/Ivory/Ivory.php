@@ -109,7 +109,7 @@ final class Ivory
      * @throws ConnectionException if connection name is explicitly specified but a connection with the same name
      *                               already exists
      */
-    public static function setupConnection($params, $connName = null): IConnection
+    public static function setupConnection($params, string $connName = null): IConnection
     {
         if (!$params instanceof ConnectionParameters) {
             $params = ConnectionParameters::create($params);
@@ -146,7 +146,7 @@ final class Ivory
      * @throws \RuntimeException if the default connection is requested but no connection has been setup yet, or if the
      *                             requested connection is not defined
      */
-    public static function getConnection($connName = null): IConnection
+    public static function getConnection(string $connName = null): IConnection
     {
         if ($connName === null) {
             if (self::$defaultConn) {

@@ -28,11 +28,14 @@ class RangeType implements INamedType, ITotallyOrderedType
         $this->canonicalFunc = $canonicalFunc;
     }
 
-    public function getSubtype()
+    public function getSubtype(): ITotallyOrderedType
     {
         return $this->subtype;
     }
 
+    /**
+     * @return IRangeCanonicalFunc|null
+     */
     public function getCanonicalFunc()
     {
         return $this->canonicalFunc;

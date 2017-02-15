@@ -30,7 +30,7 @@ class StatementException extends \RuntimeException
      * @param resource $resultHandler a PostgreSQL query result resource
      * @param string $query the statement, as sent by the client, which caused the error
      */
-    public function __construct($resultHandler, $query)
+    public function __construct($resultHandler, string $query)
     {
         $message = self::inferMessage($resultHandler);
 
@@ -53,7 +53,7 @@ class StatementException extends \RuntimeException
         }
     }
 
-    private static function inferMessage($resultHandler)
+    private static function inferMessage($resultHandler): string
     {
         $message = pg_result_error_field($resultHandler, PGSQL_DIAG_MESSAGE_PRIMARY);
         if (strlen($message) > 0) {
@@ -74,12 +74,12 @@ class StatementException extends \RuntimeException
         }
     }
 
-    final public function getSqlStateCode()
+    final public function getSqlStateCode(): string
     {
         return $this->errorFields[PGSQL_DIAG_SQLSTATE];
     }
 
-    final public function getSqlState()
+    final public function getSqlState(): SqlState
     {
         return SqlState::fromCode($this->getSqlStateCode());
     }
@@ -90,7 +90,7 @@ class StatementException extends \RuntimeException
      *                  <tt>NOTICE</tt>, <tt>DEBUG</tt>, <tt>INFO</tt>, or <tt>LOG</tt> (in a notice message), or a
      *                  localized translation of one of these
      */
-    final public function getSeverity()
+    final public function getSeverity(): string
     {
         return $this->errorFields[PGSQL_DIAG_SEVERITY];
     }
@@ -114,7 +114,7 @@ class StatementException extends \RuntimeException
     /**
      * @return string the original statement, as sent by the client, which caused the error
      */
-    final public function getQuery()
+    final public function getQuery(): string
     {
         return $this->query;
     }

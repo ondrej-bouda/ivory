@@ -20,7 +20,7 @@ class Keywords
      * @param string $keyword
      * @return bool
      */
-    public static function isUnreserved($keyword)
+    public static function isUnreserved(string $keyword): bool
     {
         static $hash = [
             'abort' => true,
@@ -302,7 +302,7 @@ class Keywords
      * @param string $keyword
      * @return bool
      */
-    public static function isColName($keyword)
+    public static function isColName(string $keyword): bool
     {
         static $hash = [
             'between' => true,
@@ -363,7 +363,7 @@ class Keywords
      * @param string $keyword
      * @return bool
      */
-    public static function isTypeOrFuncName($keyword)
+    public static function isTypeOrFuncName(string $keyword): bool
     {
         static $hash = [
             'authorization' => true,
@@ -399,7 +399,7 @@ class Keywords
      * @param string $keyword
      * @return bool
      */
-    public static function isReserved($keyword)
+    public static function isReserved(string $keyword): bool
     {
         $hash = [
             'all' => true,

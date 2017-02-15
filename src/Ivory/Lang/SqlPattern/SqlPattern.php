@@ -157,7 +157,7 @@ class SqlPattern
      * @return SqlPatternPlaceholder[] list of positional placeholders, in order of appearance, used in the
      *                                       described SQL pattern
      */
-    public function getPositionalPlaceholders(): array
+    public function getPositionalPlaceholders()
     {
         return $this->positionalPlaceholders;
     }
@@ -167,7 +167,7 @@ class SqlPattern
      *                                         of all placeholders (in order of appearance) referring to the parameter
      *                                         name
      */
-    public function getNamedPlaceholderMap(): array
+    public function getNamedPlaceholderMap()
     {
         return $this->namedPlaceholderMap;
     }
@@ -187,7 +187,7 @@ class SqlPattern
      *                                             value
      * @return string SQL string
      */
-    public function fillSql(array $parameterValueSqlStrings): string
+    public function fillSql($parameterValueSqlStrings): string
     {
         assert(
             !array_diff_key(

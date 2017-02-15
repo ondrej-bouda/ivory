@@ -25,7 +25,7 @@ class DateStyle
      * @param string $dateStyleStr the date style string, as held in the <tt>DateStyle</tt> configuration setting
      * @return DateStyle
      */
-    public static function fromString($dateStyleStr)
+    public static function fromString(string $dateStyleStr): DateStyle
     {
         $parts = preg_split('~\W+~', $dateStyleStr, 2);
         $fmt = $parts[0];
@@ -88,7 +88,7 @@ class DateStyle
         return new DateStyle($format, $order);
     }
 
-    private function __construct($format, $order)
+    private function __construct(string $format, string $order)
     {
         $this->format = $format;
         $this->order = $order;
@@ -97,7 +97,7 @@ class DateStyle
     /**
      * @return string the output format specification; one of <tt>DateStyle::FORMAT_*</tt> constants
      */
-    public function getFormat()
+    public function getFormat(): string
     {
         return $this->format;
     }
@@ -107,7 +107,7 @@ class DateStyle
      *                one of <tt>DateStyle::ORDER_*</tt> constants (synonyms are canonicalized to these constants);
      *                irrelevant values are fixed to those valid for the output format
      */
-    public function getOrder()
+    public function getOrder(): string
     {
         return $this->order;
     }

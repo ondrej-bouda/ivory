@@ -53,7 +53,7 @@ class TypeRegister
      * @param string $typeName name of the PostgreSQL type
      * @param IType $type the type converter to register
      */
-    public function registerType($schemaName, $typeName, IType $type)
+    public function registerType(string $schemaName, string $typeName, IType $type)
     {
         if (!isset($this->types[$schemaName])) {
             $this->types[$schemaName] = [];
@@ -75,7 +75,7 @@ class TypeRegister
      *                                object is provided in the first argument
      * @return bool whether the type has actually been unregistered (<tt>false</tt> if it was not registered)
      */
-    public function unregisterType($schemaNameOrTypeConverter, $typeName = null)
+    public function unregisterType($schemaNameOrTypeConverter, string $typeName = null): bool
     {
         if ($schemaNameOrTypeConverter instanceof IType) {
             if ($typeName !== null) {
@@ -115,7 +115,7 @@ class TypeRegister
      * @return bool whether the type loader has actually been registered (<tt>false</tt> if it was already registered
      *                before and thus this was a no-op)
      */
-    public function registerTypeLoader(ITypeLoader $typeLoader)
+    public function registerTypeLoader(ITypeLoader $typeLoader): bool
     {
         $pos = array_search($typeLoader, $this->typeLoaders, true);
         if ($pos === false) {
@@ -133,7 +133,7 @@ class TypeRegister
      * @return bool whether the type loader has actually been unregistered (<tt>false</tt> if it was not registered and
      *                thus this was a no-op)
      */
-    public function unregisterTypeLoader(ITypeLoader $typeLoader)
+    public function unregisterTypeLoader(ITypeLoader $typeLoader): bool
     {
         $pos = array_search($typeLoader, $this->typeLoaders, true);
         if ($pos !== false) {
@@ -156,8 +156,8 @@ class TypeRegister
      * @param IRangeCanonicalFunc $func the function to register
      */
     public function registerRangeCanonicalFunc(
-        $schemaName,
-        $funcName,
+        string $schemaName,
+        string $funcName,
         ITotallyOrderedType $subtype,
         IRangeCanonicalFunc $func
     ) {
@@ -191,9 +191,9 @@ class TypeRegister
      */
     public function unregisterRangeCanonicalFunc(
         $schemaNameOrFunc,
-        $funcName = null,
+        string $funcName = null,
         ITotallyOrderedType $subtype = null
-    ) {
+    ): bool {
         if ($schemaNameOrFunc instanceof IRangeCanonicalFunc) {
             if ($funcName !== null) {
                 $msg = sprintf(
@@ -251,7 +251,7 @@ class TypeRegister
      * @return bool whether the provider has actually been registered (<tt>false</tt> if it was already registered
      *                before and thus this was a no-op)
      */
-    public function registerRangeCanonicalFuncProvider(IRangeCanonicalFuncProvider $provider)
+    public function registerRangeCanonicalFuncProvider(IRangeCanonicalFuncProvider $provider): bool
     {
         $pos = array_search($provider, $this->rangeCanonFuncProviders, true);
         if ($pos === false) {
@@ -269,7 +269,7 @@ class TypeRegister
      * @return bool whether the provider has actually been unregistered (<tt>false</tt> if it was not registered and
      *                thus this was a no-op)
      */
-    public function unregisterRangeCanonicalFuncProvider(IRangeCanonicalFuncProvider $provider)
+    public function unregisterRangeCanonicalFuncProvider(IRangeCanonicalFuncProvider $provider): bool
     {
         $pos = array_search($provider, $this->rangeCanonFuncProviders, true);
         if ($pos !== false) {
@@ -354,7 +354,7 @@ class TypeRegister
      * @param string $typeName name of the PostgreSQL type to get the converter for
      * @return IType|null converter for the requested type, or <tt>null</tt> if no converter was registered for the type
      */
-    public function getType($schemaName, $typeName)
+    public function getType(string $schemaName, string $typeName)
     {
         return ($this->types[$schemaName][$typeName] ?? null);
     }
@@ -367,7 +367,7 @@ class TypeRegister
      * @param IConnection $connection connection above which the type is to be loaded
      * @return IType|null converter for the requested type, or <tt>null</tt> if no loader recognizes the type
      */
-    public function loadType($schemaName, $typeName, IConnection $connection)
+    public function loadType(string $schemaName, string $typeName, IConnection $connection)
     {
         foreach ($this->typeLoaders as $loader) {
             $tc = $loader->loadType($schemaName, $typeName, $connection);
@@ -398,7 +398,7 @@ class TypeRegister
      * @param ITotallyOrderedType $subtype function argument type
      * @return IRangeCanonicalFunc|null the requested function, or <tt>null</tt> if no such function was registered
      */
-    public function getRangeCanonicalFunc($schemaName, $funcName, ITotallyOrderedType $subtype)
+    public function getRangeCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype)
     {
         return ($this->rangeCanonFuncs[$schemaName][$funcName][spl_object_hash($subtype)] ?? null);
     }
@@ -411,7 +411,7 @@ class TypeRegister
      * @param ITotallyOrderedType $subtype function argument type
      * @return IRangeCanonicalFunc|null the requested function, or <tt>null</tt> if no provider recognizes the function
      */
-    public function provideRangeCanonicalFunc($schemaName, $funcName, ITotallyOrderedType $subtype)
+    public function provideRangeCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype)
     {
         foreach ($this->rangeCanonFuncProviders as $provider) {
             $func = $provider->provideCanonicalFunc($schemaName, $funcName, $subtype);

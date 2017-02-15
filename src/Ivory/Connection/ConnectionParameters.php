@@ -13,8 +13,11 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
 {
     private $params = [];
 
-
-    public static function create($params)
+    /**
+     * @param array|string $params array of parameters, or URI, or connection string
+     * @return ConnectionParameters
+     */
+    public static function create($params): ConnectionParameters
     {
         if (is_array($params)) {
             return new ConnectionParameters($params);
@@ -33,7 +36,7 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
 
 
     /**
-     * Creates a connection parameters object from a RFC 3986 URI, e.g., `"postgresql://usr@localhost:5433/db"`.
+     * Creates a connection parameters object from an RFC 3986 URI, e.g., `"postgresql://usr@localhost:5433/db"`.
      *
      * The accepted URI is the same as for the libpq connect function, described in the
      * {@link http://www.postgresql.org/docs/9.4/static/libpq-connect.html PostgreSQL documentation}.
@@ -49,7 +52,7 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
      * @param string $uri
      * @return ConnectionParameters
      */
-    public static function fromUri($uri)
+    public static function fromUri(string $uri): ConnectionParameters
     {
         $c = parse_url($uri);
         if ($c === false) {
@@ -101,7 +104,7 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
      * @param string $connStr a PostgreSQL connection string
      * @return ConnectionParameters
      */
-    public static function fromConnectionString($connStr)
+    public static function fromConnectionString(string $connStr): ConnectionParameters
     {
         $params = [];
         $keyValueRegEx = "~\\s*([^=\\s]+)\\s*=\\s*([^'\\s]+|'(?:[^'\\\\]|\\\\['\\\\])*')~";
@@ -140,7 +143,7 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
      *
      * @param array $params map: connection parameter keyword => value
      */
-    public function __construct($params)
+    public function __construct(array $params)
     {
         $this->params = $params;
     }
@@ -148,7 +151,7 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
     /**
      * @return string connection string suitable for the pg_connect() function
      */
-    public function buildConnectionString()
+    public function buildConnectionString(): string
     {
         $kvPairs = [];
         foreach ($this->params as $k => $v) {

@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Type\Std;
 
+use Ivory\Connection\IConnection;
 use Ivory\Type\AdHocCompositeType;
 
 /**
@@ -8,7 +9,7 @@ use Ivory\Type\AdHocCompositeType;
  */
 class StdTypeLoader implements \Ivory\Type\ITypeLoader
 {
-    public function loadType(string $schemaName, string $typeName, \Ivory\Connection\IConnection $connection)
+    public function loadType(string $schemaName, string $typeName, IConnection $connection)
     {
         switch ($schemaName) {
             case 'pg_catalog':

@@ -18,7 +18,7 @@ class ConnectionException extends \RuntimeException
      * @param int $code
      * @param Exception $previous
      */
-    public function __construct($message = '', $code = 0, Exception $previous = null)
+    public function __construct($message = '', int $code = 0, Exception $previous = null)
     {
         if (is_resource($message)) {
             $message = pg_last_error($message);

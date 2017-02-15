@@ -20,7 +20,7 @@ class ConnConfigValueRetriever implements IConfigObserver
      *                                        <tt>$connConfig</tt>;
      *                                      expected to return the value which should be returned by {@link getValue()}
      */
-    public function __construct(IConnConfig $connConfig, $propertyName, callable $valueProcessor = null)
+    public function __construct(IConnConfig $connConfig, string $propertyName, callable $valueProcessor = null)
     {
         $this->connConfig = $connConfig;
         $this->propName = $propertyName;

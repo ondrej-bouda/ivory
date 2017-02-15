@@ -54,7 +54,7 @@ class IdentifierType implements ITotallyOrderedType
         return strcmp((string)$a, (string)$b); // FIXME: use the same comparison as StringType
     }
 
-    private function needsQuotes($val): bool
+    private function needsQuotes(string $val): bool
     {
         return !preg_match(
             '~^

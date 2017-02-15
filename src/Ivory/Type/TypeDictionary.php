@@ -24,7 +24,7 @@ class TypeDictionary implements ITypeDictionary
     private $searchedNameCache = [];
 
 
-    public function defineType($oid, IType $type)
+    public function defineType(int $oid, IType $type)
     {
         $this->oidTypeMap[$oid] = $type;
 

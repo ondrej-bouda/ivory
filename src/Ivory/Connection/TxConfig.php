@@ -38,7 +38,7 @@ class TxConfig
     /**
      * @param int $options one or more {@link TxConfig} constants combined together with the <tt>|</tt> operator
      */
-    public function __construct($options = 0)
+    public function __construct(int $options = 0)
     {
         $isolationLevel = $options & (
                 self::ISOLATION_SERIALIZABLE | self::ISOLATION_REPEATABLE_READ |
@@ -56,7 +56,7 @@ class TxConfig
         );
     }
 
-    private static function initBool($options, $trueBit, $falseBit, $errorDesc)
+    private static function initBool(int $options, int $trueBit, int $falseBit, string $errorDesc)
     {
         if ($options & $trueBit) {
             if ($options & $falseBit) {
@@ -113,7 +113,7 @@ class TxConfig
      * @param bool|null $readOnly
      * @return TxConfig
      */
-    public function setReadOnly($readOnly)
+    public function setReadOnly($readOnly): TxConfig
     {
         $this->readOnly = $readOnly;
         return $this;
@@ -131,7 +131,7 @@ class TxConfig
      * @param bool|null $deferrable
      * @return TxConfig
      */
-    public function setDeferrable($deferrable)
+    public function setDeferrable($deferrable): TxConfig
     {
         $this->deferrable = $deferrable;
         return $this;

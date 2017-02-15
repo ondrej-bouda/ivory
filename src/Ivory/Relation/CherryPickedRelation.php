@@ -28,7 +28,7 @@ class CherryPickedRelation extends StreamlinedRelation
      * @param int $tupleOffset
      * @return $this
      */
-    public function cherryPick($tupleOffset)
+    public function cherryPick(int $tupleOffset): CherryPickedRelation
     {
         $this->offsetMap[] = $tupleOffset;
         return $this;

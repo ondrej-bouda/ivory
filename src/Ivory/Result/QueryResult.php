@@ -33,7 +33,7 @@ class QueryResult extends Result implements IQueryResult
      * @param ITypeDictionary $typeDictionary
      * @param string|null $lastNotice last notice captured on the connection
      */
-    public function __construct($resultHandler, ITypeDictionary $typeDictionary, $lastNotice = null)
+    public function __construct($resultHandler, ITypeDictionary $typeDictionary, string $lastNotice = null)
     {
         parent::__construct($resultHandler, $lastNotice);
 
@@ -43,7 +43,7 @@ class QueryResult extends Result implements IQueryResult
         $this->populate(); // not lazy - chances are, when the query was made, the caller will care about its results
     }
 
-    private function fetchNumRows()
+    private function fetchNumRows(): int
     {
         $numRows = pg_num_rows($this->handler);
         if ($numRows >= 0 && $numRows !== null) { // NOTE: besides -1, pg_num_rows() might return NULL on error

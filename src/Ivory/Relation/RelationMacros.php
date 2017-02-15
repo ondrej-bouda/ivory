@@ -159,7 +159,7 @@ trait RelationMacros
      * @param array $cols
      * @return IWritableValueMap|ITupleMap
      */
-    private function assocImpl($emptyMapFactory, $lastForValues, $cols)
+    private function assocImpl(\Closure $emptyMapFactory, bool $lastForValues, array $cols)
     {
         $multiDimKeyCols = array_slice($cols, 0, -1 - (int)$lastForValues);
         $lastKeyCol = $cols[count($cols) - 1 - (int)$lastForValues];

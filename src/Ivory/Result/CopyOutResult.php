@@ -7,7 +7,7 @@ class CopyOutResult extends Result implements ICopyOutResult
 {
     private $connHandler;
 
-    public function __construct($connHandler, $resultHandler, $lastNotice = null)
+    public function __construct($connHandler, $resultHandler, string $lastNotice = null)
     {
         parent::__construct($resultHandler, $lastNotice);
 

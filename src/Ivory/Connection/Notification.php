@@ -12,17 +12,17 @@ class Notification
     private $pid;
     private $payload;
 
-    public function __construct($channel, $pid, $payload)
+    public function __construct(string $channel, int $pid, string $payload)
     {
         $this->channel = $channel;
         $this->pid = $pid;
-        $this->payload = (string)$payload;
+        $this->payload = $payload;
     }
 
     /**
      * @return string name of the IPC channel the notification was sent through
      */
-    public function getChannel()
+    public function getChannel(): string
     {
         return $this->channel;
     }
@@ -30,15 +30,15 @@ class Notification
     /**
      * @return int ID of the database server process which sent the notification
      */
-    public function getPid()
+    public function getPid(): int
     {
         return $this->pid;
     }
 
     /**
-     * @return string the notification payload
+     * @return string the notification payload (empty string denotes no payload)
      */
-    public function getPayload()
+    public function getPayload(): string
     {
         return $this->payload;
     }

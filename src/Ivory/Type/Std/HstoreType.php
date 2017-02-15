@@ -88,7 +88,7 @@ class HstoreType extends \Ivory\Type\BaseType
         return $res;
     }
 
-    private function quoteAtom($atom)
+    private function quoteAtom($atom): string
     {
         if ($atom === null) {
             return 'NULL';
@@ -97,7 +97,7 @@ class HstoreType extends \Ivory\Type\BaseType
         }
     }
 
-    private function unescapeAtom($escapedAtom)
+    private function unescapeAtom(string $escapedAtom): string
     {
         return strtr($escapedAtom, ['\\"' => '"', '\\\\' => '\\']);
     }

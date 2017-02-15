@@ -34,8 +34,11 @@ class StatementExceptionFactory
      *                                 expression
      * @return $this
      */
-    public function registerBySqlStateCodeAndMessage($sqlStateCode, $preg, $exceptionClass)
-    {
+    public function registerBySqlStateCodeAndMessage(
+        string $sqlStateCode,
+        string $preg,
+        string $exceptionClass
+    ): StatementExceptionFactory {
         assert(is_a($exceptionClass, StatementException::class, true));
         if (!isset($this->bySqlStateCodeAndMessage[$sqlStateCode])) {
             $this->bySqlStateCodeAndMessage[$sqlStateCode] = [];
@@ -50,7 +53,7 @@ class StatementExceptionFactory
      *                                 statement error with the SQLSTATE code
      * @return $this
      */
-    public function registerBySqlStateCode($sqlStateCode, $exceptionClass)
+    public function registerBySqlStateCode(string $sqlStateCode, string $exceptionClass): StatementExceptionFactory
     {
         assert(is_a($exceptionClass, StatementException::class, true));
         $this->bySqlStateCode[$sqlStateCode] = $exceptionClass;
@@ -63,7 +66,7 @@ class StatementExceptionFactory
      *                                 statement error with an SQLSTATE code falling under the given SQLSTATE class
      * @return $this
      */
-    public function registerBySqlStateClass($sqlStateClass, $exceptionClass)
+    public function registerBySqlStateClass(string $sqlStateClass, string $exceptionClass): StatementExceptionFactory
     {
         assert(is_a($exceptionClass, StatementException::class, true));
         $this->bySqlStateClass[$sqlStateClass] = $exceptionClass;
@@ -76,7 +79,7 @@ class StatementExceptionFactory
      *                                 statement error with a message matching the regular expression
      * @return $this
      */
-    public function registerByMessage($preg, $exceptionClass)
+    public function registerByMessage(string $preg, string $exceptionClass): StatementExceptionFactory
     {
         assert(is_a($exceptionClass, StatementException::class, true));
         $this->byMessage[$preg] = $exceptionClass;
@@ -101,14 +104,17 @@ class StatementExceptionFactory
      * @param StatementExceptionFactory $fallbackFactory
      * @return StatementException
      */
-    public function createException($resultHandler, $query, StatementExceptionFactory $fallbackFactory = null)
-    {
+    public function createException(
+        $resultHandler,
+        string $query,
+        StatementExceptionFactory $fallbackFactory = null
+    ): StatementException {
         $exClass = $this->inferExceptionClass($resultHandler, $fallbackFactory);
         assert(is_a($exClass, StatementException::class, true));
         return new $exClass($resultHandler, $query);
     }
 
-    private function inferExceptionClass($resultHandler, StatementExceptionFactory $fallbackFactory = null)
+    private function inferExceptionClass($resultHandler, StatementExceptionFactory $fallbackFactory = null): string
     {
         if ($this->bySqlStateCodeAndMessage || $this->bySqlStateCode || $this->bySqlStateClass) {
             $sqlStateCode = pg_result_error_field($resultHandler, PGSQL_DIAG_SQLSTATE);

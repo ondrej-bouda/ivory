@@ -89,7 +89,10 @@ class ConnectionControl implements IConnectionControl
         return true;
     }
 
-    private function openConnection($connectFlags = 0)
+    /**
+     * @param int $connectFlags flags for {@link pg_connect()} (`PGSQL_CONNECT_FORCE_NEW` is enforced implicitly)
+     */
+    private function openConnection(int $connectFlags = 0)
     {
         $connStr = $this->params->buildConnectionString();
         $this->handler = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW | $connectFlags);
@@ -140,7 +143,7 @@ class ConnectionControl implements IConnectionControl
         }
     }
 
-    private static function isStreamReadable($stream, $sec, $usec = null)
+    private static function isStreamReadable($stream, int $sec, int $usec = null): bool
     {
         $r = [$stream];
         $w = [];

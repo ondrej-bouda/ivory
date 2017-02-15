@@ -18,7 +18,7 @@ class LineType extends CompoundGeometricType
     private $lineSegType;
 
 
-    public function __construct($schemaName, $name, $connection)
+    public function __construct(string $schemaName, string $name, $connection)
     {
         parent::__construct($schemaName, $name, $connection);
 

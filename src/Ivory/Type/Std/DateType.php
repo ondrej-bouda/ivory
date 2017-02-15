@@ -45,7 +45,7 @@ class DateType extends BaseType implements IDiscreteType
 
     private $dateStyleRetriever;
 
-    public function __construct($schemaName, $name, IConnection $connection)
+    public function __construct(string $schemaName, string $name, IConnection $connection)
     {
         parent::__construct($schemaName, $name, $connection);
 
