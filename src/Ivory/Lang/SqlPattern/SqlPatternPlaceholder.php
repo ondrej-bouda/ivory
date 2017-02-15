@@ -24,8 +24,14 @@ class SqlPatternPlaceholder
      *                                  schema is given
      * @param bool $schemaNameQuoted whether the schema name is quoted
      */
-    public function __construct(int $offset, $nameOrPosition, string $typeName = null, bool $typeNameQuoted = false, string $schemaName = null, bool $schemaNameQuoted = false)
-    {
+    public function __construct(
+        int $offset,
+        $nameOrPosition,
+        string $typeName = null,
+        bool $typeNameQuoted = false,
+        string $schemaName = null,
+        bool $schemaNameQuoted = false
+    ) {
         $this->offset = $offset;
         $this->nameOrPosition = $nameOrPosition;
         $this->typeName = $typeName;
