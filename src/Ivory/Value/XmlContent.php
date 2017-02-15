@@ -56,7 +56,7 @@ class XmlContent
             $isDoc = true;
         } elseif (is_object($value)) {
             $xmlStr = (string)$value;
-            $isDoc = self::isXmlDocument($value);
+            $isDoc = self::isXmlDocument($xmlStr);
         } else {
             throw new \InvalidArgumentException('value');
         }
