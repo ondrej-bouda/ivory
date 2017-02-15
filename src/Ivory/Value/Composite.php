@@ -40,7 +40,7 @@ class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
      * @param array $values list of values of corresponding attributes
      * @return Composite
      */
-    public static function fromList(CompositeType $type, $values)
+    public static function fromList(CompositeType $type, array $values): Composite
     {
         return new Composite($type, $values);
     }
@@ -54,7 +54,7 @@ class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
      * @param array $map map: attribute name => value; unspecified attributes get a <tt>null</tt> value
      * @return Composite
      */
-    public static function fromMap(NamedCompositeType $type, $map)
+    public static function fromMap(NamedCompositeType $type, $map): Composite
     {
         $values = array_fill(0, count($type->getAttributes()), null);
         foreach ($map as $k => $v) {
@@ -70,21 +70,17 @@ class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
         return new Composite($type, $values);
     }
 
-    private function __construct(CompositeType $type, $values)
+    private function __construct(CompositeType $type, array $values)
     {
         $this->type = $type;
         $this->values = $values;
     }
 
-    final public function getType()
+    final public function getType(): CompositeType
     {
         return $this->type;
     }
 
-    /**
-     * @param mixed $other
-     * @return bool whether this and the other composite value are of the identical type and contain the same data
-     */
     public function equals($other)
     {
         if ($other === null) {
@@ -103,7 +99,7 @@ class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
     /**
      * @return array list of the elementary values
      */
-    public function toList()
+    public function toList(): array
     {
         return $this->values;
     }
@@ -113,7 +109,7 @@ class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
      * @throws UnsupportedException if called on a value of an ad hoc composite type, i.e., such that defines no
      *                              attributes
      */
-    public function toMap()
+    public function toMap(): array
     {
         $attNames = array_keys($this->type->getAttributes());
         if (!$attNames) {

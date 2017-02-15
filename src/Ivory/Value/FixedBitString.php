@@ -29,7 +29,7 @@ class FixedBitString extends BitString
      * @return FixedBitString
      * @throws \InvalidArgumentException if <tt>$length</tt> is a non-positive number (PostgreSQL forbids it)
      */
-    public static function fromString($bits, $length = null)
+    public static function fromString(string $bits, int $length = null): FixedBitString
     {
         $bits = (string)$bits;
         $bitsLen = strlen($bits);
@@ -61,7 +61,7 @@ class FixedBitString extends BitString
      * @return FixedBitString
      * @throws \InvalidArgumentException if <tt>$length</tt> is a non-positive number
      */
-    public static function fromInt($int, $length)
+    public static function fromInt(int $int, int $length): FixedBitString
     {
         if ($length <= 0) {
             throw new \InvalidArgumentException('length <= 0');
@@ -92,7 +92,7 @@ class FixedBitString extends BitString
      *
      * @return int
      */
-    public function toInt()
+    public function toInt(): int
     {
         return bindec(substr($this->bits, -(PHP_INT_SIZE * 8 - 1)));
     }

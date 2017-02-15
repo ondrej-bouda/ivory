@@ -104,8 +104,8 @@ class Range implements IComparable, \ArrayAccess
         $lower,
         $upper,
         $boundsOrLowerInc = '[)',
-        $upperInc = null
-    ) {
+        bool $upperInc = null
+    ): Range {
         list($loInc, $upInc) = self::processBoundSpec($boundsOrLowerInc, $upperInc);
 
         if ($lower !== null && $upper !== null) {
@@ -161,7 +161,7 @@ class Range implements IComparable, \ArrayAccess
      * @param ITotallyOrderedType $subtype the range subtype
      * @return Range
      */
-    public static function createEmpty(ITotallyOrderedType $subtype)
+    public static function createEmpty(ITotallyOrderedType $subtype): Range
     {
         return new Range($subtype, null, true, null, null, null, null);
     }
@@ -195,7 +195,7 @@ class Range implements IComparable, \ArrayAccess
     private function __construct(
         ITotallyOrderedType $subtype,
         $canonicalFunc,
-        $empty,
+        bool $empty,
         $lower,
         $upper,
         $lowerInc,
@@ -214,7 +214,7 @@ class Range implements IComparable, \ArrayAccess
 
     //region getters
 
-    final public function getSubtype()
+    final public function getSubtype(): ITotallyOrderedType
     {
         return $this->subtype;
     }
@@ -222,7 +222,7 @@ class Range implements IComparable, \ArrayAccess
     /**
      * @return bool whether the range is empty
      */
-    final public function isEmpty()
+    final public function isEmpty(): bool
     {
         return $this->empty;
     }
@@ -277,7 +277,7 @@ class Range implements IComparable, \ArrayAccess
     /**
      * @return bool whether the range is just a single point
      */
-    final public function isSinglePoint()
+    final public function isSinglePoint(): bool
     {
         if ($this->empty || $this->lower === null || $this->upper === null) {
             return false;
@@ -374,8 +374,8 @@ class Range implements IComparable, \ArrayAccess
 
     /**
      * @param mixed $element a value of the range subtype
-     * @return bool whether this range contains the given element;
-     *              <tt>null</tt> on <tt>null</tt> input
+     * @return bool|null whether this range contains the given element;
+     *                   <tt>null</tt> on <tt>null</tt> input
      */
     public function containsElement($element)
     {
@@ -405,9 +405,9 @@ class Range implements IComparable, \ArrayAccess
 
     /**
      * @param mixed $element value of the range subtype
-     * @return bool <tt>true</tt> iff this range is left of the given element - value of the range subtype;
-     *              <tt>false</tt> otherwise, especially if this range is empty;
-     *              <tt>null</tt> on <tt>null</tt> input
+     * @return bool|null <tt>true</tt> iff this range is left of the given element - value of the range subtype;
+     *                   <tt>false</tt> otherwise, especially if this range is empty;
+     *                   <tt>null</tt> on <tt>null</tt> input
      */
     public function leftOfElement($element)
     {
@@ -427,9 +427,9 @@ class Range implements IComparable, \ArrayAccess
 
     /**
      * @param mixed $element value of the range subtype
-     * @return bool <tt>true</tt> iff this range is right of the given element - value of the range subtype;
-     *              <tt>false</tt> otherwise, especially if this range is empty;
-     *              <tt>null</tt> on <tt>null</tt> input
+     * @return bool|null <tt>true</tt> iff this range is right of the given element - value of the range subtype;
+     *                   <tt>false</tt> otherwise, especially if this range is empty;
+     *                   <tt>null</tt> on <tt>null</tt> input
      */
     public function rightOfElement($element)
     {
@@ -449,9 +449,9 @@ class Range implements IComparable, \ArrayAccess
 
     /**
      * @param Range $other a range of the same subtype as this range
-     * @return bool whether this range entirely contains the other range;
-     *              an empty range is considered to be contained in any range, even an empty one;
-     *              <tt>null</tt> on <tt>null</tt> input
+     * @return bool|null whether this range entirely contains the other range;
+     *                   an empty range is considered to be contained in any range, even an empty one;
+     *                   <tt>null</tt> on <tt>null</tt> input
      */
     public function containsRange($other)
     {
@@ -495,9 +495,9 @@ class Range implements IComparable, \ArrayAccess
 
     /**
      * @param Range $other a range of the same subtype as this range
-     * @return bool whether this range is entirely contained in the other range;
-     *              an empty range is considered to be contained in any range, even an empty one;
-     *              <tt>null</tt> on <tt>null</tt> input
+     * @return bool|null whether this range is entirely contained in the other range;
+     *                   an empty range is considered to be contained in any range, even an empty one;
+     *                   <tt>null</tt> on <tt>null</tt> input
      */
     public function containedInRange($other)
     {
@@ -512,8 +512,8 @@ class Range implements IComparable, \ArrayAccess
 
     /**
      * @param Range $other a range of the same subtype as this range
-     * @return bool whether this and the other range overlap, i.e., have a non-empty intersection;
-     *              <tt>null</tt> on <tt>null</tt> input
+     * @return bool|null whether this and the other range overlap, i.e., have a non-empty intersection;
+     *                   <tt>null</tt> on <tt>null</tt> input
      */
     public function overlaps($other)
     {
@@ -546,8 +546,8 @@ class Range implements IComparable, \ArrayAccess
      * Computes the intersection of this range with another range.
      *
      * @param Range $other a range of the same subtype as this range
-     * @return Range intersection of this and the other range
-     *               <tt>null</tt> on <tt>null</tt> input
+     * @return Range|null intersection of this and the other range
+     *                    <tt>null</tt> on <tt>null</tt> input
      */
     public function intersect($other)
     {
@@ -611,17 +611,17 @@ class Range implements IComparable, \ArrayAccess
      * @return bool whether the range is finite, i.e., neither starts nor ends in the infinity;
      *              note that an empty range is considered as finite
      */
-    final public function isFinite()
+    final public function isFinite(): bool
     {
         return ($this->empty || ($this->lower !== null && $this->upper !== null));
     }
 
     /**
      * @param Range|null $other a range of the same subtype as this range
-     * @return bool <tt>true</tt> iff this range is strictly left of the other range, i.e., it ends before the other
-     *                starts;
-     *              <tt>false</tt> otherwise, especially if either range is empty;
-     *              <tt>null</tt> on <tt>null</tt> input
+     * @return bool|null <tt>true</tt> iff this range is strictly left of the other range, i.e., it ends before the
+     *                   +  other starts;
+     *                   <tt>false</tt> otherwise, especially if either range is empty;
+     *                   <tt>null</tt> on <tt>null</tt> input
      */
     public function strictlyLeftOf($other)
     {
@@ -644,10 +644,10 @@ class Range implements IComparable, \ArrayAccess
 
     /**
      * @param Range|null $other a range of the same subtype as this range
-     * @return bool <tt>true</tt> iff this range is strictly left of the other range, i.e., it ends before the other
-     *                starts;
-     *              <tt>false</tt> otherwise, especially if either range is empty;;
-     *              <tt>null</tt> on <tt>null</tt> input
+     * @return bool|null <tt>true</tt> iff this range is strictly left of the other range, i.e., it ends before the
+     *                     other starts;
+     *                   <tt>false</tt> otherwise, especially if either range is empty;;
+     *                   <tt>null</tt> on <tt>null</tt> input
      */
     public function strictlyRightOf($other)
     {

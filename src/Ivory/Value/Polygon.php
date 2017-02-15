@@ -18,7 +18,7 @@ class Polygon
      * @param Point[]|float[][] $points
      * @return Polygon
      */
-    public static function fromPoints($points)
+    public static function fromPoints($points): Polygon
     {
         if (count($points) == 0) {
             throw new \InvalidArgumentException('points');

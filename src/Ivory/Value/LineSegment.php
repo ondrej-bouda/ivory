@@ -21,7 +21,7 @@ class LineSegment
      * @param Point|float[] $end
      * @return LineSegment
      */
-    public static function fromEndpoints($start, $end)
+    public static function fromEndpoints($start, $end): LineSegment
     {
         if (is_array($start)) {
             $start = Point::fromCoords($start);
@@ -39,7 +39,7 @@ class LineSegment
     }
 
 
-    private function __construct($start, $end)
+    private function __construct(Point $start, Point $end)
     {
         $this->start = $start;
         $this->end = $end;
@@ -48,7 +48,7 @@ class LineSegment
     /**
      * @return Point the first endpoint of this line segment
      */
-    public function getStart()
+    public function getStart(): Point
     {
         return $this->start;
     }
@@ -56,7 +56,7 @@ class LineSegment
     /**
      * @return Point the second endpoint of this line segment
      */
-    public function getEnd()
+    public function getEnd(): Point
     {
         return $this->end;
     }
@@ -64,7 +64,7 @@ class LineSegment
     /**
      * @return float length of the line segment
      */
-    public function getLength()
+    public function getLength(): float
     {
         return sqrt(
             ($this->start->getX() - $this->end->getX()) ** 2

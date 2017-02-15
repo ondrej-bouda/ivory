@@ -22,7 +22,7 @@ class Line
      * @param float $c the coefficient C
      * @return Line
      */
-    public static function fromEquationCoeffs($a, $b, $c)
+    public static function fromEquationCoeffs(float $a, float $b, float $c): Line
     {
         if ($a == 0 && $b == 0) {
             throw new \InvalidArgumentException('$a and $b cannot both be zero');
@@ -38,11 +38,11 @@ class Line
     /**
      * Creates a new line defined by two different points.
      *
-     * @param Point|float $p1
-     * @param Point|float $p2
+     * @param Point $p1
+     * @param Point $p2
      * @return Line
      */
-    public static function fromPoints($p1, $p2)
+    public static function fromPoints(Point $p1, Point $p2): Line
     {
         if ($p1 == $p2) {
             throw new \InvalidArgumentException('$p1 and $p2 must be different for determining a line');
@@ -55,7 +55,7 @@ class Line
         return new Line($a, $b, $c, [$p1, $p2]);
     }
 
-    private function __construct($a, $b, $c, $points)
+    private function __construct(float $a, float $b, float $c, $points)
     {
         $this->a = $a;
         $this->b = $b;
@@ -83,7 +83,7 @@ class Line
     /**
      * @return Point[] a pair of points determining the line
      */
-    public function getPoints()
+    public function getPoints(): array
     {
         return $this->points;
     }

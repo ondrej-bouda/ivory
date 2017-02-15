@@ -59,7 +59,7 @@ class Path
         return new Path($normalized, $isOpen);
     }
 
-    private function __construct($points, $isOpen)
+    private function __construct($points, bool $isOpen)
     {
         $this->points = $points;
         $this->open = $isOpen;
@@ -76,7 +76,7 @@ class Path
     /**
      * @return bool whether the path is open ({@link Path::OPEN}) or closed ({@link Path::CLOSED})
      */
-    public function isOpen()
+    public function isOpen(): bool
     {
         return $this->open;
     }

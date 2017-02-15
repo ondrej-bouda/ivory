@@ -27,7 +27,7 @@ class Timestamp extends TimestampBase
      * @return Timestamp date/time representing the current moment, with precision to microseconds (or, more
      *                     specifically, with the precision supported by the hosting platform)
      */
-    public static function now()
+    public static function now(): Timestamp
     {
         if (PHP_VERSION_ID >= 70100) {
             return new Timestamp(0, new \DateTimeImmutable('now', self::getUTCTimeZone()));
@@ -58,7 +58,7 @@ class Timestamp extends TimestampBase
      * @return Timestamp
      * @throws \InvalidArgumentException on invalid input
      */
-    public static function fromISOString($isoDateTimeString)
+    public static function fromISOString(string $isoDateTimeString): Timestamp
     {
         $dt = self::isoStringToDateTime($isoDateTimeString, self::getUTCTimeZone());
         return new Timestamp(0, $dt);
@@ -68,7 +68,7 @@ class Timestamp extends TimestampBase
      * @param \DateTimeInterface $dateTime
      * @return Timestamp date/time represented by the given <tt>$dateTime</tt> object, ignoring the timezone information
      */
-    public static function fromDateTime(\DateTimeInterface $dateTime)
+    public static function fromDateTime(\DateTimeInterface $dateTime): Timestamp
     {
         return self::fromISOString($dateTime->format('Y-m-d H:i:s.u'));
     }
@@ -96,7 +96,7 @@ class Timestamp extends TimestampBase
      * @return Timestamp
      * @throws \InvalidArgumentException if <tt>$year</tt> is zero
      */
-    public static function fromParts($year, $month, $day, $hour, $minute, $second)
+    public static function fromParts(int $year, int $month, int $day, int $hour, int $minute, $second): Timestamp
     {
         if ($year == 0) {
             throw new \InvalidArgumentException('$year zero is undefined');
@@ -143,7 +143,7 @@ class Timestamp extends TimestampBase
      *                                of the next minute)
      * @throws \InvalidArgumentException if <tt>$year</tt> is zero
      */
-    public static function fromPartsStrict($year, $month, $day, $hour, $minute, $second)
+    public static function fromPartsStrict(int $year, int $month, int $day, int $hour, int $minute, $second): Timestamp
     {
         self::assertRanges($year, $month, $day, $hour, $minute, $second);
         $z = ($year > 0 ? $year : $year + 1);
@@ -159,7 +159,7 @@ class Timestamp extends TimestampBase
     }
 
 
-    final protected function getISOFormat()
+    final protected function getISOFormat(): string
     {
         return 'Y-m-d\TH:i:s' . ($this->dt->format('u') ? '.u' : '');
     }

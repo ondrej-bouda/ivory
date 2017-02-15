@@ -29,7 +29,7 @@ class Money
      * @throws \InvalidArgumentException if the string does not conform to the recognized syntax (which is iff it does
      *                                     not contain any decimal digit)
      */
-    public static function fromString($moneyStr, $decimalSeparator)
+    public static function fromString(string $moneyStr, string $decimalSeparator): Money
     {
         $ds = preg_quote($decimalSeparator, '~');
         $re = '~^ \s*
@@ -57,7 +57,7 @@ class Money
         return new Money($decimal, $unit);
     }
 
-    public static function fromNumber($amount, $unit = null)
+    public static function fromNumber($amount, string $unit = null): Money
     {
         $decimal = Decimal::fromNumber($amount);
         if ($decimal->isNaN()) {
@@ -68,7 +68,7 @@ class Money
     }
 
 
-    private function __construct($amount, $unit)
+    private function __construct(Decimal $amount, $unit)
     {
         $this->amount = $amount;
         $this->unit = $unit;
@@ -77,7 +77,7 @@ class Money
     /**
      * @return Decimal
      */
-    public function getAmount()
+    public function getAmount(): Decimal
     {
         return $this->amount;
     }

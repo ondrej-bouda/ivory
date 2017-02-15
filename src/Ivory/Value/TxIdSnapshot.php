@@ -25,7 +25,7 @@ class TxIdSnapshot
      * @throws \InvalidArgumentException when <tt>$xmin</tt> or <tt>$xmax</tt> have an invalid value
      * @throws \OutOfRangeException when any <tt>$xipList</tt> item is out of <tt>[$xmin, $xmax)</tt>
      */
-    public static function fromParts($xmin, $xmax, array $xipList)
+    public static function fromParts(int $xmin, int $xmax, $xipList): TxIdSnapshot
     {
         if ($xmin <= 0 || $xmax <= 0 || $xmin > $xmax) {
             throw new \InvalidArgumentException('invalid $xmin or $xmax');
@@ -46,35 +46,29 @@ class TxIdSnapshot
      *                                     value
      * @throws \OutOfRangeException when any <tt>$xipList</tt> item is out of <tt>[$xmin, $xmax)</tt>
      */
-    public static function fromString($str)
+    public static function fromString(string $str): TxIdSnapshot
     {
         $parts = explode(':', $str);
         if (count($parts) != 3) {
             throw new \InvalidArgumentException('invalid format, expecting $xmin:$xmax:[$xipList]');
         }
         $xipList = ($parts[2] ? explode(',', $parts[2]) : []);
-        return self::fromParts($parts[0], $parts[1], $xipList);
+        return self::fromParts((int)$parts[0], (int)$parts[1], $xipList);
     }
 
-    private function __construct($xmin, $xmax, $xipList)
+    private function __construct(int $xmin, int $xmax, $xipList)
     {
         $this->xmin = $xmin;
         $this->xmax = $xmax;
         $this->xipList = $xipList;
     }
 
-    /**
-     * @return int
-     */
-    public function getXmin()
+    public function getXmin(): int
     {
         return $this->xmin;
     }
 
-    /**
-     * @return int
-     */
-    public function getXmax()
+    public function getXmax(): int
     {
         return $this->xmax;
     }
@@ -87,10 +81,7 @@ class TxIdSnapshot
         return $this->xipList;
     }
 
-    /**
-     * @return string
-     */
-    public function toString()
+    public function toString(): string
     {
         return sprintf('%d:%d:%s', $this->xmin, $this->xmax, implode(',', $this->xipList));
     }

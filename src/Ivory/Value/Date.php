@@ -24,7 +24,7 @@ class Date extends DateBase
     /**
      * @return Date date representing the current day
      */
-    public static function today()
+    public static function today(): Date
     {
         return new Date(0, new \DateTimeImmutable('today', self::getUTCTimeZone()));
     }
@@ -32,7 +32,7 @@ class Date extends DateBase
     /**
      * @return Date date representing the next day
      */
-    public static function tomorrow()
+    public static function tomorrow(): Date
     {
         return new Date(0, new \DateTimeImmutable('tomorrow', self::getUTCTimeZone()));
     }
@@ -40,7 +40,7 @@ class Date extends DateBase
     /**
      * @return Date date representing the previous day
      */
-    public static function yesterday()
+    public static function yesterday(): Date
     {
         return new Date(0, new \DateTimeImmutable('yesterday', self::getUTCTimeZone()));
     }
@@ -59,7 +59,7 @@ class Date extends DateBase
      * @return Date
      * @throws \InvalidArgumentException on invalid input
      */
-    public static function fromISOString($isoDateString)
+    public static function fromISOString(string $isoDateString): Date
     {
         // check out for more than 4 digits for the year - something date_create_immutable() does not handle properly
         $addYears = 0;
@@ -94,7 +94,7 @@ class Date extends DateBase
      *                         {@link mktime()} or {@link date()}
      * @return Date the date of the given timestamp
      */
-    public static function fromUnixTimestamp($timestamp)
+    public static function fromUnixTimestamp(int $timestamp): Date
     {
         return new Date(0, new \DateTimeImmutable(gmdate('Y-m-d', $timestamp), self::getUTCTimeZone()));
     }
@@ -103,7 +103,7 @@ class Date extends DateBase
      * @param \DateTimeInterface $dateTime
      * @return Date date represented by the date part of the given <tt>$dateTime</tt> object
      */
-    public static function fromDateTime(\DateTimeInterface $dateTime)
+    public static function fromDateTime(\DateTimeInterface $dateTime): Date
     {
         return self::fromISOString($dateTime->format('Y-m-d'));
     }
@@ -126,7 +126,7 @@ class Date extends DateBase
      * @return Date
      * @throws \InvalidArgumentException iff <tt>$year</tt> is zero
      */
-    public static function fromParts($year, $month, $day)
+    public static function fromParts(int $year, int $month, int $day): Date
     {
         if ($year == 0) {
             throw new \InvalidArgumentException('$year zero is undefined');
@@ -161,7 +161,7 @@ class Date extends DateBase
      *                                Gregorian calendar
      * @throws \InvalidArgumentException if <tt>$year</tt> is zero
      */
-    public static function fromPartsStrict($year, $month, $day)
+    public static function fromPartsStrict(int $year, int $month, int $day): Date
     {
         if ($year == 0) {
             throw new \InvalidArgumentException('$year zero is undefined');
@@ -183,7 +183,7 @@ class Date extends DateBase
     }
 
 
-    final protected function getISOFormat()
+    final protected function getISOFormat(): string
     {
         return 'Y-m-d';
     }
@@ -209,7 +209,7 @@ class Date extends DateBase
      * @param int $days
      * @return Date the date <tt>$years</tt> years, <tt>$months</tt> months and <tt>$days</tt> days after this date
      */
-    public function addParts($years, $months, $days)
+    public function addParts(int $years, int $months, int $days): Date
     {
         return $this->addPartsImpl($years, $months, $days, 0, 0, 0);
     }

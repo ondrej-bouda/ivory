@@ -8,7 +8,7 @@ namespace Ivory\Value;
  */
 class XmlDocument extends XmlContent
 {
-    public function toDOMDocument()
+    public function toDOMDocument(): \DOMDocument
     {
         $impl = new \DOMImplementation();
         $doc = $impl->createDocument();
@@ -16,7 +16,7 @@ class XmlDocument extends XmlContent
         return $doc;
     }
 
-    public function toSimpleXMLElement()
+    public function toSimpleXMLElement(): \SimpleXMLElement
     {
         return new \SimpleXMLElement($this->toString());
     }

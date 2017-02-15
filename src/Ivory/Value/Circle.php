@@ -19,7 +19,7 @@ class Circle
      * @param float $radius radius of the circle
      * @return Circle
      */
-    public static function fromCoords($center, $radius)
+    public static function fromCoords($center, $radius): Circle
     {
         if (is_array($center)) {
             $center = Point::fromCoords($center);
@@ -35,7 +35,7 @@ class Circle
     }
 
 
-    private function __construct($center, $radius)
+    private function __construct(Point $center, float $radius)
     {
         $this->center = $center;
         $this->radius = $radius;
@@ -44,7 +44,7 @@ class Circle
     /**
      * @return Point the center point of the circle
      */
-    public function getCenter()
+    public function getCenter(): Point
     {
         return $this->center;
     }
@@ -52,7 +52,7 @@ class Circle
     /**
      * @return float the radius of the circle
      */
-    public function getRadius()
+    public function getRadius(): float
     {
         return $this->radius;
     }

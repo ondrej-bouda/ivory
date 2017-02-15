@@ -31,7 +31,7 @@ class Time extends TimeBase
      * @throws \InvalidArgumentException on invalid input
      * @throws \OutOfRangeException when some of the parts is outside its range
      */
-    public static function fromString($timeString)
+    public static function fromString(string $timeString): Time
     {
         if (!preg_match('~^(\d+):(\d+)(?::(\d+(?:\.\d*)?))?$~', $timeString, $m)) {
             throw new \InvalidArgumentException('$timeString');
@@ -60,7 +60,7 @@ class Time extends TimeBase
      * @return Time
      * @throws \OutOfRangeException when the resulting time underruns 00:00:00 or exceeds 24:00:00
      */
-    public static function fromParts($hour, $minute, $second)
+    public static function fromParts(int $hour, int $minute, $second): Time
     {
         return new Time(self::partsToSec($hour, $minute, $second));
     }
@@ -78,7 +78,7 @@ class Time extends TimeBase
      * @return Time
      * @throws \OutOfRangeException when some of the parts is outside its range
      */
-    public static function fromPartsStrict($hour, $minute, $second)
+    public static function fromPartsStrict(int $hour, int $minute, $second): Time
     {
         return new Time(self::partsToSecStrict($hour, $minute, $second));
     }
@@ -95,7 +95,7 @@ class Time extends TimeBase
      * @param int|float $timestamp
      * @return Time
      */
-    public static function fromUnixTimestamp($timestamp)
+    public static function fromUnixTimestamp($timestamp): Time
     {
         return new Time(self::cutUnixTimestampToSec($timestamp));
     }
@@ -106,7 +106,7 @@ class Time extends TimeBase
      * @param \DateTimeInterface $dateTime
      * @return Time
      */
-    public static function fromDateTime(\DateTimeInterface $dateTime)
+    public static function fromDateTime(\DateTimeInterface $dateTime): Time
     {
         return self::fromString($dateTime->format('H:i:s.u'));
     }

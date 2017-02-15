@@ -18,7 +18,7 @@ class XmlContent
      * @param string|XmlContent|\DOMDocument|\DOMNode|\DOMNodeList|\SimpleXMLElement|object $value
      * @return XmlContent
      */
-    public static function fromValue($value)
+    public static function fromValue($value): XmlContent
     {
         if (is_string($value)) {
             $xmlStr = $value;
@@ -68,7 +68,7 @@ class XmlContent
         }
     }
 
-    private static function isXmlDocument($xmlStr)
+    private static function isXmlDocument(string $xmlStr): bool
     {
         $reader = new \XMLReader();
         $reader->xml($xmlStr);
@@ -84,7 +84,7 @@ class XmlContent
         return ($reader->depth == 0);
     }
 
-    private static function getXMLDeclaration(\DOMDocument $doc)
+    private static function getXMLDeclaration(\DOMDocument $doc): string
     {
         $out = '<?xml version="' . $doc->xmlVersion . '"';
         if (strlen($doc->xmlEncoding) > 0) {
@@ -109,7 +109,7 @@ class XmlContent
     /**
      * @return string the XML value as a string
      */
-    public function toString()
+    public function toString(): string
     {
         return $this->xmlStr;
     }

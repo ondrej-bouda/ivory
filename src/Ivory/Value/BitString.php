@@ -30,7 +30,7 @@ abstract class BitString implements IComparable, \ArrayAccess
     /**
      * @param string $bits
      */
-    protected function __construct($bits)
+    protected function __construct(string $bits)
     {
         if (!preg_match('~^[01]*$~', $bits)) {
             throw new \InvalidArgumentException('bits');
@@ -44,7 +44,7 @@ abstract class BitString implements IComparable, \ArrayAccess
     /**
      * @return string textual representation of this bit string (index 0 is the leftmost bit): a string of 1's and 0's
      */
-    public function toString()
+    public function toString(): string
     {
         return $this->bits;
     }
@@ -52,7 +52,7 @@ abstract class BitString implements IComparable, \ArrayAccess
     /**
      * @return int number of bits in the bit string
      */
-    public function getLength()
+    public function getLength(): int
     {
         return $this->len;
     }
@@ -60,7 +60,7 @@ abstract class BitString implements IComparable, \ArrayAccess
     /**
      * @return bool whether all the bits are zero
      */
-    public function isZero()
+    public function isZero(): bool
     {
         return !$this->isNonZero();
     }
@@ -68,7 +68,7 @@ abstract class BitString implements IComparable, \ArrayAccess
     /**
      * @return bool whether some bit is one
      */
-    public function isNonZero()
+    public function isNonZero(): bool
     {
         for ($i = 0; $i < $this->len; $i++) {
             if ($this->bits[$i] == '1') {
@@ -80,8 +80,8 @@ abstract class BitString implements IComparable, \ArrayAccess
     }
 
     /**
-     * @param BitString $other
-     * @return bool whether this and the other bit string are of the same type, have the same bits and same length
+     * @param BitString|null $other
+     * @return bool|null whether this and the other bit string are of the same type, have the same bits and same length
      */
     public function equals($other)
     {
@@ -95,7 +95,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      * @param BitString $other any bit string of any length
      * @return bool whether this and the other bit string have the same bits, i.e., are the same 1's and 0's strings
      */
-    public function bitEquals(BitString $other)
+    public function bitEquals(BitString $other): bool
     {
         return ($this->bits === $other->bits); // ===: PHP would otherwise convert both strings to integers
     }
@@ -108,7 +108,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      * @param BitString $other any bit string of any length
      * @return bool whether this and the other bit string share at least one set bit at the same offset
      */
-    public function intersects(BitString $other)
+    public function intersects(BitString $other): bool
     {
         for ($i = min($this->len, $other->len) - 1; $i >= 0; $i--) {
             if ($this->bits[$i] == '1' && $other->bits[$i] == '1') {
@@ -140,7 +140,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      * @return FixedBitString the substring of the bit string
      * @throws UndefinedOperationException when <tt>$for</tt> is negative
      */
-    public function substring($from, $for = null)
+    public function substring(int $from, int $for = null): FixedBitString
     {
         if ($for < 0) {
             throw new UndefinedOperationException('negative number of bits to take');
@@ -173,7 +173,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      * @param BitString $concatenated
      * @return VarBitString bit string made up by concatenating the <tt>$concatenated</tt> after this bit string
      */
-    public function concat(BitString $concatenated)
+    public function concat(BitString $concatenated): VarBitString
     {
         return VarBitString::fromString($this->bits . $concatenated->bits);
     }
@@ -185,7 +185,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      * @return FixedBitString new bit string: <tt>$this & $other</tt>
      * @throws UndefinedOperationException if the operands are of different bit lengths
      */
-    public function bitAnd(BitString $other)
+    public function bitAnd(BitString $other): FixedBitString
     {
         if ($this->len != $other->len) {
             throw new UndefinedOperationException('operands are of different bit lengths');
@@ -208,7 +208,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      * @return FixedBitString new bit string: <tt>$this | $other</tt>
      * @throws UndefinedOperationException if the operands are of different bit lengths
      */
-    public function bitOr(BitString $other)
+    public function bitOr(BitString $other): FixedBitString
     {
         if ($this->len != $other->len) {
             throw new UndefinedOperationException('operands are of different bit lengths');
@@ -231,7 +231,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      * @return FixedBitString new bit string: <tt>$this ^ $other</tt>
      * @throws UndefinedOperationException if the operands are of different bit lengths
      */
-    public function bitXor(BitString $other)
+    public function bitXor(BitString $other): FixedBitString
     {
         if ($this->len != $other->len) {
             throw new UndefinedOperationException('operands are of different bit lengths');
@@ -252,7 +252,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      *
      * @return FixedBitString new bit string: <tt>~$this</tt>
      */
-    public function bitNot()
+    public function bitNot(): FixedBitString
     {
         return FixedBitString::fromString(strtr($this->bits, '01', '10'));
     }
@@ -267,7 +267,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      *                   might even be negative (results in shifting to the right by <tt>-$shift</tt>)
      * @return FixedBitString a bit string with bits shifted by <tt>$shift</tt> to the left
      */
-    public function bitShiftLeft($shift)
+    public function bitShiftLeft(int $shift): FixedBitString
     {
         if ($shift < 0) {
             return $this->bitShiftRight(-$shift);
@@ -288,7 +288,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      *                   might even be negative (results in shifting to the left by <tt>-$shift</tt>)
      * @return FixedBitString a bit string with bits shifted by <tt>$shift</tt> to the right
      */
-    public function bitShiftRight($shift)
+    public function bitShiftRight(int $shift): FixedBitString
     {
         if ($shift < 0) {
             return $this->bitShiftLeft(-$shift);
@@ -306,7 +306,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      * @return FixedBitString a bit string with <tt>$rot</tt> (mod length) leftmost bits moved to the back of the bit
      *                          string
      */
-    public function bitRotateLeft($rot)
+    public function bitRotateLeft(int $rot): FixedBitString
     {
         if ($rot < 0) {
             return $this->bitRotateRight(-$rot);
@@ -326,7 +326,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      * @return FixedBitString a bit string with <tt>$rot</tt> (mod length) rightmost bits moved to the front of the bit
      *                          string
      */
-    public function bitRotateRight($rot)
+    public function bitRotateRight(int $rot): FixedBitString
     {
         if ($rot < 0) {
             return $this->bitRotateLeft(-$rot);

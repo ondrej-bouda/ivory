@@ -29,7 +29,7 @@ class VarBitString extends BitString
      * @return VarBitString
      * @throws \InvalidArgumentException if <tt>$length</tt> is a non-positive number (PostgreSQL forbids it)
      */
-    public static function fromString($bits, $maxLength = null)
+    public static function fromString(string $bits, int $maxLength = null): VarBitString
     {
         $bits = (string)$bits;
 
@@ -49,7 +49,7 @@ class VarBitString extends BitString
      * @param string $bits
      * @param int|null $maxLength
      */
-    protected function __construct($bits, $maxLength)
+    protected function __construct(string $bits, $maxLength)
     {
         parent::__construct($bits);
 

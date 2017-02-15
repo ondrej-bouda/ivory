@@ -28,7 +28,7 @@ abstract class TimeBase implements IComparable
      * @return int|float
      * @throws \OutOfRangeException
      */
-    protected static function partsToSec($hour, $minute, $second)
+    protected static function partsToSec(int $hour, int $minute, $second)
     {
         $s = $hour * 60 * 60 + $minute * 60 + $second;
 
@@ -49,7 +49,7 @@ abstract class TimeBase implements IComparable
      * @return int|float
      * @throws \OutOfRangeException
      */
-    protected static function partsToSecStrict($hour, $minute, $second)
+    protected static function partsToSecStrict(int $hour, int $minute, $second)
     {
         if ($hour == 24) {
             if ($minute > 0 || $second > 0) {
@@ -73,7 +73,7 @@ abstract class TimeBase implements IComparable
     /**
      * @internal
      * @param int|float $timestamp
-     * @return int
+     * @return int|float
      */
     protected static function cutUnixTimestampToSec($timestamp)
     {
@@ -102,7 +102,7 @@ abstract class TimeBase implements IComparable
     /**
      * @return int the hours part of the time (0-24)
      */
-    public function getHours()
+    public function getHours(): int
     {
         return (int)($this->sec / (60 * 60));
     }
@@ -110,7 +110,7 @@ abstract class TimeBase implements IComparable
     /**
      * @return int the minutes part of the time (0-59)
      */
-    public function getMinutes()
+    public function getMinutes(): int
     {
         return ($this->sec / 60) % 60;
     }
@@ -155,7 +155,7 @@ abstract class TimeBase implements IComparable
      * @param string $timeFmt the format string as accepted by {@link date()}
      * @return string the time formatted according to <tt>$timeFmt</tt>
      */
-    public function format($timeFmt)
+    public function format(string $timeFmt): string
     {
         $ts = $this->toUnixTimestamp();
 
@@ -180,7 +180,7 @@ abstract class TimeBase implements IComparable
      * @return string the ISO representation of this time, in format <tt>HH:MM:SS[.p]</tt>;
      *                the fractional seconds part is only used if non-zero
      */
-    public function toString()
+    public function toString(): string
     {
         $frac = round($this->sec - (int)$this->sec, self::PRECISION);
         return sprintf(

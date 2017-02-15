@@ -19,7 +19,7 @@ class Point
      * @param float|null $y
      * @return Point
      */
-    public static function fromCoords($x, $y = null)
+    public static function fromCoords($x, $y = null): Point
     {
         if ($y === null && is_array($x) && count($x) == 2) {
             $y = $x[1];
@@ -37,7 +37,7 @@ class Point
     }
 
 
-    private function __construct($x, $y)
+    private function __construct(float $x, float $y)
     {
         $this->x = $x;
         $this->y = $y;
@@ -46,7 +46,7 @@ class Point
     /**
      * @return float the X-coordinate of the point
      */
-    public function getX()
+    public function getX(): float
     {
         return $this->x;
     }
@@ -54,7 +54,7 @@ class Point
     /**
      * @return float the Y-coordinate of the point
      */
-    public function getY()
+    public function getY(): float
     {
         return $this->y;
     }
@@ -62,7 +62,7 @@ class Point
     /**
      * @return float[] pair of the X- and Y-coordinate of the point
      */
-    public function toCoords()
+    public function toCoords(): array
     {
         return [$this->x, $this->y];
     }

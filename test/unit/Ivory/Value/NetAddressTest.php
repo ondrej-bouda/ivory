@@ -361,12 +361,6 @@ class NetAddressTest extends \PHPUnit_Framework_TestCase
             $this->assertSame('255.255.255.255', $a->getAddressString());
             $this->assertSame(32, $a->getNetmaskLength());
         }
-
-        try {
-            NetAddress::fromInt('1.2.3.4');
-            $this->fail('\InvalidArgumentException expected');
-        } catch (\InvalidArgumentException $e) {
-        }
     }
 
     public function testGetExpandedAddress()

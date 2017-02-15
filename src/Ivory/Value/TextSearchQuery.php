@@ -16,7 +16,7 @@ class TextSearchQuery
      * @param string $queryString the complete query string, as to be given to PostgreSQL
      * @return TextSearchQuery
      */
-    public static function fromString($queryString)
+    public static function fromString(string $queryString): TextSearchQuery
     {
         return new TextSearchQuery($queryString);
     }
@@ -28,7 +28,7 @@ class TextSearchQuery
      * @param string[] ...$lexemes lexemes to put instead of the format string placeholders
      * @return TextSearchQuery
      */
-    public static function fromFormat($format, ...$lexemes)
+    public static function fromFormat(string $format, string ...$lexemes): TextSearchQuery
     {
         $quoted = [];
         foreach ($lexemes as $lex) {
@@ -38,12 +38,12 @@ class TextSearchQuery
         return new TextSearchQuery($queryString);
     }
 
-    private function __construct($queryString)
+    private function __construct(string $queryString)
     {
         $this->queryString = $queryString;
     }
 
-    public function toString()
+    public function toString(): string
     {
         return $this->queryString;
     }

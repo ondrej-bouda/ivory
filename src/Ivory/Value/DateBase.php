@@ -72,7 +72,7 @@ abstract class DateBase implements IComparable
      * @return bool <tt>true</tt> if this is a finite date/time,
      *              <tt>false</tt> if <tt>infinity</tt> or <tt>-infinity</tt>
      */
-    final public function isFinite()
+    final public function isFinite(): bool
     {
         return !$this->inf;
     }
@@ -127,7 +127,7 @@ abstract class DateBase implements IComparable
      * @return string|null the date/time formatted according to <tt>$dateFmt</tt>;
      *                     <tt>null</tt> iff the date/time is not finite
      */
-    final public function format($dateFmt)
+    final public function format(string $dateFmt)
     {
         if ($this->inf) {
             return null;
@@ -150,7 +150,7 @@ abstract class DateBase implements IComparable
     /**
      * @return string date format as defined by ISO 8601
      */
-    abstract protected function getISOFormat();
+    abstract protected function getISOFormat(): string;
 
     /**
      * @return int|null the date/time represented as the UNIX timestamp;

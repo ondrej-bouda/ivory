@@ -42,7 +42,7 @@ class TimeTz extends TimeBase
      * @throws \InvalidArgumentException on invalid input
      * @throws \OutOfRangeException when some of the parts is outside its range
      */
-    public static function fromString($timeString)
+    public static function fromString(string $timeString): TimeTz
     {
         $re = '~^
                 (\d+):                  # hours
@@ -110,7 +110,7 @@ class TimeTz extends TimeBase
      * @return TimeTz
      * @throws \OutOfRangeException when the resulting time underruns 00:00:00 or exceeds 24:00:00
      */
-    public static function fromParts($hour, $minute, $second, $offset)
+    public static function fromParts(int $hour, int $minute, $second, int $offset): TimeTz
     {
         return new TimeTz(self::partsToSec($hour, $minute, $second), $offset);
     }
@@ -131,7 +131,7 @@ class TimeTz extends TimeBase
      * @return TimeTz
      * @throws \OutOfRangeException when some of the parts is outside its range
      */
-    public static function fromPartsStrict($hour, $minute, $second, $offset)
+    public static function fromPartsStrict(int $hour, int $minute, $second, int $offset): TimeTz
     {
         $sec = self::partsToSecStrict($hour, $minute, $second);
         return new TimeTz($sec, $offset);
@@ -143,7 +143,7 @@ class TimeTz extends TimeBase
      * @param \DateTimeInterface $dateTime
      * @return TimeTz
      */
-    public static function fromDateTime(\DateTimeInterface $dateTime)
+    public static function fromDateTime(\DateTimeInterface $dateTime): TimeTz
     {
         return self::fromString($dateTime->format('H:i:s.uP'));
     }
@@ -160,7 +160,7 @@ class TimeTz extends TimeBase
      * @param int|float $timestamp
      * @return TimeTz
      */
-    public static function fromUnixTimestamp($timestamp)
+    public static function fromUnixTimestamp($timestamp): TimeTz
     {
         $sec = self::cutUnixTimestampToSec($timestamp);
         return new TimeTz($sec, 0);
@@ -171,7 +171,7 @@ class TimeTz extends TimeBase
      * @param int|float $sec
      * @param int $offset
      */
-    protected function __construct($sec, $offset)
+    protected function __construct($sec, int $offset)
     {
         parent::__construct($sec);
         $this->offset = $offset;
@@ -181,7 +181,7 @@ class TimeTz extends TimeBase
      * @return int the timezone offset of this time from the Greenwich Mean Time, in seconds;
      *             positive for east of Greenwich, negative for west of Greenwich
      */
-    final public function getOffset()
+    final public function getOffset(): int
     {
         return $this->offset;
     }
@@ -190,7 +190,7 @@ class TimeTz extends TimeBase
      * @return string the timezone offset of this time from the Greenwich Mean Time formatted according to ISO 8601
      *                  using no delimiter, e.g., <tt>+0200</tt> or <tt>-0830</tt>
      */
-    final public function getOffsetISOString()
+    final public function getOffsetISOString(): string
     {
         return sprintf('%s%02d%02d',
             ($this->offset >= 0 ? '+' : '-'),
@@ -208,7 +208,7 @@ class TimeTz extends TimeBase
      * @param string $timeFmt the format string as accepted by {@link date()}
      * @return string the time formatted according to <tt>$timeFmt</tt>
      */
-    public function format($timeFmt)
+    public function format(string $timeFmt): string
     {
         $ts = new \DateTime($this->toString());
         $ts->setDate(1970, 1, 1);
@@ -220,7 +220,7 @@ class TimeTz extends TimeBase
      *                  and <tt>mm</tt> represent the timezone offset in hours and minutes, respectively;
      *                the fractional seconds part is only used if non-zero
      */
-    public function toString()
+    public function toString(): string
     {
         return parent::toString() . $this->getOffsetISOString();
     }

@@ -61,7 +61,7 @@ class Decimal implements IComparable
      *                        if not given, it is computed from the given number automatically
      * @return Decimal
      */
-    public static function fromNumber($decimalNumber, $scale = null)
+    public static function fromNumber($decimalNumber, $scale = null): Decimal
     {
         if ($decimalNumber === null) {
             throw new \InvalidArgumentException('decimalNumber');
@@ -126,7 +126,7 @@ class Decimal implements IComparable
      *
      * @return Decimal the not-a-number value
      */
-    public static function NaN()
+    public static function NaN(): Decimal
     {
         static $dec = null;
         if ($dec === null) {
@@ -140,7 +140,7 @@ class Decimal implements IComparable
      *
      * @return Decimal
      */
-    public static function zero()
+    public static function zero(): Decimal
     {
         static $dec = null;
         if ($dec === null) {
@@ -257,7 +257,7 @@ class Decimal implements IComparable
      * @param string|int|float|Decimal|object $number number to compare this number with
      * @return bool whether this number numerically equals to <tt>$number</tt>
      */
-    public function equals($number)
+    public function equals($number): bool
     {
         if ($number === null) {
             return null;
@@ -269,7 +269,7 @@ class Decimal implements IComparable
      * @param string|int|float|Decimal|object $number
      * @return bool <tt>true</tt> iff this number is numerically less than <tt>$number</tt>
      */
-    public function lessThan($number)
+    public function lessThan($number): bool
     {
         return ($this->compareTo($number) < 0);
     }
@@ -278,7 +278,7 @@ class Decimal implements IComparable
      * @param string|int|float|Decimal|object $number
      * @return bool <tt>true</tt> iff this number is numerically greater than <tt>$number</tt>
      */
-    public function greaterThan($number)
+    public function greaterThan($number): bool
     {
         return ($this->compareTo($number) > 0);
     }
@@ -287,7 +287,7 @@ class Decimal implements IComparable
      * @param string|int|float|Decimal|object $number number to compare this number with
      * @return int -1, 0, or 1 if this number is numerically less than, equal to, or greater than <tt>$number</tt>
      */
-    public function compareTo($number)
+    public function compareTo($number): int
     {
         $arg = self::fromNumber($number);
         if ($this->isNaN()) {
@@ -306,7 +306,7 @@ class Decimal implements IComparable
     /**
      * @return bool whether this is a not-a-number
      */
-    public function isNaN()
+    public function isNaN(): bool
     {
         return ($this->val === null);
     }
@@ -314,7 +314,7 @@ class Decimal implements IComparable
     /**
      * @return bool whether this is zero
      */
-    public function isZero()
+    public function isZero(): bool
     {
         return ($this->equals(self::zero()));
     }
@@ -322,7 +322,7 @@ class Decimal implements IComparable
     /**
      * @return bool whether this is a positive number
      */
-    public function isPositive()
+    public function isPositive(): bool
     {
         return (!$this->isNaN() && $this->compareTo(self::zero()) > 0);
     }
@@ -330,7 +330,7 @@ class Decimal implements IComparable
     /**
      * @return bool whether this is a negative number
      */
-    public function isNegative()
+    public function isNegative(): bool
     {
         return (!$this->isNaN() && $this->val[0] == '-');
     }
@@ -338,7 +338,7 @@ class Decimal implements IComparable
     /**
      * @return bool whether this is an integer, i.e., a number without decimal part (or the decimal part equal to zero)
      */
-    public function isInteger()
+    public function isInteger(): bool
     {
         if ($this->isNaN()) {
             return false;
@@ -363,7 +363,7 @@ class Decimal implements IComparable
      * @param string|int|float|Decimal|object $augend
      * @return Decimal a new decimal number, representing the result of sum of this and the given number
      */
-    public function add($augend)
+    public function add($augend): Decimal
     {
         if ($this->isNaN()) {
             return $this;
@@ -380,7 +380,7 @@ class Decimal implements IComparable
      * @param string|int|float|Decimal|object $subtrahend
      * @return Decimal a new decimal number, representing the result of subtraction of this and the given number
      */
-    public function subtract($subtrahend)
+    public function subtract($subtrahend): Decimal
     {
         if ($this->isNaN()) {
             return $this;
@@ -397,7 +397,7 @@ class Decimal implements IComparable
      * @param string|int|float|Decimal|object $multiplicand
      * @return Decimal a new decimal number, representing the result of multiplication of this and the given number
      */
-    public function multiply($multiplicand)
+    public function multiply($multiplicand): Decimal
     {
         if ($this->isNaN()) {
             return $this;
@@ -415,7 +415,7 @@ class Decimal implements IComparable
      * @return Decimal a new decimal number, representing the result of division of this number with the given number
      * @throws \RuntimeException if <tt>$divisor</tt> is zero
      */
-    public function divide($divisor)
+    public function divide($divisor): Decimal
     {
         if ($this->isNaN()) {
             return $this;
@@ -433,7 +433,7 @@ class Decimal implements IComparable
      * @return Decimal remainder of this number divided by <tt>$modulus</tt>
      * @throws \RuntimeException if <tt>$modulus</tt> is zero
      */
-    public function mod($modulus)
+    public function mod($modulus): Decimal
     {
         if ($this->isNaN()) {
             return $this;
@@ -464,7 +464,7 @@ class Decimal implements IComparable
      * @throws \RuntimeException if this number is negative while <tt>$power</tt> is non-integer (that would lead to a
      *                             complex result)
      */
-    public function pow($power)
+    public function pow($power): Decimal
     {
         if ($this->isNaN()) {
             return $this;
@@ -490,7 +490,7 @@ class Decimal implements IComparable
     /**
      * @return Decimal the absolute value of this number
      */
-    public function abs()
+    public function abs(): Decimal
     {
         if ($this->isNegative()) {
             return $this->negate();
@@ -502,7 +502,7 @@ class Decimal implements IComparable
     /**
      * @return Decimal a new decimal number, representing the negative value of this number
      */
-    public function negate()
+    public function negate(): Decimal
     {
         if ($this->isNaN() || $this->isZero()) {
             return $this;
@@ -522,7 +522,7 @@ class Decimal implements IComparable
      * @return Decimal the factorial of this number
      * @throws UndefinedOperationException if this number is neither a zero-scale number nor the not-a-number
      */
-    public function factorial()
+    public function factorial(): Decimal
     {
         if ($this->isNaN()) {
             return $this;
@@ -550,7 +550,7 @@ class Decimal implements IComparable
      * @param int $scale number of decimal places to round this number to; may be negative to round to higher orders
      * @return Decimal a new decimal number, representing this number rounded to <tt>$scale</tt> decimal places
      */
-    public function round($scale = 0)
+    public function round(int $scale = 0): Decimal
     {
         return new Decimal($this->val, $scale);
     }
@@ -558,7 +558,7 @@ class Decimal implements IComparable
     /**
      * @return Decimal largest integer not greater than this number
      */
-    public function floor()
+    public function floor(): Decimal
     {
         $decPoint = strpos($this->val, '.');
         if ($decPoint === false) {
@@ -577,7 +577,7 @@ class Decimal implements IComparable
     /**
      * @return Decimal smallest integer not less than this number
      */
-    public function ceil()
+    public function ceil(): Decimal
     {
         $decPoint = strpos($this->val, '.');
         if ($decPoint === false) {
@@ -597,7 +597,7 @@ class Decimal implements IComparable
      * @param string|int|float|Decimal|object $number
      * @return Decimal the greater of this number and <tt>$number</tt>, preferably this number if numerically equal
      */
-    public function max($number)
+    public function max($number): Decimal
     {
         $arg = self::fromNumber($number);
         if ($this->lessThan($arg)) {
@@ -611,7 +611,7 @@ class Decimal implements IComparable
      * @param string|int|float|Decimal|object $number
      * @return Decimal the smaller of this number and <tt>$number</tt>, preferably this number if numerically equal
      */
-    public function min($number)
+    public function min($number): Decimal
     {
         $arg = self::fromNumber($number);
         if ($this->greaterThan($arg)) {
@@ -625,7 +625,7 @@ class Decimal implements IComparable
      * @return Decimal a new decimal number, representing the square root of this number
      * @throws UndefinedOperationException if this is a negative number
      */
-    public function sqrt()
+    public function sqrt(): Decimal
     {
         if ($this->isNaN()) {
             return $this;
@@ -653,7 +653,7 @@ class Decimal implements IComparable
      * @return float the value of this number cast explicitly to <tt>float</tt>, or the float <tt>NAN</tt> value if this
      *                 is the not-a-number
      */
-    public function toFloat()
+    public function toFloat(): float
     {
         return ($this->val === null ? NAN : (float)$this->val);
     }
@@ -661,7 +661,7 @@ class Decimal implements IComparable
     /**
      * @return string the value of this number, or the special string <tt>'NaN'</tt> for the not-a-number value
      */
-    public function toString()
+    public function toString(): string
     {
         return ($this->val === null ? 'NaN' : $this->val);
     }

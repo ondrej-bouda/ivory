@@ -28,7 +28,7 @@ class PgLogSequenceNumber implements IComparable
      * @return PgLogSequenceNumber
      * @throws \InvalidArgumentException when the string does not satisfy the accepted format
      */
-    public static function fromString($str)
+    public static function fromString(string $str): PgLogSequenceNumber
     {
         $scanned = sscanf($str, '%X/%X', $hi, $lo);
         if ($scanned == 2) {
@@ -45,7 +45,7 @@ class PgLogSequenceNumber implements IComparable
     }
 
 
-    public function toString()
+    public function toString(): string
     {
         return sprintf('%X/%X', $this->hi, $this->lo);
     }

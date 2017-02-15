@@ -26,7 +26,7 @@ class MacAddr
      *                     other formats are rejected by an <tt>\InvalidArgumentException</tt>
      * @return MacAddr
      */
-    public static function fromString($addr)
+    public static function fromString(string $addr): MacAddr
     {
         $re = '~^
                 [[:xdigit:]]{2}(?::[[:xdigit:]]{2}){5}
@@ -56,7 +56,7 @@ class MacAddr
         return new MacAddr($canon);
     }
 
-    private function __construct($canonAddr)
+    private function __construct(string $canonAddr)
     {
         $this->canonAddr = $canonAddr;
     }
@@ -65,7 +65,7 @@ class MacAddr
      * @return string the conventional canonical form of the MAC address, i.e., in the <tt>'XX:XX:XX:XX:XX:XX'</tt>
      *                  format, all the digits in lowercase
      */
-    final public function toString()
+    final public function toString(): string
     {
         return $this->canonAddr;
     }

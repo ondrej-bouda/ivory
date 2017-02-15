@@ -23,7 +23,7 @@ class TimestampTz extends TimestampBase
     /**
      * @return TimestampTz date/time representing the current moment with precision to seconds
      */
-    public static function now()
+    public static function now(): TimestampTz
     {
         return new TimestampTz(0, new \DateTimeImmutable('now'));
     }
@@ -33,7 +33,7 @@ class TimestampTz extends TimestampBase
      *                       specifically, with the precision supported by the hosting platform - {@link microtime()}
      *                       is used internally)
      */
-    public static function nowMicro()
+    public static function nowMicro(): TimestampTz // FIXME: merge with now() - the same as in Timestamp
     {
         list($micro, $sec) = explode(' ', microtime());
         $microFrac = substr($micro, 1); // cut off the whole part (always a zero)
@@ -59,7 +59,7 @@ class TimestampTz extends TimestampBase
      * @return TimestampTz
      * @throws \InvalidArgumentException on invalid input
      */
-    public static function fromISOString($isoDateTimeString)
+    public static function fromISOString(string $isoDateTimeString): TimestampTz
     {
         $dt = self::isoStringToDateTime($isoDateTimeString);
         return new TimestampTz(0, $dt);
@@ -69,7 +69,7 @@ class TimestampTz extends TimestampBase
      * @param \DateTimeInterface $dateTime
      * @return TimestampTz date/time represented by the given <tt>$dateTime</tt> object
      */
-    public static function fromDateTime(\DateTimeInterface $dateTime)
+    public static function fromDateTime(\DateTimeInterface $dateTime): TimestampTz
     {
         if ($dateTime instanceof \DateTimeImmutable) {
             return new TimestampTz(0, $dateTime);
@@ -117,8 +117,15 @@ class TimestampTz extends TimestampBase
      * @return TimestampTz
      * @throws \InvalidArgumentException if <tt>$year</tt> is zero or <tt>$timezone</tt> is not recognized by PHP
      */
-    public static function fromParts($year, $month, $day, $hour, $minute, $second, $timezone)
-    {
+    public static function fromParts(
+        int $year,
+        int $month,
+        int $day,
+        int $hour,
+        int $minute,
+        $second,
+        $timezone
+    ): TimestampTz {
         if ($year == 0) {
             throw new \InvalidArgumentException('$year zero is undefined');
         }
@@ -172,8 +179,15 @@ class TimestampTz extends TimestampBase
      * @return TimestampTz
      * @throws \InvalidArgumentException if <tt>$year</tt> is zero or <tt>$timezone</tt> is not recognized by PHP
      */
-    public static function fromPartsStrict($year, $month, $day, $hour, $minute, $second, $timezone)
-    {
+    public static function fromPartsStrict(
+        int $year,
+        int $month,
+        int $day,
+        int $hour,
+        int $minute,
+        $second,
+        $timezone
+    ): TimestampTz {
         self::assertRanges($year, $month, $day, $hour, $minute, $second);
         $tz = self::parseTimezone($timezone);
         $z = ($year > 0 ? $year : $year + 1);
@@ -192,7 +206,7 @@ class TimestampTz extends TimestampBase
         return new TimestampTz(0, $dt);
     }
 
-    private static function parseTimezone($timezone)
+    private static function parseTimezone($timezone): \DateTimeZone
     {
         if ($timezone instanceof \DateTimeZone) {
             return $timezone;
@@ -216,7 +230,7 @@ class TimestampTz extends TimestampBase
         }
     }
 
-    final protected function getISOFormat()
+    final protected function getISOFormat(): string
     {
         return 'Y-m-d\TH:i:s' . ($this->dt->format('u') ? '.u' : '') . 'O';
     }
@@ -225,7 +239,7 @@ class TimestampTz extends TimestampBase
      * @return string the timezone offset of this time from the Greenwich Mean Time formatted according to ISO 8601
      *                  using no delimiter, e.g., <tt>+0200</tt> or <tt>-0830</tt>
      */
-    public function getOffsetISOString()
+    public function getOffsetISOString(): string
     {
         return $this->dt->format('O');
     }

@@ -67,7 +67,7 @@ class Quantity implements IComparable
      * @throws \InvalidArgumentException if the string does not conform to the recognized syntax (which is iff it does
      *                                     not contain any decimal digit)
      */
-    public static function fromString($quantityStr, $decimalSeparator = '.')
+    public static function fromString(string $quantityStr, string $decimalSeparator = '.'): Quantity
     {
         $ds = preg_quote($decimalSeparator, '~');
         $re = '~^ \s*
@@ -97,7 +97,7 @@ class Quantity implements IComparable
         return new Quantity($val, $unit);
     }
 
-    public static function fromValue($value, $unit = null)
+    public static function fromValue($value, string $unit = null): Quantity
     {
         if (!is_numeric($value)) {
             throw new \InvalidArgumentException('$value');
@@ -125,7 +125,7 @@ class Quantity implements IComparable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUnit()
     {
@@ -135,8 +135,8 @@ class Quantity implements IComparable
     /**
      * @param Quantity|string $quantity quantity to compare this quantity with;
      *                                  if Quantity is not given, {@link Quantity::fromString()} is used to parse it
-     * @return bool whether the two quantities are comparable and of equal value (after converting to the same unit if
-     *                convertible)
+     * @return bool|null whether the two quantities are comparable and of equal value (after converting to the same unit
+     *                     if convertible)
      */
     public function equals($quantity)
     {
@@ -176,7 +176,7 @@ class Quantity implements IComparable
      * @throws UnsupportedException if conversion between the current and destination units is not supported
      * @throws UndefinedOperationException if the current and destination units are not convertible from one to another
      */
-    public function convert($destUnit)
+    public function convert(string $destUnit): Quantity
     {
         if (!$this->unit || !$destUnit) {
             if ($this->value == 0) {
@@ -209,7 +209,7 @@ class Quantity implements IComparable
     /**
      * @return string the value followed by the unit (if any), separated by a single space
      */
-    public function toString()
+    public function toString(): string
     {
         $str = (string)$this->value;
         if (strlen($this->unit) > 0) {

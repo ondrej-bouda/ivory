@@ -21,7 +21,7 @@ class Json
      * @param mixed $value value to be represented
      * @return Json
      */
-    public static function fromValue($value)
+    public static function fromValue($value): Json
     {
         $json = self::jsonEncode($value);
         return new Json($value, $json);
@@ -31,7 +31,7 @@ class Json
      * @param string $json JSON-encoded value
      * @return Json
      */
-    public static function fromEncoded($json)
+    public static function fromEncoded(string $json): Json
     {
         $value = self::jsonDecode($json);
         return new Json($value, $json);
@@ -40,7 +40,7 @@ class Json
     /**
      * @return Json representation of the <tt>null</tt> value; always returns the same object
      */
-    public static function null()
+    public static function null(): Json
     {
         static $inst = null;
         if ($inst === null) {
@@ -49,7 +49,7 @@ class Json
         return $inst;
     }
 
-    private function __construct($value, $encoded)
+    private function __construct($value, string $encoded)
     {
         $this->value = $value;
         $this->encoded = $encoded;
@@ -66,12 +66,12 @@ class Json
     /**
      * @return string the JSON encoding of the represented value
      */
-    public function getEncoded()
+    public function getEncoded(): string
     {
         return $this->encoded;
     }
 
-    private static function jsonEncode($value)
+    private static function jsonEncode($value): string
     {
         $json = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         if ($json === false) {
@@ -80,7 +80,7 @@ class Json
         return $json;
     }
 
-    private static function jsonDecode($json)
+    private static function jsonDecode(string $json)
     {
         $value = json_decode($json);
         if ($value === null && json_last_error() != JSON_ERROR_NONE) {

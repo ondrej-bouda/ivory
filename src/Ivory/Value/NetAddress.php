@@ -29,7 +29,7 @@ class NetAddress implements IComparable
      *                                             IPv4 netmask, e.g., <tt>255.255.255.240</tt> being equivalent to 28
      * @return NetAddress
      */
-    public static function fromString($addr, $netmaskLengthOrNetmask = null)
+    public static function fromString(string $addr, $netmaskLengthOrNetmask = null): NetAddress
     {
         if (strpos($addr, '/') !== false) {
             if ($netmaskLengthOrNetmask !== null) {
@@ -51,7 +51,7 @@ class NetAddress implements IComparable
      * @param string $cidrAddr the address followed by a slash and the netmask length, e.g., <tt>192.168.0.3/24</tt>
      * @return NetAddress
      */
-    public static function fromCidrString($cidrAddr)
+    public static function fromCidrString(string $cidrAddr): NetAddress
     {
         $sp = strrpos($cidrAddr, '/');
         if ($sp === false) {
@@ -77,7 +77,7 @@ class NetAddress implements IComparable
      *                                             IPv4 netmask, e.g., <tt>255.255.255.240</tt> being equivalent to 28
      * @return NetAddress
      */
-    public static function fromByteString($bytes, $netmaskLengthOrNetmask = null)
+    public static function fromByteString(string $bytes, $netmaskLengthOrNetmask = null): NetAddress
     {
         if (strlen($bytes) > 4 && !self::ipv6Support()) {
             throw new NotImplementedException('PHP must be compiled with IPv6 support');
@@ -99,12 +99,8 @@ class NetAddress implements IComparable
      *                                             IPv4 netmask, e.g., <tt>255.255.255.240</tt> being equivalent to 28
      * @return NetAddress
      */
-    public static function fromInt($ipv4Addr, $netmaskLengthOrNetmask = null)
+    public static function fromInt(int $ipv4Addr, $netmaskLengthOrNetmask = null): NetAddress
     {
-        if (filter_var($ipv4Addr, FILTER_VALIDATE_INT) === false) {
-            throw new \InvalidArgumentException('$ipv4Addr');
-        }
-
         $addrStr = @long2ip($ipv4Addr); // @: a warning would be issued when passed, e.g., an array
         if ($addrStr === null) {
             throw new \InvalidArgumentException('$ipv4Addr');
@@ -116,7 +112,7 @@ class NetAddress implements IComparable
     /**
      * @return bool whether the PHP was built with IPv6 support enabled
      */
-    private static function ipv6Support()
+    private static function ipv6Support(): bool
     {
         static $cached = null;
         if ($cached === null) {
@@ -129,7 +125,7 @@ class NetAddress implements IComparable
     }
 
 
-    private function __construct($addrStr, $netmaskLengthOrNetmask = null)
+    private function __construct(string $addrStr, $netmaskLengthOrNetmask = null)
     {
         $this->addrStr = $addrStr;
         $this->ipVersion = (strpos($addrStr, ':') !== false ? 6 : 4);
@@ -169,7 +165,7 @@ class NetAddress implements IComparable
     /**
      * @return string the represented address
      */
-    public function getAddressString()
+    public function getAddressString(): string
     {
         return $this->addrStr;
     }
@@ -177,7 +173,7 @@ class NetAddress implements IComparable
     /**
      * @return int number of bits used from the address as the network prefix
      */
-    public function getNetmaskLength()
+    public function getNetmaskLength(): int
     {
         return $this->netmaskLength;
     }
@@ -185,7 +181,7 @@ class NetAddress implements IComparable
     /**
      * @return int the IP version of this address
      */
-    public function getIpVersion()
+    public function getIpVersion(): int
     {
         return $this->ipVersion;
     }
@@ -205,7 +201,7 @@ class NetAddress implements IComparable
      *
      * @return string the IPv6 address expanded to its full explicit form; or the IPv4 address, as is
      */
-    public function getExpandedAddress()
+    public function getExpandedAddress(): string
     {
         if ($this->ipVersion == 4) {
             return $this->addrStr;
@@ -236,7 +232,7 @@ class NetAddress implements IComparable
      *
      * @return string the IPv6 address canonized according to RFC 5952; or the IPv4 address, as is
      */
-    public function getCanonicalAddress()
+    public function getCanonicalAddress(): string
     {
         if ($this->ipVersion == 4) {
             return $this->addrStr;
@@ -292,7 +288,7 @@ class NetAddress implements IComparable
     /**
      * @return bool whether this address represents just a single host address, without any subnet specification
      */
-    public function isSingleHost()
+    public function isSingleHost(): bool
     {
         if ($this->ipVersion == 6) {
             return ($this->netmaskLength == 128);
@@ -305,7 +301,7 @@ class NetAddress implements IComparable
      * @return bool whether this address represents a network, which is iff all the host number bits are zero;
      *              e.g., <tt>127.0.49.0/24</tt> represents a network, while <tt>127.0.49.0/23</tt> does not
      */
-    public function isNetwork()
+    public function isNetwork(): bool
     {
         if ($this->ipVersion == 4) {
             $hostPartLen = 32 - $this->netmaskLength;
@@ -340,7 +336,7 @@ class NetAddress implements IComparable
      *
      * @param NetAddress|string $address a {@link NetAddress} or anything {@link NetAddress::fromString()} accepts as
      *                                     its first argument
-     * @return bool
+     * @return bool|null
      */
     public function equals($address)
     {
@@ -372,7 +368,7 @@ class NetAddress implements IComparable
      * @return bool <tt>true</tt> if <tt>$address</tt> is strictly contained in this address, <tt>false</tt> otherwise
      *              (especially in case both networks are the same, or if this is actually a single host, not a network)
      */
-    public function contains($address)
+    public function contains($address): bool
     {
         if (!$address instanceof NetAddress) {
             $address = NetAddress::fromString($address);
@@ -411,7 +407,7 @@ class NetAddress implements IComparable
      * @param NetAddress|string $address
      * @return bool
      */
-    public function containsOrEquals($address)
+    public function containsOrEquals($address): bool
     {
         return ($this->equals($address) || $this->contains($address));
     }
@@ -424,7 +420,7 @@ class NetAddress implements IComparable
      *
      * @return string the (human-readable) string representation of the address
      */
-    public function toString()
+    public function toString(): string
     {
         if ($this->isSingleHost()) {
             return $this->addrStr;
@@ -436,7 +432,7 @@ class NetAddress implements IComparable
     /**
      * @return string the CIDR representation of this address, as defined in RFC 4632, e.g., <tt>"123.8.9.1/26"</tt>
      */
-    public function toCidrString()
+    public function toCidrString(): string
     {
         return $this->addrStr . '/' . $this->netmaskLength;
     }
@@ -448,7 +444,7 @@ class NetAddress implements IComparable
      *
      * @return string the address packed to a binary string
      */
-    public function toByteString()
+    public function toByteString(): string
     {
         if ($this->ipVersion == 4 || self::ipv6Support()) {
             return inet_pton($this->addrStr);
@@ -466,7 +462,7 @@ class NetAddress implements IComparable
      * @return int the address represented as an integer
      * @throws \LogicException when called on an IPv6 address, as such an address does not fit into the integer type
      */
-    public function toInt()
+    public function toInt(): int
     {
         if ($this->ipVersion == 4) {
             return ip2long($this->addrStr);

@@ -71,7 +71,7 @@ class TimeInterval implements IComparable
      * @param number[] $parts map of units (any of {@link TimeInterval} constants) to the corresponding quantity
      * @return TimeInterval
      */
-    public static function fromParts(array $parts)
+    public static function fromParts($parts): TimeInterval
     {
         $mon = 0;
         $day = 0;
@@ -165,7 +165,7 @@ class TimeInterval implements IComparable
      * @param \DateInterval $dateInterval
      * @return TimeInterval
      */
-    public static function fromDateInterval(\DateInterval $dateInterval)
+    public static function fromDateInterval(\DateInterval $dateInterval): TimeInterval
     {
         $sgn = ($dateInterval->invert ? -1 : 1);
         return self::fromParts([
@@ -191,7 +191,7 @@ class TimeInterval implements IComparable
      * @param string $str interval specification in the ISO 8601, SQL, or PostgreSQL format
      * @return TimeInterval
      */
-    public static function fromString($str)
+    public static function fromString(string $str): TimeInterval
     {
         if ($str[0] == 'P') {
             // ISO format
@@ -226,7 +226,7 @@ class TimeInterval implements IComparable
         return self::fromParts($parts);
     }
 
-    private static function parseIsoDateStr($str)
+    private static function parseIsoDateStr(string $str)
     {
         if (preg_match('~^(-?\d+)-(-?\d+)-(-?\d+)$~', $str, $m)) {
             return [
@@ -245,7 +245,7 @@ class TimeInterval implements IComparable
         }
     }
 
-    private static function parseTimeStr($str, $offset = 0, $separateMinuteSigns = true)
+    private static function parseTimeStr(string $str, int $offset = 0, bool $separateMinuteSigns = true)
     {
         $timeRe = '~^
                      ( -? \d+ (?: \.\d+ )? )
@@ -276,7 +276,7 @@ class TimeInterval implements IComparable
         }
     }
 
-    private static function parsePostgresqlStr($str, $offset = 0)
+    private static function parsePostgresqlStr(string $str, int $offset = 0)
     {
         static $pgUnits = [
             'millennium' => self::MILLENNIUM,
@@ -333,7 +333,7 @@ class TimeInterval implements IComparable
         return $parts;
     }
 
-    private static function parseQuantityUnitPairs($str, $offset, $units)
+    private static function parseQuantityUnitPairs(string $str, int $offset, $units)
     {
         $result = [];
         // OPT: the regular expression might be cached
@@ -347,7 +347,7 @@ class TimeInterval implements IComparable
         return $result;
     }
 
-    private function __construct($mon, $day, $sec)
+    private function __construct(int $mon, int $day, $sec)
     {
         $this->mon = $mon;
         $this->day = $day;
@@ -395,7 +395,7 @@ class TimeInterval implements IComparable
     /**
      * @return string
      */
-    public function toIsoString()
+    public function toIsoString(): string
     {
         $str = '';
         $inDatePart = true;
@@ -415,7 +415,7 @@ class TimeInterval implements IComparable
      * @param TimeInterval $addend
      * @return TimeInterval
      */
-    public function add(TimeInterval $addend)
+    public function add(TimeInterval $addend): TimeInterval
     {
         return new TimeInterval(
             $this->mon + $addend->mon,
@@ -430,7 +430,7 @@ class TimeInterval implements IComparable
      * @param TimeInterval $subtrahend
      * @return TimeInterval
      */
-    public function subtract(TimeInterval $subtrahend)
+    public function subtract(TimeInterval $subtrahend): TimeInterval
     {
         return new TimeInterval(
             $this->mon - $subtrahend->mon,
@@ -445,7 +445,7 @@ class TimeInterval implements IComparable
      * @param number $multiplier
      * @return TimeInterval
      */
-    public function multiply($multiplier)
+    public function multiply($multiplier): TimeInterval
     {
         return new TimeInterval($multiplier * $this->mon, $multiplier * $this->day, $multiplier * $this->sec);
     }
@@ -456,7 +456,7 @@ class TimeInterval implements IComparable
      * @param number $divisor
      * @return TimeInterval
      */
-    public function divide($divisor)
+    public function divide($divisor): TimeInterval
     {
         return new TimeInterval($this->mon / $divisor, $this->day / $divisor, $this->sec / $divisor);
     }
@@ -464,7 +464,7 @@ class TimeInterval implements IComparable
     /**
      * @return TimeInterval time interval negative to this one
      */
-    public function negate()
+    public function negate(): TimeInterval
     {
         return $this->multiply(-1);
     }

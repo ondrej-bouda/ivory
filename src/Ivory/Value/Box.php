@@ -21,7 +21,7 @@ class Box
      * @param Point|float[] $oppositeCorner
      * @return Box
      */
-    public static function fromOppositeCorners($corner, $oppositeCorner)
+    public static function fromOppositeCorners($corner, $oppositeCorner): Box
     {
         if (is_array($corner)) {
             $corner = Point::fromCoords($corner);
@@ -49,7 +49,7 @@ class Box
     }
 
 
-    private function __construct($upperRight, $lowerLeft)
+    private function __construct(Point $upperRight, Point $lowerLeft)
     {
         $this->upperRight = $upperRight;
         $this->lowerLeft = $lowerLeft;
@@ -58,7 +58,7 @@ class Box
     /**
      * @return Point upper right corner of the box
      */
-    public function getUpperRight()
+    public function getUpperRight(): Point
     {
         return $this->upperRight;
     }
@@ -66,7 +66,7 @@ class Box
     /**
      * @return Point upper left corner of the box
      */
-    public function getUpperLeft()
+    public function getUpperLeft(): Point
     {
         return Point::fromCoords($this->lowerLeft->getX(), $this->upperRight->getY());
     }
@@ -74,7 +74,7 @@ class Box
     /**
      * @return Point lower right corner of the box
      */
-    public function getLowerRight()
+    public function getLowerRight(): Point
     {
         return Point::fromCoords($this->upperRight->getX(), $this->lowerLeft->getY());
     }
@@ -82,27 +82,27 @@ class Box
     /**
      * @return Point lower left corner of the box
      */
-    public function getLowerLeft()
+    public function getLowerLeft(): Point
     {
         return $this->lowerLeft;
     }
 
-    public function getLeftSide()
+    public function getLeftSide(): LineSegment
     {
         return LineSegment::fromEndpoints($this->getUpperLeft(), $this->lowerLeft);
     }
 
-    public function getRightSide()
+    public function getRightSide(): LineSegment
     {
         return LineSegment::fromEndpoints($this->getUpperRight(), $this->getLowerRight());
     }
 
-    public function getUpperSide()
+    public function getUpperSide(): LineSegment
     {
         return LineSegment::fromEndpoints($this->getUpperLeft(), $this->getUpperRight());
     }
 
-    public function getLowerSide()
+    public function getLowerSide(): LineSegment
     {
         return LineSegment::fromEndpoints($this->getLowerLeft(), $this->getLowerRight());
     }
