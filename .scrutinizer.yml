@@ -15,7 +15,6 @@ checks:
         optional_parameters_at_the_end: true
         newline_at_end_of_file: true
         function_in_camel_caps: true
-        encourage_single_quotes: true
         classes_in_camel_caps: true
         check_method_contracts:
             verify_interface_like_constraints: true
