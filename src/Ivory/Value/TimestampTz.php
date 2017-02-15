@@ -21,24 +21,21 @@ namespace Ivory\Value;
 class TimestampTz extends TimestampBase
 {
     /**
-     * @return TimestampTz date/time representing the current moment with precision to seconds
+     * @return TimestampTz date/time representing the current moment, with precision to microseconds (or, more
+     *                       specifically, with the precision supported by the hosting platform)
      */
     public static function now(): TimestampTz
     {
-        return new TimestampTz(0, new \DateTimeImmutable('now'));
-    }
-
-    /**
-     * @return TimestampTz date/time representing the current moment with precision to microseconds (or, more
-     *                       specifically, with the precision supported by the hosting platform - {@link microtime()}
-     *                       is used internally)
-     */
-    public static function nowMicro(): TimestampTz // FIXME: merge with now() - the same as in Timestamp
-    {
-        list($micro, $sec) = explode(' ', microtime());
-        $microFrac = substr($micro, 1); // cut off the whole part (always a zero)
-        $inputStr = date('Y-m-d\TH:i:s', $sec) . $microFrac;
-        return new TimestampTz(0, new \DateTimeImmutable($inputStr));
+        if (PHP_VERSION_ID >= 70100) {
+            return new TimestampTz(0, new \DateTimeImmutable('now'));
+        }
+        else {
+            // up to PHP 7.0, new \DateTimeImmutable('now') had only precision up to seconds
+            list($micro, $sec) = explode(' ', microtime());
+            $microFrac = substr($micro, 1); // cut off the whole part (always a zero)
+            $inputStr = date('Y-m-d\TH:i:s', $sec) . $microFrac;
+            return new TimestampTz(0, new \DateTimeImmutable($inputStr));
+        }
     }
 
     /**
