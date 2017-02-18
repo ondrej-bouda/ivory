@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Connection;
 
+use Ivory\Exception\ResultException;
 use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
 use Ivory\Exception\StatementExceptionFactory;
@@ -10,6 +11,7 @@ use Ivory\Query\IRelationRecipe;
 use Ivory\Query\ISqlPatternRecipe;
 use Ivory\Query\SqlCommandRecipe;
 use Ivory\Query\SqlRelationRecipe;
+use Ivory\Relation\ITuple;
 use Ivory\Result\CommandResult;
 use Ivory\Result\CopyInResult;
 use Ivory\Result\CopyOutResult;
@@ -41,6 +43,17 @@ class StatementExecution implements IStatementExecution
 
         $sql = $recipe->toSql($this->typeCtl->getTypeDictionary());
         return $this->rawQuery($sql);
+    }
+
+    public function queryOneTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ITuple
+    {
+        $rel = $this->query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+        if ($rel->count() != 1) {
+            throw new ResultException(
+                "The query should have resulted in exactly one row, but has {$rel->count()} rows."
+            );
+        }
+        return $rel->tuple();
     }
 
     public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ICommandResult

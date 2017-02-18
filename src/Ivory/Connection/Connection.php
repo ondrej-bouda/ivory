@@ -2,6 +2,7 @@
 namespace Ivory\Connection;
 
 use Ivory\Exception\StatementExceptionFactory;
+use Ivory\Relation\ITuple;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\ICopyInResult;
 use Ivory\Result\IQueryResult;
@@ -113,6 +114,11 @@ class Connection implements IConnection
     public function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): IQueryResult
     {
         return $this->stmtExec->query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+    }
+
+    public function queryOneTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ITuple
+    {
+        return $this->stmtExec->queryOneTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
     }
 
     public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ICommandResult

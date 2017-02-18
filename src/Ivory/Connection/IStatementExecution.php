@@ -1,10 +1,12 @@
 <?php
 namespace Ivory\Connection;
 
+use Ivory\Exception\ResultException;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Lang\SqlPattern\SqlPattern;
 use Ivory\Query\ICommandRecipe;
 use Ivory\Query\IRelationRecipe;
+use Ivory\Relation\ITuple;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\IQueryResult;
 use Ivory\Result\IResult;
@@ -81,6 +83,22 @@ interface IStatementExecution
      *                                     requires
      */
     function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): IQueryResult;
+
+    /**
+     * Queries the database for a relation using an SQL pattern, checks it results in exactly one row, and returns it.
+     *
+     * The base functionality is the same as in {@link query()}. On top of that, the result is checked on having exactly
+     * one row, and the row is returned.
+     *
+     * @see query() for detailed specification
+     * @param string|SqlPattern|IRelationRecipe $sqlFragmentPatternOrRecipe
+     * @param array ...$fragmentsAndParams
+     * @return ITuple
+     * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
+     *                                     requires
+     * @throws ResultException when the resulting data set has more then one row, or no row at all
+     */
+    function queryOneTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ITuple;
 
     /**
      * Sends a command to the database using an SQL pattern, waits for its execution and returns the command result.

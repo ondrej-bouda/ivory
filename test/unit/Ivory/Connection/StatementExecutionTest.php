@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Connection;
 
+use Ivory\Exception\ResultException;
 use Ivory\Exception\StatementException;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
 use Ivory\Query\SqlRelationRecipe;
@@ -80,6 +81,26 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
                 'command', $warning->getMessage(),
                 'The warning message should mention command was actually executed', true
             );
+        }
+    }
+
+    public function testQueryOneTuple()
+    {
+        $tuple = $this->conn->queryOneTuple(
+            'SELECT MIN(num), MAX(num) FROM (VALUES (4), (-3), (3)) t (num)'
+        );
+        $this->assertSame([-3, 4], $tuple->toList());
+
+        try {
+            $this->conn->queryOneTuple('SELECT * FROM (VALUES (4), (-3), (3)) t (num)');
+            $this->fail(ResultException::class . ' was expected - multiple tuple were returned from the database');
+        } catch (ResultException $e) {
+        }
+
+        try {
+            $this->conn->queryOneTuple('SELECT 1 WHERE FALSE');
+            $this->fail(ResultException::class . ' was expected - no tuples were returned from the database');
+        } catch (ResultException $e) {
         }
     }
 

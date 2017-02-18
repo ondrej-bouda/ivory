@@ -14,11 +14,11 @@ use Ivory\Relation\ITuple;
  * - there are lessons taught by teachers;
  * - the `lesson`:`teacher` cardinality is M:N, i.e., even multiple teachers might together teach a single lesson.
  *
- * The M:N relation is represented by the `lessonteacher` table the rows of which refer to `lesson` and `teacher`, as
+ * The M:N relation is represented by the `lessonteacher` table, the rows of which refer to `lesson` and `teacher`, as
  * usual. Moreover, there are two states of lesson-teacher relation:
  * - `scheduled` specifies teachers who regularly teach the lesson, i.e., reflects the normal state;
- * - `actual` specifies teachers who will actually be teaching the lesson - those may be different from the
- *   scheduled ones in case of supply teaching.
+ * - `actual` specifies teachers who will actually be teaching the lesson - those may be different from the scheduled
+ *   ones in case of supply teaching.
  *
  * Similarly to the two states of `lessonteacher` relation, the lesson itself has two time ranges:
  * - `scheduled_timerange`, and
@@ -31,6 +31,10 @@ class ProcessingTest extends \Ivory\IvoryTestCase
     /** @var IRelation */
     private $rel;
 
+    /**
+     * Set up the sample data. Note that Ivory can build the definitions for relations on top of each other, as
+     * demonstrated in the WITH table expression "teacher".
+     */
     protected function setUp()
     {
         parent::setUp();
@@ -117,6 +121,9 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         );
     }
 
+    /**
+     * Get one tuple at a time from the relation.
+     */
     public function testTuple()
     {
         $this->assertSame(1, $this->teachers->tuple()['id']);
@@ -133,6 +140,24 @@ class ProcessingTest extends \Ivory\IvoryTestCase
             [6, 'Ada', 'Lovelace', null],
             $this->teachers->tuple(5)->toList()
         );
+    }
+
+    /**
+     * Sometimes, the query leads to exactly one tuple, e.g., when selecting a maximum or calling a scalar function.
+     * Let Ivory check there actually is at most one row, and express clearly by the code there always is one row only.
+     *
+     * Also note we are sending the relation (i.e., a fetched set of rows) back to PostgreSQL as a base for the query.
+     * This will usually come in handy in more complicated situations, such as when PostgreSQL is given a too complex
+     * query while querying parts of it result in a better query plan.
+     */
+    public function testQueryOneTuple()
+    {
+        $conn = $this->getIvoryConnection();
+        $tuple = $conn->queryOneTuple(
+            'SELECT MIN(lastname), MAX(lastname) FROM (%rel) t',
+            $this->teachers
+        );
+        $this->assertSame(['Deaton', 'Tirole'], $tuple->toList());
     }
 
     public function testCol()
