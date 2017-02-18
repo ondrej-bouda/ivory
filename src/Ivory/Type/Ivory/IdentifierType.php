@@ -6,12 +6,15 @@ use Ivory\Type\ITotallyOrderedType;
 /**
  * Identifier, e.g., table or column name.
  *
- * Unlike {@link QuotedIdentifierType}, identifiers serialized by this converter are only quoted if containing
- * characters which would be illegal for an unquoted identifier according to the PostgreSQL lexical rules. To be
- * unquoted, the identifier must:
- * - start with a letter (`a`-`z` and other characters classified as letters) or an underscore (`_`), and
- * - subsequent characters (if any) can only be letters, underscores, digits (`0`-`9`), or dollar signs (`$`).
- * Identifiers not satisfying these constraints are quoted by this type converter, and thus will become case sensitive.
+ * Unlike {@link QuotedIdentifierType}, identifiers serialized by this converter are only quoted if reasonable. There
+ * are two reasons for quoting:
+ * - uppercase characters in the identifier (without quoting, Postgres would convert the identifier to lowercase), or
+ * - characters which would be illegal for an unquoted identifier according to the PostgreSQL lexical rules.
+ *
+ * Thus, to be unquoted, the identifier must:
+ * - start with a lowercase letter (`a`-`z` and other characters classified as letters) or an underscore (`_`), and
+ * - subsequent characters (if any) can only be lowercase letters, underscores, digits (`0`-`9`), or dollar signs (`$`).
+ * Identifiers not satisfying these constraints are quoted by this type converter.
  *
  * As identifiers are expected to be used in contexts where `NULL` is illegal, serializing `null` will result in an
  * {@link \InvalidArgumentException}.
@@ -58,8 +61,8 @@ class IdentifierType implements ITotallyOrderedType
     {
         return !preg_match(
             '~^
-              [[:alpha:]_]
-              [[:alnum:]_$]*
+              [[:lower:]_]
+              [[:lower:][:digit:]_$]*
               $
              ~ux',
             $val

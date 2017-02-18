@@ -13,12 +13,13 @@ class IdentifierTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testSerializeUnquoted()
     {
-        $this->assertSame('whEEE', $this->identType->serializeValue('whEEE'));
+        $this->assertSame('wheee', $this->identType->serializeValue('wheee'));
         $this->assertSame("_\u{010D}a\u{010D}a1\$", $this->identType->serializeValue("_\u{010D}a\u{010D}a1\$"));
     }
 
     public function testSerializeQuoted()
     {
+        $this->assertSame('"whEEE"', $this->identType->serializeValue('whEEE'));
         $this->assertSame('"1whEEE"', $this->identType->serializeValue('1whEEE'));
         $this->assertSame('""', $this->identType->serializeValue(''));
     }
