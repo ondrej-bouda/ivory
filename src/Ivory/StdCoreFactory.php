@@ -7,10 +7,10 @@ use Ivory\Connection\IConnection;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Lang;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
-use Ivory\Type\Ivory\CommandRecipeType;
+use Ivory\Type\Ivory\CommandType;
 use Ivory\Type\Ivory\IdentifierType;
 use Ivory\Type\Ivory\QuotedIdentifierType;
-use Ivory\Type\Ivory\RelationRecipeType;
+use Ivory\Type\Ivory\RelationType;
 use Ivory\Type\Ivory\SqlType;
 use Ivory\Type\Std\StdRangeCanonicalFuncProvider;
 use Ivory\Type\Std\StdTypeLoader;
@@ -69,8 +69,8 @@ class StdCoreFactory implements ICoreFactory
 
         // register volatile type converters for SQL patterns
         $reg = $conn->getTypeRegister();
-        $reg->registerSqlPatternType('rel', new RelationRecipeType($conn));
-        $reg->registerSqlPatternType('cmd', new CommandRecipeType($conn));
+        $reg->registerSqlPatternType('rel', new RelationType($conn));
+        $reg->registerSqlPatternType('cmd', new CommandType($conn));
 
         return $conn;
     }

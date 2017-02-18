@@ -12,15 +12,15 @@ use Ivory\Query\ICommandRecipe;
  *
  * Note that an {@link \InvalidArgumentException} is thrown when serializing `null` as that clearly signifies an error.
  */
-class CommandRecipeType extends VolatilePatternTypeBase
+class CommandType extends VolatilePatternTypeBase
 {
     public function serializeValue($val): string
     {
-        if (!$val instanceof ICommandRecipe) {
+        if ($val instanceof ICommandRecipe) {
+            $typeDictionary = $this->getConnection()->getTypeDictionary();
+            return $val->toSql($typeDictionary);
+        } else {
             throw new \InvalidArgumentException('Expecting an ' . ICommandRecipe::class . ' object');
         }
-
-        $typeDictionary = $this->getConnection()->getTypeDictionary();
-        return $val->toSql($typeDictionary);
     }
 }
