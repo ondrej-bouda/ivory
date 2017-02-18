@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Type\Ivory;
 
-class IdentifierTypeText extends \PHPUnit_Framework_TestCase
+class IdentifierTypeTest extends \PHPUnit_Framework_TestCase
 {
     /** @var IdentifierType */
     private $identType;
