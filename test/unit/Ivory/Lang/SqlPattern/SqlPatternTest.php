@@ -6,8 +6,6 @@ use Ivory\IvoryTestCase;
 
 class SqlPatternTest extends IvoryTestCase
 {
-    use \Ivory\PHPUnitExt;
-
     /** @var SqlPatternParser */
     private $parser;
     /** @var SqlPattern */
@@ -21,60 +19,6 @@ class SqlPatternTest extends IvoryTestCase
         );
     }
 
-
-    public function testFillSqlCorrect()
-    {
-        $this->assertEquals(
-            "SELECT * FROM person WHERE name = 'John' AND ord % 2 = 0 AND is_active",
-            $this->pattern->fillSql([
-                'cond' => 'is_active',
-                0 => "'John'",
-                'tbl' => 'person',
-            ])
-        );
-    }
-
-    public function testFillSqlInsufficientArguments()
-    {
-        $this->activateAssertionExceptions();
-        try {
-            $this->assertException(\InvalidArgumentException::class, null, function () {
-                $this->pattern->fillSql(['cond' => 'is_active', 0 => "'John'"]);
-            });
-        } finally {
-            $this->restoreAssertionsConfig();
-        }
-    }
-
-    public function testFillSqlExtraArguments()
-    {
-        $this->activateAssertionExceptions();
-        try {
-            $this->assertException(\InvalidArgumentException::class, null, function () {
-                $this->pattern->fillSql(['cond' => 'is_active', 0 => "'John'", 'tbl' => 'person', 'foo' => 'bar']);
-            });
-        } finally {
-            $this->restoreAssertionsConfig();
-        }
-    }
-
-    public function testFillSqlWrongArguments()
-    {
-        $this->activateAssertionExceptions();
-        try {
-            $this->assertException(\InvalidArgumentException::class, null, function () {
-                $this->pattern->fillSql(['cond' => 'is_active', 0 => "'John'", 'foo' => 'bar']);
-            });
-        } finally {
-            $this->restoreAssertionsConfig();
-        }
-    }
-
-    public function testFillSqlInvalidArguments()
-    {
-        $this->expectException(\PHPUnit\Framework\Error\Notice::class);
-        $this->pattern->fillSql(['cond' => [], 0 => "'John'", 'tbl' => 'person']);
-    }
 
     public function testGenerateSql()
     {

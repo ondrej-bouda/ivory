@@ -173,51 +173,6 @@ class SqlPattern
     }
 
     /**
-     * Fills gaps in the SQL torso with given SQL strings to form a complete SQL string.
-     *
-     * This is merely a utility method concatenating the right parts of strings. The given parameter values must already
-     * be encoded, escaped, whatsoever, so that they may just be inserted in the gap. Each of the values is explicitly
-     * cast to `string`.
-     *
-     * Assertions are used for checking the parameters as the real sanity check should be performed in higher levels -
-     * here the argument should be correct. `InvalidArgumentException` is thrown by the assertion if the parameter value
-     * map contain insufficient or extra parameters.
-     *
-     * @param string[] $parameterValueSqlStrings map: parameter position or name => SQL string encoding the parameter
-     *                                             value
-     * @return string SQL string
-     */
-    public function fillSql($parameterValueSqlStrings): string
-    {
-        assert(
-            !array_diff_key(
-                $this->positionalPlaceholders + $this->namedPlaceholderMap,
-                $parameterValueSqlStrings
-            ),
-            new \InvalidArgumentException('Insufficient parameter values specified to be filled in the pattern.')
-        );
-
-        assert(
-            !array_diff_key(
-                $parameterValueSqlStrings,
-                $this->positionalPlaceholders + $this->namedPlaceholderMap
-            ),
-            new \InvalidArgumentException('Extra parameter values specified to be filled in the pattern.')
-        );
-
-        $result = '';
-        $offset = 0;
-        foreach ($this->placeholderSequence as $plcHld) {
-            $val = $parameterValueSqlStrings[$plcHld->getNameOrPosition()];
-            $result .= substr($this->sqlTorso, $offset, $plcHld->getOffset() - $offset) . $val;
-            $offset = $plcHld->getOffset();
-        }
-        $result .= substr($this->sqlTorso, $offset);
-
-        return $result;
-    }
-
-    /**
      * Generate SQL string from this pattern with encoded parameter values requested to be filled by the caller.
      *
      * This is a more general method to {@link fillSql()}. The reason for this method is that a single named parameter
