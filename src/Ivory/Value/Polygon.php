@@ -51,6 +51,26 @@ class Polygon
         return $this->points;
     }
 
+    /**
+     * Computes the area of the polygon.
+     *
+     * The algorithm taken from http://alienryderflex.com/polygon_area/
+     *
+     * @return float area of the polygon
+     */
+    public function getArea(): float
+    {
+        $area = 0;
+
+        $from = $this->points[count($this->points) - 1];
+        foreach ($this->points as $to) {
+            $area += ($to->getX() + $from->getX()) * ($to->getY() - $from->getY());
+            $from = $to;
+        }
+
+        return abs($area) / 2;
+    }
+
     public function __toString()
     {
         return '(' . implode(',', $this->points) . ')';
