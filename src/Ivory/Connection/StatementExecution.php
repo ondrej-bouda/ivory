@@ -45,7 +45,7 @@ class StatementExecution implements IStatementExecution
         return $this->rawQuery($sql);
     }
 
-    public function queryOneTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ITuple
+    public function querySingleTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ITuple
     {
         $rel = $this->query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
         if ($rel->count() != 1) {
@@ -54,6 +54,23 @@ class StatementExecution implements IStatementExecution
             );
         }
         return $rel->tuple();
+    }
+
+    public function querySingleValue($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams)
+    {
+        $rel = $this->query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+        if ($rel->count() != 1) {
+            throw new ResultException(
+                "The query should have resulted in exactly one row, but has {$rel->count()} rows."
+            );
+        }
+        $colCnt = count($rel->getColumns());
+        if ($colCnt != 1) {
+            throw new ResultException(
+                "The query should have resulted in exactly one column, but has $colCnt columns."
+            );
+        }
+        return $rel->value();
     }
 
     public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ICommandResult

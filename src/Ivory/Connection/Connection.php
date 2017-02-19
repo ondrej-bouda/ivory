@@ -116,9 +116,14 @@ class Connection implements IConnection
         return $this->stmtExec->query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
     }
 
-    public function queryOneTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ITuple
+    public function querySingleTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ITuple
     {
-        return $this->stmtExec->queryOneTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+        return $this->stmtExec->querySingleTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+    }
+
+    public function querySingleValue($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams)
+    {
+        return $this->stmtExec->querySingleValue($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
     }
 
     public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ICommandResult

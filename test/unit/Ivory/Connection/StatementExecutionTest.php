@@ -84,22 +84,52 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         }
     }
 
-    public function testQueryOneTuple()
+    public function testQuerySingleTuple()
     {
-        $tuple = $this->conn->queryOneTuple(
+        $tuple = $this->conn->querySingleTuple(
             'SELECT MIN(num), MAX(num) FROM (VALUES (4), (-3), (3)) t (num)'
         );
         $this->assertSame([-3, 4], $tuple->toList());
 
         try {
-            $this->conn->queryOneTuple('SELECT * FROM (VALUES (4), (-3), (3)) t (num)');
+            $this->conn->querySingleTuple('SELECT * FROM (VALUES (4), (-3), (3)) t (num)');
             $this->fail(ResultException::class . ' was expected - multiple tuple were returned from the database');
         } catch (ResultException $e) {
         }
 
         try {
-            $this->conn->queryOneTuple('SELECT 1 WHERE FALSE');
+            $this->conn->querySingleTuple('SELECT 1 WHERE FALSE');
             $this->fail(ResultException::class . ' was expected - no tuples were returned from the database');
+        } catch (ResultException $e) {
+        }
+    }
+
+    public function testQuerySingleValue()
+    {
+        $value = $this->conn->querySingleValue('SELECT 1');
+        $this->assertSame(1, $value);
+
+        try {
+            $this->conn->querySingleValue('SELECT 1, 2');
+            $this->fail(ResultException::class . ' was expected - multiple columns were returned from the database');
+        } catch (ResultException $e) {
+        }
+
+        try {
+            $this->conn->querySingleValue('SELECT');
+            $this->fail(ResultException::class . ' was expected - no columns were returned from the database');
+        } catch (ResultException $e) {
+        }
+
+        try {
+            $this->conn->querySingleValue('SELECT 1 UNION SELECT 2');
+            $this->fail(ResultException::class . ' was expected - multiple rows were returned from the database');
+        } catch (ResultException $e) {
+        }
+
+        try {
+            $this->conn->querySingleValue('SELECT 1 WHERE FALSE');
+            $this->fail(ResultException::class . ' was expected - no rows were returned from the database');
         } catch (ResultException $e) {
         }
     }

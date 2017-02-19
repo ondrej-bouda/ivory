@@ -153,7 +153,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
     public function testQueryOneTuple()
     {
         $conn = $this->getIvoryConnection();
-        $tuple = $conn->queryOneTuple(
+        $tuple = $conn->querySingleTuple(
             'SELECT MIN(lastname), MAX(lastname) FROM (%rel) t',
             $this->teachers
         );

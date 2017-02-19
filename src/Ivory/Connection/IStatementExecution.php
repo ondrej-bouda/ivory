@@ -96,9 +96,27 @@ interface IStatementExecution
      * @return ITuple
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
-     * @throws ResultException when the resulting data set has more then one row, or no row at all
+     * @throws ResultException when the resulting data set has more than one row, or no row at all
      */
-    function queryOneTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ITuple;
+    function querySingleTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ITuple;
+
+    /**
+     * Queries the database for a relation using an SQL pattern, checks it results in exactly one row with one column,
+     * and returns the value from it.
+     *
+     * The base functionality is the same as in {@link query()}. On top of that, the result is checked on having exactly
+     * one row and one column, and the value is returned.
+     *
+     * @see query() for detailed specification
+     * @param string|SqlPattern|IRelationRecipe $sqlFragmentPatternOrRecipe
+     * @param array ...$fragmentsAndParams
+     * @return mixed value of the only row from the only column the relation has
+     * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
+     *                                     requires
+     * @throws ResultException when the resulting data set has more than one row, or no row at all, or more than one
+     *                           column, or no column at all
+     */
+    function querySingleValue($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
 
     /**
      * Sends a command to the database using an SQL pattern, waits for its execution and returns the command result.
