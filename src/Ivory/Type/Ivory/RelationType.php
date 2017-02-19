@@ -35,49 +35,76 @@ class RelationType extends VolatilePatternTypeBase
 
     private function serializeRelation(IRelation $rel): string
     {
-        /** @var string[] $colNames list of column names */
-        $colNames = [];
-        /** @var IType[] $typeConverters list of type converters, one for each relation column */
-        $typeConverters = [];
-        foreach ($rel->getColumns() as $i => $column) {
-            $colNames[] = ($column->getName() ?? 'column' . ($i + 1));
+        $columns = $this->recognizeRelationColumns($rel);
+        // Due to SQL limitations, we must distinguish special cases and provide a different SQL query for them.
+        if (!$columns) {
+            return $this->serializeNoColumnRelation($rel->count());
+        } elseif ($rel->count() == 0) {
+            return $this->serializeEmptyRelation($columns);
+        } else {
+            return $this->serializeNonEmptyRelation($rel, $columns);
+        }
+    }
+
+    /**
+     * @param IRelation $relation
+     * @return array list: pair (column name, type converter)
+     */
+    private function recognizeRelationColumns(IRelation $relation): array
+    {
+        $columns = [];
+        foreach ($relation->getColumns() as $i => $column) {
+            $colName = ($column->getName() ?? 'column' . ($i + 1));
             $type = $column->getType();
-            if ($type !== null) {
-                $typeConverters[] = $type;
-            } else {
+            if ($type === null) {
                 $colIdent = ($column->getName() !== null ?
                     'column ' . $column->getName() :
                     StringUtils::englishOrd($i+1) . ' column'
                 );
                 throw new \InvalidArgumentException("Invalid relation for serialization - $colIdent has unknown type");
             }
+            $columns[] = [$colName, $type];
         }
+        return $columns;
+    }
 
-        if (!$colNames) { // a relation without any columns may not be represented using the VALUES construct
-            $result = 'SELECT';
-            if ($rel->count() == 0) {
-                $result .= ' WHERE FALSE';
-            } elseif ($rel->count() > 1) { // even multiple rows are possible
-                $result .= str_repeat(' UNION ALL SELECT', $rel->count() - 1);
-            }
-            return $result;
-        }
-
-        if ($rel->count() == 0) { // a relation without any rows may not be represented using the VALUES construct
-            $identType = $this->getIdentifierType();
-            $result = 'SELECT';
-            foreach ($colNames as $i => $colName) {
-                $type = $typeConverters[$i];
-                $result .= ($i == 0 ? ' ' : ', ') . 'NULL';
-                if ($type instanceof INamedType) {
-                    $result .= "::{$type->getSchemaName()}.{$type->getName()}";
-                }
-                $result .= ' AS ' . $identType->serializeValue($colName);
-            }
+    /**
+     * @param int $rowCount number of rows for the relation to consist of (even multiple rows as possible for relation
+     *                        of no columns in PostgreSQL)
+     * @return string SQL query the result of which is a relation with no columns and the given number of rows
+     */
+    private function serializeNoColumnRelation(int $rowCount): string
+    {
+        $result = 'SELECT';
+        if ($rowCount == 0) {
             $result .= ' WHERE FALSE';
-            return $result;
+        } else {
+            $result .= str_repeat(' UNION ALL SELECT', $rowCount - 1);
         }
+        return $result;
+    }
 
+    /**
+     * @param array $columns result of {@link recognizeRelationColumns()}
+     * @return string SQL query the result of which is a relation the specified columns and no rows
+     */
+    private function serializeEmptyRelation(array $columns): string
+    {
+        $identType = $this->getIdentifierType();
+        $result = 'SELECT';
+        foreach ($columns as $i => list($colName, $type)) {
+            $result .= ($i == 0 ? ' ' : ', ') . 'NULL';
+            if ($type instanceof INamedType) {
+                $result .= "::{$type->getSchemaName()}.{$type->getName()}";
+            }
+            $result .= ' AS ' . $identType->serializeValue($colName);
+        }
+        $result .= ' WHERE FALSE';
+        return $result;
+    }
+
+    private function serializeNonEmptyRelation(IRelation $rel, array $columns): string
+    {
         $result = <<<VAL
 SELECT *
 FROM (
@@ -95,7 +122,8 @@ VAL;
                 if ($colIdx > 0) {
                     $result .= ', ';
                 }
-                $type = $typeConverters[$colIdx];
+                /** @var IType $type */
+                $type = $columns[$colIdx][1];
                 $result .= $type->serializeValue($val);
                 if ($isFirstTuple && $type instanceof INamedType) {
                     $result .= "::{$type->getSchemaName()}.{$type->getName()}";
@@ -110,13 +138,14 @@ VAL;
 ) t (
 SQL;
         $identType = $this->getIdentifierType();
-        foreach ($colNames as $i => $name) {
+        foreach ($columns as $i => list($name, $type)) {
             if ($i > 0) {
                 $result .= ', ';
             }
             $result .= $identType->serializeValue($name);
         }
         $result .= ')';
+
         return $result;
     }
 
