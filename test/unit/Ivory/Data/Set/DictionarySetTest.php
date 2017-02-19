@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Data\Set;
 
-class DictionarySetTest extends \PHPUnit_Framework_TestCase
+class DictionarySetTest extends \PHPUnit\Framework\TestCase
 {
     public function testBasic()
     {

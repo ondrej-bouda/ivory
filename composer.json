@@ -19,7 +19,7 @@
   },
   "require-dev": {
     "ext-pdo_pgsql": "*",
-    "phpunit/phpunit": "~5.3",
-    "phpunit/dbunit": "~1.2"
+    "phpunit/phpunit": "~6.0",
+    "phpunit/dbunit": "~3.0"
   }
 }

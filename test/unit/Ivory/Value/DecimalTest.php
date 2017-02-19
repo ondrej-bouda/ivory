@@ -3,7 +3,7 @@ namespace Ivory\Value;
 
 use Ivory\Exception\UndefinedOperationException;
 
-class DecimalTest extends \PHPUnit_Framework_TestCase
+class DecimalTest extends \PHPUnit\Framework\TestCase
 {
     public function testEquals()
     {

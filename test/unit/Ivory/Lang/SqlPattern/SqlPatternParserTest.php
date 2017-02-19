@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Lang\SqlPattern;
 
-class SqlPatternParserTest extends \PHPUnit_Framework_TestCase
+class SqlPatternParserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SqlPatternParser */
     private $parser;

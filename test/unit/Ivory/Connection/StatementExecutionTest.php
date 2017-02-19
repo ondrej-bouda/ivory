@@ -72,7 +72,7 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         try {
             $this->conn->query("DO LANGUAGE plpgsql 'BEGIN END'");
             $this->fail('A warning was expected due to command executed using query().');
-        } catch (\PHPUnit_Framework_Error_Warning $warning) {
+        } catch (\PHPUnit\Framework\Error\Warning $warning) {
             $this->assertContains(
                 'query', $warning->getMessage(),
                 'The warning message should mention a query was expected', true
@@ -147,7 +147,7 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         try {
             $this->conn->command('VALUES (1),(2)');
             $this->fail('A warning was expected due to query executed using command().');
-        } catch (\PHPUnit_Framework_Error_Warning $warning) {
+        } catch (\PHPUnit\Framework\Error\Warning $warning) {
             $this->assertContains(
                 'command', $warning->getMessage(),
                 'The warning message should mention command was expected',
@@ -171,42 +171,37 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         }
     }
 
-    public function testCustomException()
+    public function testCustomExceptionByMessage()
     {
         $stmtExFactory = $this->conn->getStatementExceptionFactory();
-
         $stmtExFactory->registerByMessage('~logarithm~', StatementExecutionTest__LogarithmException::class);
-        try {
-            $this->conn->query('SELECT log(-10)');
-            $this->fail('Error expected');
-        } catch (StatementExecutionTest__LogarithmException $e) {
-        } finally {
-            $stmtExFactory->clear();
-        }
 
+        $this->expectException(StatementExecutionTest__LogarithmException::class);
+        $this->conn->query('SELECT log(-10)');
+    }
+
+    public function testCustomExceptionBySqlStateCode()
+    {
+        $stmtExFactory = $this->conn->getStatementExceptionFactory();
         $stmtExFactory->registerBySqlStateCode(
             SqlState::INVALID_ARGUMENT_FOR_LOGARITHM,
             StatementExecutionTest__LogarithmException::class
         );
-        try {
-            $this->conn->query('SELECT log(-10)');
-            $this->fail('Error expected');
-        } catch (StatementExecutionTest__LogarithmException $e) {
-        } finally {
-            $stmtExFactory->clear();
-        }
 
+        $this->expectException(StatementExecutionTest__LogarithmException::class);
+        $this->conn->query('SELECT log(-10)');
+    }
+
+    public function testCustomExceptionBySqlStateClass()
+    {
+        $stmtExFactory = $this->conn->getStatementExceptionFactory();
         $stmtExFactory->registerBySqlStateClass(
             SqlStateClass::DATA_EXCEPTION,
             StatementExecutionTest__LogarithmException::class
         );
-        try {
-            $this->conn->query('SELECT log(-10)');
-            $this->fail('Error expected');
-        } catch (StatementExecutionTest__LogarithmException $e) {
-        } finally {
-            $stmtExFactory->clear();
-        }
+
+        $this->expectException(StatementExecutionTest__LogarithmException::class);
+        $this->conn->query('SELECT log(-10)');
     }
 }
 

@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-class TimestampTzTest extends \PHPUnit_Framework_TestCase
+class TimestampTzTest extends \PHPUnit\Framework\TestCase
 {
     public function testNow()
     {

@@ -6,7 +6,7 @@ use Ivory\Exception\UndefinedOperationException;
 /**
  * Tests of operations combining objects of different BitString subclasses as operands.
  */
-class BitStringTest extends \PHPUnit_Framework_TestCase
+class BitStringTest extends \PHPUnit\Framework\TestCase
 {
     public function testEquals()
     {

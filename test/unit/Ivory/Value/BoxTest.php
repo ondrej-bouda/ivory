@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-class BoxTest extends \PHPUnit_Framework_TestCase
+class BoxTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetArea()
     {

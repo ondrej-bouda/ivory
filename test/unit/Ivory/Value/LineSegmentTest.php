@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-class LineSegmentTest extends \PHPUnit_Framework_TestCase
+class LineSegmentTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetLength()
     {

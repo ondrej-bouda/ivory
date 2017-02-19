@@ -4,7 +4,7 @@ namespace Ivory\Value;
 use Ivory\Exception\UndefinedOperationException;
 use Ivory\Exception\UnsupportedException;
 
-class QuantityTest extends \PHPUnit_Framework_TestCase
+class QuantityTest extends \PHPUnit\Framework\TestCase
 {
     public function testFromString()
     {

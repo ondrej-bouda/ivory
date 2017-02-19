@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Data\Set;
 
-class CustomSetTest extends \PHPUnit_Framework_TestCase
+class CustomSetTest extends \PHPUnit\Framework\TestCase
 {
     public function testBasic()
     {

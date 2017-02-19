@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-class TextSearchVectorTest extends \PHPUnit_Framework_TestCase
+class TextSearchVectorTest extends \PHPUnit\Framework\TestCase
 {
     public function testFromSet()
     {

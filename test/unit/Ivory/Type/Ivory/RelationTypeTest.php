@@ -97,11 +97,9 @@ SQL
         $this->assertEmpty($checkRel->getColumns());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSerializeNull()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->relationType->serializeValue(null);
     }
 }

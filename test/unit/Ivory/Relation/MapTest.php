@@ -133,7 +133,7 @@ class MapTest extends \Ivory\IvoryTestCase
         try {
             $this->fullRel->map(...$mappingCols);
             $this->fail('A warning expected due to multiple tuples mapping to the same key.');
-        } catch (\PHPUnit_Framework_Error_Warning $e) {
+        } catch (\PHPUnit\Framework\Error\Warning $e) {
             $expDesc = implode(', ', $dupKeys);
             $this->assertContains($expDesc, $e->getMessage());
         }

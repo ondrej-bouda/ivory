@@ -2,8 +2,9 @@
 namespace Ivory\Lang\SqlPattern;
 
 use Ivory\Exception\NoDataException;
+use Ivory\IvoryTestCase;
 
-class SqlPatternTest extends \PHPUnit_Framework_TestCase
+class SqlPatternTest extends IvoryTestCase
 {
     use \Ivory\PHPUnitExt;
 
@@ -37,9 +38,9 @@ class SqlPatternTest extends \PHPUnit_Framework_TestCase
     {
         $this->activateAssertionExceptions();
         try {
-            $this->pattern->fillSql(['cond' => 'is_active', 0 => "'John'"]);
-            $this->fail('InvalidArgumentException expected due to insufficient arguments');
-        } catch (\InvalidArgumentException $e) {
+            $this->assertException(\InvalidArgumentException::class, null, function () {
+                $this->pattern->fillSql(['cond' => 'is_active', 0 => "'John'"]);
+            });
         } finally {
             $this->restoreAssertionsConfig();
         }
@@ -49,9 +50,9 @@ class SqlPatternTest extends \PHPUnit_Framework_TestCase
     {
         $this->activateAssertionExceptions();
         try {
-            $this->pattern->fillSql(['cond' => 'is_active', 0 => "'John'", 'tbl' => 'person', 'foo' => 'bar']);
-            $this->fail('InvalidArgumentException expected due to extra arguments');
-        } catch (\InvalidArgumentException $e) {
+            $this->assertException(\InvalidArgumentException::class, null, function () {
+                $this->pattern->fillSql(['cond' => 'is_active', 0 => "'John'", 'tbl' => 'person', 'foo' => 'bar']);
+            });
         } finally {
             $this->restoreAssertionsConfig();
         }
@@ -61,19 +62,17 @@ class SqlPatternTest extends \PHPUnit_Framework_TestCase
     {
         $this->activateAssertionExceptions();
         try {
-            $this->pattern->fillSql(['cond' => 'is_active', 0 => "'John'", 'foo' => 'bar']);
-            $this->fail('InvalidArgumentException expected due to wrong arguments');
-        } catch (\InvalidArgumentException $e) {
+            $this->assertException(\InvalidArgumentException::class, null, function () {
+                $this->pattern->fillSql(['cond' => 'is_active', 0 => "'John'", 'foo' => 'bar']);
+            });
         } finally {
             $this->restoreAssertionsConfig();
         }
     }
 
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Notice
-     */
     public function testFillSqlInvalidArguments()
     {
+        $this->expectException(\PHPUnit\Framework\Error\Notice::class);
         $this->pattern->fillSql(['cond' => [], 0 => "'John'", 'tbl' => 'person']);
     }
 
@@ -103,20 +102,12 @@ class SqlPatternTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateSqlNotProvidingValue()
     {
-        $this->activateAssertionExceptions();
-
         $pattern = $this->parser->parse(
-            'SELECT id FROM %n:tbl UNION SELECT object_id FROM log WHERE table = %s:tbl'
+            'SELECT * FROM person WHERE firstname = %s:firstname AND lastname = %s:lastname'
         );
         $gen = $pattern->generateSql();
-        try {
-            $gen->next();
-            $gen->send('person'); // provide the value for the first placeholder
-            $gen->next(); // but not for the next one
-            $this->fail("Should have stopped due to the second value not being filled.");
-        } catch (NoDataException $e) {
-        } finally {
-            $this->restoreAssertionsConfig();
-        }
+        $gen->send('John'); // provide the value for the first placeholder
+        $this->expectException(NoDataException::class);
+        $gen->next(); // but not for the next one
     }
 }

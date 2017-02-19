@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-class TimestampTest extends \PHPUnit_Framework_TestCase
+class TimestampTest extends \PHPUnit\Framework\TestCase
 {
     private static function dt($year, $month, $day, $hour, $min, $sec)
     {

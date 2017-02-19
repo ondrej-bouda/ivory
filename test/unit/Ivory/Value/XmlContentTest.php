@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-class XmlContentTest extends \PHPUnit_Framework_TestCase
+class XmlContentTest extends \PHPUnit\Framework\TestCase
 {
     public function testFromValue()
     {

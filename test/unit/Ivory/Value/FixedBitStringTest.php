@@ -4,7 +4,7 @@ namespace Ivory\Value;
 use Ivory\Exception\ImmutableException;
 use Ivory\Exception\UndefinedOperationException;
 
-class FixedBitStringTest extends \PHPUnit_Framework_TestCase
+class FixedBitStringTest extends \PHPUnit\Framework\TestCase
 {
     public function testEquals()
     {
@@ -59,7 +59,7 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
         try {
             FixedBitString::fromString('1010010110110100111010101011010111001101011010', 4);
             $this->fail('a warning is expected due to truncation');
-        } catch (\PHPUnit_Framework_Error_Warning $e) {
+        } catch (\PHPUnit\Framework\Error\Warning $e) {
         }
         $fbs = @FixedBitString::fromString('1010010110110100111010101011010111001101011010', 4);
         $this->assertTrue(FixedBitString::fromString('1010')->equals($fbs));
@@ -79,7 +79,7 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
         try {
             FixedBitString::fromString('1010010110110100111010101011010111001101011010', 4);
             $this->fail('a warning is expected due to truncation');
-        } catch (\PHPUnit_Framework_Error_Warning $e) {
+        } catch (\PHPUnit\Framework\Error\Warning $e) {
         }
         $fbs = @FixedBitString::fromString('1010010110110100111010101011010111001101011010', 4);
         $this->assertSame('1010', $fbs->toString());
@@ -150,12 +150,12 @@ class FixedBitStringTest extends \PHPUnit_Framework_TestCase
 
     public function testFromNumber()
     {
-        // TODO once the interface is specified
+        $this->markTestIncomplete(); // TODO once the interface is specified
     }
 
     public function testToNumber()
     {
-        // TODO once the interface is specified
+        $this->markTestIncomplete(); // TODO once the interface is specified
     }
 
     public function testGetLength()

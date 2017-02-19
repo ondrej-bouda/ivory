@@ -1,14 +1,17 @@
 <?php
 namespace Ivory;
 
+use PHPUnit\DbUnit\DataSet\AbstractDataSet;
+use PHPUnit\DbUnit\DataSet\ITable;
+
 /**
  * Array-based data set for the PHPUnit Database extension.
  *
  * Taken from https://phpunit.de/manual/current/en/database.html
  */
-class ArrayDataSet extends \PHPUnit_Extensions_Database_DataSet_AbstractDataSet
+class ArrayDataSet extends AbstractDataSet
 {
-    /** @var \PHPUnit_Extensions_Database_DataSet_ITable[] map: table name => table representation */
+    /** @var ITable[] map: table name => table representation */
     private $tables = [];
 
     public function __construct(array $data)
@@ -19,8 +22,8 @@ class ArrayDataSet extends \PHPUnit_Extensions_Database_DataSet_AbstractDataSet
                 $columns = array_keys($rows[0]);
             }
 
-            $metaData = new \PHPUnit_Extensions_Database_DataSet_DefaultTableMetaData($tableName, $columns);
-            $table = new \PHPUnit_Extensions_Database_DataSet_DefaultTable($metaData);
+            $metaData = new \PHPUnit\DbUnit\DataSet\DefaultTableMetadata($tableName, $columns);
+            $table = new \PHPUnit\DbUnit\DataSet\DefaultTable($metaData);
 
             foreach ($rows as $row) {
                 $table->addRow($row);
@@ -31,7 +34,7 @@ class ArrayDataSet extends \PHPUnit_Extensions_Database_DataSet_AbstractDataSet
 
     protected function createIterator($reverse = false)
     {
-        return new \PHPUnit_Extensions_Database_DataSet_DefaultTableIterator($this->tables, $reverse);
+        return new \PHPUnit\DbUnit\DataSet\DefaultTableIterator($this->tables, $reverse);
     }
 
     public function getTable($tableName)

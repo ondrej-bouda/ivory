@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-class PolygonTest extends \PHPUnit_Framework_TestCase
+class PolygonTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetArea()
     {

@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-class TimeTest extends \PHPUnit_Framework_TestCase
+class TimeTest extends \PHPUnit\Framework\TestCase
 {
     private static function t($hour, $min, $sec)
     {

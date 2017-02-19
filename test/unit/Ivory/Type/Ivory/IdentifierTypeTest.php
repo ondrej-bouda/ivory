@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Type\Ivory;
 
-class IdentifierTypeTest extends \PHPUnit_Framework_TestCase
+class IdentifierTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var IdentifierType */
     private $identType;
@@ -24,11 +24,9 @@ class IdentifierTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('""', $this->identType->serializeValue(''));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testSerializeNull()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->identType->serializeValue(null);
     }
 }

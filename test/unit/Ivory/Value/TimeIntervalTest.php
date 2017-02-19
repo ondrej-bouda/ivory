@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-class TimeIntervalTest extends \PHPUnit_Framework_TestCase
+class TimeIntervalTest extends \PHPUnit\Framework\TestCase
 {
     public function testFromParts()
     {

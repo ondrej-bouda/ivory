@@ -233,7 +233,7 @@ class SqlPattern
      *
      * The encoded values sent to the generator are treated as strings. They has to either be strings or other types
      * convertible to strings. `null`, however, is considered as if the caller forgot to provide a value at all, and a
-     * {@link NoDataException} is thrown in such a case.
+     * `NoDataException` is thrown in such a case.
      *
      * Example:
      * <code>
@@ -260,12 +260,11 @@ class SqlPattern
         $offset = 0;
         foreach ($this->placeholderSequence as $plcHdr) {
             $encodedValue = yield $plcHdr;
-            assert(
-                $encodedValue !== null,
-                new NoDataException(
+            if ($encodedValue === null) {
+                throw new NoDataException(
                     "No value encoded for placeholder {$plcHdr->getNameOrPosition()} at offset {$plcHdr->getOffset()}."
-                )
-            );
+                );
+            }
             $result .= substr($this->sqlTorso, $offset, $plcHdr->getOffset() - $offset) . $encodedValue;
             $offset = $plcHdr->getOffset();
         }

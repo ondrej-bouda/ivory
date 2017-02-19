@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Value;
 
-class TextSearchQueryTest extends \PHPUnit_Framework_TestCase
+class TextSearchQueryTest extends \PHPUnit\Framework\TestCase
 {
     public function testFromFormat()
     {

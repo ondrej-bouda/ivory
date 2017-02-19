@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Connection;
 
-class ConnectionParametersTest extends \PHPUnit_Framework_TestCase
+class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
 {
     public function testFromConnectionString()
     {

@@ -4,7 +4,7 @@ namespace Ivory\Value;
 use Ivory\Exception\ImmutableException;
 use Ivory\Exception\UndefinedOperationException;
 
-class VarBitStringTest extends \PHPUnit_Framework_TestCase
+class VarBitStringTest extends \PHPUnit\Framework\TestCase
 {
     public function testEquals()
     {
@@ -55,7 +55,7 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
         try {
             VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);
             $this->fail('a warning is expected due to truncation');
-        } catch (\PHPUnit_Framework_Error_Warning $e) {
+        } catch (\PHPUnit\Framework\Error\Warning $e) {
         }
         $vbs = @VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);
         $this->assertTrue(VarBitString::fromString('1010', 4)->equals($vbs));
@@ -75,7 +75,7 @@ class VarBitStringTest extends \PHPUnit_Framework_TestCase
         try {
             VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);
             $this->fail('a warning is expected due to truncation');
-        } catch (\PHPUnit_Framework_Error_Warning $e) {
+        } catch (\PHPUnit\Framework\Error\Warning $e) {
         }
         $vbs = @VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);
         $this->assertSame('1010', $vbs->toString());

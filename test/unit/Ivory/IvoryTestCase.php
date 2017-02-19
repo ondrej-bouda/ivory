@@ -5,12 +5,12 @@ use Ivory\Connection\Connection;
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
 
-abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
+abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
 {
     /** @var \PDO only instantiated once for test clean-up/fixture load */
     private static $pdo = null;
 
-    /** @var \PHPUnit_Extensions_Database_DB_IDatabaseConnection instantiated once per test */
+    /** @var \PHPUnit\DbUnit\Database\Connection instantiated once per test */
     private $phpUnitConn = null;
 
     /** @var IConnection|null */
@@ -20,7 +20,7 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
     private $errorInterrupt = true;
     /** @var callable|null */
     private $origErrHandler = null;
-    /** @var \PHPUnit_Framework_Error[] error exceptions triggered in the non-interrupt mode and not yet asserted */
+    /** @var array error exceptions triggered in the non-interrupt mode and not yet asserted */
     private $triggeredErrors = [];
 
     protected function setUp()
@@ -76,6 +76,32 @@ abstract class IvoryTestCase extends \PHPUnit_Extensions_Database_TestCase
             restore_error_handler();
             $this->origErrHandler = null;
             $this->errorInterrupt = true;
+        }
+    }
+
+    /**
+     * Asserts that the given piece of code throws an exception of the given type and exception message.
+     *
+     * Adapted from https://github.com/sebastianbergmann/phpunit/issues/1798#issuecomment-134219493
+     *
+     * @param string $expectedType
+     * @param string|null $expectedMessage
+     * @param \Closure $function
+     */
+    protected function assertException(string $expectedType, $expectedMessage, \Closure $function)
+    {
+        $exception = null;
+
+        try {
+            call_user_func($function);
+        } catch (\Exception $e) {
+            $exception = $e;
+        }
+
+        self::assertThat($exception, new \PHPUnit\Framework\Constraint\Exception($expectedType));
+
+        if ($expectedMessage !== null) {
+            self::assertThat($exception, new \PHPUnit\Framework\Constraint\ExceptionMessage($expectedMessage));
         }
     }
 
