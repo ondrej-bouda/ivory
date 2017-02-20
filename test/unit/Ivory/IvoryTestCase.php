@@ -1,9 +1,9 @@
 <?php
 namespace Ivory;
 
-use Ivory\Connection\Connection;
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
+use PHPUnit\Framework\Constraint;
 
 abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
 {
@@ -84,12 +84,19 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
      *
      * Adapted from https://github.com/sebastianbergmann/phpunit/issues/1798#issuecomment-134219493
      *
-     * @param string $expectedType
-     * @param string|null $expectedMessage
-     * @param \Closure $function
+     * @param string|array $expectedTypeOrTypeMessagePair either the expected type, or pair (expected type, message)
+     * @param \Closure $function piece of code within which an exception is expected to be thrown
+     * @param string $message message to show upon failure
      */
-    protected function assertException(string $expectedType, $expectedMessage, \Closure $function)
+    protected function assertException($expectedTypeOrTypeMessagePair, \Closure $function, $message = '')
     {
+        if (is_array($expectedTypeOrTypeMessagePair)) {
+            list($expectedType, $expectedMessage) = $expectedTypeOrTypeMessagePair;
+        } else {
+            $expectedType = $expectedTypeOrTypeMessagePair;
+            $expectedMessage = null;
+        }
+
         $exception = null;
 
         try {
@@ -98,10 +105,10 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
             $exception = $e;
         }
 
-        self::assertThat($exception, new \PHPUnit\Framework\Constraint\Exception($expectedType));
+        self::assertThat($exception, new Constraint\Exception($expectedType), $message);
 
         if ($expectedMessage !== null) {
-            self::assertThat($exception, new \PHPUnit\Framework\Constraint\ExceptionMessage($expectedMessage));
+            self::assertThat($exception, new Constraint\ExceptionMessage($expectedMessage), $message);
         }
     }
 

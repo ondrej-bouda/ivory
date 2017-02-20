@@ -91,17 +91,21 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         );
         $this->assertSame([-3, 4], $tuple->toList());
 
-        try {
-            $this->conn->querySingleTuple('SELECT * FROM (VALUES (4), (-3), (3)) t (num)');
-            $this->fail(ResultException::class . ' was expected - multiple tuple were returned from the database');
-        } catch (ResultException $e) {
-        }
+        $this->assertException(
+            ResultException::class,
+            function () {
+                $this->conn->querySingleTuple('SELECT * FROM (VALUES (4), (-3), (3)) t (num)');
+            },
+            'multiple tuple were returned from the database'
+        );
 
-        try {
-            $this->conn->querySingleTuple('SELECT 1 WHERE FALSE');
-            $this->fail(ResultException::class . ' was expected - no tuples were returned from the database');
-        } catch (ResultException $e) {
-        }
+        $this->assertException(
+            ResultException::class,
+            function () {
+                $this->conn->querySingleTuple('SELECT 1 WHERE FALSE');
+            },
+            'no tuples were returned from the database'
+        );
     }
 
     public function testQuerySingleValue()
