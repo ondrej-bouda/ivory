@@ -8,7 +8,7 @@ abstract class RelationBase implements \IteratorAggregate, IRelation
     use RelationMacros;
 
 
-    public function __construct()
+    protected function __construct()
     {
     }
 

@@ -166,6 +166,18 @@ class TypeDictionary implements ITypeDictionary
 
     public function requireTypeByValue($value): IType
     {
+        // FIXME: move the deciding logic to a user-accessible place
+        if (is_int($value)) {
+            return $this->requireTypeByName('int8', 'pg_catalog');
+        } elseif (is_string($value)) {
+            return $this->requireTypeByName('text', 'pg_catalog');
+        } elseif (is_bool($value)) {
+            return $this->requireTypeByName('bool', 'pg_catalog');
+        } elseif (is_float($value)) {
+            return $this->requireTypeByName('numeric', 'pg_catalog');
+        }
+
+
         throw new \Ivory\Exception\NotImplementedException('Ivory is currently not capable of inferring the type converter just from the value.');
         // TODO: Implement TypeDictionary::requireTypeByValue()
 

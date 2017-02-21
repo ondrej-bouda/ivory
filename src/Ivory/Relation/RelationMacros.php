@@ -22,7 +22,10 @@ trait RelationMacros
 
     abstract public function tuple(int $offset = 0): ITuple;
 
-    abstract function col($offsetOrNameOrEvaluator): IColumn;
+    public function col($offsetOrNameOrEvaluator): IColumn
+    {
+        return $this->_colImpl($offsetOrNameOrEvaluator, $this->columns, $this->colNameMap, $this);
+    }
 
 
     protected static function computeColNameMap(IRelation $relation)
@@ -199,4 +202,13 @@ trait RelationMacros
 
         return $map;
     }
+
+    //region \IteratorAggregate
+
+    public function getIterator()
+    {
+        return new RelationSeekableIterator($this);
+    }
+
+    //endregion
 }

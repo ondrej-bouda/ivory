@@ -45,9 +45,9 @@ class Tuple implements \Iterator, ITuple
 //    }
 
     /**
-     * @param array $data
-     * @param Column[] $columns
-     * @param \int[] $colNameMap
+     * @param array $data list of data for the corresponding columns
+     * @param Column[] $columns list of columns
+     * @param \int[] $colNameMap map: column name => offset of the first column of the name
      */
     public function __construct(array $data, array $columns, array $colNameMap)
     {

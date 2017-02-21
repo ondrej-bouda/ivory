@@ -127,11 +127,6 @@ class QueryResult extends Result implements IQueryResult
         return new RenamedRelation($this, $renamePairs);
     }
 
-    public function col($offsetOrNameOrEvaluator): IColumn
-    {
-        return $this->_colImpl($offsetOrNameOrEvaluator, $this->columns, $this->colNameMap, $this);
-    }
-
     public function uniq($hasher = null, $comparator = null): IRelation
     {
         throw new NotImplementedException();
@@ -165,15 +160,6 @@ class QueryResult extends Result implements IQueryResult
     public function count()
     {
         return $this->numRows;
-    }
-
-    //endregion
-
-    //region \IteratorAggregate
-
-    public function getIterator()
-    {
-        return new RelationSeekableIterator($this);
     }
 
     //endregion
