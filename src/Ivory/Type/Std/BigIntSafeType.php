@@ -11,8 +11,17 @@ use Ivory\Type\IDiscreteType;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html#DATATYPE-INT
  */
-class BigIntType extends IntegerType implements IDiscreteType
+class BigIntSafeType extends IntegerType implements IDiscreteType
 {
+    public static function createForRange($min, $max, $schemaName, $typeName, $connection)
+    {
+        if (bccomp($min, PHP_INT_MIN) >= 0 && bccomp($max, PHP_INT_MAX) <= 0) {
+            return new IntegerType($schemaName, $typeName, $connection);
+        } else {
+            return new BigIntSafeType($schemaName, $typeName, $connection);
+        }
+    }
+
     public function parseValue($str)
     {
         if ($str > PHP_INT_MAX || $str < PHP_INT_MIN) { // correctness: int does not overflow, but rather gets converted to a float

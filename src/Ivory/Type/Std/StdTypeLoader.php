@@ -2,6 +2,7 @@
 namespace Ivory\Type\Std;
 
 use Ivory\Connection\IConnection;
+use Ivory\Lang\Sql\Types;
 use Ivory\Type\AdHocCompositeType;
 
 /**
@@ -23,7 +24,10 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
 
                     case 'bigint':
                     case 'int8':
-                        return new BigIntType($schemaName, $typeName, $connection);
+                        return BigIntSafeType::createForRange(
+                            Types::BIGINT_MIN, Types::BIGINT_MAX,
+                            $schemaName, $typeName, $connection
+                        );
 
                     case 'numeric':
                     case 'decimal':

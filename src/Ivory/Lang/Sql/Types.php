@@ -1,8 +1,14 @@
 <?php
 namespace Ivory\Lang\Sql;
 
+/**
+ * @see https://www.postgresql.org/docs/9.6/static/datatype-numeric.html
+ */
 class Types
 {
+    const BIGINT_MIN = '-9223372036854775808'; // NOTE: written as string not to lose precision on platforms where this
+    const BIGINT_MAX = '9223372036854775807';  //       would be converted to float
+
     /**
      * Lists names of types defined by SQL as reserved ones.
      *
