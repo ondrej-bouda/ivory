@@ -14,6 +14,8 @@ class TypeDictionary implements ITypeDictionary
     private $qualNameTypeMap = [];
     /** @var INamedType[] map: type name => type converter (might be a reference to $this->qualNameTypeMap) */
     private $nameTypeMap = [];
+    /** @var string[][][] list: map: PHP data type name => pair (schema name, type name) */
+    private $typeRecognitionRuleSets = [];
     /** @var string[] names of schemas to search for a type only given by name without schema */
     private $typeSearchPath = [];
     /** @var ITypeDictionaryUndefinedHandler|null */
@@ -85,6 +87,14 @@ class TypeDictionary implements ITypeDictionary
 
         $this->typeSearchPath = $schemaList;
         $this->recomputeNameCache();
+    }
+
+    /**
+     * @param string[][] $ruleSet map: PHP data type name => pair: (schema name, type name)
+     */
+    public function addTypeRecognitionRuleSet(array $ruleSet)
+    {
+        array_unshift($this->typeRecognitionRuleSets, $ruleSet);
     }
 
     private function recomputeNameCache()
@@ -166,23 +176,84 @@ class TypeDictionary implements ITypeDictionary
 
     public function requireTypeByValue($value): IType
     {
-        // FIXME: move the deciding logic to a user-accessible place
-        if (is_int($value)) {
-            return $this->requireTypeByName('int8', 'pg_catalog');
-        } elseif (is_string($value)) {
-            return $this->requireTypeByName('text', 'pg_catalog');
-        } elseif (is_bool($value)) {
-            return $this->requireTypeByName('bool', 'pg_catalog');
-        } elseif (is_float($value)) {
-            return $this->requireTypeByName('numeric', 'pg_catalog');
+        foreach ($this->typeRecognitionRuleSets as $ruleSet) {
+            if (!$ruleSet) {
+                continue;
+            }
+            $rule = $this->recognizeType($value, $ruleSet);
+            if ($rule) {
+                return $this->requireTypeByName($rule[1], $rule[0]);
+            }
         }
-
-
-        throw new \Ivory\Exception\NotImplementedException('Ivory is currently not capable of inferring the type converter just from the value.');
-        // TODO: Implement TypeDictionary::requireTypeByValue()
 
         $typeName = (is_object($value) ? get_class($value) : gettype($value));
         throw new UndefinedTypeException("There is no type defined for converting value of type \"$typeName\"");
+    }
+
+    private function recognizeType($value, $ruleSet)
+    {
+        static $gettypeMap = [
+            'boolean' => 'bool',
+            'integer' => 'int',
+            'double' => 'float',
+            'string' => 'string',
+            'NULL' => 'null',
+        ];
+        $type = gettype($value);
+        if (isset($gettypeMap[$type])) {
+            $ruleName = $gettypeMap[$type];
+            if (isset($ruleSet[$ruleName])) {
+                return $ruleSet[$ruleName];
+            } elseif ($ruleName == 'int' && isset($ruleSet['float'])) {
+                return $ruleSet['float'];
+            } else {
+                return null;
+            }
+        } elseif (is_object($value)) {
+            $valueClass = new \ReflectionClass($value);
+            $class = $valueClass;
+            do {
+                $name = $class->getName();
+                if (isset($ruleSet[$name])) {
+                    return $ruleSet[$name];
+                }
+                $class = $class->getParentClass();
+            } while ($class !== null);
+
+            foreach ($valueClass->getInterfaceNames() as $name) {
+                if (isset($ruleSet[$name])) {
+                    return $ruleSet[$name];
+                }
+            }
+            return null;
+        } elseif (is_array($value)) {
+            $element = $this->findFirstSignificantElement($value);
+            if ($element !== null) {
+                $elmtType = $this->recognizeType($element, $ruleSet);
+                if ($elmtType !== null) {
+                    return [$elmtType[0], $elmtType[1] . '[]'];
+                } else {
+                    return null;
+                }
+            } else {
+                return ($ruleSet['array'] ?? null);
+            }
+        } else {
+            throw new \InvalidArgumentException('$value');
+        }
+    }
+
+    private function findFirstSignificantElement(array $value)
+    {
+        foreach ($value as $element) {
+            if (is_array($element)) {
+                $element = $this->findFirstSignificantElement($element);
+            }
+            if ($element !== null) {
+                return $element;
+            }
+        }
+        return null;
     }
 
     /**

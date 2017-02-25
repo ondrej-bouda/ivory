@@ -5,6 +5,9 @@ use Ivory\Connection\ConfigParam;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\UndefinedTypeException;
 use Ivory\Type\ITypeDictionary;
+use Ivory\Value\Box;
+use Ivory\Value\Decimal;
+use Ivory\Value\Time;
 
 class SqlRecipeTest extends \Ivory\IvoryTestCase
 {
@@ -203,6 +206,60 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
 
         $this->assertSame(
             'SELECT t.col + 1 FROM t',
+            $recip->toSql($this->typeDict)
+        );
+    }
+
+    public function testAutoTypesBasic()
+    {
+        $recip = SqlRelationRecipe::fromFragments(
+            'SELECT %, %, %, %, %',
+            true, 42, 3.14, 'wheee', null
+        );
+
+        $this->assertSame(
+            "SELECT TRUE, 42, 3.14, 'wheee', NULL",
+            $recip->toSql($this->typeDict)
+        );
+    }
+
+    public function testAutoTypesObject()
+    {
+        $recip = SqlRelationRecipe::fromFragments(
+            'SELECT %, %, %',
+            Decimal::fromNumber('2.81'),
+            Box::fromOppositeCorners([3, 5], [9, 14]),
+            Time::fromString('13:49')
+        );
+
+        $this->assertSame(
+            "SELECT 2.81, box(point(9,14),point(3,5)), '13:49:00'",
+            $recip->toSql($this->typeDict)
+        );
+    }
+
+    public function testAutoTypesArray()
+    {
+        $recip = SqlRelationRecipe::fromFragments(
+            'SELECT %, %:emptyArr, %:nullStartArr, %:allNullArr, %:nestedArr, %:decArr',
+            [1 => 1, 2, 3]
+        );
+        $recip->setParams([
+            'emptyArr' => [],
+            'nullStartArr' => [1 => null, null, 1.1, 2.4],
+            'allNullArr' => [1 => null, null],
+            'nestedArr' => [1 => [1 => null, 'b'], [1 => '{', '}']],
+            'decArr' => [1 => Decimal::fromNumber(1.6), Decimal::fromNumber(8)]
+        ]);
+
+        $this->assertSame(
+            "SELECT " .
+            "'{1,2,3}'::pg_catalog.int8[], " .
+            "'{}'::pg_catalog.text[], " .
+            "'{NULL,NULL,1.1,2.4}'::pg_catalog.float8[], " .
+            "'{NULL,NULL}'::pg_catalog.text[], " .
+            "'{{NULL,b},{\"{\",\"}\"}}'::pg_catalog.text[], " .
+            "'{1.6,8}'::pg_catalog.numeric[]",
             $recip->toSql($this->typeDict)
         );
     }

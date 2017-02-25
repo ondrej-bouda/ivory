@@ -59,6 +59,7 @@ class TypeControl implements ITypeControl, ITypeProvider
                 $typeDictionary->defineTypeAlias($abbr, $schemaName, $typeName);
                 $typeDictionary->defineTypeAlias("{$abbr}[]", $schemaName, "{$typeName}[]");
             }
+            $typeDictionary->addTypeRecognitionRuleSet($reg->getTypeRecognitionRules());
         }
     }
 

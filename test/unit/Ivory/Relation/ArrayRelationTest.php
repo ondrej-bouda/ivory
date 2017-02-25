@@ -21,7 +21,7 @@ class ArrayRelationTest extends \Ivory\IvoryTestCase
         );
         $this->assertSame(5, $tuple['num']);
         $this->assertSame('g', $tuple['letter']);
-        $this->assertEquals(Decimal::fromNumber('2.81'), $tuple['decim']);
+        $this->assertEquals(2.81, $tuple['decim'], '', 1e-12);
         $this->assertSame(true, $tuple['flag']);
         $this->assertSame('text', $tuple['txt']);
     }

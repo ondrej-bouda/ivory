@@ -6,23 +6,24 @@ use Ivory\Connection\IConnection;
 /**
  * Collection of PHP type converters for recognized PostgreSQL base types.
  *
- * Type registers are used at two levels: at the Ivory class and at a connection to a concrete database. At either
- * level, specific types and type loaders may be registered. Whenever a type converter is requested for a PostgreSQL
- * type, it is retrieved from the connection type register, then from the global register. If neither of them already
- * knows the requested type, type loaders registered at both the registers are consecutively tried to load the type
- * converter.
+ * Type registers are used at two levels: at the Ivory class (global) and at a connection to a concrete database.
+ * At either level, specific types and type loaders may be registered. Whenever a type converter is requested for
+ * a PostgreSQL type, it is retrieved from the connection type register, then from the global register. If neither of
+ * them already knows the requested type, type loaders registered at both the registers are consecutively tried to load
+ * the type converter.
  *
  * For Ivory to recognize a new base type globally or locally for a given connection, the new type converter, or a whole
- * type loader may be registered at the corresponding type register, using {@link TypeRegister::registerType()} or
- * {@link TypeRegister::registerTypeLoader()}, respectively.
+ * type loader may be registered at the corresponding type register, using {@link registerType()} or
+ * {@link registerTypeLoader()}, respectively.
  *
  * The purpose of the type register is only to collect all the types and type loaders. Once any of the types is
- * requested by a connection, it may be cached for the whole script lifetime so that later type or type loader
+ * requested by a connection, it may be cached for the whole script lifetime. Thus, later type or type loader
  * registration changes are not reflected.
  *
  * Besides types and type loaders, the type register also collects several type supplements:
  * - range canonical functions and their providers;
- * - abbreviations of qualified type names.
+ * - abbreviations of qualified type names;
+ * - rules for recognizing type from value.
  */
 class TypeRegister
 {
@@ -43,6 +44,8 @@ class TypeRegister
     private $sqlPatternTypes = [];
     /** @var string[][] type name abbreviation => pair: schema name, type name */
     private $typeAbbreviations = [];
+    /** @var string[][] PHP data type => pair: schema name, type name */
+    private $typeRecognitionRules = [];
 
     /**
      * Registers a type converter for a PostgreSQL base data type.
@@ -316,9 +319,89 @@ class TypeRegister
         $this->typeAbbreviations[$abbreviation] = [$schemaName, $typeName];
     }
 
+    /**
+     * Unregisters a previously registered abbreviation for a type name.
+     *
+     * If no such abbreviation has been registered, nothing is done.
+     *
+     * @param string $abbreviation abbreviation for a type name
+     */
     public function unregisterTypeAbbreviation(string $abbreviation)
     {
         unset($this->typeAbbreviations[$abbreviation]);
+    }
+
+    /**
+     * Adds a new rule for recognizing type from a PHP value.
+     *
+     * The rule tells to use the type converter registered for `$schemaName.$typeName` type whenever a value of the
+     * specified data type is given. The data type may be given by the string containing either:
+     * - `'bool'`, `'int'`, `'float'`, `'string'`, or `'null'`, specifying to use the type converter for values of the
+     *   corresponding scalar types; or
+     * - `'array'`, specifying the type converter to used for serializing *unrecognized* arrays (see below for details
+     *   regarding recognition of types for array values); or
+     * - fully-qualified name of a class or interface.
+     *
+     * The data type of a presented PHP value is not matched just against the given data type. Subtypes are also
+     * recognized. The mechanism is as follows:
+     * 1. an exact match is attempted - if found, the converter for the recognized type is used;
+     * 2. otherwise, supertypes of the PHP value are consecutively tried and the first match is used:
+     *    - `float` is, for this purpose, considered as a supertype of `int`;
+     *    - parent classes of an object are unrolled consecutively from the closest parent to the top-level superclass;
+     *    - if parent classes do not make a match, then all interfaces the class of the PHP value implements, are tried
+     *      in the alphabetical ordered (note this also includes interfaces extended by the ones actually implemented by
+     *      the class of the PHP value.
+     *
+     * Arrays are recognized automatically - their type is recognized according to the first non-array, non-null element
+     * found in the array. Recall that PHP arrays may hold elements of various types while PostgreSQL limits arrays to
+     * be of just a single type. The type is recognized by taking the first non-null element in the array. If it is an
+     * array, the recognition procedure recursively continues on it. The whole array value is then treated by the array
+     * converter with its element type set to the recognized type. If the type is not recognized (empty array or array
+     * only containing null values), the rule specified for `array` is used, if defined.
+     *
+     * Any previously defined rule for the same data type (`$dataType`) is dropped in favor of the new one.
+     *
+     * Note the rules are case sensitive.
+     *
+     * @internal Ivory design note: Alternatively, the data types recognized for data types might be defined by the type
+     * converters. That would not work for two reasons: multiple type converters might collide about the recognized type
+     * and, more importantly, the same type converter class is registered for multiple types (e.g., IntegerType) and
+     * Ivory could not decide which type converter instance to actually use.
+     * @internal Ivory design note: Regarding the alphabetical order of interfaces matched against the rules: a more
+     * sophisticated preference system might be used. We prefer simplicity, though, over perfection (in the perfect
+     * system, the fact which parent declared implementing which interfaces, should be considered, complicated with
+     * parent interfaces...).
+     *
+     * @param string $dataType either one of <tt>boolean</tt>, <tt>integer</tt>, <tt>double</tt>, <tt>string</tt>, and
+     *                           <tt>null</tt>, or a fully-qualified name of a PHP class or interface
+     * @param string $schemaName name of schema the recognized type is defined in
+     * @param string $typeName name of the recognized type
+     */
+    public function addTypeRecognitionRule(string $dataType, string $schemaName, string $typeName)
+    {
+        $this->typeRecognitionRules[$dataType] = [$schemaName, $typeName];
+    }
+
+    /**
+     * Removes rule for the given PHP data type
+     *
+     * If no such rule has been added, nothing is done.
+     *
+     * @param string $dataType
+     */
+    public function removeTypeRecognitionRule(string $dataType)
+    {
+        unset($this->typeRecognitionRules[$dataType]);
+    }
+
+    /**
+     * Returns the list of all rules for recognizing types from PHP values.
+     *
+     * @return string[][] map: data type => pair: schema name, type name
+     */
+    public function getTypeRecognitionRules()
+    {
+        return $this->typeRecognitionRules;
     }
 
     /**

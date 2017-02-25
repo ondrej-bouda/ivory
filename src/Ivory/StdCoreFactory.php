@@ -50,6 +50,44 @@ class StdCoreFactory implements ICoreFactory
         $reg->registerTypeAbbreviation('ts', 'pg_catalog', 'timestamp');
         $reg->registerTypeAbbreviation('tstz', 'pg_catalog', 'timestamptz');
 
+        // standard type recognition rules
+        $reg->addTypeRecognitionRule('int', 'pg_catalog', 'int8');
+        $reg->addTypeRecognitionRule('string', 'pg_catalog', 'text');
+        $reg->addTypeRecognitionRule('bool', 'pg_catalog', 'bool');
+        $reg->addTypeRecognitionRule('float', 'pg_catalog', 'float8');
+        $reg->addTypeRecognitionRule('null', 'pg_catalog', 'text');
+        $reg->addTypeRecognitionRule('array', 'pg_catalog', 'text[]');
+        $reg->addTypeRecognitionRule(\Ivory\Value\Decimal::class, 'pg_catalog', 'numeric');
+        $reg->addTypeRecognitionRule(\Ivory\Value\Date::class, 'pg_catalog', 'date');
+        $reg->addTypeRecognitionRule(\Ivory\Value\Time::class, 'pg_catalog', 'time');
+        $reg->addTypeRecognitionRule(\Ivory\Value\TimeTz::class, 'pg_catalog', 'timetz');
+        $reg->addTypeRecognitionRule(\Ivory\Value\Timestamp::class, 'pg_catalog', 'timestamp');
+        $reg->addTypeRecognitionRule(\Ivory\Value\TimestampTz::class, 'pg_catalog', 'timestamptz');
+        $reg->addTypeRecognitionRule(\Ivory\Value\TimeInterval::class, 'pg_catalog', 'interval');
+        $reg->addTypeRecognitionRule(\Ivory\Value\FixedBitString::class, 'pg_catalog', 'bit');
+        $reg->addTypeRecognitionRule(\Ivory\Value\VarBitString::class, 'pg_catalog', 'varbit');
+        $reg->addTypeRecognitionRule(\Ivory\Value\Json::class, 'pg_catalog', 'json');
+        $reg->addTypeRecognitionRule(\Ivory\Value\XmlContent::class, 'pg_catalog', 'xml');
+        $reg->addTypeRecognitionRule(\Ivory\Value\XmlDocument::class, 'pg_catalog', 'xml');
+        $reg->addTypeRecognitionRule(\DOMDocument::class, 'pg_catalog', 'xml');
+        $reg->addTypeRecognitionRule(\DOMNode::class, 'pg_catalog', 'xml');
+        $reg->addTypeRecognitionRule(\DOMNodeList::class, 'pg_catalog', 'xml');
+        $reg->addTypeRecognitionRule(\SimpleXMLElement::class, 'pg_catalog', 'xml');
+        $reg->addTypeRecognitionRule(\Ivory\Value\Point::class, 'pg_catalog', 'point');
+        $reg->addTypeRecognitionRule(\Ivory\Value\Line::class, 'pg_catalog', 'line');
+        $reg->addTypeRecognitionRule(\Ivory\Value\LineSegment::class, 'pg_catalog', 'lseg');
+        $reg->addTypeRecognitionRule(\Ivory\Value\Box::class, 'pg_catalog', 'box');
+        $reg->addTypeRecognitionRule(\Ivory\Value\Path::class, 'pg_catalog', 'path');
+        $reg->addTypeRecognitionRule(\Ivory\Value\Polygon::class, 'pg_catalog', 'polygon');
+        $reg->addTypeRecognitionRule(\Ivory\Value\Circle::class, 'pg_catalog', 'circle');
+        $reg->addTypeRecognitionRule(\Ivory\Value\NetAddress::class, 'pg_catalog', 'inet');
+        $reg->addTypeRecognitionRule(\Ivory\Value\MacAddr::class, 'pg_catalog', 'macaddr');
+        $reg->addTypeRecognitionRule(\Ivory\Value\Money::class, 'pg_catalog', 'money');
+        $reg->addTypeRecognitionRule(\Ivory\Value\PgLogSequenceNumber::class, 'pg_catalog', 'pg_lsn');
+        $reg->addTypeRecognitionRule(\Ivory\Value\TxIdSnapshot::class, 'pg_catalog', 'txid_snapshot');
+        $reg->addTypeRecognitionRule(\Ivory\Value\TextSearchVector::class, 'pg_catalog', 'tsvector');
+        $reg->addTypeRecognitionRule(\Ivory\Value\TextSearchQuery::class, 'pg_catalog', 'tsquery');
+
         return $reg;
     }
 
