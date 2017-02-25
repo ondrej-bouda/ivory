@@ -176,7 +176,7 @@ class TypeRegister
     /**
      * Unregisters a range canonical function, previously registered by {@link registerRangeCanonicalFunc()}.
      *
-     * Either the name of the PostgreSQL schema, function name, and argument type are given, in which case the
+     * Either the name of the PostgreSQL schema, function name and argument type are given, in which case the
      * implementation for this concrete function will get unregistered, or a function object is given, then any
      * registrations of this function will be dropped.
      *

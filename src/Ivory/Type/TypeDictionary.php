@@ -39,20 +39,24 @@ class TypeDictionary implements ITypeDictionary
             }
             $this->qualNameTypeMap[$schemaName][$typeName] = $type;
 
-            // cache
-            $searchPathPos = array_search($schemaName, $this->typeSearchPath);
-            if ($searchPathPos !== false) {
-                if (!isset($this->searchedNameCache[$typeName])) {
+            $this->cacheNamedType($schemaName, $typeName, $type);
+        }
+    }
+
+    private function cacheNamedType(string $schemaName, string $typeName, IType $type)
+    {
+        $searchPathPos = array_search($schemaName, $this->typeSearchPath);
+        if ($searchPathPos !== false) {
+            if (!isset($this->searchedNameCache[$typeName])) {
+                $this->searchedNameCache[$typeName] = $type;
+            } else {
+                // find out whether the schema of $type is more preferred
+                $cachedPos = array_search(
+                    $this->searchedNameCache[$typeName]->getSchemaName(),
+                    $this->typeSearchPath
+                );
+                if ($cachedPos === false || $cachedPos > $searchPathPos) {
                     $this->searchedNameCache[$typeName] = $type;
-                } else {
-                    // find out whether the schema of $type is more preferred
-                    $cachedPos = array_search(
-                        $this->searchedNameCache[$typeName]->getSchemaName(),
-                        $this->typeSearchPath
-                    );
-                    if ($cachedPos === false || $cachedPos > $searchPathPos) {
-                        $this->searchedNameCache[$typeName] = $type;
-                    }
                 }
             }
         }
@@ -177,12 +181,11 @@ class TypeDictionary implements ITypeDictionary
     public function requireTypeByValue($value): IType
     {
         foreach ($this->typeRecognitionRuleSets as $ruleSet) {
-            if (!$ruleSet) {
-                continue;
-            }
-            $rule = $this->recognizeType($value, $ruleSet);
-            if ($rule) {
-                return $this->requireTypeByName($rule[1], $rule[0]);
+            if ($ruleSet) {
+                $rule = $this->recognizeType($value, $ruleSet);
+                if ($rule) {
+                    return $this->requireTypeByName($rule[1], $rule[0]);
+                }
             }
         }
 
@@ -210,36 +213,47 @@ class TypeDictionary implements ITypeDictionary
                 return null;
             }
         } elseif (is_object($value)) {
-            $valueClass = new \ReflectionClass($value);
-            $class = $valueClass;
-            do {
-                $name = $class->getName();
-                if (isset($ruleSet[$name])) {
-                    return $ruleSet[$name];
-                }
-                $class = $class->getParentClass();
-            } while ($class !== null);
-
-            foreach ($valueClass->getInterfaceNames() as $name) {
-                if (isset($ruleSet[$name])) {
-                    return $ruleSet[$name];
-                }
-            }
-            return null;
+            return $this->recognizeObjectType($value, $ruleSet);
         } elseif (is_array($value)) {
-            $element = $this->findFirstSignificantElement($value);
-            if ($element !== null) {
-                $elmtType = $this->recognizeType($element, $ruleSet);
-                if ($elmtType !== null) {
-                    return [$elmtType[0], $elmtType[1] . '[]'];
-                } else {
-                    return null;
-                }
-            } else {
-                return ($ruleSet['array'] ?? null);
-            }
+            return $this->recognizeArrayType($value, $ruleSet);
         } else {
             throw new \InvalidArgumentException('$value');
+        }
+    }
+
+    private function recognizeObjectType($value, $ruleSet)
+    {
+        $valueClass = new \ReflectionClass($value);
+        $class = $valueClass;
+        do {
+            $name = $class->getName();
+            if (isset($ruleSet[$name])) {
+                return $ruleSet[$name];
+            }
+            $class = $class->getParentClass();
+        } while ($class !== null);
+
+        foreach ($valueClass->getInterfaceNames() as $name) {
+            if (isset($ruleSet[$name])) {
+                return $ruleSet[$name];
+            }
+        }
+        return null;
+    }
+
+    private function recognizeArrayType($value, $ruleSet)
+    {
+        $element = $this->findFirstSignificantElement($value);
+
+        if ($element !== null) {
+            $elmtType = $this->recognizeType($element, $ruleSet);
+            if ($elmtType !== null) {
+                return [$elmtType[0], $elmtType[1] . '[]'];
+            } else {
+                return null;
+            }
+        } else {
+            return ($ruleSet['array'] ?? null);
         }
     }
 
