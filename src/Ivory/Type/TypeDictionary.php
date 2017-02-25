@@ -231,7 +231,7 @@ class TypeDictionary implements ITypeDictionary
                 return $ruleSet[$name];
             }
             $class = $class->getParentClass();
-        } while ($class !== null);
+        } while ($class);
 
         foreach ($valueClass->getInterfaceNames() as $name) {
             if (isset($ruleSet[$name])) {
