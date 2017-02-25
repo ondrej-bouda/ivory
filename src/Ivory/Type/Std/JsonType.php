@@ -26,6 +26,6 @@ abstract class JsonType extends BaseType
         }
 
         $encoded = $val->getEncoded();
-        return "'" . strtr($encoded, ["'" => "''"]) . "'";
+        return $this->getQualifiedName() . " '" . strtr($encoded, ["'" => "''"]) . "'";
     }
 }
