@@ -156,7 +156,8 @@ COMMENT ON TABLE usr IS 'Users of the shop.';
 CREATE UNLOGGED TABLE usr_starred_item (
   id SERIAL PRIMARY KEY,
   usr_id INT NOT NULL REFERENCES usr ON UPDATE CASCADE ON DELETE CASCADE,
-  item_id INT NOT NULL REFERENCES item ON UPDATE CASCADE ON DELETE CASCADE
+  item_id INT NOT NULL REFERENCES item ON UPDATE CASCADE ON DELETE CASCADE,
+  star_time TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE UNIQUE INDEX ON usr_starred_item (usr_id, item_id);
 CREATE INDEX ON usr_starred_item (item_id);
@@ -174,6 +175,7 @@ DECLARE
   category_count INT;
   item_count INT;
   cat_placement INT[];
+  rand_tz TIMESTAMPTZ;
 BEGIN
   TRUNCATE category, item, item_category, param, param_value, item_param_value, usr, usr_starred_item CASCADE; -- TEMP
   PERFORM setseed(0);
@@ -245,18 +247,19 @@ BEGIN
 
   item_count := (SELECT COUNT(*) FROM item);
   FOR i IN 1..1000 LOOP
+    rand_tz := rand_timestamptz('2010-01-01', '2017-03-12', .95);
     INSERT INTO usr (id, email, name, pwd_hash, is_active, last_login)
       VALUES (
         i,
         'usr' || i || '@example.com',
         'User ' || i,
-        md5(random()::TEXT),
+        md5(i::TEXT),
         rand_bool(.9),
-        rand_timestamptz('2010-01-01', '2017-03-12', .95)
+        rand_tz
       );
     FOR j IN 1..rand_int(0, 10) LOOP
-      INSERT INTO usr_starred_item (usr_id, item_id)
-        VALUES (i, rand_int(1, item_count))
+      INSERT INTO usr_starred_item (usr_id, item_id, star_time)
+        VALUES (i, rand_int(1, item_count), rand_timestamptz(rand_tz, '2017-03-12'))
         ON CONFLICT (usr_id, item_id) DO NOTHING;
     END LOOP;
   END LOOP;
