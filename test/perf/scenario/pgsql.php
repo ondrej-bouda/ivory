@@ -30,7 +30,15 @@ for ($round = 1; $round <= $totalRounds; $round++) {
     $benchmark->endSection();
 
 
-    $benchmark->startSection('1. User authentication');
+    $benchmark->startSection('1. First, trivial query');
+
+    $res = pg_query($conn, 'SELECT 1');
+    pg_free_result($res);
+
+    $benchmark->endSection();
+
+
+    $benchmark->startSection('2. User authentication');
 
     $res = pg_query_params($conn, 'SELECT * FROM usr WHERE lower(email) = lower($1)', [$testUserCredentials['email']]);
     if (!$res) {
@@ -53,7 +61,7 @@ for ($round = 1; $round <= $totalRounds; $round++) {
     $benchmark->endSection();
 
 
-    $benchmark->startSection('2. Starred items');
+    $benchmark->startSection('3. Starred items');
 
     $res = pg_query_params($conn,
         'SELECT item.id, item.name, item.description
@@ -102,7 +110,7 @@ for ($round = 1; $round <= $totalRounds; $round++) {
     $benchmark->endSection();
 
 
-    $benchmark->startSection('3. Category Items');
+    $benchmark->startSection('4. Category Items');
 
     $res = pg_query_params($conn,
         'SELECT item.id, item.name, item.description, item.introduction_date,

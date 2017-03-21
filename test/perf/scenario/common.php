@@ -32,6 +32,13 @@ class Benchmark
     private $curSection;
     private $startTime;
 
+    public function benchmarkSection(string $label, \Closure $body)
+    {
+        $this->startSection($label);
+        $body();
+        $this->endSection();
+    }
+
     public function startSection(string $label)
     {
         $this->curSection = $label;
@@ -60,7 +67,7 @@ class Benchmark
             $avg = array_sum($lapTimeList) / $count;
             printf("%4dx %-40s %f\n", $count, "$label:", $avg);
         }
-        echo "Peak memory usage: " . memory_get_peak_usage() / 1024 . " kB\n";
+        echo "Peak memory usage: " . round(memory_get_peak_usage() / 1024) . " kB\n";
     }
 }
 
