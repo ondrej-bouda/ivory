@@ -33,8 +33,8 @@ class TimestampTest extends \PHPUnit\Framework\TestCase
             $start = time();
             $dt = Timestamp::now();
             $end = time();
-            $this->assertLessThanOrEqual($dt->toUnixTimestamp(), $start);
-            $this->assertLessThanOrEqual($end, $dt->toUnixTimestamp());
+            $this->assertLessThanOrEqual($start, $dt->toUnixTimestamp());
+            $this->assertLessThanOrEqual($dt->toUnixTimestamp(), $end);
             // the precision should be greater than just mere seconds
             if ($dt->format('u') != 0) {
                 $hitNonZeroMicrosec = true;
