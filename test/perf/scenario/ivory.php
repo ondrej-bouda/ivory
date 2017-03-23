@@ -1,70 +1,74 @@
 <?php
+
 use Ivory\Ivory;
 
-require_once '../../bootstrap.php';
+class IvoryPerformanceTest implements IPerformanceTest
+{
+    const SYNCHRONOUS = 'sync';
+    const ASYNCHRONOUS = 'async';
 
-$args = require __DIR__ . '/common.php';
-$connString = $args['connString'];
-$testUserCredentials = $args['testUserCredentials'];
+    private $async = true;
+    /** @var \Ivory\Connection\IConnection */
+    private $conn;
 
-$recreate = false;
-$dropOnExit = false;
+    public function __construct($options = [])
+    {
+        if (in_array(self::SYNCHRONOUS, $options)) {
+            $this->async = false;
+        }
+        if (in_array(self::ASYNCHRONOUS, $options)) {
+            $this->async = true;
+        }
+    }
 
+    public function connect(string $connString, string $searchPathSchema)
+    {
+        $this->conn = Ivory::setupConnection($connString);
 
-if ($recreate) {
-    recreate_database($connString);
-}
+        if ($this->async) {
+            $this->conn->connect();
+        } else {
+            $this->conn->connectWait();
+        }
 
+        $this->conn->getConfig()->setForSession('search_path', $searchPathSchema);
+    }
 
-//region Benchmark
-echo "Starting.\n";
-echo "Dashboard scenario: plenty of various queries, both summary and listings.\n";
-$benchmark = new Benchmark();
+    public function trivialQuery()
+    {
+        $this->conn->querySingleValue('SELECT 1');
+    }
 
-for ($round = 1; $round <= $totalRounds; $round++) {
-    ob_start(function ($buffer) use ($round) {
-        return ($round == 1 ? $buffer : '');
-    });
-
-    $benchmark->startSection('0. Connection');
-
-    $conn = Ivory::setupConnection($connString);
-    $conn->connect();
-    $conn->getConfig()->setForSession('search_path', 'perftest');
-
-    $benchmark->endSection();
-
-
-    $benchmark->benchmarkSection('1. First, trivial query', function () use ($conn) {
-        $conn->querySingleValue('SELECT 1');
-    });
-
-
-    $benchmark->benchmarkSection('2. User authentication', function () use ($conn, $testUserCredentials, &$user) {
+    public function userAuthentication(string $email, string $password): int
+    {
         try {
-            $user = $conn->querySingleTuple(
+            $user = $this->conn->querySingleTuple(
                 'SELECT * FROM usr WHERE lower(email) = lower(%s)',
-                $testUserCredentials['email']
+                $email
             );
         }
         catch (Exception $e) {
             exit('Error authenticating the user');
         }
-        if ($user['pwd_hash'] !== md5($testUserCredentials['password'])) {
+
+        if ($user['pwd_hash'] !== md5($password)) {
             exit('Invalid password');
         }
         if (!$user['is_active']) {
             exit('User inactive');
         }
-        $conn->command('UPDATE usr SET last_login = CURRENT_TIMESTAMP WHERE id = %int', $user['id']);
+
+        $this->conn->command('UPDATE usr SET last_login = CURRENT_TIMESTAMP WHERE id = %int', $user['id']);
         if ($user['last_login']) {
             echo 'Welcome back since ' . $user['last_login']->format('n/j/Y H:i:s') . "\n";
         }
-    });
 
+        return $user['id'];
+    }
 
-    $benchmark->benchmarkSection('3. Starred items', function () use ($conn, $user) {
-        $rel = $conn->query(
+    public function starredItems(int $userId)
+    {
+        $rel = $this->conn->query(
             'SELECT item.id, item.name, item.description, item.introduction_date,
                     array_agg((category.id, category.name) ORDER BY category.name, category.id) AS categories
              FROM usr_starred_item
@@ -75,7 +79,7 @@ for ($round = 1; $round <= $totalRounds; $round++) {
              WHERE usr_starred_item.usr_id = %int
              GROUP BY item.id, usr_starred_item.star_time
              ORDER BY usr_starred_item.star_time DESC, item.name',
-            $user['id']
+            $userId
         );
         echo "Your starred items:\n";
         foreach ($rel as $item) {
@@ -91,11 +95,11 @@ for ($round = 1; $round <= $totalRounds; $round++) {
             echo $item['description'];
             echo "\n";
         }
-    });
+    }
 
-
-    $benchmark->benchmarkSection('4. Category Items', function () use ($conn) {
-        $rel = $conn->query(
+    public function categoryItems(int $categoryId)
+    {
+        $rel = $this->conn->query(
             'SELECT item.id, item.name, item.description, item.introduction_date,
                     COALESCE(
                       json_object_agg(param.name, item_param_value.value ORDER BY param.priority DESC, param.name)
@@ -110,9 +114,9 @@ for ($round = 1; $round <= $totalRounds; $round++) {
              WHERE category_id = %int
              GROUP BY item.id
              ORDER BY item.introduction_date DESC, item.name, item.id',
-            5
+            $categoryId
         );
-        echo "Category 5:\n";
+        echo "Category $categoryId:\n";
         foreach ($rel as $row) {
             printf('#%d %s, introduced %s: %s',
                 $row['id'], $row['name'],
@@ -124,25 +128,11 @@ for ($round = 1; $round <= $totalRounds; $round++) {
             }
             echo "\n";
         }
-    });
+    }
 
-
-    $benchmark->benchmarkSection('9. Disconnect', function () use ($conn) {
-        $conn->disconnect();
-    });
-
-
-    ob_end_flush();
+    public function disconnect()
+    {
+        $this->conn->disconnect();
+        $this->conn = null;
+    }
 }
-//endregion
-
-//region Reporting and epilogue
-$benchmark->printReport();
-
-if ($dropOnExit) {
-    $conn = pg_connect($connString, PGSQL_CONNECT_FORCE_NEW);
-    $res = pg_query($conn, 'DROP SCHEMA perftest CASCADE');
-    pg_free_result($res);
-    pg_close($conn);
-}
-//endregion
