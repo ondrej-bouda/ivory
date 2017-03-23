@@ -55,6 +55,10 @@ $command->flag('print-data')
     ->describe('Print the data gathered from the database to stderr.')
     ->boolean();
 
+$command->flag('progress')
+    ->describe('Print progress information.')
+    ->boolean();
+
 $command->flag('sections')
     ->alias('s')
     ->describe('Comma-separated list of test sections to run. Section 3 implies section 2.')
@@ -96,7 +100,7 @@ $command->flag('test-category')
 //region Init
 
 if ($command['recreate']) {
-    recreate_database($command['conn']);
+    recreate_database($command['conn'], (bool)$command['progress']);
 }
 
 $benchmark = new Benchmark();
@@ -163,9 +167,15 @@ for ($round = 1 - $command['warmup']; $round <= $command['rounds']; $round++) {
 $benchmark->printReport();
 
 if ($command['drop']) {
+    if ($command['progress']) {
+        echo "Dropping perftest schema...\n";
+    }
     $conn = pg_connect($command['conn'], PGSQL_CONNECT_FORCE_NEW);
     $res = pg_query($conn, 'DROP SCHEMA perftest CASCADE');
     pg_free_result($res);
+    if ($command['progress']) {
+        echo "Done.\n";
+    }
     pg_close($conn);
 }
 
@@ -190,7 +200,7 @@ interface IPerformanceTest
 }
 
 
-function recreate_database(string $connString)
+function recreate_database(string $connString, bool $printProgress = false)
 {
     $perfSchemaSql = file_get_contents(__DIR__ . '/../perfdb.sql');
 
@@ -198,13 +208,19 @@ function recreate_database(string $connString)
 
     $res = pg_query($conn, 'DROP SCHEMA IF EXISTS perftest CASCADE');
     pg_free_result($res);
-    echo "Creating perftest schema...\n";
+    if ($printProgress) {
+        echo "Creating perftest schema...\n";
+    }
     $res = pg_query($conn, $perfSchemaSql);
     pg_free_result($res);
-    echo "Schema created and filled with data.\n";
+    if ($printProgress) {
+        echo "Schema created and filled with data.\n";
+    }
     $res = pg_query($conn, 'ANALYZE');
     pg_free_result($res);
-    echo "Analyzed.\n";
+    if ($printProgress) {
+        echo "Analyzed.\n";
+    }
     pg_close($conn);
 }
 
