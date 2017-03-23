@@ -21,6 +21,7 @@
     "ext-pdo_pgsql": "*",
     "phpunit/phpunit": "~6.0",
     "phpunit/dbunit": "~3.0",
-    "nategood/commando": "*"
+    "nategood/commando": "*",
+    "dibi/dibi": "*"
   }
 }

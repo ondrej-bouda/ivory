@@ -38,6 +38,9 @@ class PgSQLPerformanceTest implements IPerformanceTest
         if ($user['last_login']) {
             echo 'Welcome back since ' . date('n/j/Y H:i:s', strtotime($user['last_login'])) . "\n";
         }
+        else {
+            echo "Welcome!\n";
+        }
 
         return $user['id'];
     }
@@ -86,7 +89,6 @@ class PgSQLPerformanceTest implements IPerformanceTest
             echo $item['description'];
             echo "\n";
         }
-        unset($items);
     }
 
     public function categoryItems(int $categoryId)

@@ -3,6 +3,7 @@ require_once __DIR__ . '/../../bootstrap.php';
 
 require_once __DIR__ . '/pgsql.php';
 require_once __DIR__ . '/ivory.php';
+require_once __DIR__ . '/dibi.php';
 
 //region Interface Specification
 
@@ -11,16 +12,20 @@ $command->argument()
     ->require()
     ->describe('Implementation to use')
     ->must(function ($impl) {
-        return in_array($impl, ['ivory', 'ivory-sync', 'pgsql']);
+        return in_array($impl, ['ivory', 'ivory-sync', 'pgsql', 'dibi', 'dibi-lazy']);
     })
     ->map(function ($impl) {
         switch ($impl) {
             case 'ivory':
-                return new IvoryPerformanceTest(IvoryPerformanceTest::ASYNCHRONOUS);
+                return new IvoryPerformanceTest();
             case 'ivory-sync':
                 return new IvoryPerformanceTest(IvoryPerformanceTest::SYNCHRONOUS);
             case 'pgsql':
                 return new PgSQLPerformanceTest();
+            case 'dibi':
+                return new DibiPerformanceTest();
+            case 'dibi-lazy':
+                return new DibiPerformanceTest(DibiPerformanceTest::LAZY);
             default:
                 throw new RuntimeException('Unsupported implementation requested');
         }
@@ -47,7 +52,7 @@ $command->flag('busyloop')
     ->defaultsTo(0);
 
 $command->flag('print-data')
-    ->describe('Print the data gathered from the database.')
+    ->describe('Print the data gathered from the database to stderr.')
     ->boolean();
 
 $command->flag('sections')
@@ -142,7 +147,8 @@ for ($round = 1 - $command['warmup']; $round <= $command['rounds']; $round++) {
     $benchmark->endSection();
 
     if ($printData) {
-        ob_end_flush();
+        $buffer = ob_get_clean();
+        fprintf(STDERR, "%s", $buffer);
         $printData = false;
     }
     else {
@@ -243,12 +249,15 @@ class Benchmark
     public function printReport()
     {
         echo str_repeat('-', 80) . "\n";
+        $avgSum = 0;
         foreach ($this->measurements as $label => $lapTimeList) {
             $count = count($lapTimeList);
             $avg = array_sum($lapTimeList) / $count;
             printf("%4dx %-40s %f\n", $count, "$label:", $avg);
+            $avgSum += $avg;
         }
-        echo "Peak memory usage: " . round(memory_get_peak_usage() / 1024) . " kB\n";
+        printf("Total:             %f\n", $avgSum);
+        printf("Peak memory usage: %d kB\n", round(memory_get_peak_usage() / 1024));
     }
 
     public function busyLoop(int $rounds)
