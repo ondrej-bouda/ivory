@@ -46,11 +46,14 @@ interface IConnectionControl
      *
      * The connection is not shared with any other `IConnection` objects. A new connection is always established.
      *
+     * @param \Closure $initProcedure code to execute after the connection is established, before any queries;
+     *                                the closure is given one {@link IConnection} argument - this connection;
+     *                                suitable for, e.g., setting up <tt>search_path</tt>, session variables, etc.
      * @return bool <tt>true</tt> if the connection has actually started to being established,
      *              <tt>false</tt> if the connection has already been open or started opening and thus this was a no-op
      * @throws ConnectionException on error connecting to the database
      */
-    function connect(): bool;
+    function connect(\Closure $initProcedure = null): bool;
 
     /**
      * Establishes a connection with the database and waits for the connection to be established.

@@ -36,7 +36,7 @@ class Connection implements IConnection
     public function __construct(string $name, $params)
     {
         $this->name = $name;
-        $this->connCtl = new ConnectionControl($params); // TODO: extract all usages of ConnectionControl::requireConnection() - consider introducing an interface specifying the method, named like PGSQLDriver or ConnectionManager or ConnectionPool
+        $this->connCtl = new ConnectionControl($this, $params); // TODO: extract all usages of ConnectionControl::requireConnection() - consider introducing an interface specifying the method, named like PGSQLDriver or ConnectionManager or ConnectionPool
         $this->typeCtl = new TypeControl($this, $this->connCtl);
         $this->stmtExec = new StatementExecution($this->connCtl, $this->typeCtl);
         $this->copyCtl = new CopyControl();
@@ -73,9 +73,9 @@ class Connection implements IConnection
         return $this->connCtl->isConnectedWait();
     }
 
-    public function connect(): bool
+    public function connect(\Closure $initProcedure = null): bool
     {
-        return $this->connCtl->connect();
+        return $this->connCtl->connect($initProcedure);
     }
 
     public function connectWait(): bool

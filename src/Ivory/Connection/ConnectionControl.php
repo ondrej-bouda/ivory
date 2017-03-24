@@ -6,18 +6,23 @@ use Ivory\Exception\InvalidStateException;
 
 class ConnectionControl implements IConnectionControl
 {
+    /** @var IConnection */
+    private $ivoryConnection;
     /** @var ConnectionParameters parameters used for connecting to the database */
     private $params;
     /** @var resource|null the connection handler, or null if connection was not requested or already closed */
     private $handler = null;
     /** @var bool whether the asynchronous connecting was finished (<tt>true</tt> if synchronous connecting was used) */
     private $finishedConnecting;
+    /** @var \Closure */
+    private $initProcedure = null;
     /** @var string|null last notice received on this connection */
     private $lastNotice = null;
 
 
-    public function __construct($params)
+    public function __construct(IConnection $ivoryConnection, $params)
     {
+        $this->ivoryConnection = $ivoryConnection;
         $this->params = ConnectionParameters::create($params);
     }
 
@@ -51,9 +56,10 @@ class ConnectionControl implements IConnectionControl
         }
     }
 
-    public function connect(): bool
+    public function connect(\Closure $initProcedure = null): bool
     {
         if ($this->handler === null) {
+            $this->initProcedure = $initProcedure;
             $this->openConnection(PGSQL_CONNECT_ASYNC);
             return true;
         } else {
@@ -86,6 +92,7 @@ class ConnectionControl implements IConnectionControl
         }
         $this->handler = null;
         $this->finishedConnecting = null;
+        $this->initProcedure = null;
         return true;
     }
 
@@ -115,6 +122,9 @@ class ConnectionControl implements IConnectionControl
         $pollStatus = pg_connect_poll($this->handler);
         if ($pollStatus === PGSQL_POLLING_OK) {
             $this->finishedConnecting = true;
+            if ($this->initProcedure !== null) {
+                call_user_func($this->initProcedure, $this->ivoryConnection);
+            }
             return;
         }
 
@@ -127,6 +137,9 @@ class ConnectionControl implements IConnectionControl
             switch ($pollStatus) {
                 case PGSQL_POLLING_OK:
                     $this->finishedConnecting = true;
+                    if ($this->initProcedure !== null) {
+                        call_user_func($this->initProcedure, $this->ivoryConnection);
+                    }
                     return;
                 case PGSQL_POLLING_FAILED:
                     throw new ConnectionException('Failed waiting for connection');

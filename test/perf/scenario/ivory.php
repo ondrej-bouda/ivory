@@ -1,5 +1,6 @@
 <?php
 
+use Ivory\Connection\IConnection;
 use Ivory\Ivory;
 
 class IvoryPerformanceTest implements IPerformanceTest
@@ -7,7 +8,7 @@ class IvoryPerformanceTest implements IPerformanceTest
     const SYNCHRONOUS = 1;
 
     private $async;
-    /** @var \Ivory\Connection\IConnection */
+    /** @var IConnection */
     private $conn;
 
     public function __construct(int $options = 0)
@@ -20,12 +21,13 @@ class IvoryPerformanceTest implements IPerformanceTest
         $this->conn = Ivory::setupConnection($connString);
 
         if ($this->async) {
-            $this->conn->connect();
+            $this->conn->connect(function (IConnection $conn) use ($searchPathSchema) {
+                $conn->getConfig()->setForSession('search_path', $searchPathSchema);
+            });
         } else {
             $this->conn->connectWait();
+            $this->conn->getConfig()->setForSession('search_path', $searchPathSchema);
         }
-
-        $this->conn->getConfig()->setForSession('search_path', $searchPathSchema);
     }
 
     public function trivialQuery()
