@@ -1,57 +1,57 @@
-php bench.php --recreate --rounds 100 --warmup 5 --busyloop 30000 IMPL 
+php bench.php --recreate --rounds 100 --warmup 5 --busyloop 100000 IMPL 
 measured on ThinkPad T540p 
  
 pgsql: 
 --------------------------------------------------------------------------------
- 100x 0. Connection:                           0.084660
- 100x 1. First, trivial query:                 0.000936
- 100x 2. User authentication:                  0.007644
- 100x 3. Starred items:                        0.010633
- 100x 4. Category Items:                       0.025634
- 100x X. Disconnect:                           0.000000
-Total:             0.129507
+ 100x 0. Connection:                           0.151839
+ 100x 1. First, trivial query:                 0.000910
+ 100x 2. User authentication:                  0.008501
+ 100x 3. Starred items:                        0.010631
+ 100x 4. Category Items:                       0.025961
+ 100x X. Disconnect:                           0.000140
+Total:             0.197981
 Peak memory usage: 1261 kB
  
 ivory: 
 --------------------------------------------------------------------------------
- 100x 0. Connection:                           0.095791
- 100x 1. First, trivial query:                 0.142130
- 100x 2. User authentication:                  0.013682
- 100x 3. Starred items:                        0.015288
- 100x 4. Category Items:                       0.064547
- 100x X. Disconnect:                           0.000000
-Total:             0.331439
+ 100x 0. Connection:                           0.151209
+ 100x 1. First, trivial query:                 0.145668
+ 100x 2. User authentication:                  0.009791
+ 100x 3. Starred items:                        0.013811
+ 100x 4. Category Items:                       0.068284
+ 100x X. Disconnect:                           0.000160
+Total:             0.388922
 Peak memory usage: 41933 kB
  
 ivory-sync: 
 --------------------------------------------------------------------------------
- 100x 0. Connection:                           0.085326
- 100x 1. First, trivial query:                 0.145779
- 100x 2. User authentication:                  0.008902
- 100x 3. Starred items:                        0.013582
- 100x 4. Category Items:                       0.069289
- 100x X. Disconnect:                           0.000000
-Total:             0.322879
+ 100x 0. Connection:                           0.150849
+ 100x 1. First, trivial query:                 0.145968
+ 100x 2. User authentication:                  0.009901
+ 100x 3. Starred items:                        0.014011
+ 100x 4. Category Items:                       0.068654
+ 100x X. Disconnect:                           0.000200
+Total:             0.389582
 Peak memory usage: 41933 kB
  
 dibi: 
 --------------------------------------------------------------------------------
- 100x 0. Connection:                           0.085576
- 100x 1. First, trivial query:                 0.001404
- 100x 2. User authentication:                  0.008212
- 100x 3. Starred items:                        0.012842
- 100x 4. Category Items:                       0.042286
- 100x X. Disconnect:                           0.000312
-Total:             0.150632
+ 100x 0. Connection:                           0.150139
+ 100x 1. First, trivial query:                 0.001760
+ 100x 2. User authentication:                  0.008681
+ 100x 3. Starred items:                        0.012131
+ 100x 4. Category Items:                       0.042342
+ 100x X. Disconnect:                           0.000140
+Total:             0.215192
 Peak memory usage: 1932 kB
  
 dibi-lazy: 
 --------------------------------------------------------------------------------
- 100x 0. Connection:                           0.028174
- 100x 1. First, trivial query:                 0.057673
- 100x 2. User authentication:                  0.007825
- 100x 3. Starred items:                        0.011800
- 100x 4. Category Items:                       0.042630
- 100x X. Disconnect:                           0.000000
-Total:             0.148102
+ 100x 0. Connection:                           0.092605
+ 100x 1. First, trivial query:                 0.059743
+ 100x 2. User authentication:                  0.008661
+ 100x 3. Starred items:                        0.012011
+ 100x 4. Category Items:                       0.042312
+ 100x X. Disconnect:                           0.000200
+Total:             0.215532
 Peak memory usage: 1932 kB
