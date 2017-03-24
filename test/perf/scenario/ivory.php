@@ -134,6 +134,7 @@ class IvoryPerformanceTest implements IPerformanceTest
     public function disconnect()
     {
         $this->conn->disconnect();
+        Ivory::dropConnection($this->conn);
         $this->conn = null;
     }
 }

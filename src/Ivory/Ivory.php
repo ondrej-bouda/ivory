@@ -181,4 +181,36 @@ final class Ivory
 
         self::$defaultConn = $conn;
     }
+
+    /**
+     * Removes a connection from the register so that it no longer occupies memory.
+     *
+     * @param IConnection|string|null $conn (name of) connection to remove from the register;
+     *                                      <tt>null</tt> to remove the default connection
+     * @throw \RuntimeException if the default connection is requested but no connection has been setup yet, or if the
+     *                            requested connection is not defined
+     */
+    public static function dropConnection($conn = null)
+    {
+        if ($conn instanceof IConnection) {
+            $connName = $conn->getName();
+        } elseif ($conn === null) {
+            if (self::$defaultConn) {
+                $connName = self::$defaultConn->getName();
+            } else {
+                throw new \RuntimeException('No connection has been setup');
+            }
+        } else {
+            $connName = $conn;
+        }
+
+        if (isset(self::$connections[$connName])) {
+            if (self::$connections[$connName] === self::$defaultConn) {
+                self::$defaultConn = null;
+            }
+            unset(self::$connections[$connName]);
+        } else {
+            throw new \RuntimeException('Undefined connection');
+        }
+    }
 }
