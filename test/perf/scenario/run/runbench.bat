@@ -6,3 +6,4 @@ runbench_ivory.cmd
 runbench_ivory-sync.cmd
 runbench_dibi.cmd
 runbench_dibi-lazy.cmd
+runbench_doctrine.cmd
