@@ -210,7 +210,7 @@ class TimeTz extends TimeBase
      */
     public function format(string $timeFmt): string
     {
-        $ts = new \DateTime($this->toString());
+        $ts = new \DateTime($this->toString()); // OPT: \DateTime::createFromFormat() is supposed to be twice as fast as new \DateTime()
         $ts->setDate(1970, 1, 1);
         return $ts->format($timeFmt);
     }

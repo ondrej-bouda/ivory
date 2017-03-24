@@ -171,7 +171,7 @@ abstract class DateBase implements IComparable
      */
     public function toDateTime(\DateTimeZone $timezone = null)
     {
-        return ($this->inf ? null : new \DateTime($this->toISOString(), $timezone));
+        return ($this->inf ? null : new \DateTime($this->toISOString(), $timezone)); // OPT: \DateTime::createFromFormat() is supposed to be twice as fast as new \DateTime()
     }
 
     /**
