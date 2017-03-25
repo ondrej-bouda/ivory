@@ -3,7 +3,7 @@ namespace Ivory\Type\Std;
 
 use Ivory\Connection\IConnection;
 use Ivory\Lang\Sql\Types;
-use Ivory\Type\AdHocCompositeType;
+use Ivory\Type\Postgresql\AdHocCompositeType;
 
 /**
  * Type loader for the standard PostgreSQL base types.

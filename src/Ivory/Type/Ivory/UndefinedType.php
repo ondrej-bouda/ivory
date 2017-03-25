@@ -1,8 +1,8 @@
 <?php
-namespace Ivory\Type;
+namespace Ivory\Type\Ivory;
 
-use Ivory\Connection\IConnection;
 use Ivory\Exception\UndefinedTypeException;
+use Ivory\Type\BaseType;
 
 /**
  * A special class used for any PostgreSQL type which is not recognized.

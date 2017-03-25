@@ -1,7 +1,8 @@
 <?php
-namespace Ivory\Type;
+namespace Ivory\Type\Postgresql;
 
 use Ivory\NamedDbObject;
+use Ivory\Type\Postgresql\CompositeType;
 
 /**
  * A composite type which has a name. That basically means the type is stored in the database.

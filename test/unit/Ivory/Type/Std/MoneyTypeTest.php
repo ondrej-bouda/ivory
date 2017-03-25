@@ -1,5 +1,5 @@
 <?php
-namespace Ivory\Type;
+namespace Ivory\Type\Std;
 
 use Ivory\Connection\ConfigParam;
 use Ivory\IvoryTestCase;

@@ -1,8 +1,12 @@
 <?php
-namespace Ivory\Type;
+namespace Ivory\Type\Postgresql;
 
 use Ivory\Exception\UnsupportedException;
 use Ivory\NamedDbObject;
+use Ivory\Type\IDiscreteType;
+use Ivory\Type\INamedType;
+use Ivory\Type\ITotallyOrderedType;
+use Ivory\Type\IType;
 
 class DomainType implements INamedType, IDiscreteType
 {

@@ -3,8 +3,8 @@ namespace Ivory\Value;
 
 use Ivory\Exception\ImmutableException;
 use Ivory\Exception\UnsupportedException;
-use Ivory\Type\CompositeType;
-use Ivory\Type\NamedCompositeType;
+use Ivory\Type\Postgresql\CompositeType;
+use Ivory\Type\Postgresql\NamedCompositeType;
 use Ivory\Utils\IComparable;
 use Ivory\Utils\ValueUtils;
 

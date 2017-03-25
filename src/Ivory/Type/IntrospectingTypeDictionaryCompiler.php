@@ -3,6 +3,13 @@ namespace Ivory\Type;
 
 use Ivory\Connection\IConnection;
 use Ivory\Exception\InternalException;
+use Ivory\Type\Ivory\UndefinedType;
+use Ivory\Type\Postgresql\ArrayType;
+use Ivory\Type\Postgresql\CompositeType;
+use Ivory\Type\Postgresql\DomainType;
+use Ivory\Type\Postgresql\EnumType;
+use Ivory\Type\Postgresql\NamedCompositeType;
+use Ivory\Type\Postgresql\RangeType;
 
 class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
 {

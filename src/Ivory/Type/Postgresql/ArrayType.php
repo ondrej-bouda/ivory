@@ -1,9 +1,11 @@
 <?php
-namespace Ivory\Type;
+namespace Ivory\Type\Postgresql;
 
 use Ivory\Exception\InternalException;
 use Ivory\Exception\ParseException;
 use Ivory\Exception\UnsupportedException;
+use Ivory\Type\INamedType;
+use Ivory\Type\ITotallyOrderedType;
 
 /**
  * Converter for arrays.

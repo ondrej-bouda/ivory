@@ -1,5 +1,5 @@
 <?php
-namespace Ivory\Type;
+namespace Ivory\Type\Postgresql;
 
 use Ivory\Type\Std\IntegerType;
 use Ivory\Type\Std\StringType;
