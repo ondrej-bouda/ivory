@@ -1,12 +1,13 @@
 <?php
 namespace Ivory\Type;
 
+use Ivory\Connection\IConnection;
 use Ivory\Exception\UndefinedTypeException;
 
 /**
  * Dictionary of data types on a concrete database.
  */
-class TypeDictionary implements ITypeDictionary
+class TypeDictionary implements ICacheableTypeDictionary
 {
     /** @var IType[] */
     private $oidTypeMap = [];
@@ -270,11 +271,45 @@ class TypeDictionary implements ITypeDictionary
         return null;
     }
 
-    /**
-     * Exports the current state of the dictionary to a PHP class implementing ITypeDictionary.
-     */
-    public function export()
+    public function detachFromConnection()
     {
-        throw new \Ivory\Exception\NotImplementedException(); // TODO
+        $connDepTypes = $this->collectTypes(IConnectionDependentType::class);
+        foreach ($connDepTypes as $type) {
+            /** @var IConnectionDependentType $type */
+            $type->detachFromConnection();
+        }
+    }
+
+    public function attachToConnection(IConnection $connection)
+    {
+        $connDepTypes = $this->collectTypes(IConnectionDependentType::class);
+        foreach ($connDepTypes as $type) {
+            /** @var IConnectionDependentType $type */
+            $type->attachToConnection($connection);
+        }
+    }
+
+    private function collectTypes(string $className): \SplObjectStorage
+    {
+        $result = new \SplObjectStorage();
+        foreach ($this->oidTypeMap as $type) {
+            if ($type instanceof $className) {
+                $result->attach($type);
+            }
+        }
+        foreach ($this->qualNameTypeMap as $types) {
+            foreach ($types as $type) {
+                if ($type instanceof $className) {
+                    $result->attach($type);
+                }
+            }
+        }
+        foreach ($this->nameTypeMap as $type) {
+            if ($type instanceof $className) {
+                $result->attach($type);
+            }
+        }
+
+        return $result;
     }
 }

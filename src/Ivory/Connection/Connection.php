@@ -22,6 +22,7 @@ class Connection implements IConnection
     private $copyCtl;
     private $txCtl;
     private $ipcCtl;
+    private $cacheCtl;
 
     private $config;
 
@@ -37,6 +38,7 @@ class Connection implements IConnection
     {
         $this->name = $name;
         $this->connCtl = new ConnectionControl($this, $params); // TODO: extract all usages of ConnectionControl::requireConnection() - consider introducing an interface specifying the method, named like PGSQLDriver or ConnectionManager or ConnectionPool
+        $this->cacheCtl = new CacheControl();
         $this->typeCtl = new TypeControl($this, $this->connCtl);
         $this->stmtExec = new StatementExecution($this->connCtl, $this->typeCtl);
         $this->copyCtl = new CopyControl();
@@ -301,6 +303,35 @@ class Connection implements IConnection
     public function pollNotification()
     {
         return $this->ipcCtl->pollNotification();
+    }
+
+    //endregion
+
+    //region Cache Control
+
+    public function cacheForSession(string $cacheKey, $object): bool
+    {
+        return $this->cacheCtl->cacheForSession($cacheKey, $object);
+    }
+
+    public function cachePermanently(string $cacheKey, $object): bool
+    {
+        return $this->cacheCtl->cachePermanently($cacheKey, $object);
+    }
+
+    public function getCached(string $cacheKey)
+    {
+        return $this->cacheCtl->getCached($cacheKey);
+    }
+
+    public function flushCache(string $cacheKey = null): bool
+    {
+        return $this->cacheCtl->flushCache($cacheKey);
+    }
+
+    public function flushAnyIvoryCaches(): bool
+    {
+        return $this->cacheCtl->flushAnyIvoryCaches();
     }
 
     //endregion

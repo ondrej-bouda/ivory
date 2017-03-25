@@ -38,6 +38,7 @@ $command->argument()
     });
 
 $command->flag('rounds')
+    ->alias('loops')
     ->describe('Number of rounds to execute')
     ->must(function ($n) { return ($n > 0); })
     ->map(function ($n) { return (int)$n; })
