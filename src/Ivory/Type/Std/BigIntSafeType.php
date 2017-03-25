@@ -13,12 +13,12 @@ use Ivory\Type\IDiscreteType;
  */
 class BigIntSafeType extends IntegerType implements IDiscreteType
 {
-    public static function createForRange($min, $max, $schemaName, $typeName, $connection)
+    public static function createForRange($min, $max, $schemaName, $typeName)
     {
         if (bccomp($min, PHP_INT_MIN) >= 0 && bccomp($max, PHP_INT_MAX) <= 0) {
-            return new IntegerType($schemaName, $typeName, $connection);
+            return new IntegerType($schemaName, $typeName);
         } else {
-            return new BigIntSafeType($schemaName, $typeName, $connection);
+            return new BigIntSafeType($schemaName, $typeName);
         }
     }
 

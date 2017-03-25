@@ -1,9 +1,7 @@
 <?php
 namespace Ivory\Type\Std;
 
-use Ivory\IvoryTestCase;
-
-class HstoreTypeTest extends IvoryTestCase
+class HstoreTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HstoreType */
     private $hstoreType;
@@ -12,7 +10,7 @@ class HstoreTypeTest extends IvoryTestCase
     {
         parent::setUp();
 
-        $this->hstoreType = new HstoreType('public', 'hstore', $this->getIvoryConnection());
+        $this->hstoreType = new HstoreType('public', 'hstore');
     }
 
     public function testSerializeValue()

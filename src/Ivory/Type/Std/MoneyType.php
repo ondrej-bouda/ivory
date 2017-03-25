@@ -31,7 +31,7 @@ class MoneyType extends BaseType implements ITotallyOrderedType
 
     public function __construct(string $schemaName, string $name, IConnection $connection)
     {
-        parent::__construct($schemaName, $name, $connection);
+        parent::__construct($schemaName, $name);
 
         $this->decSepRetriever = new ConnConfigValueRetriever($connection->getConfig(), ConfigParam::MONEY_DEC_SEP);
     }

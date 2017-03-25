@@ -121,9 +121,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                         $subtype = $dict->requireTypeByOid($row['parenttype']);
                         if (!$subtype instanceof ITotallyOrderedType) {
                             if ($subtype instanceof UndefinedType) {
-                                $type = new UndefinedType(
-                                    $schemaName, $typeName, $this->connection->getName(), $this->connection
-                                );
+                                $type = new UndefinedType($schemaName, $typeName, $this->connection->getName());
                                 break;
                             }
 
@@ -223,7 +221,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
         if ($type !== null) {
             return $type;
         } else {
-            return new UndefinedType($schemaName, $typeName, $this->connection->getName(), $this->connection);
+            return new UndefinedType($schemaName, $typeName, $this->connection->getName());
         }
     }
 

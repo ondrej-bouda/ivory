@@ -1,12 +1,11 @@
 <?php
 namespace Ivory\Type;
 
-use Ivory\IvoryTestCase;
 use Ivory\Type\Std\IntegerType;
 use Ivory\Type\Std\StringType;
 use Ivory\Value\Composite;
 
-class CompositeTypeTest extends IvoryTestCase
+class CompositeTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CompositeType */
     private $adHocComposite;
@@ -45,11 +44,11 @@ STR
     {
         $this->assertSame([], $this->adHocComposite->parseValue('()')->toList());
 
-        $this->adHocComposite->addAttribute('a', new IntegerType('pg_catalog', 'int4', $this->getIvoryConnection()));
+        $this->adHocComposite->addAttribute('a', new IntegerType('pg_catalog', 'int4'));
         $this->assertSame([1], $this->adHocComposite->parseValue('(1)')->toList());
         $this->assertSame([null], $this->adHocComposite->parseValue('()')->toList());
 
-        $this->adHocComposite->addAttribute('b', new StringType('pg_catalog', 'text', $this->getIvoryConnection()));
+        $this->adHocComposite->addAttribute('b', new StringType('pg_catalog', 'text'));
         $this->assertSame([1, 'ab'], $this->adHocComposite->parseValue('(1,ab)')->toList());
         $this->assertSame([null, ''], $this->adHocComposite->parseValue('(,"")')->toList());
         $this->assertSame([0, null], $this->adHocComposite->parseValue('(0,)')->toList());
@@ -81,11 +80,11 @@ STR
 
     public function testSerializeSimpleTyped()
     {
-        $this->adHocComposite->addAttribute('a', new IntegerType('pg_catalog', 'int4', $this->getIvoryConnection()));
+        $this->adHocComposite->addAttribute('a', new IntegerType('pg_catalog', 'int4'));
         $this->assertSame('ROW(1)', $this->adHocComposite->serializeValue($this->val([1])));
         $this->assertSame('ROW(NULL)', $this->adHocComposite->serializeValue($this->val([null])));
 
-        $this->adHocComposite->addAttribute('b', new StringType('pg_catalog', 'text', $this->getIvoryConnection()));
+        $this->adHocComposite->addAttribute('b', new StringType('pg_catalog', 'text'));
         $this->assertSame("(1,'ab')", $this->adHocComposite->serializeValue($this->val([1, 'ab'])));
         $this->assertSame("(NULL,'')", $this->adHocComposite->serializeValue($this->val([null, ''])));
         $this->assertSame('(0,NULL)', $this->adHocComposite->serializeValue($this->val([0, null])));

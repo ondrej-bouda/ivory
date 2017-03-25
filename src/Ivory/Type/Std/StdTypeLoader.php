@@ -20,28 +20,28 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
                     case 'integer':
                     case 'int':
                     case 'int4':
-                        return new IntegerType($schemaName, $typeName, $connection);
+                        return new IntegerType($schemaName, $typeName);
 
                     case 'bigint':
                     case 'int8':
                         return BigIntSafeType::createForRange(
                             Types::BIGINT_MIN, Types::BIGINT_MAX,
-                            $schemaName, $typeName, $connection
+                            $schemaName, $typeName
                         );
 
                     case 'numeric':
                     case 'decimal':
-                        return new DecimalType($schemaName, $typeName, $connection);
+                        return new DecimalType($schemaName, $typeName);
 
                     case 'real':
                     case 'float4':
                     case 'double precision':
                     case 'float8':
-                        return new FloatType($schemaName, $typeName, $connection);
+                        return new FloatType($schemaName, $typeName);
 
                     case 'boolean':
                     case 'bool':
-                        return new BooleanType($schemaName, $typeName, $connection);
+                        return new BooleanType($schemaName, $typeName);
 
                     case 'text':
                     case 'character':
@@ -51,79 +51,79 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
                     case 'bpchar':
                     case 'unknown':
                     case 'cstring':
-                        return new StringType($schemaName, $typeName, $connection);
+                        return new StringType($schemaName, $typeName);
 
                     case 'date':
                         return new DateType($schemaName, $typeName, $connection);
                     case 'time':
-                        return new TimeType($schemaName, $typeName, $connection);
+                        return new TimeType($schemaName, $typeName);
                     case 'timetz':
-                        return new TimeTzType($schemaName, $typeName, $connection);
+                        return new TimeTzType($schemaName, $typeName);
                     case 'timestamp':
                         return new TimestampType($schemaName, $typeName, $connection);
                     case 'timestamptz':
                         return new TimestampTzType($schemaName, $typeName, $connection);
                     case 'interval':
-                        return new IntervalType($schemaName, $typeName, $connection);
+                        return new IntervalType($schemaName, $typeName);
 
                     case 'bytea':
-                        return new BinaryType($schemaName, $typeName, $connection);
+                        return new BinaryType($schemaName, $typeName);
 
                     case 'bit':
-                        return new FixedBitStringType($schemaName, $typeName, $connection);
+                        return new FixedBitStringType($schemaName, $typeName);
 
                     case 'bit varying':
                     case 'varbit':
-                        return new VarBitStringType($schemaName, $typeName, $connection);
+                        return new VarBitStringType($schemaName, $typeName);
 
                     case 'json':
-                        return new JsonExactType($schemaName, $typeName, $connection);
+                        return new JsonExactType($schemaName, $typeName);
                     case 'jsonb':
-                        return new JsonBType($schemaName, $typeName, $connection);
+                        return new JsonBType($schemaName, $typeName);
 
                     case 'xml':
-                        return new XmlType($schemaName, $typeName, $connection);
+                        return new XmlType($schemaName, $typeName);
 
                     case 'uuid':
-                        return new UuidType($schemaName, $typeName, $connection);
+                        return new UuidType($schemaName, $typeName);
 
                     case 'point':
-                        return new PointType($schemaName, $typeName, $connection);
+                        return new PointType($schemaName, $typeName);
                     case 'line':
-                        return new LineType($schemaName, $typeName, $connection);
+                        return new LineType($schemaName, $typeName);
                     case 'lseg':
-                        return new LineSegmentType($schemaName, $typeName, $connection);
+                        return new LineSegmentType($schemaName, $typeName);
                     case 'box':
-                        return new BoxType($schemaName, $typeName, $connection);
+                        return new BoxType($schemaName, $typeName);
                     case 'path':
-                        return new PathType($schemaName, $typeName, $connection);
+                        return new PathType($schemaName, $typeName);
                     case 'polygon':
-                        return new PolygonType($schemaName, $typeName, $connection);
+                        return new PolygonType($schemaName, $typeName);
                     case 'circle':
-                        return new CircleType($schemaName, $typeName, $connection);
+                        return new CircleType($schemaName, $typeName);
 
                     case 'inet':
-                        return new InetType($schemaName, $typeName, $connection);
+                        return new InetType($schemaName, $typeName);
                     case 'cidr':
-                        return new CidrType($schemaName, $typeName, $connection);
+                        return new CidrType($schemaName, $typeName);
                     case 'macaddr':
-                        return new MacAddrType($schemaName, $typeName, $connection);
+                        return new MacAddrType($schemaName, $typeName);
 
                     case 'money':
                         return new MoneyType($schemaName, $typeName, $connection);
 
                     case 'pg_lsn':
-                        return new PgLsnType($schemaName, $typeName, $connection);
+                        return new PgLsnType($schemaName, $typeName);
                     case 'txid_snapshot':
-                        return new TxIdSnapshotType($schemaName, $typeName, $connection);
+                        return new TxIdSnapshotType($schemaName, $typeName);
 
                     case 'tsvector':
-                        return new TsVectorType($schemaName, $typeName, $connection);
+                        return new TsVectorType($schemaName, $typeName);
                     case 'tsquery':
-                        return new TsQueryType($schemaName, $typeName, $connection);
+                        return new TsQueryType($schemaName, $typeName);
 
                     case 'void':
-                        return new VoidType($schemaName, $typeName, $connection);
+                        return new VoidType($schemaName, $typeName);
 
                     case 'record':
                         return new AdHocCompositeType($schemaName, $typeName);
@@ -134,14 +134,14 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
                     case 'anynonarray':
                     case 'anyenum':
                     case 'anyrange':
-                        return new PolymorphicPseudoType($schemaName, $typeName, $connection);
+                        return new PolymorphicPseudoType($schemaName, $typeName);
                 }
                 break;
 
             case 'public':
                 switch ($typeName) {
                     case 'hstore':
-                        return new HstoreType($schemaName, $typeName, $connection);
+                        return new HstoreType($schemaName, $typeName);
                 }
                 break;
         }

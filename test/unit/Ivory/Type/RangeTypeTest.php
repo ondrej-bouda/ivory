@@ -1,12 +1,11 @@
 <?php
 namespace Ivory\Type;
 
-use Ivory\IvoryTestCase;
 use Ivory\Type\Std\ConventionalRangeCanonicalFunc;
 use Ivory\Type\Std\IntegerType;
 use Ivory\Value\Range;
 
-class RangeTypeTest extends IvoryTestCase
+class RangeTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var  RangeType */
     private $intRangeType;
@@ -15,7 +14,7 @@ class RangeTypeTest extends IvoryTestCase
     {
         parent::setUp();
 
-        $int = new IntegerType('pg_catalog', 'int4', $this->getIvoryConnection());
+        $int = new IntegerType('pg_catalog', 'int4');
         $canonFunc = new ConventionalRangeCanonicalFunc($int);
         $this->intRangeType = new RangeType('pg_catalog', 'int4range', $int, $canonFunc);
     }

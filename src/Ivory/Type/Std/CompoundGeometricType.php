@@ -12,10 +12,10 @@ abstract class CompoundGeometricType extends BaseType
     protected $pointType;
 
 
-    public function __construct(string $schemaName, string $name, $connection)
+    public function __construct(string $schemaName, string $name)
     {
-        parent::__construct($schemaName, $name, $connection);
+        parent::__construct($schemaName, $name);
 
-        $this->pointType = new PointType($schemaName, $name . '@' . PointType::class, $connection);
+        $this->pointType = new PointType($schemaName, $name . '@' . PointType::class);
     }
 }

@@ -1,11 +1,10 @@
 <?php
 namespace Ivory\Type;
 
-use Ivory\IvoryTestCase;
 use Ivory\Type\Std\IntegerType;
 use Ivory\Type\Std\StringType;
 
-class ArrayTypeTest extends IvoryTestCase
+class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ArrayType */
     private $intArrayType;
@@ -16,10 +15,10 @@ class ArrayTypeTest extends IvoryTestCase
     {
         parent::setUp();
 
-        $intType = new IntegerType('pg_catalog', 'int4', $this->getIvoryConnection());
+        $intType = new IntegerType('pg_catalog', 'int4');
         $this->intArrayType = new ArrayType($intType, ',');
 
-        $strType = new StringType('pg_catalog', 'text', $this->getIvoryConnection());
+        $strType = new StringType('pg_catalog', 'text');
         $this->strArrayType = new ArrayType($strType, ',');
     }
 

@@ -8,17 +8,9 @@ abstract class BaseType implements INamedType
 {
     use NamedDbObject;
 
-    private $connection;
-
-    public function __construct(string $schemaName, string $name, IConnection $connection)
+    public function __construct(string $schemaName, string $name)
     {
         $this->setName($schemaName, $name);
-        $this->connection = $connection;
-    }
-
-    final protected function getConnection(): IConnection
-    {
-        return $this->connection;
     }
 
     protected function throwInvalidValue($str, \Exception $cause = null)

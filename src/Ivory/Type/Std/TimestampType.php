@@ -47,7 +47,7 @@ class TimestampType extends BaseType implements ITotallyOrderedType
 
     public function __construct(string $schemaName, string $name, IConnection $connection)
     {
-        parent::__construct($schemaName, $name, $connection);
+        parent::__construct($schemaName, $name);
 
         $this->dateStyleRetriever = new ConnConfigValueRetriever(
             $connection->getConfig(), ConfigParam::DATE_STYLE, [DateStyle::class, 'fromString']
