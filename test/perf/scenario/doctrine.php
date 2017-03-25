@@ -63,13 +63,14 @@ class DoctrinePerformanceTest implements IPerformanceTest
             $items[$row['id']]['categories'] = [];
         }
         if ($items) {
-            $itemIdList = implode(',', array_keys($items));
             $res = $this->conn->executeQuery(
                 "SELECT item_id, category_id, name AS category_name
                  FROM item_category
                       JOIN category ON category.id = category_id
-                 WHERE item_id IN ($itemIdList)
-                 ORDER BY category_name, category_id"
+                 WHERE item_id IN (?)
+                 ORDER BY category_name, category_id",
+                [array_keys($items)],
+                [\Doctrine\DBAL\Connection::PARAM_INT_ARRAY]
             );
             while (($row = $res->fetch())) {
                 $items[$row['item_id']]['categories'][$row['category_id']] = $row['category_name'];
@@ -127,5 +128,6 @@ class DoctrinePerformanceTest implements IPerformanceTest
     public function disconnect()
     {
         $this->conn->close();
+        $this->conn = null;
     }
 }
