@@ -5,6 +5,7 @@ require_once __DIR__ . '/pgsql.php';
 require_once __DIR__ . '/ivory.php';
 require_once __DIR__ . '/dibi.php';
 require_once __DIR__ . '/doctrine.php';
+require_once __DIR__ . '/laravel.php';
 
 //region Interface Specification
 
@@ -13,7 +14,7 @@ $command->argument()
     ->require()
     ->describe('Implementation to use')
     ->must(function ($impl) {
-        return in_array($impl, ['ivory', 'ivory-sync', 'pgsql', 'dibi', 'dibi-lazy', 'doctrine']);
+        return in_array($impl, ['ivory', 'ivory-sync', 'pgsql', 'dibi', 'dibi-lazy', 'doctrine', 'laravel']);
     })
     ->map(function ($impl) {
         switch ($impl) {
@@ -29,6 +30,8 @@ $command->argument()
                 return new DibiPerformanceTest(DibiPerformanceTest::LAZY);
             case 'doctrine':
                 return new DoctrinePerformanceTest();
+            case 'laravel':
+                return new LaravelPerformanceTest();
             default:
                 throw new RuntimeException('Unsupported implementation requested');
         }

@@ -23,6 +23,7 @@
     "phpunit/dbunit": "~3.0",
     "nategood/commando": "*",
     "dibi/dibi": "*",
-    "doctrine/dbal": "*"
+    "doctrine/dbal": "*",
+    "illuminate/database": "*"
   }
 }
