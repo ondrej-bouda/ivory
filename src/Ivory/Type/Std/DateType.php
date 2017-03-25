@@ -65,10 +65,8 @@ class DateType extends BaseType implements IDiscreteType
         }
 
         $matched = preg_match('~^(\d+)([-/.])(\d+)(?2)(\d+)(\s+BC)?$~', $str, $m);
-        if (PHP_MAJOR_VERSION >= 7) {
-            assert($matched, new \InvalidArgumentException('$str'));
-        } else {
-            assert($matched);
+        if (!$matched) {
+            throw new \InvalidArgumentException('$str');
         }
 
         $p = [];
