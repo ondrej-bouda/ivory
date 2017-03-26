@@ -1,6 +1,6 @@
 <?php
 $connStringRetriever = function () {
-    $configFile = realpath(__DIR__ . '/../phpunit.xml');
+    $configFile = realpath(__DIR__ . '/phpunit.xml');
     if ($configFile === false) {
         throw new RuntimeException('Config file not found');
     }

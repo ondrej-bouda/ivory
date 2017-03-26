@@ -81,7 +81,7 @@ $command->flag('drop')
 
 $command->flag('conn')
     ->describe('Connection string to use for connecting.')
-    ->defaultsTo(include __DIR__ . '/../conn_params.php');
+    ->defaultsTo(include __DIR__ . '/../../conn_params.php');
 
 $command->flag('test-email')
     ->describe('E-mail address to use for the userAuthentication() benchmark section.')
