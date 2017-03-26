@@ -5,7 +5,7 @@ use Ivory\Connection\ConfigParam;
 use Ivory\Connection\ConnConfigValueRetriever;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\IncomparableException;
-use Ivory\Type\BaseType;
+use Ivory\Type\ConnectionDependentBaseType;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Decimal;
 use Ivory\Value\Money;
@@ -25,15 +25,19 @@ use Ivory\Value\Money;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-money.html
  */
-class MoneyType extends BaseType implements ITotallyOrderedType
+class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedType
 {
+    /** @var ConnConfigValueRetriever */
     private $decSepRetriever;
 
-    public function __construct(string $schemaName, string $name, IConnection $connection)
+    public function attachToConnection(IConnection $connection)
     {
-        parent::__construct($schemaName, $name);
-
         $this->decSepRetriever = new ConnConfigValueRetriever($connection->getConfig(), ConfigParam::MONEY_DEC_SEP);
+    }
+
+    public function detachFromConnection()
+    {
+        $this->decSepRetriever = null;
     }
 
     public function parseValue($str)

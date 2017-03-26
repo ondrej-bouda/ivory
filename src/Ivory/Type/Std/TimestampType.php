@@ -5,7 +5,7 @@ use Ivory\Connection\ConfigParam;
 use Ivory\Connection\ConnConfigValueRetriever;
 use Ivory\Connection\DateStyle;
 use Ivory\Connection\IConnection;
-use Ivory\Type\BaseType;
+use Ivory\Type\ConnectionDependentBaseType;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Type\TotallyOrderedByPhpOperators;
 use Ivory\Value\Timestamp;
@@ -38,20 +38,24 @@ use Ivory\Value\Timestamp;
  * @see http://www.postgresql.org/docs/9.4/static/datetime-units-history.html
  * @see http://www.postgresql.org/docs/9.4/static/runtime-config-client.html#GUC-DATESTYLE
  */
-class TimestampType extends BaseType implements ITotallyOrderedType
+class TimestampType extends ConnectionDependentBaseType implements ITotallyOrderedType
 {
     use TotallyOrderedByPhpOperators;
 
 
+    /** @var ConnConfigValueRetriever */
     private $dateStyleRetriever;
 
-    public function __construct(string $schemaName, string $name, IConnection $connection)
+    public function attachToConnection(IConnection $connection)
     {
-        parent::__construct($schemaName, $name);
-
         $this->dateStyleRetriever = new ConnConfigValueRetriever(
             $connection->getConfig(), ConfigParam::DATE_STYLE, [DateStyle::class, 'fromString']
         );
+    }
+
+    public function detachFromConnection()
+    {
+        $this->dateStyleRetriever = null;
     }
 
     public function parseValue($str)

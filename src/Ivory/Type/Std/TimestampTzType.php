@@ -5,7 +5,7 @@ use Ivory\Connection\ConfigParam;
 use Ivory\Connection\ConnConfigValueRetriever;
 use Ivory\Connection\DateStyle;
 use Ivory\Connection\IConnection;
-use Ivory\Type\BaseType;
+use Ivory\Type\ConnectionDependentBaseType;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\TimestampTz;
 
@@ -23,22 +23,23 @@ use Ivory\Value\TimestampTz;
  * @see http://www.postgresql.org/docs/9.4/static/datetime-units-history.html
  * @see http://www.postgresql.org/docs/9.4/static/runtime-config-client.html#GUC-DATESTYLE
  */
-class TimestampTzType extends BaseType implements ITotallyOrderedType
+class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrderedType
 {
+    /** @var ConnConfigValueRetriever */
     private $dateStyleRetriever;
+    /** @var ConnConfigValueRetriever */
     private $localMeanTimeZoneRetriever;
 
-    public function __construct(string $schemaName, string $name, IConnection $connection)
+    public function attachToConnection(IConnection $connection)
     {
-        parent::__construct($schemaName, $name);
-
         $this->dateStyleRetriever = new ConnConfigValueRetriever(
             $connection->getConfig(), ConfigParam::DATE_STYLE, [DateStyle::class, 'fromString']
         );
+        $connName = $connection->getName();
         $this->localMeanTimeZoneRetriever = new ConnConfigValueRetriever(
             $connection->getConfig(),
             ConfigParam::TIME_ZONE,
-            function ($timeZone) use ($connection) {
+            function ($timeZone) use ($connName) {
                 try {
                     $tz = new \DateTimeZone($timeZone);
                     $longitude = $tz->getLocation()['longitude'];
@@ -48,14 +49,20 @@ class TimestampTzType extends BaseType implements ITotallyOrderedType
                     // unfortunately, \DateTimeZone cannot be created with offsets precise to seconds
                     return new \DateTimeZone($tzSpec);
                 } catch (\Exception $e) {
-                    $msg = "Time zone '$timeZone', as configured for the PostgreSQL connection {$connection->getName()}, "
-                        . "is unknown to PHP. Falling back to UTC (only relevant for timestamptz values representing "
-                        . "very old date/times).";
+                    $msg = "Time zone '$timeZone', as configured for the PostgreSQL connection $connName, is unknown "
+                        . "to PHP. Falling back to UTC (only relevant for timestamptz values representing very old "
+                        . "date/times).";
                     trigger_error($msg, E_USER_NOTICE);
                     return new \DateTimeZone('UTC');
                 }
             }
         );
+    }
+
+    public function detachFromConnection()
+    {
+        $this->dateStyleRetriever = null;
+        $this->localMeanTimeZoneRetriever = null;
     }
 
     public function parseValue($str)
