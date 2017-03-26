@@ -42,12 +42,6 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
             function ($timeZone) use ($connName) {
                 try {
                     $tz = new \DateTimeZone($timeZone);
-                    $longitude = $tz->getLocation()['longitude'];
-                    $offset = $longitude * 24 / 360;
-                    $abs = abs($offset);
-                    $tzSpec = sprintf('%s%d:%02d', ($offset >= 0 ? '+' : '-'), (int)$abs, (int)(($abs - (int)$abs) * 60));
-                    // unfortunately, \DateTimeZone cannot be created with offsets precise to seconds
-                    return new \DateTimeZone($tzSpec);
                 } catch (\Exception $e) {
                     $msg = "Time zone '$timeZone', as configured for the PostgreSQL connection $connName, is unknown "
                         . "to PHP. Falling back to UTC (only relevant for timestamptz values representing very old "
@@ -55,6 +49,13 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
                     trigger_error($msg, E_USER_NOTICE);
                     return new \DateTimeZone('UTC');
                 }
+
+                $longitude = $tz->getLocation()['longitude'];
+                $offset = $longitude * 24 / 360;
+                $abs = abs($offset);
+                $tzSpec = sprintf('%s%d:%02d', ($offset >= 0 ? '+' : '-'), (int)$abs, (int)(($abs - (int)$abs) * 60));
+                // unfortunately, \DateTimeZone cannot be created with offsets precise to seconds
+                return new \DateTimeZone($tzSpec);
             }
         );
     }
