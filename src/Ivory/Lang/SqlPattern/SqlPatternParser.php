@@ -3,6 +3,9 @@ namespace Ivory\Lang\SqlPattern;
 
 use Ivory\Utils\StringUtils;
 
+/**
+ * Parser of SQL pattern strings into {@link SqlPattern} objects.
+ */
 class SqlPatternParser
 {
     /**
