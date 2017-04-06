@@ -154,7 +154,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                 }
             }
 
-            $dict->defineType($row['oid'], $type);
+            $dict->defineType($type, $row['oid']);
         }
 
         $this->fetchCompositeAttributes($dict);
