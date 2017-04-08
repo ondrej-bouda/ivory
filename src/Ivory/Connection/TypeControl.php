@@ -42,6 +42,7 @@ class TypeControl implements ITypeControl, ITypeProvider
                 $this->typeDictionary->attachToConnection($this->connection);
             } else {
                 $this->typeDictionary = $this->introspectTypeDictionary();
+                $this->cacheTypeDictionary($this->typeDictionary);
             }
             $this->applyTypeRegisters($this->typeDictionary);
             $this->setupTypeDictionarySearchPath($this->typeDictionary);
@@ -57,6 +58,15 @@ class TypeControl implements ITypeControl, ITypeProvider
         $dict = $compiler->compileTypeDictionary($this);
 
         return $dict;
+    }
+
+    private function cacheTypeDictionary(ICacheableTypeDictionary $dict)
+    {
+        if ($this->connection->isCacheEnabled()) {
+            $dict->detachFromConnection();
+            $this->connection->cachePermanently(ITypeControl::TYPE_DICTIONARY_CACHE_KEY, $dict);
+            $dict->attachToConnection($this->connection);
+        }
     }
 
     private function setupTypeDictionarySearchPath(ITypeDictionary $typeDictionary)
@@ -84,9 +94,7 @@ class TypeControl implements ITypeControl, ITypeProvider
             // now that the requested type was really found, replace the current dictionary with the new one, which recognized the type
             $this->typeDictionary = $dict;
             if ($dict instanceof ICacheableTypeDictionary) {
-                $dict->detachFromConnection();
-                $this->connection->cachePermanently(ITypeControl::TYPE_DICTIONARY_CACHE_KEY, $dict);
-                $dict->attachToConnection($this->connection);
+                $this->cacheTypeDictionary($dict);
             }
             $this->setupTypeDictionaryUndefinedHandler();
 

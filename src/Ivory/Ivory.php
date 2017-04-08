@@ -7,9 +7,12 @@ use Ivory\Exception\ConnectionException;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
 use Ivory\Type\TypeRegister;
+use Psr\Cache\CacheItemPoolInterface;
 
 final class Ivory
 {
+    const VERSION = '0.1.0a1';
+    
     /** @var ICoreFactory */
     private static $coreFactory = null;
     /** @var TypeRegister */
@@ -22,6 +25,8 @@ final class Ivory
     private static $connections = [];
     /** @var IConnection */
     private static $defaultConn = null;
+    /** @var CacheItemPoolInterface|null */
+    private static $defaultCacheImpl = null;
 
 
     private function __construct()
@@ -84,6 +89,24 @@ final class Ivory
     }
 
     /**
+     * @return CacheItemPoolInterface|null the cache implementation to use for connections which do not set their own
+     *                                       cache, or <tt>null</tt> if no default cache implementation is set up
+     */
+    public static function getDefaultCacheImpl()
+    {
+        return self::$defaultCacheImpl;
+    }
+
+    /**
+     * @param CacheItemPoolInterface|null $cacheItemPool the cache implementation to use for connections which do not
+     *                                                     set their own cache, or <tt>null</tt> for no default cache
+     */
+    public static function setDefaultCacheImpl($cacheItemPool)
+    {
+        self::$defaultCacheImpl = $cacheItemPool;
+    }
+
+    /**
      * Sets up a new database connection.
      *
      * If this is the first connection to set up, it is automatically set as the default connection.
@@ -109,7 +132,7 @@ final class Ivory
      * @throws ConnectionException if connection name is explicitly specified but a connection with the same name
      *                               already exists
      */
-    public static function setupConnection($params, string $connName = null): IConnection
+    public static function setupConnection($params, string $connName = null): IConnection // TODO: rename to setupNewConnection() to indicate a new connection is created, not the old one set up to different parameters
     {
         if (!$params instanceof ConnectionParameters) {
             $params = ConnectionParameters::create($params);

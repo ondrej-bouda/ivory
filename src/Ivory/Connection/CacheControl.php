@@ -1,48 +1,107 @@
 <?php
 namespace Ivory\Connection;
 
-// TODO: consider making the pg_database.oid check optional - especially so that the dictionary might get loaded during connecting to the database
+use Ivory\Ivory;
+use Psr\Cache\CacheItemPoolInterface;
+
 class CacheControl implements ICacheControl
 {
-    const CACHE_FILE = __DIR__ . '/../../../dict.cache'; // FIXME: remove, just a quick&dirty implementation
+    /** @var CacheItemPoolInterface|null */
+    private $cacheItemPool = null;
+    /** @var string */
+    private $ivoryCacheKey;
+    /** @var string */
+    private $connectionCacheKey;
 
-    public function cacheForSession(string $cacheKey, $object): bool
+    public function __construct(ConnectionParameters $connectionParameters)
     {
-        throw new \Ivory\Exception\NotImplementedException(); // TODO
+        $this->ivoryCacheKey = self::safeCacheKey('Ivory' . Ivory::VERSION . '.');
+        $this->connectionCacheKey = self::safeCacheKey(sprintf(
+            '.%s.%d.%s',
+            $connectionParameters->getHost(),
+            $connectionParameters->getPort(),
+            $connectionParameters->getDbName()
+        ));
+    }
+
+    /**
+     * @param CacheItemPoolInterface|null $cacheItemPool cache implementation to use, or <tt>null</tt> to use the
+     *                                                     default set to {@link Ivory::setDefaultCacheImpl()}
+     */
+    public function setCacheImpl($cacheItemPool)
+    {
+        $this->cacheItemPool = $cacheItemPool;
+    }
+
+    private function composeCacheKey(string $objectKey)
+    {
+        // object key before connection key - the connection key might contain anything out of control of Ivory
+        $key = $this->ivoryCacheKey . self::safeCacheKey($objectKey) . $this->connectionCacheKey;
+
+        // PSR-6 only guarantees acceptance of keys length at most 64 characters - shorten the key if longer
+        if (strlen($key) > 64) { // strlen() is safe here since the key will only consist of one-byte UTF-8 characters
+            $key = substr($key, 0, 32) . md5($key);
+        }
+
+        return $key;
+    }
+
+    /**
+     * Returns a string only consisting of characters safe to be used as a PSR-6 cache key.
+     *
+     * @see http://www.php-fig.org/psr/psr-6/
+     *
+     * @param string $key
+     * @return string
+     */
+    private static function safeCacheKey(string $key): string
+    {
+        if (preg_match('~^[A-Za-z0-9_.]+$~', $key)) {
+            return $key;
+        } else {
+            return substr(md5($key), 0, 16); // half of MD5 will probably be enough
+        }
+    }
+
+    public function isCacheEnabled(): bool
+    {
+        return (($this->cacheItemPool ?? Ivory::getDefaultCacheImpl()) !== null);
     }
 
     public function cachePermanently(string $cacheKey, $object): bool
     {
-//        return false;
+        $cachePool = ($this->cacheItemPool ?? Ivory::getDefaultCacheImpl());
+        if ($cachePool === null) {
+            return false;
+        }
 
-        // FIXME
-        $serialized = serialize($object);
-        file_put_contents(self::CACHE_FILE, $serialized, LOCK_EX);
-        return true;
+        $key = $this->composeCacheKey($cacheKey);
+        $item = $cachePool->getItem($key);
+        $item->set($object);
+
+        return $cachePool->save($item);
     }
 
     public function getCached(string $cacheKey)
     {
-//        return null;
-
-        if (file_exists(self::CACHE_FILE)) {
-            $serialized = file_get_contents(self::CACHE_FILE);
-            $object = @unserialize($serialized);
-            if ($object !== false) {
-                return $object;
-            }
+        $cachePool = ($this->cacheItemPool ?? Ivory::getDefaultCacheImpl());
+        if ($cachePool === null) {
+            return null;
         }
 
-        return null;
+        $key = $this->composeCacheKey($cacheKey);
+        $item = $cachePool->getItem($key);
+        return $item->get();
     }
 
-    public function flushCache(string $cacheKey = null): bool
+    public function flushCache(string $cacheKey): bool
     {
-        return @unlink(self::CACHE_FILE); // FIXME
-    }
+        $cachePool = ($this->cacheItemPool ?? Ivory::getDefaultCacheImpl());
+        if ($cachePool === null) {
+            return false;
+        }
 
-    public function flushAnyIvoryCaches(): bool
-    {
-        return @unlink(self::CACHE_FILE); // FIXME
+        $key = $this->composeCacheKey($cacheKey);
+        return $cachePool->deleteItem($key);
     }
 }
