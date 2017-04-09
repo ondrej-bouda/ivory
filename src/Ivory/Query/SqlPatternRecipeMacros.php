@@ -42,10 +42,10 @@ trait SqlPatternRecipeMacros
      * <pre>
      * <?php
      * $recipe = new SqlRecipe(
-     *   'SELECT *, %s:status FROM person WHERE role = %d AND email = %s',
+     *   'SELECT * FROM person WHERE role = %d AND email = %s',
      *   4, 'john@doe.com'
      * );
-     * // results in "SELECT * FROM person WHERE role = 4 AND email = 'john@doe.com'"
+     * // results in recipe giving "SELECT * FROM person WHERE role = 4 AND email = 'john@doe.com'"
      * </pre>
      *
      * Performance considerations: parsing the SQL pattern, if given as a string, is done by the parser obtained by

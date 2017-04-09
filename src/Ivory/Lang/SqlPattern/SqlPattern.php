@@ -6,7 +6,7 @@ use Ivory\Exception\NoDataException;
 /**
  * An immutable representation of an SQL pattern.
  *
- * This class is not intended for direct construction - instead, use {@link SqlPatternParser} to had an `SqlPattern`
+ * This class is not intended for direct construction - instead, use {@link SqlPatternParser} to have an `SqlPattern`
  * created, or {@link \Ivory\Query\SqlRelationRecipe} or {@link \Ivory\Query\SqlCommandRecipe} to use it indirectly.
  *
  * An SQL pattern is a plain SQL string with special placeholders for parameters.
@@ -16,7 +16,7 @@ use Ivory\Exception\NoDataException;
  * - *positional parameters* - specified solely by their position relative to other positional parameters.
  *
  * Multiple occurrences of the same named parameter may be used in the SQL pattern, referring to the same one value. On
- * the other hand, positional parameters may not be reused - a value must be provided for each positional parameter, and
+ * the contrary, positional parameters may not be reused - a value must be provided for each positional parameter, and
  * placeholders may not explicitly refer to positional parameter values.
  *
  * Placeholders use the following syntax in SQL patterns:
@@ -42,7 +42,7 @@ use Ivory\Exception\NoDataException;
  *   * a single token, or
  *   * any string enclosed in double quotes (the `"` character; to write a double quote character literally, use two of
  *     them), or
- *   * any string within a pair of curly braces (the `{` and `}`); note there is no way to type the closing brace
+ *   * any string within a pair of curly braces (the `{` and `}`; note there is no way to type the closing brace
  *     literally using this variant).
  * * The `type` may optionally be prefixed with `typeschema.`, where `typeschema` meets the same syntax rules as `type`.
  * * The `type` specification may be ended with an empty pair of square brackets, indicating an array type. (Multiple
@@ -146,7 +146,7 @@ class SqlPattern
      * Returns the described SQL pattern with placeholders removed and sequences `%%` unescaped.
      *
      * Parameter values must be inserted in this string in place of the removed placeholders to form a valid SQL
-     * statement. Use {@link fillSql()} or {@link generateSql()} for that.
+     * statement. Use {@link generateSql()} for that.
      */
     public function getSqlTorso(): string
     {
@@ -175,10 +175,10 @@ class SqlPattern
     /**
      * Generate SQL string from this pattern with encoded parameter values requested to be filled by the caller.
      *
-     * This is a more general method to {@link fillSql()}. The reason for this method is that a single named parameter
-     * may have multiple placeholders within the pattern, each with a different type specification. Therefore, each
-     * occurrence might result in different encoding. This method presents the caller each placeholder, one by one, so
-     * that the caller provides the encoded parameter value.
+     * The reason for such a complicated interface (instead of just passing a map of placeholders) is that a single
+     * named parameter may have multiple placeholders within the pattern, each with a different type specification.
+     * Therefore, each occurrence might result in different encoding. This method presents the caller each placeholder,
+     * one by one, so that the caller provides the encoded parameter value.
      *
      * Technically, this is achieved by returning a `\Generator` being treated as a coroutine. Each placeholder is
      * yielded from the generator as a {@link SqlPatternPlaceholder} object, describing the placeholder to fill the
