@@ -35,4 +35,24 @@ interface ITypeDictionary
      * @throws UndefinedTypeException if no type capable of converting the given value is found
      */
     function requireTypeByValue($value): IType;
+
+    /**
+     * @return ITypeDictionaryUndefinedHandler|null
+     */
+    function getUndefinedTypeHandler();
+
+    /**
+     * @param ITypeDictionaryUndefinedHandler|null $undefinedTypeHandler
+     */
+    function setUndefinedTypeHandler($undefinedTypeHandler);
+
+    /**
+     * @return string[] schema name list
+     */
+    function getTypeSearchPath(): array;
+
+    /**
+     * @param string[] $schemaList
+     */
+    function setTypeSearchPath(array $schemaList);
 }

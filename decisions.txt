@@ -3,7 +3,7 @@ Some decisions are commented directly in source code, denoted by phrase "Ivory d
 
 * Ivory heavily relies on the type introspector, which looks up all data types defined on the database.
 ** The type introspector is necessary to getting type OIDs, besides some other useful metadata (such as array item separators).
-** Type OIDs are necessary for identifying data types of relation result columns and processing their data correctly. The PHP pgSQL driver only allows recognizing by OID or by an unqualified name. Since there may be multiple data types of the same name in different schemas of the database, the latter is insufficient.
+** Type OIDs are necessary for identifying data types of relation result columns and processing their data correctly. The PHP pgSQL driver only allows recognizing by OID or by an unqualified name. Since there may be multiple data types of the same name in different schemas of the database, the latter is insufficient. (See also the comment for pgsql.c function php_pgsql_get_data_type: "This is stupid way to do. I'll fix it when I decied how to support user defined types. (Yasuo)".)
 * The default PHP type into which Ivory will convert SQL DATE values is not \DateTime, but rather an \Ivory\Value\Date. The rationale behind this:
 ** It is pretty different information whether a variable holds a date or datetime. Just as it is generally better to use boolean true/false values instead of integer 1/0, a date says it is mere date, not time.
 ** A lot of issues is connected with datetime values - especially regarding timezones and daylight "saving" time. Working with a mere date is much simpler as no such issues are relevant for it.

@@ -1,11 +1,13 @@
 <?php
 
+use Cache\Adapter\PHPArray\ArrayCachePool;
 use Ivory\Connection\IConnection;
 use Ivory\Ivory;
 
 class IvoryPerformanceTest implements IPerformanceTest
 {
     const SYNCHRONOUS = 1;
+    const NO_CACHE = 2;
 
     private $async;
     /** @var IConnection */
@@ -14,6 +16,10 @@ class IvoryPerformanceTest implements IPerformanceTest
     public function __construct(int $options = 0)
     {
         $this->async = !($options & self::SYNCHRONOUS);
+
+        if (!($options & self::NO_CACHE)) {
+            Ivory::setDefaultCacheImpl(new ArrayCachePool());
+        }
     }
 
     public function connect(string $connString, string $searchPathSchema)

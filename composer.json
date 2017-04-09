@@ -15,7 +15,8 @@
   "require": {
     "php": ">= 7.0",
     "ext-mbstring": "*",
-    "ext-pgsql": "*"
+    "ext-pgsql": "*",
+    "psr/cache": "~1.0"
   },
   "require-dev": {
     "ext-pdo_pgsql": "*",
@@ -24,6 +25,10 @@
     "nategood/commando": "*",
     "dibi/dibi": "*",
     "doctrine/dbal": "*",
-    "illuminate/database": "*"
+    "illuminate/database": "*",
+    "cache/array-adapter": "*"
+  },
+  "suggest": {
+    "cache/memcached-adapter": "Some PSR-6 compliant cache pool is essential for Ivory to be fast enough. Use \\Ivory\\Ivory::setDefaultCacheImpl()."
   }
 }

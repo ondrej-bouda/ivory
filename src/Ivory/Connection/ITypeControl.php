@@ -1,11 +1,14 @@
 <?php
 namespace Ivory\Connection;
 
+use Ivory\Type\ICacheableTypeDictionary;
 use Ivory\Type\ITypeDictionary;
 use Ivory\Type\TypeRegister;
 
 interface ITypeControl
 {
+    const TYPE_DICTIONARY_CACHE_KEY = ICacheableTypeDictionary::class;
+
     /**
      * @return TypeRegister the type register local to this connection
      */

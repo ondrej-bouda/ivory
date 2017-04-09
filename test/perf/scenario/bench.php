@@ -14,7 +14,10 @@ $command->argument()
     ->require()
     ->describe('Implementation to use')
     ->must(function ($impl) {
-        return in_array($impl, ['ivory', 'ivory-sync', 'pgsql', 'dibi', 'dibi-lazy', 'doctrine', 'laravel']);
+        return in_array($impl, [
+            'ivory', 'ivory-sync', 'ivory-nocache',
+            'pgsql', 'dibi', 'dibi-lazy', 'doctrine', 'laravel',
+        ]);
     })
     ->map(function ($impl) {
         switch ($impl) {
@@ -22,6 +25,8 @@ $command->argument()
                 return new IvoryPerformanceTest();
             case 'ivory-sync':
                 return new IvoryPerformanceTest(IvoryPerformanceTest::SYNCHRONOUS);
+            case 'ivory-nocache':
+                return new IvoryPerformanceTest(IvoryPerformanceTest::NO_CACHE);
             case 'pgsql':
                 return new PgSQLPerformanceTest();
             case 'dibi':
@@ -38,6 +43,7 @@ $command->argument()
     });
 
 $command->flag('rounds')
+    ->alias('loops')
     ->describe('Number of rounds to execute')
     ->must(function ($n) { return ($n > 0); })
     ->map(function ($n) { return (int)$n; })

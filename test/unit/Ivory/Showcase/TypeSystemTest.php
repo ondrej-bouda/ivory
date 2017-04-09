@@ -2,9 +2,8 @@
 namespace Ivory\Showcase;
 
 use Ivory\Connection\IConnection;
+use Ivory\Connection\ITypeControl;
 use Ivory\Type\INamedType;
-use Ivory\Type\ITotallyOrderedType;
-use Ivory\Type\IType;
 use Ivory\Value\Composite;
 use Ivory\Value\Json;
 use Ivory\Value\Polygon;
@@ -146,6 +145,8 @@ SQL
 
         // ...and register it. Either at the global level, or just for a specific connection.
         $this->conn->getTypeRegister()->registerType('pg_catalog', 'time', $customTimeConverter);
+        // NOTE: necessary as the cached dictionary refers to type converters defined in time of caching the dictionary
+        $this->conn->flushCache(ITypeControl::TYPE_DICTIONARY_CACHE_KEY);
 
         $val = $this->conn->querySingleValue("SELECT TIME '16:42'");
         $this->assertEquals(new \DateTime('16:42:00'), $val);
