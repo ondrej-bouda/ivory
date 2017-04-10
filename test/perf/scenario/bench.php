@@ -172,6 +172,8 @@ for ($round = 1 - $command['warmup']; $round <= $command['rounds']; $round++) {
     }
 }
 
+$benchmark->takePeakMemoryUsage();
+
 //endregion
 
 //region Reporting and epilogue
@@ -239,11 +241,12 @@ function recreate_database(string $connString, bool $printProgress = false)
 
 class Benchmark
 {
-    /** @var float[][] map: section label => list: lap time */
+    /** @var int[][] map: section label => list: lap time [ms] */
     private $measurements = [];
     private $curSection;
     private $startTime;
     private $warmUp = false;
+    private $peakMemoryUsage = null;
 
     public function benchmarkSection(string $label, \Closure $body)
     {
@@ -274,18 +277,67 @@ class Benchmark
         $this->startTime = null;
     }
 
+    public function takePeakMemoryUsage()
+    {
+        $this->peakMemoryUsage = memory_get_peak_usage();
+    }
+
     public function printReport()
     {
+        echo str_repeat('=', 80) . "\n";
+        printf("%-40s %-8s|%-8s|%-8s\n", 'Section', 'Mean[ms]', 'Std.Dev', '95pct[ms]');
         echo str_repeat('-', 80) . "\n";
-        $avgSum = 0;
+
+        $totals = [];
         foreach ($this->measurements as $label => $lapTimeList) {
-            $count = count($lapTimeList);
-            $avg = array_sum($lapTimeList) / $count;
-            printf("%4dx %-40s %f\n", $count, "$label:", $avg);
-            $avgSum += $avg;
+            $this->printMeasurementStats($label, $lapTimeList);
+            foreach ($lapTimeList as $i => $lapTime) {
+                $totals[$i] = ($totals[$i] ?? 0) + $lapTime;
+            }
         }
-        printf("Total:             %f\n", $avgSum);
-        printf("Peak memory usage: %d kB\n", round(memory_get_peak_usage() / 1024));
+        echo str_repeat('-', 80) . "\n";
+
+        $this->printMeasurementStats('Total', $totals);
+        if ($this->peakMemoryUsage !== null) {
+            printf("Peak memory usage: %d kB\n", round($this->peakMemoryUsage / 1024));
+        }
+    }
+
+    private function printMeasurementStats(string $label, array $lapTimeList)
+    {
+        $sorted = $lapTimeList;
+        sort($lapTimeList);
+
+        $mean = round(1000 * self::kthPercentile(50, $sorted));
+        $p95 = round(1000 * self::kthPercentile(95, $sorted));
+        $stdDev = round(100 * self::relStdDev($sorted));
+
+        printf("%-40s %8s %7s%% %8s\n", $label, $mean, $stdDev, $p95);
+    }
+
+    private static function kthPercentile(int $k, array $sortedValues)
+    {
+        assert($k >= 0 && $k <= 100);
+        $index = $k / 100 * count($sortedValues);
+        if ($index - (int)$index < 1e-9) {
+            return $sortedValues[$index - 1];
+        } else {
+            return round(($sortedValues[(int)floor($index) - 1] + $sortedValues[(int)ceil($index) - 1]) / 2);
+        }
+    }
+
+    private static function relStdDev(array $sortedValues)
+    {
+        $mean = self::kthPercentile(50, $sortedValues);
+        if ($mean < 1e-9) {
+            return 0;
+        }
+
+        $sum = 0;
+        foreach ($sortedValues as $val) {
+            $sum += ($mean - $val)**2;
+        }
+        return sqrt($sum / count($sortedValues)) / $mean;
     }
 
     public function busyLoop(int $rounds)

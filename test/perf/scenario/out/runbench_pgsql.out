@@ -1,9 +1,12 @@
+================================================================================
+Section                                  Mean[ms]|Std.Dev |95pct[ms]
 --------------------------------------------------------------------------------
- 100x 0. Connection:                           0.056763
- 100x 1. First, trivial query:                 0.000720
- 100x 2. User authentication:                  0.008401
- 100x 3. Starred items:                        0.010511
- 100x 4. Category Items:                       0.026112
- 100x X. Disconnect:                           0.000180
-Total:             0.102686
-Peak memory usage: 1437 kB
+0. Connection                                  59       4%       57
+1. First, trivial query                         1      46%        0
+2. User authentication                          9      11%        8
+3. Starred items                               10      14%       10
+4. Category Items                              25       5%       26
+X. Disconnect                                   1      91%        0
+--------------------------------------------------------------------------------
+Total                                         105       3%      101
+Peak memory usage: 1448 kB
