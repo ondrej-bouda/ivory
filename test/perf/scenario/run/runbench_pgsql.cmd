@@ -1,1 +1,1 @@
-php ../bench.php --recreate --rounds 100 --warmup 5 --busyloop 100000 pgsql > ../out/runbench_pgsql.out
+php ../bench.php --recreate --rounds 100 --warmup 5 pgsql > ../out/runbench_pgsql.out

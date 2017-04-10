@@ -1,9 +1,9 @@
 --------------------------------------------------------------------------------
- 100x 0. Connection:                           0.097496
- 100x 1. First, trivial query:                 0.155979
- 100x 2. User authentication:                  0.009721
- 100x 3. Starred items:                        0.013691
- 100x 4. Category Items:                       0.065774
- 100x X. Disconnect:                           0.000190
-Total:             0.342850
-Peak memory usage: 11430 kB
+ 100x 0. Connection:                           0.004770
+ 100x 1. First, trivial query:                 0.199241
+ 100x 2. User authentication:                  0.009711
+ 100x 3. Starred items:                        0.013841
+ 100x 4. Category Items:                       0.065894
+ 100x X. Disconnect:                           0.000230
+Total:             0.293687
+Peak memory usage: 11471 kB

@@ -1,1 +1,1 @@
-php ../bench.php --recreate --rounds 100 --warmup 5 --busyloop 100000 dibi-lazy > ../out/runbench_dibi-lazy.out
+php ../bench.php --recreate --rounds 100 --warmup 5 dibi-lazy > ../out/runbench_dibi-lazy.out

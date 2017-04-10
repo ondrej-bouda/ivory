@@ -1,1 +1,1 @@
-php ../bench.php --recreate --rounds 100 --warmup 5 --busyloop 100000 ivory > ../out/runbench_ivory.out
+php ../bench.php --recreate --rounds 100 --warmup 5 ivory > ../out/runbench_ivory.out
