@@ -13,15 +13,27 @@ use Ivory\Type\ITotallyOrderedType;
  * Note that arrays in PHP and PostgreSQL are completely different beasts. In PHP, "arrays" are in fact sorted hash maps
  * with string or integer keys, or a mixture of both, having no restrictions on the elements. In PostgreSQL, arrays are
  * much closer to other programming languages: all the elements must be of the same type and dimension (i.e.,
- * multidimensional arrays must be "rectangular") and are indexed using a continuous sequence of integers. Thus:
- * - an array converter always supports just one type of array elements - the one for which the converter was created;
- * - when serializing a PHP array to PostgreSQL, the array is refused if it is invalid for PostgreSQL (i.e., if it uses
- *   string keys or has gaps within the keys or the elements are of different types or dimensions);
- * - when serializing a PHP array to PostgreSQL, the array gets sorted by its keys, i.e., the original order gets lost.
+ * multidimensional arrays must be "rectangular") and are indexed using a continuous sequence of integers.
  *
  * Moreover, PHP arrays are zero-based by default, whereas PostgreSQL defaults to one-based arrays; in both, the bounds
- * may be explicitly specified, however. The converter does not rebase the elements - the arrays are converted as is,
- * including the bounds.
+ * may be explicitly specified, however.
+ *
+ * The array converter has two modes: *strict* and *plain*. Simply said, the strict mode converts the arrays including
+ * the element indexes, whereas the plain mode ignores array indexes completely. *Strict mode is the default.*
+ *
+ * **Restrictions on values to be converted:**
+ * - an array converter always supports just one type of array elements - the one for which the converter was created;
+ * - when serializing a PHP array to PostgreSQL, the array is refused if it is invalid for PostgreSQL (i.e., if the
+ *   elements are of different types or dimensions, or - in the strict mode - if the array uses string keys or has gaps
+ *   within the keys).
+ *
+ * **Behaviour according to the mode:**
+ * * In the strict mode, the converter does not rebase the elements - the arrays are converted as is, including the
+ *   bounds. However, when serializing a PHP array to PostgreSQL, the array gets sorted by its keys, i.e., the original
+ *   order gets lost.
+ * * In the plain mode, the converter merely iterates through the array and puts each item in the result, ignoring the
+ *   array keys completely. The elements are not sorted by their keys. When converting arrays from PostgreSQL to PHP,
+ *   zero-based arrays are created. Conversely, when arrays from PHP are converted to one-based PostgreSQL arrays.
  *
  * @see http://www.postgresql.org/docs/9.4/static/arrays.html
  */
@@ -30,12 +42,23 @@ class ArrayType implements ITotallyOrderedType, INamedType
     private $elemType;
     private $delim;
     private $elemNeedsQuotesRegex;
+    private $ignoreIndexes = false;
 
     public function __construct(INamedType $elemType, string $delimiter)
     {
         $this->elemType = $elemType;
         $this->delim = $delimiter;
         $this->elemNeedsQuotesRegex = '~[{}\\s"\\\\' . preg_quote($delimiter, '~') . ']|^NULL$|^$~i';
+    }
+
+    public function switchToPlainMode()
+    {
+        $this->ignoreIndexes = true;
+    }
+
+    public function switchToStrictMode()
+    {
+        $this->ignoreIndexes = false;
     }
 
     public function getSchemaName(): string
@@ -46,6 +69,20 @@ class ArrayType implements ITotallyOrderedType, INamedType
     public function getName(): string
     {
         return $this->elemType->getName() . '[]';
+    }
+
+    private function throwParseException(
+        string $str,
+        string $errMsg = null,
+        int $offset = null,
+        \Exception $cause = null
+    ) {
+        $elemTypeName = $this->elemType->getSchemaName() . '.' . $this->elemType->getName();
+        $msg = "Value '$str' is not valid for an array of type $elemTypeName";
+        if (strlen($errMsg) > 0) {
+            $msg .= ": $errMsg";
+        }
+        throw new ParseException($msg, $offset, 0, $cause);
     }
 
     public function parseValue($str)
@@ -70,7 +107,7 @@ class ArrayType implements ITotallyOrderedType, INamedType
 
             preg_match_all('~\[(\d+):\d+\]~', $decoration, $m);
             if ($decorSepPos === false || !$m) {
-                self::throwArrayParseException($str, 'Invalid array bounds decoration');
+                $this->throwParseException($str, 'Invalid array bounds decoration');
             }
             for ($strOffset = $decorSepPos + 1; isset($str[$strOffset]) && ctype_space($str[$strOffset]); $strOffset++) {
             }
@@ -92,9 +129,13 @@ class ArrayType implements ITotallyOrderedType, INamedType
                 }
             }
             if ($dims == 0) {
-                self::throwArrayParseException($str, "Expected '{'", 0);
+                $this->throwParseException($str, "Expected '{'", 0);
             }
             $lowerBounds = array_fill(0, $dims, 1);
+        }
+
+        if ($this->ignoreIndexes) {
+            $lowerBounds = array_fill(0, count($lowerBounds), 0);
         }
 
         $result = [];
@@ -171,28 +212,88 @@ class ArrayType implements ITotallyOrderedType, INamedType
      */
     public function serializeValue($val): string
     {
-        $str = $this->serializeValueImpl($val, $bounds);
+        if ($this->ignoreIndexes) {
+            $str = $this->serializeValuePlain($val);
+        } else {
+            $str = $this->serializeValueStrict($val, $bounds);
 
-        $needsDimDecoration = false;
-        foreach ($bounds as $b) {
-            if ($b[0] != 1) {
-                $needsDimDecoration = true;
-                break;
-            }
-        }
-        if ($needsDimDecoration) {
-            $dimDec = '';
+            $needsDimDecoration = false;
             foreach ($bounds as $b) {
-                $dimDec .= "[{$b[0]}:{$b[1]}]";
+                if ($b[0] != 1) {
+                    $needsDimDecoration = true;
+                    break;
+                }
             }
-            $str = "$dimDec=$str";
+            if ($needsDimDecoration) {
+                $dimDec = '';
+                foreach ($bounds as $b) {
+                    $dimDec .= "[{$b[0]}:{$b[1]}]";
+                }
+                $str = "$dimDec=$str";
+            }
+
+            $str = "'$str'"; // NOTE: literal single quotes in serialized elements are already doubled
         }
 
-        return sprintf("'%s'::%s.%s[]",
-            $str, // NOTE: literal single quotes in serialized elements are already doubled
+        return sprintf("%s::%s.%s[]",
+            $str,
             $this->elemType->getSchemaName(),
             $this->elemType->getName()
         );
+    }
+
+    /**
+     * @param string|null $val the value to serialize
+     * @param int[] $dims list: for each dimension, the size of the array is mentioned
+     * @param int $curDim the current dimension being processed (zero-based)
+     * @param int $maxDim the maximal dimension discovered so far
+     * @return string the PostgreSQL external representation of <tt>$val</tt>
+     */
+    private function serializeValuePlain($val, &$dims = [], int $curDim = 0, int &$maxDim = -1): string
+    {
+        if ($val === null) {
+            return 'NULL';
+        }
+
+        if (!is_array($val)) {
+            throw new \InvalidArgumentException("Value '$val' is not valid for array type");
+        }
+
+        if ($curDim > $maxDim) {
+            $maxDim = $curDim;
+            $expSize = count($val);
+            $dims[$curDim] = $expSize;
+        } else {
+            $expSize = $dims[$curDim];
+            if ($expSize != count($val)) {
+                $msg = 'The array is not rectangular: item ' . print_r($val, true) . ' contains a wrong number of elements';
+                throw new \InvalidArgumentException($msg);
+            }
+        }
+
+        $out = ($curDim == 0 ? 'ARRAY[' : '[');
+        $first = true;
+        foreach ($val as $v) {
+            if ($first) {
+                $first = false;
+            } else {
+                $out .= $this->delim;
+            }
+
+            if (is_array($v)) {
+                $out .= $this->serializeValuePlain($v, $dims, $curDim + 1, $maxDim);
+            } else {
+                if ($curDim != $maxDim) {
+                    $msg = "Some array items do not match the dimensions of the array: " . print_r($val, true);
+                    throw new \InvalidArgumentException($msg);
+                }
+                
+                $out .= $this->elemType->serializeValue($v);
+            }
+        }
+        $out .= ']';
+
+        return $out;
     }
 
     /**
@@ -202,7 +303,7 @@ class ArrayType implements ITotallyOrderedType, INamedType
      * @param int $maxDim the maximal dimension discovered so far
      * @return string the PostgreSQL external representation of <tt>$val</tt>
      */
-    private function serializeValueImpl($val, &$bounds = [], int $curDim = 0, int &$maxDim = -1): string
+    private function serializeValueStrict($val, &$bounds = [], int $curDim = 0, int &$maxDim = -1): string
     {
         if ($val === null) {
             return 'NULL';
@@ -216,7 +317,7 @@ class ArrayType implements ITotallyOrderedType, INamedType
         ksort($arr);
         $keys = array_keys($arr);
 
-        if ($maxDim < $curDim) {
+        if ($curDim > $maxDim) {
             $maxDim = $curDim;
             $b = ($arr ? [$keys[0], $keys[count($keys) - 1]] : [1, 0]);
             $bounds[$curDim] = $b;
@@ -242,9 +343,9 @@ class ArrayType implements ITotallyOrderedType, INamedType
             }
 
             if (is_array($v)) {
-                $out .= $this->serializeValueImpl($v, $bounds, $curDim + 1, $maxDim);
+                $out .= $this->serializeValueStrict($v, $bounds, $curDim + 1, $maxDim);
             } else {
-                if ($curDim != $maxDim) {
+                if ($curDim != $maxDim) { // it should have been an array
                     $msg = "Some array items do not match the dimensions of the array: " . print_r($val, true);
                     throw new \InvalidArgumentException($msg);
                 }
@@ -275,29 +376,6 @@ class ArrayType implements ITotallyOrderedType, INamedType
         $out .= '}';
 
         return $out;
-    }
-
-    private static function throwArrayParseException(string $str, string $errMsg = null, int $offset = null)
-    {
-        $msg = "Value '$str' is not valid for an array";
-        if (strlen($errMsg) > 0) {
-            $msg .= ": $errMsg";
-        }
-        throw new ParseException($msg, $offset);
-    }
-
-    private function throwParseException(
-        string $str,
-        string $errMsg = null,
-        int $offset = null,
-        \Exception $cause = null
-    ) {
-        $elemTypeName = $this->elemType->getSchemaName() . '.' . $this->elemType->getName();
-        $msg = "Value '$str' is not valid for an array of type $elemTypeName";
-        if (strlen($errMsg) > 0) {
-            $msg .= ": $errMsg";
-        }
-        throw new ParseException($msg, $offset, 0, $cause);
     }
 
     public function compareValues($a, $b)

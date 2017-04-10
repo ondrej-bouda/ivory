@@ -83,7 +83,7 @@ STR
     {
         $this->assertSame(
             "'[0:1][-3:-1]={{1,2,3},{4,5,6}}'::pg_catalog.int4[]",
-            $this->intArrayType->serializeValue([[-3 => 1, -2 => 2, -1 => 3], [-3 => 4, -2 => 5, -1 => 6]])
+            $this->intArrayType->serializeValue([[-3 => 1, -2 => 2, -1 => 3], [-3 => 4, -1 => 6, -2 => 5]])
         );
 
         try {
@@ -95,6 +95,48 @@ STR
         try {
             $this->intArrayType->serializeValue([[1, -5 => 2, 3]]);
             $this->fail('InvalidArgumentException expected due to non-continuous array subscripts');
+        } catch (\InvalidArgumentException $e) {
+        }
+    }
+
+    public function testSerializePlainMode()
+    {
+        $this->intArrayType->switchToPlainMode();
+        $this->strArrayType->switchToPlainMode();
+
+        $this->assertSame('ARRAY[1]::pg_catalog.int4[]', $this->intArrayType->serializeValue([1]));
+        $this->assertSame('ARRAY[]::pg_catalog.int4[]', $this->intArrayType->serializeValue([]));
+
+        $this->assertSame(
+            "ARRAY['abc',NULL,'NULL']::pg_catalog.text[]",
+            $this->strArrayType->serializeValue(['abc', null, 'NULL'])
+        );
+
+        $this->assertSame(
+            'ARRAY[[1,2,NULL],[4,6,5]]::pg_catalog.int4[]',
+            $this->intArrayType->serializeValue([[-3 => 1, -2 => 2, -1 => null], [-3 => 4, -1 => 6, -2 => 5]])
+        );
+        $this->assertSame(
+            'ARRAY[[1,2,3]]::pg_catalog.int4[]',
+            $this->intArrayType->serializeValue([[1, 2 => 2, 3]])
+        );
+
+
+        try {
+            $this->intArrayType->serializeValue(123);
+            $this->fail('InvalidArgumentException expected due to non-array input');
+        } catch (\InvalidArgumentException $e) {
+        }
+
+        try {
+            $this->intArrayType->serializeValue([[1, 2, 3], null]);
+            $this->fail('InvalidArgumentException expected due to non-matching array dimensions');
+        } catch (\InvalidArgumentException $e) {
+        }
+
+        try {
+            $this->intArrayType->serializeValue([[1, 2, 3], 4]);
+            $this->fail('InvalidArgumentException expected due to non-matching array dimensions');
         } catch (\InvalidArgumentException $e) {
         }
     }
