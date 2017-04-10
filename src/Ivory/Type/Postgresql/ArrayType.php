@@ -98,7 +98,8 @@ class ArrayType implements ITotallyOrderedType, INamedType
 
         $strOffset = 0;
 
-        for (; isset($str[$strOffset]) && ctype_space($str[$strOffset]); $strOffset++) {
+        while (isset($str[$strOffset]) && ctype_space($str[$strOffset])) {
+            $strOffset++;
         }
 
         if ($str[$strOffset] == '[') { // explicit bounds specification
@@ -109,7 +110,9 @@ class ArrayType implements ITotallyOrderedType, INamedType
             if ($decorSepPos === false || !$m) {
                 $this->throwParseException($str, 'Invalid array bounds decoration');
             }
-            for ($strOffset = $decorSepPos + 1; isset($str[$strOffset]) && ctype_space($str[$strOffset]); $strOffset++) {
+            $strOffset = $decorSepPos + 1;
+            while (isset($str[$strOffset]) && ctype_space($str[$strOffset])) {
+                $strOffset++;
             }
             $lowerBounds = $m[1];
             unset($m);
@@ -205,8 +208,8 @@ class ArrayType implements ITotallyOrderedType, INamedType
     /**
      * {@inheritdoc}
      *
-     * Note the `ARRAY[1,2,3]` syntax cannot be used as it does not allow for specifying custom array bounds. Instead,
-     * the string representation (e.g., `'{1,2,3}'`) is employed.
+     * Note that, in the strict mode, the `ARRAY[1,2,3]` syntax cannot be used as it does not allow for specifying
+     * custom array bounds. Instead, the string representation (e.g., `'{1,2,3}'`) is employed.
      *
      * @todo eliminate recursion, process multidimensional arrays using iteration instead
      */
@@ -243,7 +246,7 @@ class ArrayType implements ITotallyOrderedType, INamedType
     }
 
     /**
-     * @param string|null $val the value to serialize
+     * @param array|null $val the value to serialize
      * @param int[] $dims list: for each dimension, the size of the array is mentioned
      * @param int $curDim the current dimension being processed (zero-based)
      * @param int $maxDim the maximal dimension discovered so far
