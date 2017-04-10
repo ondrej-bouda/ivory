@@ -306,7 +306,7 @@ class Benchmark
     private function printMeasurementStats(string $label, array $lapTimeList)
     {
         $sorted = $lapTimeList;
-        sort($lapTimeList);
+        sort($sorted);
 
         $mean = round(1000 * self::kthPercentile(50, $sorted));
         $p95 = round(1000 * self::kthPercentile(95, $sorted));
