@@ -34,7 +34,7 @@ interface ICacheControl
      * Loads an item cached upon this connection.
      *
      * @param string $cacheKey key to get the cached object for
-     * @return mixed the cache item, or <tt>null</tt> if no such item is cached or no caching mechanism is set up
+     * @return mixed the cached object, or <tt>null</tt> if no such item is cached or no caching mechanism is set up
      */
     function getCached(string $cacheKey);
 
