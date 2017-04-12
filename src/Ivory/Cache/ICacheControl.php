@@ -1,5 +1,5 @@
 <?php
-namespace Ivory\Connection;
+namespace Ivory\Cache;
 
 /**
  * Caching functionality for Ivory.

@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Connection;
 
+use Ivory\Cache\ICacheControl;
+
 /**
  * Connection to a database.
  *

@@ -1,7 +1,6 @@
 <?php
-namespace Ivory\Connection;
+namespace Ivory\Cache;
 
-use Ivory\Ivory;
 use Psr\Cache\CacheItemPoolInterface;
 
 class CacheControl implements ICacheControl
@@ -9,19 +8,18 @@ class CacheControl implements ICacheControl
     /** @var CacheItemPoolInterface|null */
     private $cacheItemPool = null;
     /** @var string */
-    private $ivoryCacheKey;
+    private $prefix;
     /** @var string */
-    private $connectionCacheKey;
+    private $postfix;
 
-    public function __construct(ConnectionParameters $connectionParameters)
-    {
-        $this->ivoryCacheKey = self::safeCacheKey('Ivory' . Ivory::VERSION . '.');
-        $this->connectionCacheKey = self::safeCacheKey(sprintf(
-            '.%s.%d.%s',
-            $connectionParameters->getHost(),
-            $connectionParameters->getPort(),
-            $connectionParameters->getDbName()
-        ));
+    public function __construct(
+        CacheItemPoolInterface $itemPool = null,
+        string $cacheKeyPrefix = '',
+        string $cacheKeyPostfix = ''
+    ) {
+        $this->cacheItemPool = $itemPool;
+        $this->prefix = ($cacheKeyPrefix === '' ? '' : self::safeCacheKey($cacheKeyPrefix));
+        $this->postfix = ($cacheKeyPostfix === '' ? '' : self::safeCacheKey($cacheKeyPostfix));
     }
 
     /**
@@ -36,7 +34,7 @@ class CacheControl implements ICacheControl
     private function composeCacheKey(string $objectKey)
     {
         // object key before connection key - the connection key might contain anything out of control of Ivory
-        $key = $this->ivoryCacheKey . self::safeCacheKey($objectKey) . $this->connectionCacheKey;
+        $key = $this->prefix . self::safeCacheKey($objectKey) . $this->postfix;
 
         // PSR-6 only guarantees acceptance of keys length at most 64 characters - shorten the key if longer
         if (strlen($key) > 64) { // strlen() is safe here since the key will only consist of one-byte UTF-8 characters
@@ -65,43 +63,40 @@ class CacheControl implements ICacheControl
 
     public function isCacheEnabled(): bool
     {
-        return (($this->cacheItemPool ?? Ivory::getDefaultCacheImpl()) !== null);
+        return ($this->cacheItemPool !== null);
     }
 
     public function cachePermanently(string $cacheKey, $object): bool
     {
-        $cachePool = ($this->cacheItemPool ?? Ivory::getDefaultCacheImpl());
-        if ($cachePool === null) {
+        if ($this->cacheItemPool === null) {
             return false;
         }
 
         $key = $this->composeCacheKey($cacheKey);
-        $item = $cachePool->getItem($key);
+        $item = $this->cacheItemPool->getItem($key);
         $item->set($object);
 
-        return $cachePool->save($item);
+        return $this->cacheItemPool->save($item);
     }
 
     public function getCached(string $cacheKey)
     {
-        $cachePool = ($this->cacheItemPool ?? Ivory::getDefaultCacheImpl());
-        if ($cachePool === null) {
+        if ($this->cacheItemPool === null) {
             return null;
         }
 
         $key = $this->composeCacheKey($cacheKey);
-        $item = $cachePool->getItem($key);
+        $item = $this->cacheItemPool->getItem($key);
         return $item->get();
     }
 
     public function flushCache(string $cacheKey): bool
     {
-        $cachePool = ($this->cacheItemPool ?? Ivory::getDefaultCacheImpl());
-        if ($cachePool === null) {
+        if ($this->cacheItemPool === null) {
             return false;
         }
 
         $key = $this->composeCacheKey($cacheKey);
-        return $cachePool->deleteItem($key);
+        return $this->cacheItemPool->deleteItem($key);
     }
 }

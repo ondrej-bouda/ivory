@@ -2,10 +2,11 @@
 namespace Ivory;
 
 use Ivory\Connection\ConnectionParameters;
+use Ivory\Cache\ICacheControl;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\ConnectionException;
 use Ivory\Exception\StatementExceptionFactory;
-use Ivory\Lang\SqlPattern\SqlPatternParser;
+use Ivory\Lang\SqlPattern\ISqlPatternParser;
 use Ivory\Type\TypeRegister;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -17,16 +18,18 @@ final class Ivory
     private static $coreFactory = null;
     /** @var TypeRegister */
     private static $typeRegister = null;
-    /** @var SqlPatternParser */
+    /** @var ISqlPatternParser */
     private static $sqlPatternParser = null;
     /** @var StatementExceptionFactory */
     private static $stmtExFactory = null;
     /** @var IConnection[] map: name => connection */
     private static $connections = [];
-    /** @var IConnection */
+    /** @var IConnection|null */
     private static $defaultConn = null;
     /** @var CacheItemPoolInterface|null */
     private static $defaultCacheImpl = null;
+    /** @var ICacheControl|null */
+    private static $globalCacheControl = null;
 
 
     private function __construct()
@@ -66,10 +69,11 @@ final class Ivory
         return self::$typeRegister;
     }
 
-    public static function getSqlPatternParser(): SqlPatternParser
+    public static function getSqlPatternParser(): ISqlPatternParser
     {
         if (self::$sqlPatternParser === null) {
-            self::$sqlPatternParser = self::getCoreFactory()->createSqlPatternParser();
+            $cacheControl = self::getGlobalCacheControl();
+            self::$sqlPatternParser = self::getCoreFactory()->createSqlPatternParser($cacheControl);
         }
         return self::$sqlPatternParser;
     }
@@ -86,6 +90,17 @@ final class Ivory
             self::$stmtExFactory = self::getCoreFactory()->createStatementExceptionFactory();
         }
         return self::$stmtExFactory;
+    }
+
+    /**
+     * @return ICacheControl cache control used globally, independent of any specific connection
+     */
+    public static function getGlobalCacheControl(): ICacheControl
+    {
+        if (self::$globalCacheControl === null) {
+            self::$globalCacheControl = self::getCoreFactory()->createCacheControl();
+        }
+        return self::$globalCacheControl;
     }
 
     /**

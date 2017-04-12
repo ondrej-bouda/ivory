@@ -6,15 +6,9 @@ use Ivory\Utils\StringUtils;
 /**
  * Parser of SQL pattern strings into {@link SqlPattern} objects.
  */
-class SqlPatternParser
+class SqlPatternParser implements ISqlPatternParser
 {
-    /**
-     * Parses an SQL pattern string to an {@link SqlPattern} object.
-     *
-     * @param string $sqlPattern
-     * @return SqlPattern
-     */
-    public function parse(string $sqlPattern): SqlPattern
+    public function parse(string $sqlPatternString): SqlPattern
     {
         $positionalPlaceholders = [];
         $namedPlaceholderMap = [];
@@ -90,7 +84,7 @@ class SqlPatternParser
                 $rawOffsetDelta -= strlen($matchWithOffsets[0][0]); // put no characters instead of the whole match
                 return '';
             },
-            $sqlPattern
+            $sqlPatternString
         );
 
         return new SqlPattern($sqlTorso, $positionalPlaceholders, $namedPlaceholderMap);

@@ -1,10 +1,11 @@
 <?php
 namespace Ivory;
 
+use Ivory\Cache\ICacheControl;
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\StatementExceptionFactory;
-use Ivory\Lang\SqlPattern\SqlPatternParser;
+use Ivory\Lang\SqlPattern\ISqlPatternParser;
 use Ivory\Type\TypeRegister;
 
 /**
@@ -16,7 +17,15 @@ interface ICoreFactory
 
     function createConnection(string $connName, ConnectionParameters $params): IConnection;
 
-    function createSqlPatternParser(): SqlPatternParser;
+    /**
+     * Create a cache control, either for a given connection or for global usage.
+     *
+     * @param IConnection|null $connection
+     * @return ICacheControl
+     */
+    function createCacheControl(IConnection $connection = null): ICacheControl;
+
+    function createSqlPatternParser(ICacheControl $cacheControl = null): ISqlPatternParser;
 
     function createStatementExceptionFactory(): StatementExceptionFactory;
 }

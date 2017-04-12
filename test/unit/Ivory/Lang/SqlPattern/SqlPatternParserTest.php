@@ -3,7 +3,7 @@ namespace Ivory\Lang\SqlPattern;
 
 class SqlPatternParserTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SqlPatternParser */
+    /** @var ISqlPatternParser */
     private $parser;
 
     protected function setUp()

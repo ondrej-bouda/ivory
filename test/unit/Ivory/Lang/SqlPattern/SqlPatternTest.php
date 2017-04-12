@@ -6,7 +6,7 @@ use Ivory\IvoryTestCase;
 
 class SqlPatternTest extends IvoryTestCase
 {
-    /** @var SqlPatternParser */
+    /** @var ISqlPatternParser */
     private $parser;
     /** @var SqlPattern */
     private $pattern;

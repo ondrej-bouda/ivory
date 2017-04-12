@@ -1,11 +1,15 @@
 <?php
 namespace Ivory;
 
+use Ivory\Cache\CacheControl;
+use Ivory\Cache\ICacheControl;
 use Ivory\Connection\Connection;
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Lang;
+use Ivory\Lang\SqlPattern\CachingSqlPatternParser;
+use Ivory\Lang\SqlPattern\ISqlPatternParser;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
 use Ivory\Type\Ivory\CommandType;
 use Ivory\Type\Ivory\IdentifierType;
@@ -90,9 +94,13 @@ class StdCoreFactory implements ICoreFactory
         return $reg;
     }
 
-    public function createSqlPatternParser(): SqlPatternParser
+    public function createSqlPatternParser(ICacheControl $cacheControl = null): ISqlPatternParser
     {
-        return new SqlPatternParser();
+        if ($cacheControl === null) {
+            return new SqlPatternParser();
+        } else {
+            return new CachingSqlPatternParser($cacheControl);
+        }
     }
 
     public function createStatementExceptionFactory(): StatementExceptionFactory
@@ -110,5 +118,24 @@ class StdCoreFactory implements ICoreFactory
         $reg->registerSqlPatternType('cmd', new CommandType($conn));
 
         return $conn;
+    }
+
+    public function createCacheControl(IConnection $connection = null): ICacheControl
+    {
+        $prefix = 'Ivory' . Ivory::VERSION . '.';
+
+        if ($connection === null) {
+            $postfix = '';
+        } else {
+            $params = $connection->getParameters();
+            $postfix = sprintf(
+                '.%s.%d.%s',
+                $params->getHost(),
+                $params->getPort(),
+                $params->getDbName()
+            );
+        }
+
+        return new CacheControl(Ivory::getDefaultCacheImpl(), $prefix, $postfix);
     }
 }

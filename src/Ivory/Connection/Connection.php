@@ -4,6 +4,7 @@ namespace Ivory\Connection;
 use Ivory\Connection\Config\ConnConfig;
 use Ivory\Connection\Config\IConnConfig;
 use Ivory\Exception\StatementExceptionFactory;
+use Ivory\Ivory;
 use Ivory\Relation\ITuple;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\ICopyInResult;
@@ -40,13 +41,13 @@ class Connection implements IConnection
     {
         $this->name = $name;
         $this->connCtl = new ConnectionControl($this, $params); // TODO: extract all usages of ConnectionControl::requireConnection() - consider introducing an interface specifying the method, named like PGSQLDriver or ConnectionManager or ConnectionPool
-        $this->cacheCtl = new CacheControl($this->connCtl->getParameters());
         $this->typeCtl = new TypeControl($this, $this->connCtl);
         $this->stmtExec = new StatementExecution($this->connCtl, $this->typeCtl);
         $this->copyCtl = new CopyControl();
         $this->txCtl = new TransactionControl($this->connCtl, $this->stmtExec);
         $this->ipcCtl = new IPCControl($this->connCtl);
         $this->config = new ConnConfig($this->connCtl, $this->stmtExec, $this->txCtl);
+        $this->cacheCtl = Ivory::getCoreFactory()->createCacheControl($this); // TODO: consider moving cacheCtl initialization out of Connection itself (let the core factory set it up), or do not hold cache control here but rather besides the connection register at Ivory
     }
 
     final public function getName(): string
