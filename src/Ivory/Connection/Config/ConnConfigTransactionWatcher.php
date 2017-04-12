@@ -1,6 +1,7 @@
 <?php
-namespace Ivory\Connection;
+namespace Ivory\Connection\Config;
 
+use Ivory\Connection\ITransactionControlObserver;
 use Ivory\Exception\InternalException;
 
 class ConnConfigTransactionWatcher implements ITransactionControlObserver

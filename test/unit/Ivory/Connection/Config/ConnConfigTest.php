@@ -1,5 +1,5 @@
 <?php
-namespace Ivory\Connection;
+namespace Ivory\Connection\Config;
 
 use Ivory\Exception\StatementException;
 use Ivory\Result\QueryResult;
@@ -197,8 +197,7 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
             $this->cfg->resetAll();
             $this->assertSame([ConnConfigTestObserver::RESET], $obsAll->fetchObserved());
             $this->assertSame([ConnConfigTestObserver::RESET], $obsSome->fetchObserved());
-        }
-        finally {
+        } finally {
             $this->getIvoryConnection()->startTransaction();
         }
     }
@@ -301,8 +300,7 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
             $this->assertSame([ConnConfigTestObserver::RESET], $obs->fetchObserved());
             $conn->rollback();
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'Ivory']], $obs->fetchObserved());
-        }
-        finally {
+        } finally {
             $this->clearPreparedTransaction('t');
             if (!$conn->inTransaction()) {
                 $conn->startTransaction();

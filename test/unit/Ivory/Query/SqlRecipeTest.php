@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Query;
 
-use Ivory\Connection\ConfigParam;
+use Ivory\Connection\Config\ConfigParam;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\UndefinedTypeException;
 use Ivory\Type\ITypeDictionary;

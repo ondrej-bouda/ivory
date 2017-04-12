@@ -1,5 +1,5 @@
 <?php
-namespace Ivory\Connection;
+namespace Ivory\Connection\Config;
 
 class ConnConfigValueRetriever implements IConfigObserver
 {

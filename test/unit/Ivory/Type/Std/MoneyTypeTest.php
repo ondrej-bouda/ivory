@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Type\Std;
 
-use Ivory\Connection\ConfigParam;
+use Ivory\Connection\Config\ConfigParam;
 use Ivory\IvoryTestCase;
 use Ivory\Result\IQueryResult;
 use Ivory\Utils\System;

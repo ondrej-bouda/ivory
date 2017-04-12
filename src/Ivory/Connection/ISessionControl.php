@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Connection;
 
+use Ivory\Connection\Config\IConnConfig;
+
 interface ISessionControl
 {
     /**

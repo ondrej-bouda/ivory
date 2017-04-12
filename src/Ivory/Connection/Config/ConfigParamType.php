@@ -1,5 +1,5 @@
 <?php
-namespace Ivory\Connection;
+namespace Ivory\Connection\Config;
 
 use Ivory\Exception\UnsupportedException;
 use Ivory\Value\Quantity;

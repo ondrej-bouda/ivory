@@ -1,5 +1,5 @@
 <?php
-namespace Ivory\Connection;
+namespace Ivory\Connection\Config;
 
 /**
  * Connection config enhanced with client-side caching of known values.

@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Relation;
 
-use Ivory\Connection\ConfigParam;
+use Ivory\Connection\Config\ConfigParam;
 use Ivory\Connection\IConnection;
 use Ivory\Data\Set\CustomSet;
 use Ivory\Exception\UndefinedColumnException;

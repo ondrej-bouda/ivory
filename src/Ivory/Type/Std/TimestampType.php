@@ -1,8 +1,8 @@
 <?php
 namespace Ivory\Type\Std;
 
-use Ivory\Connection\ConfigParam;
-use Ivory\Connection\ConnConfigValueRetriever;
+use Ivory\Connection\Config\ConfigParam;
+use Ivory\Connection\Config\ConnConfigValueRetriever;
 use Ivory\Connection\DateStyle;
 use Ivory\Connection\IConnection;
 use Ivory\Type\ConnectionDependentBaseType;

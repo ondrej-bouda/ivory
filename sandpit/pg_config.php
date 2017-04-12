@@ -6,7 +6,7 @@
 
 namespace Ivory\Sandpit;
 
-use Ivory\Connection\ConfigParam;
+use Ivory\Connection\Config\ConfigParam;
 
 require_once '../src/Ivory/Connection/ConfigParamType.php';
 require_once '../src/Ivory/Connection/ConfigParam.php';

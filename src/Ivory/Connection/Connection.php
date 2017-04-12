@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Connection;
 
+use Ivory\Connection\Config\ConnConfig;
+use Ivory\Connection\Config\IConnConfig;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Relation\ITuple;
 use Ivory\Result\ICommandResult;

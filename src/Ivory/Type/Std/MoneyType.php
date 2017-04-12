@@ -1,8 +1,8 @@
 <?php
 namespace Ivory\Type\Std;
 
-use Ivory\Connection\ConfigParam;
-use Ivory\Connection\ConnConfigValueRetriever;
+use Ivory\Connection\Config\ConfigParam;
+use Ivory\Connection\Config\ConnConfigValueRetriever;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\IncomparableException;
 use Ivory\Type\ConnectionDependentBaseType;
