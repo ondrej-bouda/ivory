@@ -1,13 +1,17 @@
 <?php
 
+use Cache\Adapter\Filesystem\FilesystemCachePool;
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use Ivory\Connection\IConnection;
 use Ivory\Ivory;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
 
 class IvoryPerformanceTest implements IPerformanceTest
 {
     const SYNCHRONOUS = 1;
     const NO_CACHE = 2;
+    const FILE_CACHE = 4;
 
     private $async;
     /** @var IConnection */
@@ -17,7 +21,12 @@ class IvoryPerformanceTest implements IPerformanceTest
     {
         $this->async = !($options & self::SYNCHRONOUS);
 
-        if (!($options & self::NO_CACHE)) {
+        if ($options & self::FILE_CACHE) {
+            $outDir = __DIR__ . '/out';
+            $fsAdapter = new Local($outDir);
+            $fs = new Filesystem($fsAdapter);
+            Ivory::setDefaultCacheImpl(new FilesystemCachePool($fs));
+        } elseif (!($options & self::NO_CACHE)) {
             Ivory::setDefaultCacheImpl(new ArrayCachePool());
         }
     }

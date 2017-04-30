@@ -1,3 +1,4 @@
 .idea
 composer.phar
 /test/phpunit.xml
+/test/perf/scenario/out/cache/

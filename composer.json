@@ -26,7 +26,8 @@
     "dibi/dibi": "*",
     "doctrine/dbal": "*",
     "illuminate/database": "*",
-    "cache/array-adapter": "*"
+    "cache/array-adapter": "*",
+    "cache/filesystem-adapter": "*"
   },
   "suggest": {
     "cache/memcached-adapter": "Some PSR-6 compliant cache pool is essential for Ivory to be fast enough. Use \\Ivory\\Ivory::setDefaultCacheImpl()."

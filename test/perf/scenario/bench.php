@@ -15,7 +15,7 @@ $command->argument()
     ->describe('Implementation to use')
     ->must(function ($impl) {
         return in_array($impl, [
-            'ivory', 'ivory-sync', 'ivory-nocache',
+            'ivory', 'ivory-sync', 'ivory-nocache', 'ivory-filecache',
             'pgsql', 'dibi', 'dibi-lazy', 'doctrine', 'laravel',
         ]);
     })
@@ -27,6 +27,8 @@ $command->argument()
                 return new IvoryPerformanceTest(IvoryPerformanceTest::SYNCHRONOUS);
             case 'ivory-nocache':
                 return new IvoryPerformanceTest(IvoryPerformanceTest::NO_CACHE);
+            case 'ivory-filecache':
+                return new IvoryPerformanceTest(IvoryPerformanceTest::FILE_CACHE);
             case 'pgsql':
                 return new PgSQLPerformanceTest();
             case 'dibi':
