@@ -8,7 +8,7 @@ interface ITypeProvider
      *
      * @param string $schemaName name of the PostgreSQL schema to get the converter for
      * @param string $typeName name of the PostgreSQL type to get the converter for
-     * @return IType|null converter for the requested type, or <tt>null</tt> if no corresponding type is registered
+     * @return INamedType|null converter for the requested type, or <tt>null</tt> if no corresponding type is registered
      */
     function provideType(string $schemaName, string $typeName);
 

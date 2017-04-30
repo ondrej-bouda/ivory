@@ -16,8 +16,8 @@ interface ITypeLoader
      * @param IConnection $connection connection above which the type is to be loaded;
      *                                this might be necessary for some special data types which need the database
      *                                  session parameters, such as <tt>money</tt>
-     * @return IType|null the corresponding type object, or
-     *                    <tt>null</tt> if this type loader does not recognize the given type
+     * @return INamedType|null the corresponding type object, or
+     *                         <tt>null</tt> if this type loader does not recognize the given type
      */
     function loadType(string $schemaName, string $typeName, IConnection $connection);
 }

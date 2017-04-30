@@ -220,9 +220,9 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      * @param string $schemaName
      * @param string $typeName
      * @param ITypeProvider $typeProvider
-     * @return IType
+     * @return INamedType
      */
-    protected function createBaseType(string $schemaName, string $typeName, ITypeProvider $typeProvider): IType
+    protected function createBaseType(string $schemaName, string $typeName, ITypeProvider $typeProvider): INamedType
     {
         $type = $typeProvider->provideType($schemaName, $typeName);
         if ($type !== null) {
@@ -232,23 +232,12 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
         }
     }
 
-    /**
-     * @param string $schemaName
-     * @param string $typeName
-     * @return IType
-     */
-    protected function createCompositeType(string $schemaName, string $typeName): IType
+    protected function createCompositeType(string $schemaName, string $typeName): INamedType
     {
         return new NamedCompositeType($schemaName, $typeName);
     }
 
-    /**
-     * @param string $schemaName
-     * @param string $typeName
-     * @param IType $baseType the domain base type
-     * @return IType
-     */
-    protected function createDomainType(string $schemaName, string $typeName, IType $baseType): IType
+    protected function createDomainType(string $schemaName, string $typeName, IType $baseType): INamedType
     {
         return new DomainType($schemaName, $typeName, $baseType);
     }
@@ -257,35 +246,23 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      * @param string $schemaName
      * @param string $typeName
      * @param string[] $labels list of enumeration labels in the definition order
-     * @return IType
+     * @return INamedType
      */
-    private function createEnumType(string $schemaName, string $typeName, $labels):IType
+    private function createEnumType(string $schemaName, string $typeName, $labels): INamedType
     {
         return new EnumType($schemaName, $typeName, $labels);
     }
 
-    /**
-     * @param string $schemaName
-     * @param string $typeName
-     * @param ITotallyOrderedType $subtype the range subtype
-     * @param IRangeCanonicalFunc $canonicalFunc the range canonical function
-     * @return IType
-     */
     protected function createRangeType(
         string $schemaName,
         string $typeName,
         ITotallyOrderedType $subtype,
         IRangeCanonicalFunc $canonicalFunc = null
-    ): IType {
+    ): INamedType {
         return new RangeType($schemaName, $typeName, $subtype, $canonicalFunc);
     }
 
-    /**
-     * @param INamedType $elemType
-     * @param string $delimiter
-     * @return IType
-     */
-    protected function createArrayType(INamedType $elemType, string $delimiter): IType
+    protected function createArrayType(INamedType $elemType, string $delimiter): INamedType
     {
         return new ArrayType($elemType, $delimiter);
     }

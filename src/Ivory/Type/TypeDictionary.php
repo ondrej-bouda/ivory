@@ -27,23 +27,21 @@ class TypeDictionary implements ICacheableTypeDictionary
     private $searchedNameCache = [];
 
 
-    public function defineType(IType $type, int $oid = null)
+    public function defineType(INamedType $type, int $oid = null)
     {
         if ($oid !== null) {
             $this->oidTypeMap[$oid] = $type;
         }
 
-        if ($type instanceof INamedType) {
-            $schemaName = $type->getSchemaName();
-            $typeName = $type->getName();
+        $schemaName = $type->getSchemaName();
+        $typeName = $type->getName();
 
-            if (!isset($this->qualNameTypeMap[$schemaName])) {
-                $this->qualNameTypeMap[$schemaName] = [];
-            }
-            $this->qualNameTypeMap[$schemaName][$typeName] = $type;
-
-            $this->cacheNamedType($schemaName, $typeName, $type);
+        if (!isset($this->qualNameTypeMap[$schemaName])) {
+            $this->qualNameTypeMap[$schemaName] = [];
         }
+        $this->qualNameTypeMap[$schemaName][$typeName] = $type;
+
+        $this->cacheNamedType($schemaName, $typeName, $type);
     }
 
     private function cacheNamedType(string $schemaName, string $typeName, IType $type)

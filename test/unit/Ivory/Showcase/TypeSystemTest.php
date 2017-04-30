@@ -144,7 +144,7 @@ SQL
         };
 
         // ...and register it. Either at the global level, or just for a specific connection.
-        $this->conn->getTypeRegister()->registerType('pg_catalog', 'time', $customTimeConverter);
+        $this->conn->getTypeRegister()->registerNamedType($customTimeConverter);
         // NOTE: necessary as the cached dictionary refers to type converters defined in time of caching the dictionary
         $this->conn->flushCache(ITypeControl::TYPE_DICTIONARY_CACHE_KEY);
 

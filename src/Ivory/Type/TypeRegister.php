@@ -13,7 +13,7 @@ use Ivory\Connection\IConnection;
  * the type converter.
  *
  * For Ivory to recognize a new base type globally or locally for a given connection, the new type converter, or a whole
- * type loader may be registered at the corresponding type register, using {@link registerType()} or
+ * type loader may be registered at the corresponding type register, using {@link registerNamedType()} or
  * {@link registerTypeLoader()}, respectively.
  *
  * The purpose of the type register is only to collect all the types and type loaders. Once any of the types is
@@ -27,8 +27,8 @@ use Ivory\Connection\IConnection;
  */
 class TypeRegister
 {
-    /** @var IType[][] already known types; map: schema name => map: type name => type converter object */
-    private $types = [];
+    /** @var INamedType[][] already known types; map: schema name => map: type name => type converter object */
+    private $namedTypes = [];
     /** @var ITypeLoader[] list of registered type loaders, in the definition order */
     private $typeLoaders = [];
     /**
@@ -48,67 +48,60 @@ class TypeRegister
     private $typeRecognitionRules = [];
 
     /**
-     * Registers a type converter for a PostgreSQL base data type.
+     * Registers a type converter for a named data type.
      *
-     * If a type converter has already been registered for the given type, it gets dropped in favor of the new one.
+     * If a type converter has already been registered under the same qualified name, it gets dropped in favor of this
+     * new one.
      *
-     * @param string $schemaName name of the PostgreSQL schema the type is defined in
-     * @param string $typeName name of the PostgreSQL type
-     * @param IType $type the type converter to register
+     * @param INamedType $type the type converter to register
      */
-    public function registerType(string $schemaName, string $typeName, IType $type)
+    public function registerNamedType(INamedType $type)
     {
-        if (!isset($this->types[$schemaName])) {
-            $this->types[$schemaName] = [];
+        $schemaName = $type->getSchemaName();
+        $typeName = $type->getName();
+
+        if (!isset($this->namedTypes[$schemaName])) {
+            $this->namedTypes[$schemaName] = [];
         }
-        $this->types[$schemaName][$typeName] = $type;
+        $this->namedTypes[$schemaName][$typeName] = $type;
     }
 
     /**
-     * Unregisters a type converter, previously registered by {@link registerType()}.
+     * Unregisters a type converter, previously registered by {@link registerNamedType()}.
      *
-     * Either the name of the PostgreSQL schema and type name is given, in which case the converter for this concrete
-     * type will get unregistered, or a type converter object is given, then any registrations of this type converter
-     * will be dropped.
+     * The type converter to unregister may either be given itself, or by the schema and type name.
      *
-     * @param string|IType $schemaNameOrTypeConverter
-     *                                  name of the PostgreSQL schema the type to unregister is defined in, or type
-     *                                    converter to unregister
-     * @param string|null $typeName name of the PostgreSQL type to unregister, or <tt>null</tt> if an <tt>IType</tt>
-     *                                object is provided in the first argument
+     * @param string|INamedType $schemaNameOrTypeConverter
+     *                                  name of the PostgreSQL schema the type to unregister is defined in, or the type
+     *                                    converter itself to unregister
+     * @param string|null $typeName name of the type to unregister, or <tt>null</tt> if an <tt>INamedType</tt> object
+     *                                is provided in the first argument
      * @return bool whether the type has actually been unregistered (<tt>false</tt> if it was not registered)
      */
-    public function unregisterType($schemaNameOrTypeConverter, string $typeName = null): bool
+    public function unregisterNamedType($schemaNameOrTypeConverter, string $typeName = null): bool
     {
-        if ($schemaNameOrTypeConverter instanceof IType) {
+        if ($schemaNameOrTypeConverter instanceof INamedType) {
             if ($typeName !== null) {
                 $msg = sprintf(
                     '$typeName is irrelevant when an %s object is given in the first argument',
-                    IType::class
+                    INamedType::class
                 );
                 trigger_error($msg, E_USER_NOTICE);
             }
 
-            $typeConverter = $schemaNameOrTypeConverter;
-            $existed = false;
-            foreach ($this->types as $sn => $types) {
-                foreach ($types as $tn => $tc) {
-                    if ($tc === $typeConverter) {
-                        $existed = true;
-                        unset($this->types[$sn][$tn]);
-                    }
-                }
-                if (!$this->types[$sn]) {
-                    unset($this->types[$sn]);
-                }
-            }
-            return $existed;
+            $schemaName = $schemaNameOrTypeConverter->getSchemaName();
+            $typeName = $schemaNameOrTypeConverter->getName();
         } else {
             $schemaName = $schemaNameOrTypeConverter;
-            $existed = isset($this->types[$schemaName][$typeName]);
-            unset($this->types[$schemaName][$typeName]);
-            return $existed;
+            if ($typeName === null) {
+                trigger_error('$typeName not given', E_USER_WARNING);
+                return false;
+            }
         }
+
+        $existed = isset($this->namedTypes[$schemaName][$typeName]);
+        unset($this->namedTypes[$schemaName][$typeName]);
+        return $existed;
     }
 
     /**
@@ -431,15 +424,16 @@ class TypeRegister
     }
 
     /**
-     * Returns the type converter explicitly registered using {@link TypeRegister::registerType()}.
+     * Returns the type converter explicitly registered using {@link TypeRegister::registerNamedType()}.
      *
      * @param string $schemaName name of the PostgreSQL schema to get the converter for
      * @param string $typeName name of the PostgreSQL type to get the converter for
-     * @return IType|null converter for the requested type, or <tt>null</tt> if no converter was registered for the type
+     * @return INamedType|null converter for the requested type, or <tt>null</tt> if no converter was registered for the
+     *                           type
      */
     public function getType(string $schemaName, string $typeName)
     {
-        return ($this->types[$schemaName][$typeName] ?? null);
+        return ($this->namedTypes[$schemaName][$typeName] ?? null);
     }
 
     /**
@@ -448,7 +442,7 @@ class TypeRegister
      * @param string $schemaName name of the PostgreSQL schema to get the converter for
      * @param string $typeName name of the PostgreSQL type to get the converter for
      * @param IConnection $connection connection above which the type is to be loaded
-     * @return IType|null converter for the requested type, or <tt>null</tt> if no loader recognizes the type
+     * @return INamedType|null converter for the requested type, or <tt>null</tt> if no loader recognizes the type
      */
     public function loadType(string $schemaName, string $typeName, IConnection $connection)
     {
