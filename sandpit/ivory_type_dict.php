@@ -17,12 +17,13 @@ $dict->setUndefinedTypeHandler(null);
 
 $serialized = serialize($dict);
 /** @var ICacheableTypeDictionary $unserialized */
+$mem1 = memory_get_usage();
 $unserialized = unserialize($serialized);
+$mem2 = memory_get_usage();
 
-echo 'TypeDictionary serialized size: ' . strlen($serialized) . PHP_EOL;
-return;
+echo 'TypeDictionary serialized size: ' . strlen($serialized) . ', memory size: ' . ($mem2 - $mem1) . PHP_EOL;
 echo 'Equality test ' . ($unserialized == $dict ? 'passed' : 'failed') . PHP_EOL;
-echo 'Orig reference test ' . ($dict->requireTypeByName('s') === $dict->requireTypeByName('text', 'pg_catalog')) . PHP_EOL;
-echo 'Reference test ' . ($unserialized->requireTypeByName('s') === $unserialized->requireTypeByName('text', 'pg_catalog')) . PHP_EOL;
-
-echo 'SPL same object test: ' . (spl_object_hash($unserialized->requireTypeByName('s')) === spl_object_hash($unserialized->requireTypeByName('text', 'pg_catalog'))) . PHP_EOL;
+echo 'Orig reference test ' . ($dict->requireTypeByName('s') === $dict->requireTypeByName('text', 'pg_catalog') ? 'passed' : 'failed') . PHP_EOL;
+echo 'Reference test ' . ($unserialized->requireTypeByName('s') === $unserialized->requireTypeByName('text', 'pg_catalog') ? 'passed' : 'failed') . PHP_EOL;
+echo 'SPL same object test: ' . (spl_object_hash($unserialized->requireTypeByName('s')) === spl_object_hash($unserialized->requireTypeByName('text', 'pg_catalog')) ? 'passed' : 'failed') . PHP_EOL;
+echo 'SPL same object test: ' . (spl_object_hash($dict->requireTypeByName('s')) !== spl_object_hash($unserialized->requireTypeByName('text', 'pg_catalog')) ? 'passed' : 'failed') . PHP_EOL;
