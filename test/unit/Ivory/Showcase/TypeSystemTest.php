@@ -3,7 +3,7 @@ namespace Ivory\Showcase;
 
 use Ivory\Connection\IConnection;
 use Ivory\Connection\ITypeControl;
-use Ivory\Type\INamedType;
+use Ivory\Type\IType;
 use Ivory\Value\Composite;
 use Ivory\Value\Json;
 use Ivory\Value\Polygon;
@@ -96,13 +96,13 @@ SQL
     }
 
     /**
-     * Type converters for custom user-defined types may easily be plugged into Ivory. Also, any type converter shipped
-     * with Ivory may be overridden with a custom one.
+     * Type objects for custom user-defined types may easily be plugged into Ivory. Also, any type object shipped with
+     * Ivory may be overridden with a custom one.
      */
-    public function testCustomTypeConverter()
+    public function testCustomType()
     {
-        // Just implement the INamedType (and ITotallyOrderedType, for the type to be usable in ranges)...
-        $customTimeConverter = new class implements INamedType {
+        // Just implement the IType (or ITotallyOrderedType, for the type to be usable in ranges)...
+        $customTimeType = new class implements IType {
             public function getSchemaName(): string
             {
                 return 'pg_catalog';
@@ -144,8 +144,8 @@ SQL
         };
 
         // ...and register it. Either at the global level, or just for a specific connection.
-        $this->conn->getTypeRegister()->registerNamedType($customTimeConverter);
-        // NOTE: necessary as the cached dictionary refers to type converters defined in time of caching the dictionary
+        $this->conn->getTypeRegister()->registerType($customTimeType);
+        // NOTE: necessary as the cached dictionary refers to type objects defined in time of caching the dictionary
         $this->conn->flushCache(ITypeControl::TYPE_DICTIONARY_CACHE_KEY);
 
         $val = $this->conn->querySingleValue("SELECT TIME '16:42'");

@@ -3,11 +3,12 @@ namespace Ivory\Type\Ivory;
 
 use Ivory\Connection\IConnection;
 use Ivory\Type\IConnectionDependentObject;
+use Ivory\Type\IValueSerializer;
 
 /**
- * Pattern type converter base the operation of which depends on the database connection.
+ * A value serializer the operation of which depends on the database connection.
  */
-abstract class VolatilePatternTypeBase extends PatternTypeBase implements IConnectionDependentObject
+abstract class ConnectionDependentValueSerializer implements IValueSerializer, IConnectionDependentObject
 {
     private $conn;
 

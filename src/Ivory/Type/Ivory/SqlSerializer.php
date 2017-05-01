@@ -1,14 +1,16 @@
 <?php
 namespace Ivory\Type\Ivory;
 
+use Ivory\Type\IValueSerializer;
+
 /**
- * Internal Ivory converter passing the given value unencoded to output as the SQL value.
+ * Internal Ivory serializer passing the given value un-encoded to output as the SQL value.
  *
  * Used in SQL patterns to handle `%sql` placeholders.
  *
  * Note that an {@link \InvalidArgumentException} is thrown when serializing `null` as that clearly signifies an error.
  */
-class SqlType extends PatternTypeBase
+class SqlSerializer implements IValueSerializer
 {
     public function serializeValue($val): string
     {

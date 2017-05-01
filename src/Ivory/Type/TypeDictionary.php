@@ -11,10 +11,12 @@ class TypeDictionary implements ICacheableTypeDictionary
 {
     /** @var IType[] */
     private $oidTypeMap = [];
-    /** @var INamedType[][] map: schema name => map: type name => type converter */
+    /** @var IType[][] map: schema name => map: type name => type object */
     private $qualNameTypeMap = [];
-    /** @var INamedType[] map: type name => type converter (might be a reference to $this->qualNameTypeMap) */
-    private $nameTypeMap = [];
+    /** @var IType[] map: type alias => type (might be a reference to $this->qualNameTypeMap) */
+    private $typeAliases = [];
+    /** @var IValueSerializer[] map: serializer name => value serializer */
+    private $valueSerializers = [];
     /** @var string[][][] list: map: PHP data type name => pair (schema name, type name) */
     private $typeRecognitionRuleSets = [];
     /** @var string[] names of schemas to search for a type only given by name without schema */
@@ -22,12 +24,12 @@ class TypeDictionary implements ICacheableTypeDictionary
     /** @var ITypeDictionaryUndefinedHandler|null */
     private $undefinedTypeHandler = null;
 
-    /** @var INamedType[] cache of unqualified type names, preferred according to the current type search path;
-     *                    map: plain type name => type converter (might be a reference to $this->qualNameTypeMap) */
+    /** @var IType[] cache of unqualified type names, preferred according to the current type search path;
+     *               map: plain type name => type object (might be a reference to $this->qualNameTypeMap) */
     private $searchedNameCache = [];
 
 
-    public function defineType(INamedType $type, int $oid = null)
+    public function defineType(IType $type, int $oid = null)
     {
         if ($oid !== null) {
             $this->oidTypeMap[$oid] = $type;
@@ -41,11 +43,14 @@ class TypeDictionary implements ICacheableTypeDictionary
         }
         $this->qualNameTypeMap[$schemaName][$typeName] = $type;
 
-        $this->cacheNamedType($schemaName, $typeName, $type);
+        $this->cacheType($type);
     }
 
-    private function cacheNamedType(string $schemaName, string $typeName, IType $type)
+    private function cacheType(IType $type)
     {
+        $schemaName = $type->getSchemaName();
+        $typeName = $type->getName();
+
         $searchPathPos = array_search($schemaName, $this->typeSearchPath);
         if ($searchPathPos !== false) {
             if (!isset($this->searchedNameCache[$typeName])) {
@@ -63,14 +68,14 @@ class TypeDictionary implements ICacheableTypeDictionary
         }
     }
 
-    public function defineCustomType(string $name, IType $type)
+    public function defineValueSerializer(string $name, IValueSerializer $valueSerializer)
     {
-        $this->nameTypeMap[$name] = $type;
+        $this->valueSerializers[$name] = $valueSerializer;
     }
 
     public function defineTypeAlias(string $alias, string $schemaName, string $typeName)
     {
-        $this->nameTypeMap[$alias] =& $this->qualNameTypeMap[$schemaName][$typeName];
+        $this->typeAliases[$alias] =& $this->qualNameTypeMap[$schemaName][$typeName];
     }
 
     /**
@@ -106,7 +111,7 @@ class TypeDictionary implements ICacheableTypeDictionary
     {
         $this->searchedNameCache = [];
         foreach ($this->typeSearchPath as $schemaName) {
-            foreach (($this->qualNameTypeMap[$schemaName] ?? []) as $typeName => $converter) {
+            foreach (($this->qualNameTypeMap[$schemaName] ?? []) as $typeName => $type) {
                 if (!isset($this->searchedNameCache[$typeName])) {
                     $this->searchedNameCache[$typeName] =& $this->qualNameTypeMap[$schemaName][$typeName];
                 }
@@ -149,8 +154,8 @@ class TypeDictionary implements ICacheableTypeDictionary
     public function requireTypeByName(string $typeName, $schemaName = null): IType
     {
         if ($schemaName === null) {
-            if (isset($this->nameTypeMap[$typeName])) {
-                return $this->nameTypeMap[$typeName];
+            if (isset($this->typeAliases[$typeName])) {
+                return $this->typeAliases[$typeName];
             }
             if (isset($this->searchedNameCache[$typeName])) {
                 return $this->searchedNameCache[$typeName];
@@ -192,6 +197,11 @@ class TypeDictionary implements ICacheableTypeDictionary
 
         $typeName = (is_object($value) ? get_class($value) : gettype($value));
         throw new UndefinedTypeException("There is no type defined for converting value of type \"$typeName\"");
+    }
+
+    public function getValueSerializer(string $name)
+    {
+        return ($this->valueSerializers[$name] ?? null);
     }
 
     private function recognizeType($value, $ruleSet)
@@ -273,7 +283,7 @@ class TypeDictionary implements ICacheableTypeDictionary
 
     public function detachFromConnection()
     {
-        $connDepTypes = $this->collectTypes(IConnectionDependentObject::class);
+        $connDepTypes = $this->collectObjects(IConnectionDependentObject::class);
         foreach ($connDepTypes as $type) {
             /** @var IConnectionDependentObject $type */
             $type->detachFromConnection();
@@ -282,14 +292,14 @@ class TypeDictionary implements ICacheableTypeDictionary
 
     public function attachToConnection(IConnection $connection)
     {
-        $connDepTypes = $this->collectTypes(IConnectionDependentObject::class);
+        $connDepTypes = $this->collectObjects(IConnectionDependentObject::class);
         foreach ($connDepTypes as $type) {
             /** @var IConnectionDependentObject $type */
             $type->attachToConnection($connection);
         }
     }
 
-    private function collectTypes(string $className): \SplObjectStorage
+    private function collectObjects(string $className): \SplObjectStorage
     {
         $result = new \SplObjectStorage();
         foreach ($this->oidTypeMap as $type) {
@@ -304,9 +314,14 @@ class TypeDictionary implements ICacheableTypeDictionary
                 }
             }
         }
-        foreach ($this->nameTypeMap as $type) {
+        foreach ($this->typeAliases as $type) {
             if ($type instanceof $className) {
                 $result->attach($type);
+            }
+        }
+        foreach ($this->valueSerializers as $serializer) {
+            if ($serializer instanceof $className) {
+                $result->attach($serializer);
             }
         }
 

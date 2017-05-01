@@ -1,24 +1,24 @@
 <?php
 namespace Ivory\Type\Ivory;
 
+use Ivory\INamedDbObject;
 use Ivory\Query\IRelationRecipe;
 use Ivory\Relation\IRelation;
 use Ivory\Relation\ITuple;
-use Ivory\Type\INamedType;
-use Ivory\Type\IType;
+use Ivory\Type\IValueSerializer;
 use Ivory\Utils\StringUtils;
 
 /**
- * Internal Ivory converter serializing relation and relation recipes into SQL value.
+ * Internal Ivory value serializer for serializing relation and relation recipes into SQL statements.
  *
  * Used in SQL patterns to handle `%rel` placeholders. These will typically be used in subselects or in
  * {@link https://www.postgresql.org/docs/current/static/queries-with.html `WITH` queries (common table expressions)}.
  *
  * Note that an {@link \InvalidArgumentException} is thrown when serializing `null` as that clearly signifies an error.
  */
-class RelationType extends VolatilePatternTypeBase
+class RelationSerializer extends ConnectionDependentValueSerializer
 {
-    private $identifierType = null;
+    private $identifierSerializer = null;
 
     public function serializeValue($val): string
     {
@@ -48,7 +48,7 @@ class RelationType extends VolatilePatternTypeBase
 
     /**
      * @param IRelation $relation
-     * @return array list: pair (column name, type converter)
+     * @return array list: pair (column name, type object)
      */
     private function recognizeRelationColumns(IRelation $relation): array
     {
@@ -90,14 +90,14 @@ class RelationType extends VolatilePatternTypeBase
      */
     private function serializeEmptyRelation(array $columns): string
     {
-        $identType = $this->getIdentifierType();
+        $identSerializer = $this->getIdentifierSerializer();
         $result = 'SELECT';
         foreach ($columns as $i => list($colName, $type)) {
             $result .= ($i == 0 ? ' ' : ', ') . 'NULL';
-            if ($type instanceof INamedType) {
+            if ($type instanceof INamedDbObject) {
                 $result .= "::{$type->getSchemaName()}.{$type->getName()}";
             }
-            $result .= ' AS ' . $identType->serializeValue($colName);
+            $result .= ' AS ' . $identSerializer->serializeValue($colName);
         }
         $result .= ' WHERE FALSE';
         return $result;
@@ -122,11 +122,11 @@ VAL;
                 if ($colIdx > 0) {
                     $result .= ', ';
                 }
-                /** @var IType $type */
-                $type = $columns[$colIdx][1];
-                $result .= $type->serializeValue($val);
-                if ($isFirstTuple && $type instanceof INamedType) {
-                    $result .= "::{$type->getSchemaName()}.{$type->getName()}";
+                /** @var IValueSerializer $serializer */
+                $serializer = $columns[$colIdx][1];
+                $result .= $serializer->serializeValue($val);
+                if ($isFirstTuple && $serializer instanceof INamedDbObject) {
+                    $result .= "::{$serializer->getSchemaName()}.{$serializer->getName()}";
                 }
                 $colIdx++;
             }
@@ -137,23 +137,23 @@ VAL;
 
 ) t (
 SQL;
-        $identType = $this->getIdentifierType();
-        foreach ($columns as $i => list($name, $type)) {
+        $identSerializer = $this->getIdentifierSerializer();
+        foreach ($columns as $i => list($name, $serializer)) {
             if ($i > 0) {
                 $result .= ', ';
             }
-            $result .= $identType->serializeValue($name);
+            $result .= $identSerializer->serializeValue($name);
         }
         $result .= ')';
 
         return $result;
     }
 
-    private function getIdentifierType(): IdentifierType
+    private function getIdentifierSerializer(): IdentifierSerializer
     {
-        if ($this->identifierType === null) {
-            $this->identifierType = new IdentifierType();
+        if ($this->identifierSerializer === null) {
+            $this->identifierSerializer = new IdentifierSerializer();
         }
-        return $this->identifierType;
+        return $this->identifierSerializer;
     }
 }

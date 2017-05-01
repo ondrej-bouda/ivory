@@ -4,11 +4,11 @@ namespace Ivory\Type\Postgresql;
 use Ivory\Exception\InternalException;
 use Ivory\Exception\ParseException;
 use Ivory\Exception\UnsupportedException;
-use Ivory\Type\INamedType;
+use Ivory\Type\IType;
 use Ivory\Type\ITotallyOrderedType;
 
 /**
- * Converter for arrays.
+ * Array type object.
  *
  * Note that arrays in PHP and PostgreSQL are completely different beasts. In PHP, "arrays" are in fact sorted hash maps
  * with string or integer keys, or a mixture of both, having no restrictions on the elements. In PostgreSQL, arrays are
@@ -18,33 +18,33 @@ use Ivory\Type\ITotallyOrderedType;
  * Moreover, PHP arrays are zero-based by default, whereas PostgreSQL defaults to one-based arrays; in both, the bounds
  * may be explicitly specified, however.
  *
- * The array converter has two modes: *strict* and *plain*. Simply said, the strict mode converts the arrays including
+ * The array type object has two modes: *strict* and *plain*. Simply said, the strict mode converts the arrays including
  * the element indexes, whereas the plain mode ignores array indexes completely. *Strict mode is the default.*
  *
  * **Restrictions on values to be converted:**
- * - an array converter always supports just one type of array elements - the one for which the converter was created;
+ * - an array type object always supports just one type of array elements - the one for which the object was created;
  * - when serializing a PHP array to PostgreSQL, the array is refused if it is invalid for PostgreSQL (i.e., if the
  *   elements are of different types or dimensions, or - in the strict mode - if the array uses string keys or has gaps
  *   within the keys).
  *
  * **Behaviour according to the mode:**
- * * In the strict mode, the converter does not rebase the elements - the arrays are converted as is, including the
+ * * In the strict mode, the type object does not rebase the elements - the arrays are converted as is, including the
  *   bounds. However, when serializing a PHP array to PostgreSQL, the array gets sorted by its keys, i.e., the original
  *   order gets lost.
- * * In the plain mode, the converter merely iterates through the array and puts each item in the result, ignoring the
+ * * In the plain mode, the type object merely iterates through the array and puts each item in the result, ignoring the
  *   array keys completely. The elements are not sorted by their keys. When converting arrays from PostgreSQL to PHP,
- *   zero-based arrays are created. Conversely, when arrays from PHP are converted to one-based PostgreSQL arrays.
+ *   zero-based arrays are created. Conversely, arrays from PHP are converted to one-based PostgreSQL arrays.
  *
  * @see http://www.postgresql.org/docs/9.4/static/arrays.html
  */
-class ArrayType implements ITotallyOrderedType, INamedType
+class ArrayType implements ITotallyOrderedType
 {
     private $elemType;
     private $delim;
     private $elemNeedsQuotesRegex;
     private $ignoreIndexes = false;
 
-    public function __construct(INamedType $elemType, string $delimiter)
+    public function __construct(IType $elemType, string $delimiter)
     {
         $this->elemType = $elemType;
         $this->delim = $delimiter;

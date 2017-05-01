@@ -13,21 +13,21 @@ use Ivory\Connection\IConnection;
 interface IConnectionDependentObject
 {
     /**
-     * Attach the type converter to the connection it is supposed to work for.
+     * Attach the object to connection it is supposed to work for.
      *
-     * This method must be called prior to any usage of the this type converter.
+     * This method must be called prior to any usage of the this object.
      *
      * @param IConnection $connection
      */
     function attachToConnection(IConnection $connection);
 
     /**
-     * Detach the type converter from the connection.
+     * Detach the object from the connection.
      *
-     * After executing this method, the type converter must be safe to be serialized or exported. Especially, no links
+     * After executing this method, the object must be completely independent from the connection. Especially, no links
      * to objects retrieved from the attached connection may be kept.
      *
-     * Prior to further usage of this type converter, {@link attachToConnection()} must be called again.
+     * Prior to further usage of this object, {@link attachToConnection()} must be called again.
      */
     function detachFromConnection();
 }

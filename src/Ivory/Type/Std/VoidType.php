@@ -8,8 +8,8 @@ use Ivory\Type\ITotallyOrderedType;
 /**
  * Representation of the PostgreSQL void type, i.e., nothing.
  *
- * There are just two possible values accepted or returned by this converter: `null` and {@link VoidType::void()}, which
- * is an empty singleton object.
+ * There are just two possible values accepted or returned by this type object: `null` and {@link VoidType::void()},
+ * which is an empty singleton object.
  */
 class VoidType extends BaseType implements ITotallyOrderedType
 {

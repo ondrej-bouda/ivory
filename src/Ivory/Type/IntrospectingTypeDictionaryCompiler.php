@@ -97,7 +97,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                 switch ($row['typtype']) {
                     case 'A':
                         $elemType = $dict->requireTypeByOid($row['parenttype']);
-                        assert($elemType instanceof INamedType,
+                        assert($elemType instanceof IType,
                             new InternalException('Only named types are supposed to be used as array element types.')
                         );
                         $type = $this->createArrayType($elemType, $row['arrelemtypdelim']);
@@ -116,6 +116,9 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
 
                     case 'd':
                         $baseType = $dict->requireTypeByOid($row['parenttype']);
+                        assert($baseType instanceof IType,
+                            new InternalException('Only named types are supposed to be used as domain base types.')
+                        );
                         $type = $this->createDomainType($schemaName, $typeName, $baseType);
                         break;
 
@@ -220,9 +223,9 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      * @param string $schemaName
      * @param string $typeName
      * @param ITypeProvider $typeProvider
-     * @return INamedType
+     * @return IType
      */
-    protected function createBaseType(string $schemaName, string $typeName, ITypeProvider $typeProvider): INamedType
+    protected function createBaseType(string $schemaName, string $typeName, ITypeProvider $typeProvider): IType
     {
         $type = $typeProvider->provideType($schemaName, $typeName);
         if ($type !== null) {
@@ -232,12 +235,12 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
         }
     }
 
-    protected function createCompositeType(string $schemaName, string $typeName): INamedType
+    protected function createCompositeType(string $schemaName, string $typeName): IType
     {
         return new NamedCompositeType($schemaName, $typeName);
     }
 
-    protected function createDomainType(string $schemaName, string $typeName, IType $baseType): INamedType
+    protected function createDomainType(string $schemaName, string $typeName, IType $baseType): IType
     {
         return new DomainType($schemaName, $typeName, $baseType);
     }
@@ -246,9 +249,9 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
      * @param string $schemaName
      * @param string $typeName
      * @param string[] $labels list of enumeration labels in the definition order
-     * @return INamedType
+     * @return IType
      */
-    private function createEnumType(string $schemaName, string $typeName, $labels): INamedType
+    private function createEnumType(string $schemaName, string $typeName, $labels): IType
     {
         return new EnumType($schemaName, $typeName, $labels);
     }
@@ -258,11 +261,11 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
         string $typeName,
         ITotallyOrderedType $subtype,
         IRangeCanonicalFunc $canonicalFunc = null
-    ): INamedType {
+    ): IType {
         return new RangeType($schemaName, $typeName, $subtype, $canonicalFunc);
     }
 
-    protected function createArrayType(INamedType $elemType, string $delimiter): INamedType
+    protected function createArrayType(IType $elemType, string $delimiter): IType
     {
         return new ArrayType($elemType, $delimiter);
     }

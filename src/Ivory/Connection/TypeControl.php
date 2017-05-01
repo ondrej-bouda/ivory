@@ -167,8 +167,8 @@ class TypeControl implements ITypeControl, ITypeProvider
         $localReg = $this->getTypeRegister();
         foreach ([$globalReg, $localReg] as $reg) {
             /** @var TypeRegister $reg */
-            foreach ($reg->getSqlPatternTypes() as $name => $type) {
-                $dict->defineCustomType($name, $type);
+            foreach ($reg->getValueSerializers() as $name => $type) {
+                $dict->defineValueSerializer($name, $type);
             }
             foreach ($reg->getTypeAbbreviations() as $abbr => list($schemaName, $typeName)) {
                 $dict->defineTypeAlias($abbr, $schemaName, $typeName);

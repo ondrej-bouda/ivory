@@ -11,11 +11,11 @@ use Ivory\Lang;
 use Ivory\Lang\SqlPattern\CachingSqlPatternParser;
 use Ivory\Lang\SqlPattern\ISqlPatternParser;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
-use Ivory\Type\Ivory\CommandType;
-use Ivory\Type\Ivory\IdentifierType;
-use Ivory\Type\Ivory\QuotedIdentifierType;
-use Ivory\Type\Ivory\RelationType;
-use Ivory\Type\Ivory\SqlType;
+use Ivory\Type\Ivory\CommandSerializer;
+use Ivory\Type\Ivory\IdentifierSerializer;
+use Ivory\Type\Ivory\QuotedIdentifierSerializer;
+use Ivory\Type\Ivory\RelationSerializer;
+use Ivory\Type\Ivory\SqlSerializer;
 use Ivory\Type\Std\StdRangeCanonicalFuncProvider;
 use Ivory\Type\Std\StdTypeLoader;
 use Ivory\Type\TypeRegister;
@@ -40,10 +40,10 @@ class StdCoreFactory implements ICoreFactory
             $reg->registerTypeAbbreviation($alias, $implSchema, $implName);
         }
 
-        // standard non-volatile type converters for SQL patterns; volatile ones will be defined on the connection
-        $reg->registerSqlPatternType('sql', new SqlType());
-        $reg->registerSqlPatternType('ident', new IdentifierType());
-        $reg->registerSqlPatternType('qident', new QuotedIdentifierType());
+        // standard non-volatile value serializers; volatile ones will be defined on the connection
+        $reg->registerValueSerializer('sql', new SqlSerializer());
+        $reg->registerValueSerializer('ident', new IdentifierSerializer());
+        $reg->registerValueSerializer('qident', new QuotedIdentifierSerializer());
 
         // standard type abbreviations
         $reg->registerTypeAbbreviation('s', 'pg_catalog', 'text');
@@ -112,10 +112,9 @@ class StdCoreFactory implements ICoreFactory
     {
         $conn = new Connection($connName, $params);
 
-        // register volatile type converters for SQL patterns
         $reg = $conn->getTypeRegister();
-        $reg->registerSqlPatternType('rel', new RelationType($conn));
-        $reg->registerSqlPatternType('cmd', new CommandType($conn));
+        $reg->registerValueSerializer('rel', new RelationSerializer($conn));
+        $reg->registerValueSerializer('cmd', new CommandSerializer($conn));
 
         return $conn;
     }

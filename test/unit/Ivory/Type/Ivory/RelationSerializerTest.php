@@ -8,19 +8,19 @@ use Ivory\Result\IQueryResult;
 use Ivory\Type\Std\IntegerType;
 use Ivory\Type\Std\StringType;
 
-class RelationTypeTest extends IvoryTestCase
+class RelationSerializerTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;
-    /** @var RelationType */
-    private $relationType;
+    /** @var RelationSerializer */
+    private $relationSerializer;
 
     protected function setUp()
     {
         parent::setUp();
 
         $this->conn = $this->getIvoryConnection();
-        $this->relationType = new RelationType($this->conn);
+        $this->relationSerializer = new RelationSerializer($this->conn);
     }
 
     public function testSerializeRelationRecipe()
@@ -30,7 +30,7 @@ class RelationTypeTest extends IvoryTestCase
         );
         $this->assertSame(
             "VALUES (1, 'a'), (3, 'b'), (2, 'c')",
-            $this->relationType->serializeValue($recipe)
+            $this->relationSerializer->serializeValue($recipe)
         );
     }
 
@@ -43,7 +43,7 @@ class RelationTypeTest extends IvoryTestCase
     private function queryUsingSerializedRelation(string $sqlQuery): IQueryResult
     {
         $inputRel = $this->conn->query($sqlQuery);
-        $serialized = $this->relationType->serializeValue($inputRel);
+        $serialized = $this->relationSerializer->serializeValue($inputRel);
         $checkRel = $this->conn->query("SELECT * FROM ($serialized) rel");
         return $checkRel;
     }
@@ -100,6 +100,6 @@ SQL
     public function testSerializeNull()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->relationType->serializeValue(null);
+        $this->relationSerializer->serializeValue(null);
     }
 }

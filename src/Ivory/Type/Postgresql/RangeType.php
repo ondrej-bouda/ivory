@@ -3,17 +3,16 @@ namespace Ivory\Type\Postgresql;
 
 use Ivory\Exception\IncomparableException;
 use Ivory\NamedDbObject;
-use Ivory\Type\INamedType;
 use Ivory\Type\IRangeCanonicalFunc;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Range;
 
 /**
- * Converter for ranges.
+ * Type object for ranges.
  *
  * @see http://www.postgresql.org/docs/9.4/static/rangetypes.html
  */
-class RangeType implements INamedType, ITotallyOrderedType
+class RangeType implements ITotallyOrderedType
 {
     use NamedDbObject;
 

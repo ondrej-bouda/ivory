@@ -3,9 +3,8 @@ namespace Ivory\Type\Postgresql;
 
 use Ivory\Exception\IncomparableException;
 use Ivory\Exception\UnsupportedException;
-use Ivory\Type\INamedType;
-use Ivory\Type\ITotallyOrderedType;
 use Ivory\Type\IType;
+use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Composite;
 
 /**
@@ -13,7 +12,7 @@ use Ivory\Value\Composite;
  *
  * It is optional for a `CompositeType` to have its attributes defined. It is has, it is called "typed", otherwise, we
  * consider it as "untyped".
- * - Typed composite types use the type converters for parsing and serializing the corresponding tuple values.
+ * - Typed composite types use the type objects for parsing and serializing the corresponding tuple values.
  * - Untyped composite types parse and serialize every tuple value to a string (or `null` if the value is `NULL`). Note
  *   that PostgreSQL does not differentiate between `ROW()` and `ROW(NULL)` in their external text representation.
  *   As an untyped composite type cannot tell the original expression, it prefers `ROW()`.
@@ -21,7 +20,7 @@ use Ivory\Value\Composite;
  * @todo throw ParseException on parse errors
  * @see http://www.postgresql.org/docs/9.4/static/rowtypes.html
  */
-abstract class CompositeType implements INamedType, ITotallyOrderedType
+abstract class CompositeType implements ITotallyOrderedType
 {
     /** @var IType[] ordered map: attribute name => attribute type */
     private $attributes = [];
@@ -211,7 +210,7 @@ abstract class CompositeType implements INamedType, ITotallyOrderedType
             foreach ($t->attributes as $att => $type) {
                 if ($type instanceof ITotallyOrderedType) {
                     $xComp = $type->compareValues($a[$att], $b[$att]);
-                    if ($xComp) {
+                    if ($xComp != 0) {
                         return $xComp;
                     }
                 } else {
@@ -228,7 +227,7 @@ abstract class CompositeType implements INamedType, ITotallyOrderedType
             foreach ($al as $i => $av) {
                 $bv = $bl[$i];
                 $xComp = strcmp((string)$av, (string)$bv);
-                if ($xComp) {
+                if ($xComp != 0) {
                     return $xComp;
                 }
             }

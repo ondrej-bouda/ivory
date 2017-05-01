@@ -290,11 +290,17 @@ trait SqlPatternRecipeMacros
                     $schemaName = false;
                 }
 
-                $converter = $typeDictionary->requireTypeByName($typeName, $schemaName);
+                $serializer = null;
+                if ($schemaName === null) {
+                    $serializer = $typeDictionary->getValueSerializer($typeName);
+                }
+                if ($serializer === null) {
+                    $serializer = $typeDictionary->requireTypeByName($typeName, $schemaName);
+                }
             } else {
-                $converter = $typeDictionary->requireTypeByValue($value);
+                $serializer = $typeDictionary->requireTypeByValue($value);
             }
-            $serializedValue = $converter->serializeValue($value);
+            $serializedValue = $serializer->serializeValue($value);
 
             $gen->send($serializedValue);
         }

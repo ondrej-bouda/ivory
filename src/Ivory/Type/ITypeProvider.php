@@ -4,11 +4,11 @@ namespace Ivory\Type;
 interface ITypeProvider
 {
     /**
-     * Retrieves the type converter for the specified PostgreSQL type, using the local and the global type register.
+     * Retrieves the type object for the specified PostgreSQL type, using the local and the global type register.
      *
-     * @param string $schemaName name of the PostgreSQL schema to get the converter for
-     * @param string $typeName name of the PostgreSQL type to get the converter for
-     * @return INamedType|null converter for the requested type, or <tt>null</tt> if no corresponding type is registered
+     * @param string $schemaName name of the PostgreSQL schema to get the type object for
+     * @param string $typeName name of the PostgreSQL type to get the type object for
+     * @return IType|null the requested type object, or <tt>null</tt> if no corresponding type object is registered
      */
     function provideType(string $schemaName, string $typeName);
 

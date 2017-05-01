@@ -9,15 +9,15 @@ use Ivory\Connection\IConnection;
 interface ITypeLoader
 {
     /**
-     * Loads a type converter object for the specified type.
+     * Loads a type object for the specified type.
      *
      * @param string $schemaName name of schema the type is defined in
      * @param string $typeName name of the type; e.g., <tt>"VARCHAR"</tt>
      * @param IConnection $connection connection above which the type is to be loaded;
      *                                this might be necessary for some special data types which need the database
      *                                  session parameters, such as <tt>money</tt>
-     * @return INamedType|null the corresponding type object, or
-     *                         <tt>null</tt> if this type loader does not recognize the given type
+     * @return IType|null the corresponding type object, or
+     *                         <tt>null</tt> if this type loader does not recognize the requested type
      */
     function loadType(string $schemaName, string $typeName, IConnection $connection);
 }

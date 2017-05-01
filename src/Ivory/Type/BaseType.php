@@ -4,7 +4,7 @@ namespace Ivory\Type;
 use Ivory\Connection\IConnection;
 use Ivory\NamedDbObject;
 
-abstract class BaseType implements INamedType
+abstract class BaseType implements IType
 {
     use NamedDbObject;
 
