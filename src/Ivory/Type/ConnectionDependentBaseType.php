@@ -3,7 +3,7 @@ namespace Ivory\Type;
 
 use Ivory\Connection\IConnection;
 
-abstract class ConnectionDependentBaseType extends BaseType implements IConnectionDependentType
+abstract class ConnectionDependentBaseType extends BaseType implements IConnectionDependentObject
 {
     /**
      * @param string $schemaName name of database schema of data type instead of which this object is to be created

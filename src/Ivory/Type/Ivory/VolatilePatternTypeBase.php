@@ -2,12 +2,12 @@
 namespace Ivory\Type\Ivory;
 
 use Ivory\Connection\IConnection;
-use Ivory\Type\IConnectionDependentType;
+use Ivory\Type\IConnectionDependentObject;
 
 /**
  * Pattern type converter base the operation of which depends on the database connection.
  */
-abstract class VolatilePatternTypeBase extends PatternTypeBase implements IConnectionDependentType
+abstract class VolatilePatternTypeBase extends PatternTypeBase implements IConnectionDependentObject
 {
     private $conn;
 

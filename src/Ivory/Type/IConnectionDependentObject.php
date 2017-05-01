@@ -4,13 +4,13 @@ namespace Ivory\Type;
 use Ivory\Connection\IConnection;
 
 /**
- * {@inheritdoc}
+ * An object which depends on a concrete connection in some way.
  *
- * Users of any type converter implementing `IConnectionDependentType` are obliged to:
+ * Users of any object implementing `IConnectionDependentObject` are obliged to:
  * - call the {@link attachToConnection()} prior to any usage, and call it in case of further changes of the connection;
- * - call the {@link detachFromConnection()} prior to serializing or exporting the implementing type converter.
+ * - call the {@link detachFromConnection()} prior to serializing or exporting the implementing object.
  */
-interface IConnectionDependentType extends IType
+interface IConnectionDependentObject
 {
     /**
      * Attach the type converter to the connection it is supposed to work for.

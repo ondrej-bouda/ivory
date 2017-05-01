@@ -273,18 +273,18 @@ class TypeDictionary implements ICacheableTypeDictionary
 
     public function detachFromConnection()
     {
-        $connDepTypes = $this->collectTypes(IConnectionDependentType::class);
+        $connDepTypes = $this->collectTypes(IConnectionDependentObject::class);
         foreach ($connDepTypes as $type) {
-            /** @var IConnectionDependentType $type */
+            /** @var IConnectionDependentObject $type */
             $type->detachFromConnection();
         }
     }
 
     public function attachToConnection(IConnection $connection)
     {
-        $connDepTypes = $this->collectTypes(IConnectionDependentType::class);
+        $connDepTypes = $this->collectTypes(IConnectionDependentObject::class);
         foreach ($connDepTypes as $type) {
-            /** @var IConnectionDependentType $type */
+            /** @var IConnectionDependentObject $type */
             $type->attachToConnection($connection);
         }
     }
