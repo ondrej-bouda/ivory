@@ -13,7 +13,7 @@ use Ivory\Type\TypeRegister;
  */
 interface ICoreFactory
 {
-    function createTypeRegister(): TypeRegister;
+    function createGlobalTypeRegister(): TypeRegister;
 
     function createConnection(string $connName, ConnectionParameters $params): IConnection;
 

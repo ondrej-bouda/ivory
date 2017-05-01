@@ -29,7 +29,7 @@ use Ivory\Type\TypeRegister;
  */
 class StdCoreFactory implements ICoreFactory
 {
-    public function createTypeRegister(): TypeRegister
+    public function createGlobalTypeRegister(): TypeRegister
     {
         $reg = new TypeRegister();
         $reg->registerTypeLoader(new StdTypeLoader());

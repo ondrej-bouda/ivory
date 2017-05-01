@@ -64,7 +64,7 @@ final class Ivory
     public static function getTypeRegister(): TypeRegister
     {
         if (self::$typeRegister === null) {
-            self::$typeRegister = self::getCoreFactory()->createTypeRegister();
+            self::$typeRegister = self::getCoreFactory()->createGlobalTypeRegister();
         }
         return self::$typeRegister;
     }
