@@ -5,6 +5,7 @@ use Ivory\Connection\IConnection;
 use Ivory\IvoryTestCase;
 use Ivory\Query\SqlRelationRecipe;
 use Ivory\Result\IQueryResult;
+use Ivory\Type\Std\BigIntSafeType;
 use Ivory\Type\Std\IntegerType;
 use Ivory\Type\Std\StringType;
 
@@ -61,7 +62,11 @@ SQL
         );
         $this->assertSame(3, $checkRel->count());
         $this->assertSame(2, count($checkRel->getColumns()));
-        $this->assertInstanceOf(IntegerType::class, $checkRel->col('Num')->getType());
+        if (PHP_INT_SIZE >= 8) {
+            $this->assertInstanceOf(IntegerType::class, $checkRel->col('Num')->getType());
+        } else {
+            $this->assertInstanceOf(BigIntSafeType::class, $checkRel->col('Num')->getType());
+        }
         $this->assertInstanceOf(StringType::class, $checkRel->col('char')->getType());
         $this->assertSame(
             [
