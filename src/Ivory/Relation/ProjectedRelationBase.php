@@ -114,15 +114,6 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
         return $this->projectedColNameMap;
     }
 
-    public function populate()
-    {
-        throw new \Ivory\Exception\NotImplementedException(); // TODO
-    }
-
-    public function flush()
-    {
-    }
-
     public function col($offsetOrNameOrEvaluator): IColumn
     {
         return $this->_colImpl($offsetOrNameOrEvaluator, $this->projectedColumns, $this->projectedColNameMap, $this);

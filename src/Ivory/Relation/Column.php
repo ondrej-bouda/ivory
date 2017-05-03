@@ -116,20 +116,6 @@ class Column implements \IteratorAggregate, IColumn
         return $this->relation->value($this->colDef, $valueOffset);
     }
 
-    //region ICachingDataProcessor
-
-    public function populate()
-    {
-        throw new NotImplementedException();
-    }
-
-    public function flush()
-    {
-        throw new NotImplementedException();
-    }
-
-    //endregion
-
     //region Countable
 
     public function count()

@@ -4,7 +4,7 @@ namespace Ivory\Relation;
 use Ivory\Relation\Alg\CallbackValueFilter;
 use Ivory\Relation\Alg\IValueFilter;
 
-class FilteredColumn implements \IteratorAggregate, IColumn
+class FilteredColumn implements \IteratorAggregate, IColumn, ICachingDataProcessor
 {
     private $baseCol;
     private $decider;

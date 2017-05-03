@@ -22,7 +22,7 @@ class CherryPickedRelation extends StreamlinedRelation
     /**
      * Cherry-picks an additional tuple, on top of the already cherry-picked ones.
      *
-     * The tuple gets sorted at the of this relation.
+     * The tuple gets sorted at the end of this relation.
      * A single tuple may be cherry-picked multiple times.
      *
      * @param int $tupleOffset
@@ -32,16 +32,6 @@ class CherryPickedRelation extends StreamlinedRelation
     {
         $this->offsetMap[] = $tupleOffset;
         return $this;
-    }
-
-    public function populate()
-    {
-        // TODO
-    }
-
-    public function flush()
-    {
-        // TODO
     }
 
     public function count()

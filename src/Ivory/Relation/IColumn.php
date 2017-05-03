@@ -11,12 +11,9 @@ use Ivory\Type\IType;
  *
  * A column is essentially a `Countable` `Traversable` list of values of the same type.
  *
- * The column itself might not actually hold the data (and for performance reasons, it usually will not). Instead, it
- * may be derived from its originating relation. From this point of view, a column is an {@link ICachingDataProcessor}.
- *
  * Unless computed by a client-side evaluator, a column is characterized by its name and data type of its values.
  */
-interface IColumn extends \Traversable, \Countable, ICachingDataProcessor
+interface IColumn extends \Traversable, \Countable
 {
     /**
      * @return string|null name of the column, if defined
@@ -36,7 +33,7 @@ interface IColumn extends \Traversable, \Countable, ICachingDataProcessor
 
     /**
      * @param IRelation $relation the new relation to bind the column to
-     * @return IColumn a new column - copy of this column - binded to the given relation
+     * @return IColumn a new column - copy of this column - bound to the given relation
      */
     function bindToRelation(IRelation $relation): IColumn;
 

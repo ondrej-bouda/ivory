@@ -5,7 +5,7 @@ use Ivory\Relation\Alg\CallbackTupleFilter;
 use Ivory\Relation\Alg\ITupleFilter;
 use Ivory\Relation\Alg\TupleFilterIterator;
 
-class FilteredRelation extends StreamlinedRelation
+class FilteredRelation extends StreamlinedRelation implements ICachingDataProcessor
 {
     private $decider;
     private $acceptMap = null;

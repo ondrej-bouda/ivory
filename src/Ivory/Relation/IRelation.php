@@ -17,11 +17,8 @@ use Ivory\Data\Map\IValueMap;
  * A relation is essentially a `Countable` `Traversable` list of {@link ITuple}s, each conforming to the same scheme -
  * the relation columns. Note the relation is intentionally not `ArrayAccess`ible - use the {@link IRelation::tuple()}
  * method to get to specific rows.
- *
- * The relation itself might not actually hold the data (and for performance reasons, it usually will not). Instead, it
- * may be derived from another relation. From this point of view, a relation is an {@link ICachingDataProcessor}.
  */
-interface IRelation extends \Traversable, \Countable, ICachingDataProcessor
+interface IRelation extends \Traversable, \Countable
 {
     /**
      * @return IColumn[] list of columns constituting this relation

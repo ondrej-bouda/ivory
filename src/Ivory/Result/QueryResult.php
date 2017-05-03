@@ -5,11 +5,9 @@ use Ivory\Exception\NotImplementedException;
 use Ivory\Exception\ResultException;
 use Ivory\Relation\Column;
 use Ivory\Relation\FilteredRelation;
-use Ivory\Relation\IColumn;
 use Ivory\Relation\IRelation;
 use Ivory\Relation\ITuple;
 use Ivory\Relation\ProjectedRelation;
-use Ivory\Relation\RelationSeekableIterator;
 use Ivory\Relation\RelationMacros;
 use Ivory\Relation\RenamedRelation;
 use Ivory\Relation\Tuple;
@@ -19,9 +17,7 @@ class QueryResult extends Result implements IQueryResult
 {
     use RelationMacros;
 
-    private $typeDictionary;
     private $numRows;
-    private $populated = false;
     /** @var Column[] */
     private $columns;
     /** @var int[] map: column name => offset of the first column of the name */
@@ -37,10 +33,8 @@ class QueryResult extends Result implements IQueryResult
     {
         parent::__construct($resultHandler, $lastNotice);
 
-        $this->typeDictionary = $typeDictionary;
-
         $this->numRows = $this->fetchNumRows();
-        $this->populate(); // not lazy - chances are, when the query was made, the caller will care about its results
+        $this->initCols($typeDictionary);
     }
 
     private function fetchNumRows(): int
@@ -53,15 +47,8 @@ class QueryResult extends Result implements IQueryResult
         }
     }
 
-
-    //region ICachingDataProcessor
-
-    public function populate()
+    private function initCols(ITypeDictionary $typeDictionary)
     {
-        if ($this->populated) {
-            return;
-        }
-
         $numFields = pg_num_fields($this->handler);
         if ($numFields < 0 || $numFields === null) {
             throw new ResultException('Error retrieving number of fields of the result.');
@@ -85,7 +72,7 @@ class QueryResult extends Result implements IQueryResult
             if ($typeOid === false || $typeOid === null) { // NOTE: besides false, pg_field_type_oid() might return NULL on error
                 throw new ResultException("Error retrieving type OID of result column $i.");
             }
-            $type = $this->typeDictionary->requireTypeByOid($typeOid);
+            $type = $typeDictionary->requireTypeByOid($typeOid);
 
             $this->columns[] = new Column($this, $i, $name, $type);
 
@@ -93,17 +80,8 @@ class QueryResult extends Result implements IQueryResult
                 $this->colNameMap[$name] = $i;
             }
         }
-
-        $this->populated = true;
     }
 
-    public function flush()
-    {
-        $this->populated = false;
-        $this->populate(); // re-initialize the internal data right away for the other methods not to call populate() over and over again
-    }
-
-    //endregion
 
     //region IRelation
 

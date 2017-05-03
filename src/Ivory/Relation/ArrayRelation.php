@@ -99,12 +99,4 @@ class ArrayRelation extends RelationBase
     {
         return $this->numRows;
     }
-
-    public function populate()
-    {
-    }
-
-    public function flush()
-    {
-    }
 }
