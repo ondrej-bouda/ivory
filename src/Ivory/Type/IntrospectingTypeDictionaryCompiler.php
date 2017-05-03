@@ -22,7 +22,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
         $this->connHandler = $connHandler;
     }
 
-    public function compileTypeDictionary(ITypeProvider $typeProvider)
+    public function compileTypeDictionary(ITypeProvider $typeProvider): ITypeDictionary
     {
         $dict = new TypeDictionary();
 

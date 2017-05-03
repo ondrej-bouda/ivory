@@ -52,6 +52,23 @@ class TypeControl implements ITypeControl, ITypeProvider
         return $this->typeDictionary;
     }
 
+    private function applyTypeRegisters(TypeDictionary $dict) // FIXME: should require just ITypeDictionary
+    {
+        $globalReg = Ivory::getTypeRegister();
+        $localReg = $this->getTypeRegister();
+        foreach ([$globalReg, $localReg] as $reg) {
+            /** @var TypeRegister $reg */
+            foreach ($reg->getValueSerializers() as $name => $type) {
+                $dict->defineValueSerializer($name, $type);
+            }
+            foreach ($reg->getTypeAbbreviations() as $abbr => list($schemaName, $typeName)) {
+                $dict->defineTypeAlias($abbr, $schemaName, $typeName);
+                $dict->defineTypeAlias("{$abbr}[]", $schemaName, "{$typeName}[]");
+            }
+            $dict->addTypeRecognitionRuleSet($reg->getTypeRecognitionRules());
+        }
+    }
+
     private function introspectTypeDictionary(): ITypeDictionary
     {
         $compiler = new IntrospectingTypeDictionaryCompiler($this->connection, $this->connCtl->requireConnection());
@@ -159,23 +176,6 @@ class TypeControl implements ITypeControl, ITypeProvider
             }
         }
         return null;
-    }
-
-    private function applyTypeRegisters(TypeDictionary $dict) // FIXME: should require just ITypeDictionary
-    {
-        $globalReg = Ivory::getTypeRegister();
-        $localReg = $this->getTypeRegister();
-        foreach ([$globalReg, $localReg] as $reg) {
-            /** @var TypeRegister $reg */
-            foreach ($reg->getValueSerializers() as $name => $type) {
-                $dict->defineValueSerializer($name, $type);
-            }
-            foreach ($reg->getTypeAbbreviations() as $abbr => list($schemaName, $typeName)) {
-                $dict->defineTypeAlias($abbr, $schemaName, $typeName);
-                $dict->defineTypeAlias("{$abbr}[]", $schemaName, "{$typeName}[]");
-            }
-            $dict->addTypeRecognitionRuleSet($reg->getTypeRecognitionRules());
-        }
     }
 
     //endregion

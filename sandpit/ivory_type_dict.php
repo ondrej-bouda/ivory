@@ -13,11 +13,11 @@ $dict = $conn->getTypeDictionary();
 assert($dict instanceof ICacheableTypeDictionary);
 
 $dict->detachFromConnection();
-$dict->setUndefinedTypeHandler(null);
+$dict->setUndefinedTypeHandler(null); // object of an anonymous class cannot be serialized
 
 $serialized = serialize($dict);
-/** @var ICacheableTypeDictionary $unserialized */
 $mem1 = memory_get_usage();
+/** @var ICacheableTypeDictionary $unserialized */
 $unserialized = unserialize($serialized);
 $mem2 = memory_get_usage();
 

@@ -45,19 +45,9 @@ interface ITypeDictionary
     function getValueSerializer(string $name);
 
     /**
-     * @return ITypeDictionaryUndefinedHandler|null
-     */
-    function getUndefinedTypeHandler();
-
-    /**
      * @param ITypeDictionaryUndefinedHandler|null $undefinedTypeHandler
      */
     function setUndefinedTypeHandler($undefinedTypeHandler);
-
-    /**
-     * @return string[] schema name list
-     */
-    function getTypeSearchPath(): array;
 
     /**
      * @param string[] $schemaList
