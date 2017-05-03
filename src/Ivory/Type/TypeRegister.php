@@ -4,26 +4,28 @@ namespace Ivory\Type;
 use Ivory\Connection\IConnection;
 
 /**
- * Collection of PHP type objects for recognized PostgreSQL base types.
+ * Collection of PHP type objects and their supplements for recognized PostgreSQL types.
  *
- * Type registers are used at two levels: at the Ivory class (global) and at a connection to a concrete database.
- * At either level, specific types and type loaders may be registered. Whenever a type object is requested for
- * a PostgreSQL type, it is retrieved from the connection type register, then from the global register. If neither of
- * them already knows the requested type, type loaders registered at both the registers are consecutively tried to load
- * the type object.
+ * Type registers serve as the way to define the type system behaviour. Their purpose is to collect:
+ * - types and type loaders,
+ * - range canonical functions and their providers,
+ * - abbreviations of qualified type names, and
+ * - rules for recognizing types from values.
  *
- * For Ivory to recognize a new base type globally or locally for a given connection, the new type object or a whole
- * type loader may be registered at the corresponding type register, using {@link registerType()} or
- * {@link registerTypeLoader()}, respectively.
+ * By {@link registerType() registering a type object} or a whole {@link registerTypeLoader() type loader}, one may
+ * define the processing of any custom PostgreSQL type not yet covered by Ivory or override any builtin type object with
+ * a custom one. Likewise, abbreviations of type names may be defined at will - they will be recognized in
+ * {@link \Ivory\Lange\SqlPattern\SqlPattern SQL patterns} when composing an SQL query or command.
  *
- * The purpose of the type register is only to collect all the types and type loaders. Once any of the types is
- * requested by a connection, it may be cached for the whole script lifetime. Thus, later type or type loader
- * registration changes are not reflected.
+ * The type registers are used at two levels: a *global* one at the Ivory class and a *local* one at the connection to
+ * a concrete database. Definitions from the local type register are preferred. Only when the type or abbreviation is
+ * not recognized by the local type register, the global type register is consulted. The same applies when recognizing
+ * the type from a PHP value - first, the local type register rules are tried, followed by the global type register
+ * rules.
  *
- * Besides types and type loaders, the type register also collects several type supplements:
- * - range canonical functions and their providers;
- * - abbreviations of qualified type names;
- * - rules for recognizing type from value.
+ * The type registers are not directly used when Ivory works with types. Instead, they merely serve as a basis for an
+ * {@link ITypeDictionary}, which is compiled automatically when first needed, and is usually cached for the whole
+ * script lifetime. Thus, **later registration changes of types, types loaders or type supplements are not reflected**.
  */
 class TypeRegister
 {
