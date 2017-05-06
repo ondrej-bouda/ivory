@@ -25,6 +25,7 @@ class TypeDictionary implements ITypeDictionary
      *               map: plain type name => type object (might be a reference to $this->qualNameTypeMap) */
     private $searchedNameCache = [];
 
+
     public function __sleep()
     {
         return [
@@ -38,111 +39,7 @@ class TypeDictionary implements ITypeDictionary
         ];
     }
 
-    public function defineType(IType $type, int $oid = null)
-    {
-        if ($oid !== null) {
-            $this->oidTypeMap[$oid] = $type;
-        }
-
-        $schemaName = $type->getSchemaName();
-        $typeName = $type->getName();
-
-        if (!isset($this->qualNameTypeMap[$schemaName])) {
-            $this->qualNameTypeMap[$schemaName] = [];
-        }
-        $this->qualNameTypeMap[$schemaName][$typeName] = $type;
-
-        $this->cacheType($type);
-    }
-
-    private function cacheType(IType $type)
-    {
-        $schemaName = $type->getSchemaName();
-        $typeName = $type->getName();
-
-        $searchPathPos = array_search($schemaName, $this->typeSearchPath);
-        if ($searchPathPos !== false) {
-            if (!isset($this->searchedNameCache[$typeName])) {
-                $this->searchedNameCache[$typeName] = $type;
-            } else {
-                // find out whether the schema of $type is more preferred
-                $cachedPos = array_search(
-                    $this->searchedNameCache[$typeName]->getSchemaName(),
-                    $this->typeSearchPath
-                );
-                if ($cachedPos === false || $cachedPos > $searchPathPos) {
-                    $this->searchedNameCache[$typeName] = $type;
-                }
-            }
-        }
-    }
-
-    public function defineValueSerializer(string $name, IValueSerializer $valueSerializer)
-    {
-        $this->valueSerializers[$name] = $valueSerializer;
-    }
-
-    public function defineTypeAlias(string $alias, string $schemaName, string $typeName)
-    {
-        $this->typeAliases[$alias] =& $this->qualNameTypeMap[$schemaName][$typeName];
-    }
-
-    /**
-     * @return string[] schema name list
-     */
-    public function getTypeSearchPath(): array
-    {
-        return $this->typeSearchPath;
-    }
-
-    /**
-     * @param string[] $schemaList
-     */
-    public function setTypeSearchPath(array $schemaList)
-    {
-        if ($this->typeSearchPath == $schemaList) {
-            return;
-        }
-
-        $this->typeSearchPath = $schemaList;
-        $this->recomputeNameCache();
-    }
-
-    /**
-     * @param string[][] $ruleSet map: PHP data type name => pair: (schema name, type name)
-     */
-    public function addTypeRecognitionRuleSet(array $ruleSet)
-    {
-        $this->typeRecognitionRuleSets[] = $ruleSet;
-    }
-
-    private function recomputeNameCache()
-    {
-        $this->searchedNameCache = [];
-        foreach ($this->typeSearchPath as $schemaName) {
-            foreach (($this->qualNameTypeMap[$schemaName] ?? []) as $typeName => $type) {
-                if (!isset($this->searchedNameCache[$typeName])) {
-                    $this->searchedNameCache[$typeName] =& $this->qualNameTypeMap[$schemaName][$typeName];
-                }
-            }
-        }
-    }
-
-    /**
-     * @return ITypeDictionaryUndefinedHandler|null
-     */
-    public function getUndefinedTypeHandler()
-    {
-        return $this->undefinedTypeHandler;
-    }
-
-    /**
-     * @param ITypeDictionaryUndefinedHandler|null $undefinedTypeHandler
-     */
-    public function setUndefinedTypeHandler($undefinedTypeHandler)
-    {
-        $this->undefinedTypeHandler = $undefinedTypeHandler;
-    }
+    //region ITypeDictionary
 
     public function requireTypeByOid(int $oid): IType
     {
@@ -206,11 +103,6 @@ class TypeDictionary implements ITypeDictionary
 
         $typeName = (is_object($value) ? get_class($value) : gettype($value));
         throw new UndefinedTypeException("There is no type defined for converting value of type \"$typeName\"");
-    }
-
-    public function getValueSerializer(string $name)
-    {
-        return ($this->valueSerializers[$name] ?? null);
     }
 
     private function recognizeType($value, $ruleSet)
@@ -290,6 +182,48 @@ class TypeDictionary implements ITypeDictionary
         return null;
     }
 
+    public function getValueSerializer(string $name)
+    {
+        return ($this->valueSerializers[$name] ?? null);
+    }
+
+    /**
+     * @return ITypeDictionaryUndefinedHandler|null
+     */
+    public function getUndefinedTypeHandler()
+    {
+        return $this->undefinedTypeHandler;
+    }
+
+    /**
+     * @param ITypeDictionaryUndefinedHandler|null $undefinedTypeHandler
+     */
+    public function setUndefinedTypeHandler($undefinedTypeHandler)
+    {
+        $this->undefinedTypeHandler = $undefinedTypeHandler;
+    }
+
+    /**
+     * @return string[] schema name list
+     */
+    public function getTypeSearchPath(): array
+    {
+        return $this->typeSearchPath;
+    }
+
+    /**
+     * @param string[] $schemaList
+     */
+    public function setTypeSearchPath(array $schemaList)
+    {
+        if ($this->typeSearchPath == $schemaList) {
+            return;
+        }
+
+        $this->typeSearchPath = $schemaList;
+        $this->recomputeNameCache();
+    }
+
     public function attachToConnection(IConnection $connection)
     {
         $connDepTypes = $this->collectObjects(IConnectionDependentObject::class);
@@ -336,4 +270,79 @@ class TypeDictionary implements ITypeDictionary
 
         return $result;
     }
+
+    //endregion
+
+    //region content management
+
+    public function defineType(IType $type, int $oid = null)
+    {
+        if ($oid !== null) {
+            $this->oidTypeMap[$oid] = $type;
+        }
+
+        $schemaName = $type->getSchemaName();
+        $typeName = $type->getName();
+
+        if (!isset($this->qualNameTypeMap[$schemaName])) {
+            $this->qualNameTypeMap[$schemaName] = [];
+        }
+        $this->qualNameTypeMap[$schemaName][$typeName] = $type;
+
+        $this->cacheType($type);
+    }
+
+    private function cacheType(IType $type)
+    {
+        $schemaName = $type->getSchemaName();
+        $typeName = $type->getName();
+
+        $searchPathPos = array_search($schemaName, $this->typeSearchPath);
+        if ($searchPathPos !== false) {
+            if (!isset($this->searchedNameCache[$typeName])) {
+                $this->searchedNameCache[$typeName] = $type;
+            } else {
+                // find out whether the schema of $type is more preferred
+                $cachedPos = array_search(
+                    $this->searchedNameCache[$typeName]->getSchemaName(),
+                    $this->typeSearchPath
+                );
+                if ($cachedPos === false || $cachedPos > $searchPathPos) {
+                    $this->searchedNameCache[$typeName] = $type;
+                }
+            }
+        }
+    }
+
+    public function defineValueSerializer(string $name, IValueSerializer $valueSerializer)
+    {
+        $this->valueSerializers[$name] = $valueSerializer;
+    }
+
+    public function defineTypeAlias(string $alias, string $schemaName, string $typeName)
+    {
+        $this->typeAliases[$alias] =& $this->qualNameTypeMap[$schemaName][$typeName];
+    }
+
+    /**
+     * @param string[][] $ruleSet map: PHP data type name => pair: (schema name, type name)
+     */
+    public function addTypeRecognitionRuleSet(array $ruleSet)
+    {
+        $this->typeRecognitionRuleSets[] = $ruleSet;
+    }
+
+    private function recomputeNameCache()
+    {
+        $this->searchedNameCache = [];
+        foreach ($this->typeSearchPath as $schemaName) {
+            foreach (($this->qualNameTypeMap[$schemaName] ?? []) as $typeName => $type) {
+                if (!isset($this->searchedNameCache[$typeName])) {
+                    $this->searchedNameCache[$typeName] =& $this->qualNameTypeMap[$schemaName][$typeName];
+                }
+            }
+        }
+    }
+
+    //endregion
 }
