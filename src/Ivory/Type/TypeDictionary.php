@@ -36,7 +36,8 @@ class TypeDictionary implements ITypeDictionary
             'typeAliases',
             'valueSerializers',
             'typeRecognitionRuleSets',
-            'searchedNameCache',
+            // typeSearchPath and undefinedTypeHandler are expected to be set again after unserializing.
+            // searchedNameCache is needless to serialize - it must be recomputed anyway when the type search path is set.
         ];
     }
 
