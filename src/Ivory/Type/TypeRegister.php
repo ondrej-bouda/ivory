@@ -1,34 +1,34 @@
 <?php
 namespace Ivory\Type;
 
-use Ivory\Connection\IConnection;
-
 /**
- * Collection of PHP type converters for recognized PostgreSQL base types.
+ * Collection of PHP type objects and their supplements for recognized PostgreSQL types.
  *
- * Type registers are used at two levels: at the Ivory class (global) and at a connection to a concrete database.
- * At either level, specific types and type loaders may be registered. Whenever a type converter is requested for
- * a PostgreSQL type, it is retrieved from the connection type register, then from the global register. If neither of
- * them already knows the requested type, type loaders registered at both the registers are consecutively tried to load
- * the type converter.
+ * Type registers serve as the way to define the type system behaviour. Their purpose is to collect:
+ * - types and type loaders,
+ * - range canonical functions and their providers,
+ * - abbreviations of qualified type names, and
+ * - rules for recognizing types from values.
  *
- * For Ivory to recognize a new base type globally or locally for a given connection, the new type converter, or a whole
- * type loader may be registered at the corresponding type register, using {@link registerNamedType()} or
- * {@link registerTypeLoader()}, respectively.
+ * By {@link registerType() registering a type object} or a whole {@link registerTypeLoader() type loader}, one may
+ * define the processing of any custom PostgreSQL type not yet covered by Ivory or override any builtin type object with
+ * a custom one. Likewise, abbreviations of type names may be defined at will - they will be recognized in
+ * {@link \Ivory\Lange\SqlPattern\SqlPattern SQL patterns} when composing an SQL query or command.
  *
- * The purpose of the type register is only to collect all the types and type loaders. Once any of the types is
- * requested by a connection, it may be cached for the whole script lifetime. Thus, later type or type loader
- * registration changes are not reflected.
+ * The type registers are used at two levels: a *global* one at the Ivory class and a *local* one at the connection to
+ * a concrete database. Definitions from the local type register are preferred. Only when the type or abbreviation is
+ * not recognized by the local type register, the global type register is consulted. The same applies when recognizing
+ * the type from a PHP value - first, the local type register rules are tried, followed by the global type register
+ * rules.
  *
- * Besides types and type loaders, the type register also collects several type supplements:
- * - range canonical functions and their providers;
- * - abbreviations of qualified type names;
- * - rules for recognizing type from value.
+ * The type registers are not directly used when Ivory works with types. Instead, they merely serve as a basis for an
+ * {@link ITypeDictionary}, which is compiled automatically when first needed, and is usually cached for the whole
+ * script lifetime. Thus, **later registration changes of types, type loaders or type supplements are not reflected**.
  */
-class TypeRegister
+class TypeRegister implements ITypeProvider
 {
-    /** @var INamedType[][] already known types; map: schema name => map: type name => type converter object */
-    private $namedTypes = [];
+    /** @var IType[][] already known types; map: schema name => map: type name => type object */
+    private $types = [];
     /** @var ITypeLoader[] list of registered type loaders, in the definition order */
     private $typeLoaders = [];
     /**
@@ -40,67 +40,66 @@ class TypeRegister
      * @var IRangeCanonicalFuncProvider[] list of registered range canonical function providers, in the definition order
      */
     private $rangeCanonFuncProviders = [];
-    /** @var IType[] map: name => type converter */
-    private $sqlPatternTypes = [];
+    /** @var IValueSerializer[] map: name => value serializer */
+    private $valueSerializers = [];
     /** @var string[][] type name abbreviation => pair: schema name, type name */
     private $typeAbbreviations = [];
     /** @var string[][] PHP data type => pair: schema name, type name */
     private $typeRecognitionRules = [];
 
     /**
-     * Registers a type converter for a named data type.
+     * Registers a type.
      *
-     * If a type converter has already been registered under the same qualified name, it gets dropped in favor of this
-     * new one.
+     * If a type has already been registered under the same qualified name, it gets dropped in favor of this new one.
      *
-     * @param INamedType $type the type converter to register
+     * @param IType $type the type to register
      */
-    public function registerNamedType(INamedType $type)
+    public function registerType(IType $type)
     {
         $schemaName = $type->getSchemaName();
         $typeName = $type->getName();
 
-        if (!isset($this->namedTypes[$schemaName])) {
-            $this->namedTypes[$schemaName] = [];
+        if (!isset($this->types[$schemaName])) {
+            $this->types[$schemaName] = [];
         }
-        $this->namedTypes[$schemaName][$typeName] = $type;
+        $this->types[$schemaName][$typeName] = $type;
     }
 
     /**
-     * Unregisters a type converter, previously registered by {@link registerNamedType()}.
+     * Unregisters a type, previously registered by {@link registerType()}.
      *
-     * The type converter to unregister may either be given itself, or by the schema and type name.
+     * The type to unregister may either be given itself, or by the schema and type name.
      *
-     * @param string|INamedType $schemaNameOrTypeConverter
+     * @param string|IType $schemaNameOrType
      *                                  name of the PostgreSQL schema the type to unregister is defined in, or the type
-     *                                    converter itself to unregister
-     * @param string|null $typeName name of the type to unregister, or <tt>null</tt> if an <tt>INamedType</tt> object
-     *                                is provided in the first argument
+     *                                    itself to unregister
+     * @param string|null $typeName name of the type to unregister, or <tt>null</tt> if an <tt>IType</tt> object is
+     *                                provided in the first argument
      * @return bool whether the type has actually been unregistered (<tt>false</tt> if it was not registered)
      */
-    public function unregisterNamedType($schemaNameOrTypeConverter, string $typeName = null): bool
+    public function unregisterType($schemaNameOrType, string $typeName = null): bool
     {
-        if ($schemaNameOrTypeConverter instanceof INamedType) {
+        if ($schemaNameOrType instanceof IType) {
             if ($typeName !== null) {
                 $msg = sprintf(
                     '$typeName is irrelevant when an %s object is given in the first argument',
-                    INamedType::class
+                    IType::class
                 );
                 trigger_error($msg, E_USER_NOTICE);
             }
 
-            $schemaName = $schemaNameOrTypeConverter->getSchemaName();
-            $typeName = $schemaNameOrTypeConverter->getName();
+            $schemaName = $schemaNameOrType->getSchemaName();
+            $typeName = $schemaNameOrType->getName();
         } else {
-            $schemaName = $schemaNameOrTypeConverter;
+            $schemaName = $schemaNameOrType;
             if ($typeName === null) {
                 trigger_error('$typeName not given', E_USER_WARNING);
                 return false;
             }
         }
 
-        $existed = isset($this->namedTypes[$schemaName][$typeName]);
-        unset($this->namedTypes[$schemaName][$typeName]);
+        $existed = isset($this->types[$schemaName][$typeName]);
+        unset($this->types[$schemaName][$typeName]);
         return $existed;
     }
 
@@ -277,25 +276,25 @@ class TypeRegister
     }
 
     /**
-     * Registers a type converter to be used for serializing parameters of {@link Ivory\Lang\SqlPattern\SqlPattern}
+     * Registers value serializer to be used for serializing parameters of {@link Ivory\Lang\SqlPattern\SqlPattern}
      * typed placeholders.
      *
-     * This method is only useful for registering special converters, such as `sql`. Common data types are registered
-     * automatically by their name, abbreviations are registered with {@link registerSqlPatternTypeAbbreviation()}.
+     * This method is only useful for registering special serializers, such as `sql`. Common data types are registered
+     * automatically by their name, their abbreviations registered with {@link registerTypeAbbreviation()}.
      *
-     * If a type converter has already been registered with the given name, it gets dropped in favor of the new one.
+     * If a value serializer has already been registered with the given name, it gets dropped in favor of the new one.
      *
      * @param string $name
-     * @param IType $type
+     * @param IValueSerializer $valueSerializer
      */
-    public function registerSqlPatternType(string $name, IType $type)
+    public function registerValueSerializer(string $name, IValueSerializer $valueSerializer)
     {
-        $this->sqlPatternTypes[$name] = $type;
+        $this->valueSerializers[$name] = $valueSerializer;
     }
 
-    public function unregisterSqlPatternType(string $name)
+    public function unregisterValueSerializer(string $name)
     {
-        unset($this->sqlPatternTypes[$name]);
+        unset($this->valueSerializers[$name]);
     }
 
     /**
@@ -327,17 +326,17 @@ class TypeRegister
     /**
      * Adds a new rule for recognizing type from a PHP value.
      *
-     * The rule tells to use the type converter registered for `$schemaName.$typeName` type whenever a value of the
+     * The rule tells to use the type object registered for `$schemaName.$typeName` type whenever a value of the
      * specified data type is given. The data type may be given by the string containing either:
-     * - `'bool'`, `'int'`, `'float'`, `'string'`, or `'null'`, specifying to use the type converter for values of the
+     * - `'bool'`, `'int'`, `'float'`, `'string'`, or `'null'`, specifying to use the type object for values of the
      *   corresponding scalar types; or
-     * - `'array'`, specifying the type converter to used for serializing *unrecognized* arrays (see below for details
+     * - `'array'`, specifying the type object to used for serializing *unrecognized* arrays (see below for details
      *   regarding recognition of types for array values); or
      * - fully-qualified name of a class or interface.
      *
      * The data type of a presented PHP value is not matched just against the given data type. Subtypes are also
      * recognized. The mechanism is as follows:
-     * 1. an exact match is attempted - if found, the converter for the recognized type is used;
+     * 1. an exact match is attempted - if found, the type object for the recognized type is used;
      * 2. otherwise, supertypes of the PHP value are consecutively tried and the first match is used:
      *    - `float` is, for this purpose, considered as a supertype of `int`;
      *    - parent classes of an object are unrolled consecutively from the closest parent to the top-level superclass;
@@ -349,17 +348,17 @@ class TypeRegister
      * found in the array. Recall that PHP arrays may hold elements of various types while PostgreSQL limits arrays to
      * be of just a single type. The type is recognized by taking the first non-null element in the array. If it is an
      * array, the recognition procedure recursively continues on it. The whole array value is then treated by the array
-     * converter with its element type set to the recognized type. If the type is not recognized (empty array or array
+     * type object with its element type set to the recognized type. If the type is not recognized (empty array or array
      * only containing null values), the rule specified for `array` is used, if defined.
      *
      * Any previously defined rule for the same data type (`$dataType`) is dropped in favor of the new one.
      *
      * Note the rules are case sensitive.
      *
-     * @internal Ivory design note: Alternatively, the data types recognized for data types might be defined by the type
-     * converters. That would not work for two reasons: multiple type converters might collide about the recognized type
-     * and, more importantly, the same type converter class is registered for multiple types (e.g., IntegerType) and
-     * Ivory could not decide which type converter instance to actually use.
+     * @internal Ivory design note: Alternatively, the data types recognition might be defined by the registered type
+     * objects. That would not work for two reasons: multiple type objects might collide about the recognized type
+     * and, more importantly, the same type object class is registered for multiple types (e.g., IntegerType) and
+     * Ivory could not decide which type object instance to actually use.
      * @internal Ivory design note: Regarding the alphabetical order of interfaces matched against the rules: a more
      * sophisticated preference system might be used. We prefer simplicity, though, over perfection (in the perfect
      * system, the fact which parent declared implementing which interfaces, should be considered, complicated with
@@ -387,30 +386,17 @@ class TypeRegister
         unset($this->typeRecognitionRules[$dataType]);
     }
 
+
     /**
-     * Returns the list of all rules for recognizing types from PHP values.
+     * Returns the type object explicitly registered using {@link TypeRegister::registerType()}.
      *
-     * @return string[][] map: data type => pair: schema name, type name
+     * @param string $schemaName name of the PostgreSQL schema to get the type object for
+     * @param string $typeName name of the PostgreSQL type to get the type object for
+     * @return IType|null the requested type object, or <tt>null</tt> if no corresponding type is registered
      */
-    public function getTypeRecognitionRules()
+    public function getType(string $schemaName, string $typeName)
     {
-        return $this->typeRecognitionRules;
-    }
-
-    /**
-     * @return IType[] map: name => type converter
-     */
-    public function getSqlPatternTypes()
-    {
-        return $this->sqlPatternTypes;
-    }
-
-    /**
-     * @return string[][] map: abbreviation => pair: schema name, type name
-     */
-    public function getTypeAbbreviations()
-    {
-        return $this->typeAbbreviations;
+        return ($this->types[$schemaName][$typeName] ?? null);
     }
 
     /**
@@ -421,49 +407,6 @@ class TypeRegister
     public function getTypeLoaders()
     {
         return $this->typeLoaders;
-    }
-
-    /**
-     * Returns the type converter explicitly registered using {@link TypeRegister::registerNamedType()}.
-     *
-     * @param string $schemaName name of the PostgreSQL schema to get the converter for
-     * @param string $typeName name of the PostgreSQL type to get the converter for
-     * @return INamedType|null converter for the requested type, or <tt>null</tt> if no converter was registered for the
-     *                           type
-     */
-    public function getType(string $schemaName, string $typeName)
-    {
-        return ($this->namedTypes[$schemaName][$typeName] ?? null);
-    }
-
-    /**
-     * Loads a type converter from the first registered type loader recognizing the type.
-     *
-     * @param string $schemaName name of the PostgreSQL schema to get the converter for
-     * @param string $typeName name of the PostgreSQL type to get the converter for
-     * @param IConnection $connection connection above which the type is to be loaded
-     * @return INamedType|null converter for the requested type, or <tt>null</tt> if no loader recognizes the type
-     */
-    public function loadType(string $schemaName, string $typeName, IConnection $connection)
-    {
-        foreach ($this->typeLoaders as $loader) {
-            $tc = $loader->loadType($schemaName, $typeName, $connection);
-            if ($tc !== null) {
-                return $tc;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Retrieves all the registered range canonical function providers.
-     *
-     * @return IRangeCanonicalFuncProvider[] list of the registered range canonical function providers, in the
-     *                                         registration order
-     */
-    public function getRangeCanonicalFuncProviders()
-    {
-        return $this->rangeCanonFuncProviders;
     }
 
     /**
@@ -481,21 +424,67 @@ class TypeRegister
     }
 
     /**
-     * Provides a range canonical function by the first registered provider recognizing it.
+     * Retrieves all the registered range canonical function providers.
      *
-     * @param string $schemaName name of the PostgreSQL schema to get the function from
-     * @param string $funcName name of the PostgreSQL function to provide
-     * @param ITotallyOrderedType $subtype function argument type
-     * @return IRangeCanonicalFunc|null the requested function, or <tt>null</tt> if no provider recognizes the function
+     * @return IRangeCanonicalFuncProvider[] list of the registered range canonical function providers, in the
+     *                                         registration order
      */
+    public function getRangeCanonicalFuncProviders()
+    {
+        return $this->rangeCanonFuncProviders;
+    }
+
+
+    //region ITypeProvider
+
+    public function provideType(string $schemaName, string $typeName)
+    {
+        $type = $this->getType($schemaName, $typeName);
+        if ($type !== null) {
+            return $type;
+        }
+
+        foreach ($this->typeLoaders as $loader) {
+            $type = $loader->loadType($schemaName, $typeName);
+            if ($type !== null) {
+                return $type;
+            }
+        }
+
+        return null;
+    }
+
     public function provideRangeCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype)
     {
+        $func = $this->getRangeCanonicalFunc($schemaName, $funcName, $subtype);
+        if ($func !== null) {
+            return $func;
+        }
+
         foreach ($this->rangeCanonFuncProviders as $provider) {
             $func = $provider->provideCanonicalFunc($schemaName, $funcName, $subtype);
             if ($func !== null) {
                 return $func;
             }
         }
+
         return null;
     }
+
+    public function getTypeRecognitionRules()
+    {
+        return $this->typeRecognitionRules;
+    }
+
+    public function getValueSerializers()
+    {
+        return $this->valueSerializers;
+    }
+
+    public function getTypeAbbreviations()
+    {
+        return $this->typeAbbreviations;
+    }
+
+    //endregion
 }

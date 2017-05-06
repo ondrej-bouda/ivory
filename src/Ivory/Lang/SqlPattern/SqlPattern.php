@@ -79,6 +79,10 @@ use Ivory\Exception\NoDataException;
  * inside string constants written in the SQL string literally *will* be interpreted as a placeholder and replaced with
  * a provided value.
  *
+ * Also beware of stating non-schema-qualified types followed with a dot and a named. This is typical when qualifying
+ * column names with the relation name, e.g., `person.name`. To parametrize the table name, use `%{ident}.name` to
+ * prevent Ivory to search for a type `name` in schema `ident`.
+ *
  * Note that even {@link IRelationRecipe} and {@link ICommandRecipe} objects may be used as parameter values to form a
  * more complex recipe, e.g., a
  * {@link https://www.postgresql.org/docs/current/static/queries-with.html Common Table Expression}.

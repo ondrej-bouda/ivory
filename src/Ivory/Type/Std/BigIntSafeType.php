@@ -11,9 +11,9 @@ use Ivory\Type\IDiscreteType;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html#DATATYPE-INT
  */
-class BigIntSafeType extends IntegerType implements IDiscreteType
+class BigIntSafeType extends \Ivory\Type\BaseType implements IDiscreteType
 {
-    public static function createForRange($min, $max, $schemaName, $typeName)
+    public static function createForRange($min, $max, $schemaName, $typeName): IDiscreteType
     {
         if (bccomp($min, PHP_INT_MIN) >= 0 && bccomp($max, PHP_INT_MAX) <= 0) {
             return new IntegerType($schemaName, $typeName);
@@ -24,23 +24,27 @@ class BigIntSafeType extends IntegerType implements IDiscreteType
 
     public function parseValue($str)
     {
-        if ($str > PHP_INT_MAX || $str < PHP_INT_MIN) { // correctness: int does not overflow, but rather gets converted to a float
-            return $str;
+        if ($str === null) {
+            return null;
+        } elseif ($str >= PHP_INT_MIN && $str <= PHP_INT_MAX) { // correctness: int does not overflow, but rather gets converted to a float
+            return (int)$str;
         } else {
-            return parent::parseValue($str);
+            return $str;
         }
     }
 
     public function serializeValue($val): string
     {
-        if ($val > PHP_INT_MAX || $val < PHP_INT_MIN) {
+        if ($val === null) {
+            return 'NULL';
+        } elseif ($val >= PHP_INT_MIN && $val <= PHP_INT_MAX) {
+            return (int)$val;
+        } else {
             if (preg_match('~^\s*-?[0-9]+\s*$~', $val)) {
                 return (string)$val;
             } else {
                 $this->throwInvalidValue($val);
             }
-        } else {
-            return parent::serializeValue($val);
         }
     }
 

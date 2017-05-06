@@ -4,6 +4,7 @@
 @call runbench_pgsql.cmd
 @call runbench_ivory.cmd
 @call runbench_ivory-sync.cmd
+@call runbench_ivory-filecache.cmd
 @call runbench_ivory-nocache.cmd
 @call runbench_dibi.cmd
 @call runbench_dibi-lazy.cmd

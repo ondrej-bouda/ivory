@@ -1,12 +1,19 @@
 <?php
 namespace Ivory\Type;
 
+use Ivory\Connection\IConnection;
 use Ivory\Exception\UndefinedTypeException;
 
+/**
+ * Dictionary of all the specific types and other type-related objects and definitions prepared for being used.
+ *
+ * A type dictionary is the interface of the type system to other Ivory subsystems. All the definitions and rules are
+ * compiled in the dictionary, so that just the dictionary is needed for serializing, parsing and recognizing types.
+ */
 interface ITypeDictionary
 {
     /**
-     * Searches the dictionary for a type converter according to the given type OID.
+     * Searches the dictionary for a type according to the given type OID.
      *
      * @param int $oid
      * @return IType
@@ -15,12 +22,12 @@ interface ITypeDictionary
     function requireTypeByOid(int $oid): IType;
 
     /**
-     * Searches the dictionary for a type converter according to the given type name or abbreviation.
+     * Searches the dictionary for a type according to the given type name or abbreviation.
      *
-     * @param string $typeName name of type to get the converter for
+     * @param string $typeName name of type to get
      * @param string|bool $schemaName name of schema the type is defined in;
-     *                                <tt>null</tt> to get the type by its unqualified name (either it is a custom type
-     *                                  or alias, or the search path is to be used to find the first type);
+     *                                <tt>null</tt> to get the type by its unqualified name (either it is an alias or
+     *                                  the search path is to be used to find the first type by its unqualified name);
      *                                <tt>false</tt> to only use the search path to figure out the schema name
      * @return IType
      * @throws UndefinedTypeException if no type of the given name is found
@@ -28,7 +35,7 @@ interface ITypeDictionary
     function requireTypeByName(string $typeName, $schemaName = null): IType;
 
     /**
-     * Searches the dictionary for a type converter the most suitable for converting the given value.
+     * Searches the dictionary for the most suitable type for serializing the given value to PostgreSQL.
      *
      * @param mixed $value
      * @return IType
@@ -37,9 +44,12 @@ interface ITypeDictionary
     function requireTypeByValue($value): IType;
 
     /**
-     * @return ITypeDictionaryUndefinedHandler|null
+     * Searches the dictionary for a value serializer of the given name.
+     *
+     * @param string $name
+     * @return IValueSerializer|null value serializer of the given name, or <tt>null</tt> if no such serializer is defined
      */
-    function getUndefinedTypeHandler();
+    function getValueSerializer(string $name);
 
     /**
      * @param ITypeDictionaryUndefinedHandler|null $undefinedTypeHandler
@@ -47,12 +57,21 @@ interface ITypeDictionary
     function setUndefinedTypeHandler($undefinedTypeHandler);
 
     /**
-     * @return string[] schema name list
-     */
-    function getTypeSearchPath(): array;
-
-    /**
      * @param string[] $schemaList
      */
     function setTypeSearchPath(array $schemaList);
+
+    /**
+     * Attach connection-dependent objects in this dictionary to a connection.
+     *
+     * @param IConnection $connection connection to attach the dictionary to
+     */
+    function attachToConnection(IConnection $connection);
+
+    /**
+     * Detach any objects in this dictionary from the database connection.
+     *
+     * After this operation, the dictionary must be safe for serialization.
+     */
+    function detachFromConnection();
 }

@@ -2,16 +2,13 @@
 namespace Ivory\Connection;
 
 use Ivory\Ivory;
-use Ivory\Type\ICacheableTypeDictionary;
-use Ivory\Type\ITotallyOrderedType;
 use Ivory\Type\ITypeDictionary;
 use Ivory\Type\ITypeDictionaryUndefinedHandler;
-use Ivory\Type\ITypeProvider;
-use Ivory\Type\TypeDictionary;
 use Ivory\Type\IntrospectingTypeDictionaryCompiler;
+use Ivory\Type\TypeProviderList;
 use Ivory\Type\TypeRegister;
 
-class TypeControl implements ITypeControl, ITypeProvider
+class TypeControl implements ITypeControl
 {
     private $connection;
     private $connCtl;
@@ -38,13 +35,12 @@ class TypeControl implements ITypeControl, ITypeProvider
     {
         if ($this->typeDictionary === null) {
             $this->typeDictionary = $this->connection->getCached(ITypeControl::TYPE_DICTIONARY_CACHE_KEY);
-            if ($this->typeDictionary instanceof ICacheableTypeDictionary) {
-                $this->typeDictionary->attachToConnection($this->connection);
-            } else {
+            if (!$this->typeDictionary instanceof ITypeDictionary) {
                 $this->typeDictionary = $this->introspectTypeDictionary();
                 $this->cacheTypeDictionary($this->typeDictionary);
             }
-            $this->applyTypeRegisters($this->typeDictionary);
+
+            $this->typeDictionary->attachToConnection($this->connection);
             $this->setupTypeDictionarySearchPath($this->typeDictionary);
             $this->setupTypeDictionaryUndefinedHandler();
         }
@@ -54,18 +50,26 @@ class TypeControl implements ITypeControl, ITypeProvider
 
     private function introspectTypeDictionary(): ITypeDictionary
     {
-        $compiler = new IntrospectingTypeDictionaryCompiler($this->connection, $this->connCtl->requireConnection());
-        $dict = $compiler->compileTypeDictionary($this);
+        $compiler = new IntrospectingTypeDictionaryCompiler($this->connCtl->requireConnection());
+
+        $typeProvider = new TypeProviderList();
+        $typeProvider->appendTypeProvider($this->getTypeRegister());
+        $typeProvider->appendTypeProvider(Ivory::getTypeRegister());
+
+        $dict = $compiler->compileTypeDictionary($typeProvider);
 
         return $dict;
     }
 
-    private function cacheTypeDictionary(ICacheableTypeDictionary $dict)
+    /**
+     * Caches the type dictionary, if cache is enabled at the connection.
+     *
+     * @param ITypeDictionary $dict the dictionary to cache; must *not* be attached to the connection
+     */
+    private function cacheTypeDictionary(ITypeDictionary $dict)
     {
         if ($this->connection->isCacheEnabled()) {
-            $dict->detachFromConnection();
             $this->connection->cachePermanently(ITypeControl::TYPE_DICTIONARY_CACHE_KEY, $dict);
-            $dict->attachToConnection($this->connection);
         }
     }
 
@@ -93,10 +97,10 @@ class TypeControl implements ITypeControl, ITypeProvider
 
             // now that the requested type was really found, replace the current dictionary with the new one, which recognized the type
             $this->typeDictionary = $dict;
-            if ($dict instanceof ICacheableTypeDictionary) {
-                $this->cacheTypeDictionary($dict);
-            }
+            $this->cacheTypeDictionary($dict);
             $this->setupTypeDictionaryUndefinedHandler();
+
+            $dict->attachToConnection($this->connection);
 
             return $type;
         };
@@ -119,63 +123,6 @@ class TypeControl implements ITypeControl, ITypeProvider
     public function flushTypeDictionary()
     {
         $this->typeDictionary = null;
-    }
-
-    //endregion
-
-    //region ITypeProvider
-
-    public function provideType(string $schemaName, string $typeName)
-    {
-        $localReg = $this->getTypeRegister();
-        $globalReg = Ivory::getTypeRegister();
-        foreach ([$localReg, $globalReg] as $reg) {
-            /** @var TypeRegister $reg */
-            $type = $reg->getType($schemaName, $typeName);
-            if ($type !== null) {
-                return $type;
-            }
-            $type = $reg->loadType($schemaName, $typeName, $this->connection);
-            if ($type !== null) {
-                return $type;
-            }
-        }
-        return null;
-    }
-
-    public function provideRangeCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype)
-    {
-        $localReg = $this->getTypeRegister();
-        $globalReg = Ivory::getTypeRegister();
-        foreach ([$localReg, $globalReg] as $reg) {
-            /** @var TypeRegister $reg */
-            $func = $reg->getRangeCanonicalFunc($schemaName, $funcName, $subtype);
-            if ($func !== null) {
-                return $func;
-            }
-            $func = $reg->provideRangeCanonicalFunc($schemaName, $funcName, $subtype);
-            if ($func !== null) {
-                return $func;
-            }
-        }
-        return null;
-    }
-
-    private function applyTypeRegisters(TypeDictionary $dict) // FIXME: should require just ITypeDictionary
-    {
-        $globalReg = Ivory::getTypeRegister();
-        $localReg = $this->getTypeRegister();
-        foreach ([$globalReg, $localReg] as $reg) {
-            /** @var TypeRegister $reg */
-            foreach ($reg->getSqlPatternTypes() as $name => $type) {
-                $dict->defineCustomType($name, $type);
-            }
-            foreach ($reg->getTypeAbbreviations() as $abbr => list($schemaName, $typeName)) {
-                $dict->defineTypeAlias($abbr, $schemaName, $typeName);
-                $dict->defineTypeAlias("{$abbr}[]", $schemaName, "{$typeName}[]");
-            }
-            $dict->addTypeRecognitionRuleSet($reg->getTypeRecognitionRules());
-        }
     }
 
     //endregion

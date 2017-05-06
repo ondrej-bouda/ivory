@@ -51,7 +51,7 @@ class QueryingTest extends \Ivory\IvoryTestCase
         $sql = $recipe->toSql($this->conn->getTypeDictionary());
         $this->assertSame("SELECT pg_catalog.json 'null', pg_catalog.json '{\"a\":42}'", $sql);
 
-        // Also, brand new types may be introduced. See \Ivory\Showcase\TypeSystemTest::testCustomTypeConverter().
+        // Also, brand new types may be introduced. See \Ivory\Showcase\TypeSystemTest::testCustomType().
     }
 
     public function testRelationRecipe()

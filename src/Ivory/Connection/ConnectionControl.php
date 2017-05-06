@@ -84,7 +84,7 @@ class ConnectionControl implements IConnectionControl
             return false;
         }
 
-        // TODO: handle the case when there are any open LO handles (an LO shall be an IType registered at the connection)
+        // TODO: handle the case when there are some open LO handles (an LO shall be an IType registered at the connection)
 
         $closed = pg_close($this->handler); // NOTE: it seems correct to close a not yet established asynchronous connection
         if (!$closed) {

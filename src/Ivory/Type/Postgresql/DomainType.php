@@ -4,11 +4,10 @@ namespace Ivory\Type\Postgresql;
 use Ivory\Exception\UnsupportedException;
 use Ivory\NamedDbObject;
 use Ivory\Type\IDiscreteType;
-use Ivory\Type\INamedType;
-use Ivory\Type\ITotallyOrderedType;
 use Ivory\Type\IType;
+use Ivory\Type\ITotallyOrderedType;
 
-class DomainType implements INamedType, IDiscreteType
+class DomainType implements IDiscreteType
 {
     use NamedDbObject;
 

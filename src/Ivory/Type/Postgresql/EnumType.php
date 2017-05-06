@@ -3,10 +3,9 @@ namespace Ivory\Type\Postgresql;
 
 use Ivory\Exception\IncomparableException;
 use Ivory\NamedDbObject;
-use Ivory\Type\INamedType;
 use Ivory\Type\ITotallyOrderedType;
 
-class EnumType implements INamedType, ITotallyOrderedType
+class EnumType implements ITotallyOrderedType
 {
     use NamedDbObject;
 

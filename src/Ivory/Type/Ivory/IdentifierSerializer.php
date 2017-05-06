@@ -1,40 +1,29 @@
 <?php
 namespace Ivory\Type\Ivory;
 
-use Ivory\Type\ITotallyOrderedType;
+use Ivory\Type\IValueSerializer;
 
 /**
  * Identifier, e.g., table or column name.
  *
- * Unlike {@link QuotedIdentifierType}, identifiers serialized by this converter are only quoted if reasonable. There
- * are two reasons for quoting:
+ * Unlike {@link QuotedIdentifierSerializer}, identifiers serialized by this serializer are only quoted if reasonable.
+ * There are two reasons for quoting:
  * - uppercase characters in the identifier (without quoting, Postgres would convert the identifier to lowercase), or
  * - characters which would be illegal for an unquoted identifier according to the PostgreSQL lexical rules.
  *
  * Thus, to be unquoted, the identifier must:
  * - start with a lowercase letter (`a`-`z` and other characters classified as letters) or an underscore (`_`), and
  * - subsequent characters (if any) can only be lowercase letters, underscores, digits (`0`-`9`), or dollar signs (`$`).
- * Identifiers not satisfying these constraints are quoted by this type converter.
+ * Identifiers not satisfying these constraints are quoted by this serializer.
  *
  * As identifiers are expected to be used in contexts where `NULL` is illegal, serializing `null` will result in an
  * {@link \InvalidArgumentException}.
  *
- * Represented as the PHP `string` type.
- *
- * @see QuotedIdentifierType type converter always quoting the identifier
+ * @see QuotedIdentifierSerializer - a serializer always quoting the identifier
  * @see https://www.postgresql.org/docs/9.6/static/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
  */
-class IdentifierType implements ITotallyOrderedType
+class IdentifierSerializer implements IValueSerializer
 {
-    public function parseValue($str)
-    {
-        if ($str === null) {
-            return null;
-        } else {
-            return $str;
-        }
-    }
-
     public function serializeValue($val): string
     {
         if ($val === null) {
@@ -46,15 +35,6 @@ class IdentifierType implements ITotallyOrderedType
         } else {
             return $val;
         }
-    }
-
-    public function compareValues($a, $b)
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-
-        return strcmp((string)$a, (string)$b); // FIXME: use the same comparison as StringType
     }
 
     private function needsQuotes(string $val): bool

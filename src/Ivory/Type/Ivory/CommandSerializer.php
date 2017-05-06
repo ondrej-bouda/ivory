@@ -4,7 +4,7 @@ namespace Ivory\Type\Ivory;
 use Ivory\Query\ICommandRecipe;
 
 /**
- * Internal Ivory converter serializing command recipes into SQL value.
+ * Internal Ivory value serializer for serializing command recipes into SQL statements.
  *
  * Used in SQL patterns to handle `%cmd` placeholders. These will typically be used combined with the `RETURNING`
  * clause, either as single `INSERT` or `UPDATE` commands for which the caller wants to fetch the written rows, or in
@@ -12,7 +12,7 @@ use Ivory\Query\ICommandRecipe;
  *
  * Note that an {@link \InvalidArgumentException} is thrown when serializing `null` as that clearly signifies an error.
  */
-class CommandType extends VolatilePatternTypeBase
+class CommandSerializer extends ConnectionDependentValueSerializer
 {
     public function serializeValue($val): string
     {
