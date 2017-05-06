@@ -4,7 +4,7 @@ namespace Ivory\Type;
 interface ITypeProvider
 {
     /**
-     * Retrieves the type object for the specified PostgreSQL type, using the local and the global type register.
+     * Retrieves the type object for the specified PostgreSQL type, if it is known to the type provider.
      *
      * @param string $schemaName name of the PostgreSQL schema to get the type object for
      * @param string $typeName name of the PostgreSQL type to get the type object for
@@ -13,7 +13,7 @@ interface ITypeProvider
     function provideType(string $schemaName, string $typeName);
 
     /**
-     * Provides the implementation of the range canonical function, using the local and the global type register.
+     * Provides the implementation of the range canonical function.
      *
      * @param string $schemaName name of the PostgreSQL schema to get the function from
      * @param string $funcName name of the PostgreSQL canonical function to get the implementation for
@@ -22,4 +22,21 @@ interface ITypeProvider
      *                                    corresponding implementation is registered
      */
     function provideRangeCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype);
+
+    /**
+     * Returns the list of all rules for recognizing types from PHP values.
+     *
+     * @return string[][] map: data type => pair: schema name, type name
+     */
+    function getTypeRecognitionRules();
+
+    /**
+     * @return IValueSerializer[] map: name => value serializer
+     */
+    function getValueSerializers();
+
+    /**
+     * @return string[][] map: abbreviation => pair: schema name, type name
+     */
+    function getTypeAbbreviations();
 }

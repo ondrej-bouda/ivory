@@ -7,7 +7,7 @@ use Ivory\Exception\UndefinedTypeException;
 /**
  * Dictionary of data types on a concrete database.
  */
-class TypeDictionary implements ICacheableTypeDictionary
+class TypeDictionary implements ITypeDictionary
 {
     /** @var IType[] */
     private $oidTypeMap = [];
@@ -28,6 +28,17 @@ class TypeDictionary implements ICacheableTypeDictionary
      *               map: plain type name => type object (might be a reference to $this->qualNameTypeMap) */
     private $searchedNameCache = [];
 
+    public function __sleep()
+    {
+        return [
+            'oidTypeMap',
+            'qualNameTypeMap',
+            'typeAliases',
+            'valueSerializers',
+            'typeRecognitionRuleSets',
+            'searchedNameCache',
+        ];
+    }
 
     public function defineType(IType $type, int $oid = null)
     {
@@ -104,7 +115,7 @@ class TypeDictionary implements ICacheableTypeDictionary
      */
     public function addTypeRecognitionRuleSet(array $ruleSet)
     {
-        array_unshift($this->typeRecognitionRuleSets, $ruleSet);
+        $this->typeRecognitionRuleSets[] = $ruleSet;
     }
 
     private function recomputeNameCache()
@@ -281,21 +292,21 @@ class TypeDictionary implements ICacheableTypeDictionary
         return null;
     }
 
-    public function detachFromConnection()
-    {
-        $connDepTypes = $this->collectObjects(IConnectionDependentObject::class);
-        foreach ($connDepTypes as $type) {
-            /** @var IConnectionDependentObject $type */
-            $type->detachFromConnection();
-        }
-    }
-
     public function attachToConnection(IConnection $connection)
     {
         $connDepTypes = $this->collectObjects(IConnectionDependentObject::class);
         foreach ($connDepTypes as $type) {
             /** @var IConnectionDependentObject $type */
             $type->attachToConnection($connection);
+        }
+    }
+
+    public function detachFromConnection()
+    {
+        $connDepTypes = $this->collectObjects(IConnectionDependentObject::class);
+        foreach ($connDepTypes as $type) {
+            /** @var IConnectionDependentObject $type */
+            $type->detachFromConnection();
         }
     }
 

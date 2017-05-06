@@ -1,7 +1,6 @@
 <?php
 namespace Ivory\Type;
 
-use Ivory\Connection\IConnection;
 use Ivory\Exception\InternalException;
 use Ivory\Type\Ivory\UndefinedType;
 use Ivory\Type\Postgresql\ArrayType;
@@ -11,21 +10,17 @@ use Ivory\Type\Postgresql\EnumType;
 use Ivory\Type\Postgresql\NamedCompositeType;
 use Ivory\Type\Postgresql\RangeType;
 
-class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
+class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
 {
-    private $connection;
     private $connHandler;
 
-    public function __construct(IConnection $connection, $connHandler)
+    public function __construct($connHandler)
     {
-        $this->connection = $connection;
         $this->connHandler = $connHandler;
     }
 
-    public function compileTypeDictionary(ITypeProvider $typeProvider): ITypeDictionary
+    protected function yieldTypes(ITypeProvider $typeProvider, ITypeDictionary $dict): \Generator
     {
-        $dict = new TypeDictionary();
-
         $enumLabels = $this->retrieveEnumLabels();
 
         $query = "WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypdelim, rngcfnspname, rngcfname) AS (
@@ -131,7 +126,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                         $subtype = $dict->requireTypeByOid($row['parenttype']);
                         if (!$subtype instanceof ITotallyOrderedType) {
                             if ($subtype instanceof UndefinedType) {
-                                $type = new UndefinedType($schemaName, $typeName, $this->connection);
+                                $type = new UndefinedType($schemaName, $typeName);
                                 break;
                             }
 
@@ -162,12 +157,10 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
                 }
             }
 
-            $dict->defineType($type, $row['oid']);
+            yield $row['oid'] => $type;
         }
 
         $this->fetchCompositeAttributes($dict);
-
-        return $dict;
     }
 
     private function retrieveEnumLabels()
@@ -231,7 +224,7 @@ class IntrospectingTypeDictionaryCompiler implements ITypeDictionaryCompiler
         if ($type !== null) {
             return $type;
         } else {
-            return new UndefinedType($schemaName, $typeName, $this->connection);
+            return new UndefinedType($schemaName, $typeName);
         }
     }
 

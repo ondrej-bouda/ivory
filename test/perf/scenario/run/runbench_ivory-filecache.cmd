@@ -1,0 +1,1 @@
+php ../bench.php --recreate --rounds 100 --warmup 5 ivory-filecache > ../out/runbench_ivory-filecache.out

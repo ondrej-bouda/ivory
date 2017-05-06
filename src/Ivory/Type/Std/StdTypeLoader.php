@@ -1,7 +1,6 @@
 <?php
 namespace Ivory\Type\Std;
 
-use Ivory\Connection\IConnection;
 use Ivory\Lang\Sql\Types;
 use Ivory\Type\Postgresql\AdHocCompositeType;
 
@@ -10,7 +9,7 @@ use Ivory\Type\Postgresql\AdHocCompositeType;
  */
 class StdTypeLoader implements \Ivory\Type\ITypeLoader
 {
-    public function loadType(string $schemaName, string $typeName, IConnection $connection)
+    public function loadType(string $schemaName, string $typeName)
     {
         switch ($schemaName) {
             case 'pg_catalog':
@@ -54,15 +53,15 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
                         return new StringType($schemaName, $typeName);
 
                     case 'date':
-                        return new DateType($schemaName, $typeName, $connection);
+                        return new DateType($schemaName, $typeName);
                     case 'time':
                         return new TimeType($schemaName, $typeName);
                     case 'timetz':
                         return new TimeTzType($schemaName, $typeName);
                     case 'timestamp':
-                        return new TimestampType($schemaName, $typeName, $connection);
+                        return new TimestampType($schemaName, $typeName);
                     case 'timestamptz':
-                        return new TimestampTzType($schemaName, $typeName, $connection);
+                        return new TimestampTzType($schemaName, $typeName);
                     case 'interval':
                         return new IntervalType($schemaName, $typeName);
 
@@ -110,7 +109,7 @@ class StdTypeLoader implements \Ivory\Type\ITypeLoader
                         return new MacAddrType($schemaName, $typeName);
 
                     case 'money':
-                        return new MoneyType($schemaName, $typeName, $connection);
+                        return new MoneyType($schemaName, $typeName);
 
                     case 'pg_lsn':
                         return new PgLsnType($schemaName, $typeName);

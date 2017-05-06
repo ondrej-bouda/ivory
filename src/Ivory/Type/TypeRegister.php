@@ -1,8 +1,6 @@
 <?php
 namespace Ivory\Type;
 
-use Ivory\Connection\IConnection;
-
 /**
  * Collection of PHP type objects and their supplements for recognized PostgreSQL types.
  *
@@ -25,9 +23,9 @@ use Ivory\Connection\IConnection;
  *
  * The type registers are not directly used when Ivory works with types. Instead, they merely serve as a basis for an
  * {@link ITypeDictionary}, which is compiled automatically when first needed, and is usually cached for the whole
- * script lifetime. Thus, **later registration changes of types, types loaders or type supplements are not reflected**.
+ * script lifetime. Thus, **later registration changes of types, type loaders or type supplements are not reflected**.
  */
-class TypeRegister
+class TypeRegister implements ITypeProvider
 {
     /** @var IType[][] already known types; map: schema name => map: type name => type object */
     private $types = [];
@@ -388,41 +386,6 @@ class TypeRegister
         unset($this->typeRecognitionRules[$dataType]);
     }
 
-    /**
-     * Returns the list of all rules for recognizing types from PHP values.
-     *
-     * @return string[][] map: data type => pair: schema name, type name
-     */
-    public function getTypeRecognitionRules()
-    {
-        return $this->typeRecognitionRules;
-    }
-
-    /**
-     * @return IValueSerializer[] map: name => value serializer
-     */
-    public function getValueSerializers()
-    {
-        return $this->valueSerializers;
-    }
-
-    /**
-     * @return string[][] map: abbreviation => pair: schema name, type name
-     */
-    public function getTypeAbbreviations()
-    {
-        return $this->typeAbbreviations;
-    }
-
-    /**
-     * Retrieves all the registered type loaders.
-     *
-     * @return ITypeLoader[] list of the registered type loaders, in the registration order
-     */
-    public function getTypeLoaders()
-    {
-        return $this->typeLoaders;
-    }
 
     /**
      * Returns the type object explicitly registered using {@link TypeRegister::registerType()}.
@@ -437,33 +400,13 @@ class TypeRegister
     }
 
     /**
-     * Loads a type from the first registered type loader recognizing the type.
+     * Retrieves all the registered type loaders.
      *
-     * @param string $schemaName name of the PostgreSQL schema to get the type object for
-     * @param string $typeName name of the PostgreSQL type to get the type object for
-     * @param IConnection $connection connection above which the type is to be loaded
-     * @return IType|null the requested type, or <tt>null</tt> if no loader recognizes the type
+     * @return ITypeLoader[] list of the registered type loaders, in the registration order
      */
-    public function loadType(string $schemaName, string $typeName, IConnection $connection)
+    public function getTypeLoaders()
     {
-        foreach ($this->typeLoaders as $loader) {
-            $tc = $loader->loadType($schemaName, $typeName, $connection);
-            if ($tc !== null) {
-                return $tc;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Retrieves all the registered range canonical function providers.
-     *
-     * @return IRangeCanonicalFuncProvider[] list of the registered range canonical function providers, in the
-     *                                         registration order
-     */
-    public function getRangeCanonicalFuncProviders()
-    {
-        return $this->rangeCanonFuncProviders;
+        return $this->typeLoaders;
     }
 
     /**
@@ -481,21 +424,67 @@ class TypeRegister
     }
 
     /**
-     * Provides a range canonical function by the first registered provider recognizing it.
+     * Retrieves all the registered range canonical function providers.
      *
-     * @param string $schemaName name of the PostgreSQL schema to get the function from
-     * @param string $funcName name of the PostgreSQL function to provide
-     * @param ITotallyOrderedType $subtype function argument type
-     * @return IRangeCanonicalFunc|null the requested function, or <tt>null</tt> if no provider recognizes the function
+     * @return IRangeCanonicalFuncProvider[] list of the registered range canonical function providers, in the
+     *                                         registration order
      */
+    public function getRangeCanonicalFuncProviders()
+    {
+        return $this->rangeCanonFuncProviders;
+    }
+
+
+    //region ITypeProvider
+
+    public function provideType(string $schemaName, string $typeName)
+    {
+        $type = $this->getType($schemaName, $typeName);
+        if ($type !== null) {
+            return $type;
+        }
+
+        foreach ($this->typeLoaders as $loader) {
+            $type = $loader->loadType($schemaName, $typeName);
+            if ($type !== null) {
+                return $type;
+            }
+        }
+
+        return null;
+    }
+
     public function provideRangeCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype)
     {
+        $func = $this->getRangeCanonicalFunc($schemaName, $funcName, $subtype);
+        if ($func !== null) {
+            return $func;
+        }
+
         foreach ($this->rangeCanonFuncProviders as $provider) {
             $func = $provider->provideCanonicalFunc($schemaName, $funcName, $subtype);
             if ($func !== null) {
                 return $func;
             }
         }
+
         return null;
     }
+
+    public function getTypeRecognitionRules()
+    {
+        return $this->typeRecognitionRules;
+    }
+
+    public function getValueSerializers()
+    {
+        return $this->valueSerializers;
+    }
+
+    public function getTypeAbbreviations()
+    {
+        return $this->typeAbbreviations;
+    }
+
+    //endregion
 }

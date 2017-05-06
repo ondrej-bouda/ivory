@@ -1,8 +1,15 @@
 <?php
 namespace Ivory\Type;
 
+use Ivory\Connection\IConnection;
 use Ivory\Exception\UndefinedTypeException;
 
+/**
+ * Dictionary of all the specific types and other type-related objects and definitions prepared for being used.
+ *
+ * A type dictionary is the interface of the type system to other Ivory subsystems. All the definitions and rules are
+ * compiled in the dictionary, so that just the dictionary is needed for serializing, parsing and recognizing types.
+ */
 interface ITypeDictionary
 {
     /**
@@ -53,4 +60,18 @@ interface ITypeDictionary
      * @param string[] $schemaList
      */
     function setTypeSearchPath(array $schemaList);
+
+    /**
+     * Attach connection-dependent objects in this dictionary to a connection.
+     *
+     * @param IConnection $connection connection to attach the dictionary to
+     */
+    function attachToConnection(IConnection $connection);
+
+    /**
+     * Detach any objects in this dictionary from the database connection.
+     *
+     * After this operation, the dictionary must be safe for serialization.
+     */
+    function detachFromConnection();
 }
