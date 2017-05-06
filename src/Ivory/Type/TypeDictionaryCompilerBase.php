@@ -3,7 +3,7 @@ namespace Ivory\Type;
 
 abstract class TypeDictionaryCompilerBase implements ITypeDictionaryCompiler
 {
-    protected function createTypeDictionary()
+    protected function createTypeDictionary(): TypeDictionary
     {
         return new TypeDictionary();
     }

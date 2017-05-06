@@ -4,9 +4,6 @@ namespace Ivory\Type;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\UndefinedTypeException;
 
-/**
- * Dictionary of data types on a concrete database.
- */
 class TypeDictionary implements ITypeDictionary
 {
     /** @var IType[] */

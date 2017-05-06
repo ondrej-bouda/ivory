@@ -12,6 +12,8 @@ class IvoryPerformanceTest implements IPerformanceTest
     const SYNCHRONOUS = 1;
     const NO_CACHE = 2;
     const FILE_CACHE = 4;
+    
+    const FILE_CACHE_DIR = __DIR__ . '/out';
 
     private $async;
     /** @var IConnection */
@@ -22,10 +24,11 @@ class IvoryPerformanceTest implements IPerformanceTest
         $this->async = !($options & self::SYNCHRONOUS);
 
         if ($options & self::FILE_CACHE) {
-            $outDir = __DIR__ . '/out';
-            $fsAdapter = new Local($outDir);
+            $fsAdapter = new Local(self::FILE_CACHE_DIR);
             $fs = new Filesystem($fsAdapter);
-            Ivory::setDefaultCacheImpl(new FilesystemCachePool($fs));
+            $cachePool = new FilesystemCachePool($fs);
+            $cachePool->clear();
+            Ivory::setDefaultCacheImpl($cachePool);
         } elseif (!($options & self::NO_CACHE)) {
             Ivory::setDefaultCacheImpl(new ArrayCachePool());
         }

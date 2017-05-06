@@ -69,6 +69,7 @@ class TypeControl implements ITypeControl
     private function cacheTypeDictionary(ITypeDictionary $dict)
     {
         if ($this->connection->isCacheEnabled()) {
+            $this->typeDictionary->detachFromConnection();
             $this->connection->cachePermanently(ITypeControl::TYPE_DICTIONARY_CACHE_KEY, $dict);
         }
     }
