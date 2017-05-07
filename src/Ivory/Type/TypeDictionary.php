@@ -324,6 +324,10 @@ class TypeDictionary implements ITypeDictionary
 
     public function defineTypeAlias(string $alias, string $schemaName, string $typeName)
     {
+        if (!isset($this->qualNameTypeMap[$schemaName])) {
+            // necessary for the forward reference to be valid once the aliased type finally appears in the type map
+            $this->qualNameTypeMap[$schemaName] = [];
+        }
         $this->typeAliases[$alias] =& $this->qualNameTypeMap[$schemaName][$typeName];
     }
 
