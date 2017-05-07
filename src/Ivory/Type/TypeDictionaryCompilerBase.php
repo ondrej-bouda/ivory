@@ -5,7 +5,7 @@ abstract class TypeDictionaryCompilerBase implements ITypeDictionaryCompiler
 {
     protected function createTypeDictionary(): TypeDictionary
     {
-        return new TypeDictionary();
+        return new TrackingTypeDictionary();
     }
 
     public function compileTypeDictionary(ITypeProvider $typeProvider): ITypeDictionary
@@ -25,6 +25,10 @@ abstract class TypeDictionaryCompilerBase implements ITypeDictionaryCompiler
 
         foreach ($this->yieldTypes($typeProvider, $dict) as $oid => $type) {
             $dict->defineType($type, $oid);
+        }
+
+        if ($dict instanceof TrackingTypeDictionary) {
+            $dict->resetTypeUsageStats();
         }
 
         return $dict;

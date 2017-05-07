@@ -18,6 +18,10 @@ class ConnectionControl implements IConnectionControl
     private $initProcedure = null;
     /** @var string|null last notice received on this connection */
     private $lastNotice = null;
+    /** @var \Closure[] */
+    private $preDisconnectHooks = [];
+    /** @var \Closure[] */
+    private $postDisconnectHooks = [];
 
 
     public function __construct(IConnection $ivoryConnection, $params)
@@ -84,16 +88,35 @@ class ConnectionControl implements IConnectionControl
             return false;
         }
 
+        foreach ($this->preDisconnectHooks as $hook) {
+            call_user_func($hook);
+        }
+
         // TODO: handle the case when there are some open LO handles (an LO shall be an IType registered at the connection)
 
         $closed = pg_close($this->handler); // NOTE: it seems correct to close a not yet established asynchronous connection
         if (!$closed) {
             throw new ConnectionException('Error closing the connection');
         }
+
+        foreach ($this->postDisconnectHooks as $hook) {
+            call_user_func($hook);
+        }
+
         $this->handler = null;
         $this->finishedConnecting = null;
         $this->initProcedure = null;
         return true;
+    }
+
+    public function registerPreDisconnectHook(\Closure $closure)
+    {
+        $this->preDisconnectHooks[] = $closure;
+    }
+
+    public function registerPostDisconnectHook(\Closure $closure)
+    {
+        $this->postDisconnectHooks[] = $closure;
     }
 
     /**

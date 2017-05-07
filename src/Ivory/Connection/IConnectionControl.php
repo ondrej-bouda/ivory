@@ -86,4 +86,28 @@ interface IConnectionControl
      * @throws ConnectionException on error closing the connection
      */
     function disconnect(): bool;
+
+    /**
+     * Registers a closure to be called right before disconnecting from the database.
+     *
+     * Multiple hooks may be registered. They will be called in the registration order.
+     *
+     * The connection control disconnects from the database either on an explicit call of the {@link disconnect()}
+     * method, or when the connection gets destroyed before freeing from memory.
+     *
+     * @param \Closure $closure closure to call, given no arguments
+     */
+    function registerPreDisconnectHook(\Closure $closure);
+
+    /**
+     * Registers a closure to be called right after disconnecting from the database.
+     *
+     * Multiple hooks may be registered. They will be called in the registration order.
+     *
+     * The connection control disconnects from the database either on an explicit call of the {@link disconnect()}
+     * method, or when the connection gets destroyed before freeing from memory.
+     *
+     * @param \Closure $closure closure to call, given no arguments
+     */
+    function registerPostDisconnectHook(\Closure $closure);
 }

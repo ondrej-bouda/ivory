@@ -7,15 +7,15 @@ use Ivory\Exception\UndefinedTypeException;
 class TypeDictionary implements ITypeDictionary
 {
     /** @var IType[] */
-    private $oidTypeMap = [];
+    protected $oidTypeMap = [];
     /** @var IType[][] map: schema name => map: type name => type object */
-    private $qualNameTypeMap = [];
-    /** @var IType[] map: type alias => type (might be a reference to $this->qualNameTypeMap) */
-    private $typeAliases = [];
+    protected $qualNameTypeMap = [];
+    /** @var IType[] map: type alias => reference to $this->qualNameTypeMap */
+    protected $typeAliases = [];
     /** @var IValueSerializer[] map: serializer name => value serializer */
-    private $valueSerializers = [];
+    protected $valueSerializers = [];
     /** @var string[][][] list: map: PHP data type name => pair (schema name, type name) */
-    private $typeRecognitionRuleSets = [];
+    protected $typeRecognitionRuleSets = [];
     /** @var string[] names of schemas to search for a type only given by name without schema */
     private $typeSearchPath = [];
     /** @var ITypeDictionaryUndefinedHandler|null */
@@ -28,6 +28,7 @@ class TypeDictionary implements ITypeDictionary
 
     public function __sleep()
     {
+        // NOTE: for the subclasses to be able to serialize the dictionary, keep all serialized properties protected
         return [
             'oidTypeMap',
             'qualNameTypeMap',
@@ -242,35 +243,6 @@ class TypeDictionary implements ITypeDictionary
         }
     }
 
-    private function collectObjects(string $className): \SplObjectStorage
-    {
-        $result = new \SplObjectStorage();
-        foreach ($this->oidTypeMap as $type) {
-            if ($type instanceof $className) {
-                $result->attach($type);
-            }
-        }
-        foreach ($this->qualNameTypeMap as $types) {
-            foreach ($types as $type) {
-                if ($type instanceof $className) {
-                    $result->attach($type);
-                }
-            }
-        }
-        foreach ($this->typeAliases as $type) {
-            if ($type instanceof $className) {
-                $result->attach($type);
-            }
-        }
-        foreach ($this->valueSerializers as $serializer) {
-            if ($serializer instanceof $className) {
-                $result->attach($serializer);
-            }
-        }
-
-        return $result;
-    }
-
     //endregion
 
     //region content management
@@ -314,6 +286,37 @@ class TypeDictionary implements ITypeDictionary
         }
     }
 
+    /**
+     * Removes the type from the dictionary.
+     *
+     * @param IType $type
+     */
+    public function disposeType(IType $type)
+    {
+        $schema = $type->getSchemaName();
+        $name = $type->getName();
+
+        unset($this->qualNameTypeMap[$schema][$name]);
+
+        self::removeAll($this->typeAliases, $type);
+        self::removeAll($this->oidTypeMap, $type);
+
+        if (($this->searchedNameCache[$name] ?? null) === $type) {
+            unset($this->searchedNameCache[$name]);
+        }
+
+        if ($type instanceof IValueSerializer) {
+            self::removeAll($this->valueSerializers, $type);
+        }
+    }
+
+    private static function removeAll(array &$array, $item)
+    {
+        while (($key = array_search($item, $array, true)) !== false) {
+            unset($array[$key]);
+        }
+    }
+
     public function defineValueSerializer(string $name, IValueSerializer $valueSerializer)
     {
         $this->valueSerializers[$name] = $valueSerializer;
@@ -342,6 +345,30 @@ class TypeDictionary implements ITypeDictionary
                 }
             }
         }
+    }
+
+    protected function collectObjects(string $className): \SplObjectStorage
+    {
+        $result = new \SplObjectStorage();
+        foreach ($this->oidTypeMap as $type) {
+            if ($type instanceof $className) {
+                $result->attach($type);
+            }
+        }
+        foreach ($this->qualNameTypeMap as $types) {
+            foreach ($types as $type) {
+                if ($type instanceof $className) {
+                    $result->attach($type);
+                }
+            }
+        }
+        foreach ($this->valueSerializers as $serializer) {
+            if ($serializer instanceof $className) {
+                $result->attach($serializer);
+            }
+        }
+
+        return $result;
     }
 
     //endregion
