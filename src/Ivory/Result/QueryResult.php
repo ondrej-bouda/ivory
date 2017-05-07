@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Result;
 
+use Ivory\Connection\ITypeControl;
 use Ivory\Exception\NotImplementedException;
 use Ivory\Exception\ResultException;
 use Ivory\Relation\Column;
@@ -11,7 +12,6 @@ use Ivory\Relation\ProjectedRelation;
 use Ivory\Relation\RelationMacros;
 use Ivory\Relation\RenamedRelation;
 use Ivory\Relation\Tuple;
-use Ivory\Type\ITypeDictionary;
 
 class QueryResult extends Result implements IQueryResult
 {
@@ -26,15 +26,15 @@ class QueryResult extends Result implements IQueryResult
 
     /**
      * @param resource $resultHandler the result, with the internal pointer at the beginning
-     * @param ITypeDictionary $typeDictionary
+     * @param ITypeControl $typeControl
      * @param string|null $lastNotice last notice captured on the connection
      */
-    public function __construct($resultHandler, ITypeDictionary $typeDictionary, string $lastNotice = null)
+    public function __construct($resultHandler, ITypeControl $typeControl, string $lastNotice = null)
     {
         parent::__construct($resultHandler, $lastNotice);
 
         $this->numRows = $this->fetchNumRows();
-        $this->initCols($typeDictionary);
+        $this->initCols($typeControl);
     }
 
     private function fetchNumRows(): int
@@ -47,7 +47,7 @@ class QueryResult extends Result implements IQueryResult
         }
     }
 
-    private function initCols(ITypeDictionary $typeDictionary)
+    private function initCols(ITypeControl $typeControl)
     {
         $numFields = pg_num_fields($this->handler);
         if ($numFields < 0 || $numFields === null) {
@@ -72,6 +72,8 @@ class QueryResult extends Result implements IQueryResult
             if ($typeOid === false || $typeOid === null) { // NOTE: besides false, pg_field_type_oid() might return NULL on error
                 throw new ResultException("Error retrieving type OID of result column $i.");
             }
+            // NOTE: the type dictionary may change during the iterations, so taky a fresh one every time
+            $typeDictionary = $typeControl->getTypeDictionary();
             $type = $typeDictionary->requireTypeByOid($typeOid);
 
             $this->columns[] = new Column($this, $i, $name, $type);
