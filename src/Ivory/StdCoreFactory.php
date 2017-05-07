@@ -40,10 +40,12 @@ class StdCoreFactory implements ICoreFactory
             $reg->registerTypeAbbreviation($alias, $implSchema, $implName);
         }
 
-        // standard non-volatile value serializers; volatile ones will be defined on the connection
+        // standard value serializers
         $reg->registerValueSerializer('sql', new SqlSerializer());
         $reg->registerValueSerializer('ident', new IdentifierSerializer());
         $reg->registerValueSerializer('qident', new QuotedIdentifierSerializer());
+        $reg->registerValueSerializer('rel', new RelationSerializer());
+        $reg->registerValueSerializer('cmd', new CommandSerializer());
 
         // standard type abbreviations
         $reg->registerTypeAbbreviation('s', 'pg_catalog', 'text');
@@ -110,13 +112,7 @@ class StdCoreFactory implements ICoreFactory
 
     public function createConnection(string $connName, ConnectionParameters $params): IConnection
     {
-        $conn = new Connection($connName, $params);
-
-        $reg = $conn->getTypeRegister();
-        $reg->registerValueSerializer('rel', new RelationSerializer($conn));
-        $reg->registerValueSerializer('cmd', new CommandSerializer($conn));
-
-        return $conn;
+        return new Connection($connName, $params);
     }
 
     public function createCacheControl(IConnection $connection = null): ICacheControl

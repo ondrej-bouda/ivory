@@ -14,7 +14,8 @@ class TypeControl implements ITypeControl
 {
     private $connection;
     private $connCtl;
-    private $typeRegister;
+    /** @var TypeRegister|null */
+    private $typeRegister = null;
     /** @var ITypeDictionary|null */
     private $typeDictionary = null;
     /** @var bool flag telling whether the current type dictionary has been loaded from the cache */
@@ -24,7 +25,6 @@ class TypeControl implements ITypeControl
     {
         $this->connection = $connection;
         $this->connCtl = $connCtl;
-        $this->typeRegister = new TypeRegister();
 
         $this->connCtl->registerPostDisconnectHook(function () {
             $this->cacheTypeDictionary();
@@ -49,6 +49,10 @@ class TypeControl implements ITypeControl
 
     public function getTypeRegister(): TypeRegister
     {
+        if ($this->typeRegister === null) {
+            $this->typeRegister = new TypeRegister();
+        }
+
         return $this->typeRegister;
     }
 
