@@ -50,7 +50,7 @@ class TypeControl implements ITypeControl
 
     private function cacheTypeDictionary()
     {
-        if ($this->typeDictionary !== null && !$this->typeDictionaryLoadedFromCache &&
+        if ($this->typeDictionary !== null && $this->typeDictionaryLoadedFromCache !== true &&
             $this->connection->isCacheEnabled())
         {
             $this->typeDictionary->detachFromConnection();

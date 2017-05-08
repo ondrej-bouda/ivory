@@ -19,7 +19,7 @@ class ConnectionControl implements IConnectionControl
     /** @var string|null last notice received on this connection */
     private $lastNotice = null;
 
-    /** @var \Closure */
+    /** @var \Closure[] */
     private $connectStartHooks = [];
     /** @var \Closure[] */
     private $preDisconnectHooks = [];
