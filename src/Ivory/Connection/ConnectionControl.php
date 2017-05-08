@@ -18,6 +18,9 @@ class ConnectionControl implements IConnectionControl
     private $initProcedure = null;
     /** @var string|null last notice received on this connection */
     private $lastNotice = null;
+
+    /** @var \Closure */
+    private $connectStartHooks = [];
     /** @var \Closure[] */
     private $preDisconnectHooks = [];
     /** @var \Closure[] */
@@ -65,6 +68,9 @@ class ConnectionControl implements IConnectionControl
         if ($this->handler === null) {
             $this->initProcedure = $initProcedure;
             $this->openConnection(PGSQL_CONNECT_ASYNC);
+            foreach ($this->connectStartHooks as $hook) {
+                call_user_func($hook);
+            }
             return true;
         } else {
             return false;
@@ -107,6 +113,11 @@ class ConnectionControl implements IConnectionControl
         $this->finishedConnecting = null;
         $this->initProcedure = null;
         return true;
+    }
+
+    public function registerConnectStartHook(\Closure $closure)
+    {
+        $this->connectStartHooks[] = $closure;
     }
 
     public function registerPreDisconnectHook(\Closure $closure)

@@ -88,6 +88,18 @@ interface IConnectionControl
     function disconnect(): bool;
 
     /**
+     * Registers a closure to be called right after starting to connect asynchronously to the database.
+     *
+     * Multiple hooks may be registered. They will be called in the registration order.
+     *
+     * Note that the hooks are only called if the {@link connect()} method is used. If connecting synchronously using
+     * {@link connectWait()}, the hooks are *not* called.
+     *
+     * @param \Closure $closure closure to call, given no arguments
+     */
+    function registerConnectStartHook(\Closure $closure);
+
+    /**
      * Registers a closure to be called right before disconnecting from the database.
      *
      * Multiple hooks may be registered. They will be called in the registration order.

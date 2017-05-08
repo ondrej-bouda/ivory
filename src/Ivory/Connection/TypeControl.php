@@ -18,20 +18,37 @@ class TypeControl implements ITypeControl
     private $typeRegister = null;
     /** @var ITypeDictionary|null */
     private $typeDictionary = null;
-    /** @var bool flag telling whether the current type dictionary has been loaded from the cache */
-    private $typeDictionaryLoadedFromCache = false;
+    /** @var ITypeDictionary|null */
+    private $preloadedTypeDictionary = null;
+    /**
+     * @var bool|null flag telling whether the current type dictionary has been loaded from the cache;
+     *                <tt>null</tt> if not yet attempted to load from cache
+     */
+    private $typeDictionaryLoadedFromCache = null;
 
     public function __construct(IConnection $connection, ConnectionControl $connCtl)
     {
         $this->connection = $connection;
         $this->connCtl = $connCtl;
 
+        $this->connCtl->registerConnectStartHook(function () {
+            $this->preloadTypeDictionary();
+        });
         $this->connCtl->registerPostDisconnectHook(function () {
             $this->cacheTypeDictionary();
         });
     }
 
-    public function cacheTypeDictionary()
+    private function preloadTypeDictionary()
+    {
+        if ($this->typeDictionary !== null) {
+            return null;
+        }
+
+        $this->preloadedTypeDictionary = $this->loadTypeDictionaryFromCache();
+    }
+
+    private function cacheTypeDictionary()
     {
         if ($this->typeDictionary !== null && !$this->typeDictionaryLoadedFromCache &&
             $this->connection->isCacheEnabled())
@@ -41,6 +58,21 @@ class TypeControl implements ITypeControl
                 $this->typeDictionary->disposeUnusedTypes();
             }
             $this->connection->cachePermanently(ITypeControl::TYPE_DICTIONARY_CACHE_KEY, $this->typeDictionary);
+        }
+    }
+
+    private function loadTypeDictionaryFromCache()
+    {
+        $dict = $this->connection->getCached(ITypeControl::TYPE_DICTIONARY_CACHE_KEY);
+        if ($dict instanceof ITypeDictionary) {
+            if ($dict instanceof TrackingTypeDictionary) {
+                // type usage watching is no more necessary - all types retrieved from cache are considered as being used
+                $dict->disableTypeUsageWatching();
+            }
+            return $dict;
+        }
+        else {
+            return null;
         }
     }
 
@@ -59,16 +91,18 @@ class TypeControl implements ITypeControl
     public function getTypeDictionary(): ITypeDictionary
     {
         if ($this->typeDictionary === null) {
-            $this->typeDictionary = $this->connection->getCached(ITypeControl::TYPE_DICTIONARY_CACHE_KEY);
-            if ($this->typeDictionary instanceof ITypeDictionary) {
+            if ($this->preloadedTypeDictionary !== null) {
+                $this->typeDictionary = $this->preloadedTypeDictionary;
+                $this->preloadedTypeDictionary = null;
                 $this->typeDictionaryLoadedFromCache = true;
-                if ($this->typeDictionary instanceof TrackingTypeDictionary) {
-                    // type usage watching is no more necessary - all types retrieved from cache are considered as being used
-                    $this->typeDictionary->disableTypeUsageWatching();
-                }
             } else {
-                $this->typeDictionary = $this->introspectTypeDictionary();
-                $this->typeDictionaryLoadedFromCache = false;
+                $this->typeDictionary = $this->loadTypeDictionaryFromCache();
+                if ($this->typeDictionary !== null) {
+                    $this->typeDictionaryLoadedFromCache = true;
+                } else {
+                    $this->typeDictionary = $this->introspectTypeDictionary();
+                    $this->typeDictionaryLoadedFromCache = false;
+                }
             }
 
             $this->typeDictionary->attachToConnection($this->connection);

@@ -93,6 +93,11 @@ class Connection implements IConnection
         return $this->connCtl->disconnect();
     }
 
+    public function registerConnectStartHook(\Closure $closure)
+    {
+        $this->connCtl->registerConnectStartHook($closure);
+    }
+
     public function registerPreDisconnectHook(\Closure $closure)
     {
         $this->connCtl->registerPreDisconnectHook($closure);
