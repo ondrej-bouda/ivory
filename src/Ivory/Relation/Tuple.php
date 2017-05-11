@@ -17,8 +17,8 @@ class Tuple implements \Iterator, ITuple
 {
     /** @var array list of data for the corresponding columns; already converted */
     private $data;
-    /** @var Column[] list of columns */
-    private $columns;
+    /** @var string[] list of column names */
+    private $columnNames;
     /** @var int[] map: column name => offset of the first column of the name */
     private $colNameMap;
     /** @var int iteration position */
@@ -46,13 +46,13 @@ class Tuple implements \Iterator, ITuple
 
     /**
      * @param array $data list of data for the corresponding columns
-     * @param Column[] $columns list of columns
-     * @param \int[] $colNameMap map: column name => offset of the first column of the name
+     * @param string[] $columnNames list of column names
+     * @param int[] $colNameMap map: column name => offset of the first column of the name
      */
-    public function __construct(array $data, array $columns, array $colNameMap)
+    public function __construct(array $data, array $columnNames, array $colNameMap)
     {
         $this->data = $data;
-        $this->columns = $columns;
+        $this->columnNames = $columnNames;
         $this->colNameMap = $colNameMap;
     }
 
@@ -101,9 +101,9 @@ class Tuple implements \Iterator, ITuple
         }
     }
 
-    public function getColumns()
+    public function getColumnNames()
     {
-        return $this->columns;
+        return $this->columnNames;
     }
 
     //endregion
@@ -191,7 +191,7 @@ class Tuple implements \Iterator, ITuple
 
     public function key()
     {
-        return $this->columns[$this->pos]->getName();
+        return $this->columnNames[$this->pos];
     }
 
     public function valid()

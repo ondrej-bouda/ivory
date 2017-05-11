@@ -55,9 +55,9 @@ interface ITuple extends \ArrayAccess, \Traversable, IComparable // TODO: test I
     function value($colOffsetOrNameOrEvaluator = 0);
 
     /**
-     * @return IColumn[] list of columns the tuple consists of
+     * @return string[] list of column names the tuple consists of
      */
-    function getColumns();
+    function getColumnNames();
 
     /**
      * @param string $name column name

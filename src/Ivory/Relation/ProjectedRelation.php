@@ -103,6 +103,6 @@ class ProjectedRelation extends ProjectedRelationBase
             }
         }
 
-        return new Tuple($data, $this->getColumns(), $this->getColNameMap());
+        return new Tuple($data, $this->getColNames(), $this->getColNameMap());
     }
 }

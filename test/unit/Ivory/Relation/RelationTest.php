@@ -219,9 +219,7 @@ class RelationTest extends \Ivory\IvoryTestCase
                 ->project([
                     'n',
                     'z' => function (ITuple $tuple) {
-                        $cols = $tuple->getColumns();
-                        $colNames = array_map(function (IColumn $col) { return $col->getName(); }, $cols);
-                        $this->assertSame(['m', 'n', 'z'], $colNames);
+                        $this->assertSame(['m', 'n', 'z'], $tuple->getColumnNames());
                         return -$tuple['z'];
                     },
                 ])
