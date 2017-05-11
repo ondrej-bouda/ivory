@@ -61,9 +61,6 @@ class Tuple implements \Iterator, ITuple
 
     public function toMap(): array
     {
-        // TODO: benchmark which is faster, perhaps with some expressions precomputed and passed to the constructor...
-//        return array_combine(array_keys($this->colNameMap), array_intersect_key($this->data, $this->colNameMap));
-
         $res = [];
         foreach ($this->colNameMap as $name => $i) {
             $res[$name] = $this->data[$i];
