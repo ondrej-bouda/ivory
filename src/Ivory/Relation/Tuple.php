@@ -25,24 +25,24 @@ class Tuple implements \Iterator, ITuple
     private $pos = 0;
 
 
-    // TODO: allow the user to compose a tuple; it needs a relation to refer to, though
-//    /**
-//     * Creates a tuple from an associative array.
-//     *
-//     * @param array|\Traversable $map
-//     * @return Tuple
-//     */
-//    public static function fromMap($map)
-//    {
-//        $data = [];
-//        $columns = [];
-//        $colNameMap = [];
-//        foreach ($map as $k => $v) {
-//            $data[] = $v;
-//            $columns[] = new Column()
-//            $colNameMap[$k] = count($data) - 1;
-//        }
-//    }
+    /**
+     * Creates a tuple from an associative array.
+     *
+     * @param array|\Traversable $map
+     * @return Tuple
+     */
+    public static function fromMap($map)
+    {
+        $data = [];
+        $colNames = [];
+        $colNameMap = [];
+        foreach ($map as $k => $v) {
+            $data[] = $v;
+            $colNames[] = $k;
+            $colNameMap[$k] = count($data) - 1;
+        }
+        return new Tuple($data, $colNames, $colNameMap);
+    }
 
     /**
      * @param array $data list of data for the corresponding columns
