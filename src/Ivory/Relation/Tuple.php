@@ -13,7 +13,7 @@ use Ivory\Utils\ValueUtils;
  * and `ArrayAccess` write operations (namely {@link \ArrayAccess::offsetSet()} and {@link \ArrayAccess::offsetUnset()})
  * throw an {@link \Ivory\Exception\ImmutableException}.
  */
-class Tuple implements \Iterator, ITuple
+class Tuple implements \IteratorAggregate, ITuple
 {
     /** @var array list of data for the corresponding columns; already converted */
     private $data;
@@ -21,8 +21,6 @@ class Tuple implements \Iterator, ITuple
     private $columnNames;
     /** @var int[] map: column name => offset of the first column of the name */
     private $colNameMap;
-    /** @var int iteration position */
-    private $pos = 0;
 
 
     /**
@@ -174,31 +172,13 @@ class Tuple implements \Iterator, ITuple
 
     //endregion
 
-    //region \Iterator
+    //region \IteratorAggregate
 
-    public function current()
+    public function getIterator()
     {
-        return $this->data[$this->pos];
-    }
-
-    public function next()
-    {
-        $this->pos++;
-    }
-
-    public function key()
-    {
-        return $this->columnNames[$this->pos];
-    }
-
-    public function valid()
-    {
-        return ($this->pos < count($this->data));
-    }
-
-    public function rewind()
-    {
-        $this->pos = 0;
+        foreach ($this->data as $i => $val) {
+            yield $this->columnNames[$i] => $val;
+        }
     }
 
     //endregion

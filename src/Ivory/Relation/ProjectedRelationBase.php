@@ -130,6 +130,9 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
 
     public function getIterator()
     {
-        return new RelationTupleIterator($this);
+        $cnt = $this->count();
+        for ($i = 0; $i < $cnt; $i++) {
+            yield $this->tuple($i);
+        }
     }
 }
