@@ -1,0 +1,106 @@
+Cursors
+=======
+* Introduce support for cursors iterating over a relation.
+
+
+
+Nested Transactions
+===================
+* A nested code block does not need to know whether it actually commits the whole transaction, or if it is just a piece
+  of a wider operation.
+* Similarly to output buffering, implement "transaction" nesting.
+* The block tells Ivory it has finished its batch. According to whether this is an outer or inner block, the BEGIN or
+  SAVEPOINT command, respectively, is really executed. Similarly, when cancelling the effect of a block, either ROLLBACK
+  TRANSACTION or ROLLBACK TO SAVEPOINT is automatically chosen, allowing the outer block to recover from failure of an
+  inner block, and even continue with the transaction.
+* With nested transactions, one may easily cause an error simply by not treating every transaction level correctly.
+  E.g., if an exception is thrown upon an error and not caught within the same transaction level, the correspondence
+  between the opening and closing methods may be broken. To help fight this, the method opening a (nested) transaction
+  block will return a handle. This handle must then be passed to the corresponding block commit/rollback method, which
+  will check whether it is the expected handle, and throw an exception if it does not match. This will be an optional
+  check, i.e., if no handle is passed to the closing method, no check will be performed and more responsibility lies in
+  the programmer's hands.
+** To make it clear the returned argument does not represent the transaction itself (which it can't - only one
+   transaction may be run on a single connection), represent the handle by a pure integer holding the nesting level.
+   Or, on the other way round, to make the thing type-safe, return a custom object, perhaps one only Ivory is capable of
+   creating.
+** Upon exception being thrown due to the level mismatch, rollback up to the level where the mismatch is detected. I.e.,
+   if mismatch is detected in a nested block, rollback it, throw an exception from the inner block, and allow the outer
+   block catch the exception and handle it gracefully.
+* Method names:
+** startBlock
+** commitBlock
+** rollbackBlock
+* See sandpit/nested_transactions.php.
+* Consider validating the correctness using generated UUIDs for savepoint names. That would require the called to
+  provide the handler retrieved from startBlock() - which might be OK.
+** Another option is to use savepoints named by the nesting levels.
+** Another option is to use a single fixed name for savepoint names, and leverage the fact Postgres allows one to use a
+   single savepoint name repeatedly.
+* Try finding a way how to catch exceptions throw from erroneous queries in inner block, and handle the error within the
+  outer block, with as few boilerplate code as possible. The worst would be requiring the user to catch database errors
+  in the outer block by hand and forcing them to issue a block rollback and re-throw the exception.
+
+
+
+List Serializers
+================
+* Implement serializers for lists of values.
+* Especially, implement "li" (comma-separated list of "i") and "ls" (comma-separated list of strings).
+* Useful for IN clauses (although arrays are more useful as they do not make a syntax error if empty).
+
+
+
+Encapsulation of Database Function Calls
+========================================
+* Introduce methods to call database functions from PHP code directly, not by composing the function call by hand.
+* Allow one to define classes representing database functions (regardless of whether permanent or temporary), and
+  instantiating them to call them.
+* Distinguish void, scalar, and set-returning functions. That would either lead to a relation recipe or command recipe,
+  which would also be used in more complex queries. Scalar function results might be used as parameters in complex
+  queries, or as just a value to fetch.
+
+
+
+Extend the Database Introspector
+================================
+* Implement a full-featured introspector of database objects.
+* Consider implementing that as a separate package, pluggable to Ivory.
+* Encapsulate the introspector as a standalone class, used by the type dictionary compiler.
+* Take the full strength from the DVN project.
+* Offer methods for testing the database being connected to - tables, data types, functions...
+** Especially useful for custom type/function objects to check that the database actually has the type or function
+   defined.
+
+
+
+Synchronized Type Dictionary
+============================
+* Currently, the type dictionary is cached for the whole script lifetime, or even among individual requests. As such,
+  any changes to type registers or in the connected-to database are not reflected by the Type Dictionary.
+* The only way to handle such changes after the Type Dictionary is set up is to manually call the
+  ITypeControl::flushTypeDictionary() method.
+* Implement updating the type dictionary according to the changes in type registers.
+* Update the docs for TypeRegister then - currently, it says: "later registration changes of types, types loaders or
+  type supplements are not reflected".
+
+
+
+Implement Data Source
+=====================
+* Introduce DataSource - an SqlRecipe paired with a database connection, ready to be executed.
+* Both having explicit methods like execute() or query(), and directly iterable, executing the query in the background.
+* Occurrences:
+** IStatementExecution::dataSource() + implementations
+** IRelationRecipe::toDataSource(IConnection)
+** DataSource::fromRecipe(IRelationRecipe, IConnection)
+* Consider specifying a smaller part of IConnection to be held by the data source, just the necessary methods for a
+  recipe to be executable.
+
+
+
+Global Ivory Methods
+====================
+* Implement Ivory::query() constructing a QueryRelation, or Ivory::expr() constructing an expression, applied on the
+  default connection.
+

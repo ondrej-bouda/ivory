@@ -1,6 +1,73 @@
+Strict Separation to Query and Command
+======================================
+* In other database layers, query() is commonly used in the more general meaning of statement().
+* Ivory strictly distinguishes between query() and command().
+* Is it OK to complain to the programmer about INSERT being pushed to query(), or the other way round? What about
+  finding a new term instead of query()?
+
+
+
+The Connection Mode
+===================
 * The default is asynchronous connecting.
 ** Because why not?
 ** But isn't it more expected for Ivory::connect() to return once it is really connected?
    Wouldn't Ivory::startConnecting() tell more what's going on? - Although, in case of asynchronous connecting, Ivory
    automatically waits until the connection is ready, so it is pretty transparent, and startConnecting() would, on the
    other hand, suggest some extra work has to be done.
+
+
+
+Clean up the names
+==================
+* RelationRecipe + Relation:
+** Relation is OK. RelationRecipe is not - the word "recipe" suggests a plan how to get something; instead, the object
+   actually defines what to bring, not how.
+** Other brainstormed, but refused ideas, for RelationRecipe:
+*** DataSource (misleading, it will not hold the connection and thus will not directly be iterable)
+*** SqlBuilder (too specific - SQL will be just one of many ways prescribing a relation)
+*** Prescription (too weird, totally suprising)
+*** RelationBuilder (quite exact, although it directly names the design pattern and "Builder" is not the exact meaning here - it is rather an indirect metaphor)
+** What about RelationDefinition or RelationDef, for short? (as hints the comment in
+   \Ivory\Showcase\QueryingTest::testRelationRecipe())
+* CommandRecipe + CommandResult:
+** Inconsistent with RelationRecipe + Relation.
+** What about renaming to just Command + CommandResult?
+
+
+
+Nested Transaction Method Naming
+================================
+* Revise the Nested Transactions point in the feature plan.
+* Are the method names OK? Other suggestions for the term instead of "block"?
+
+
+
+DataSource
+==========
+* Would DataSource be useful?
+* Would an analogy for Command be useful?
+
+
+
+Iterable Tuple
+==============
+* Is it reasonable for ITuple to be Traversable?
+* If so, is it reasonable to return column names as keys?
+* The problem is in repeated keys - e.g., tuple consisting of columns A, A, B, C is correct. Ivory aims to support this,
+  and relations are really lists of columns, which may have duplicate names. But what about iteration over ITuple?
+* Might lead to reducing Tuple::$columnNames
+
+
+
+Dibi-Style SQL Fragment Concatenation
+=====================================
+* Při dibi-style skládání dotazu, tj. prokládání několika fragmentů jejich parametry: slepovat fragmenty bez přerušení,
+  nebo navíc vložit mezi fragmenty mezeru?
+** S mezerou odpadá opruz nutnosti dělat mezeru ručně všude; bude to tak pohodlnější a v běžném případě i méně chybové.
+** Může vést k chybě v případě hranice fragmentu v místě, kde mezera má význam.
+*** Na druhou stranu, pokud to tak prostě bude specifikováno, může uživatel přerušit fragment později, až mezera nebude
+    vadit.
+** Zatím zvoleno a implementováno oddělení mezerou, pokud následující fragment nezačíná whitespacem (v tom případě se
+   čistě přilepí) - vhodné zejm. pro fragmenty začínající odřádkováním, ve výsledném SQL pak není mezera na konci řádku.
+
