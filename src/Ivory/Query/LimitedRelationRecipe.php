@@ -10,8 +10,6 @@ class LimitedRelationRecipe extends RelationRecipe implements IRelationRecipe
     private $offset;
 
     /**
-     * LimitedRelationRecipe constructor.
-     *
      * @param IRelationRecipe $relRecipe recipe for relation to limit
      * @param int|null $limit maximal number of rows to return; <tt>null</tt> for unlimited number of rows
      * @param int $offset a non-negative offset - the number of original rows to skip

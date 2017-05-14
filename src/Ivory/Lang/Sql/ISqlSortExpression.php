@@ -4,7 +4,7 @@ namespace Ivory\Lang\Sql;
 /**
  * An expression according to which a relation may be sorted, including the sorting direction.
  */
-interface ISqlSortExpression extends ISqlExpression
+interface ISqlSortExpression
 {
     const ASC = 'ASC';
     const DESC = 'DESC';

@@ -3,6 +3,7 @@ namespace Ivory\Query;
 
 use Ivory\Lang\Sql\ISqlPredicate;
 use Ivory\Lang\Sql\ISqlSortExpression;
+use Ivory\Lang\SqlPattern\SqlPattern;
 use Ivory\Type\ITypeDictionary;
 
 /**
@@ -21,8 +22,12 @@ interface IRelationRecipe
     /**
      * Creates the recipe reduced only to tuples satisfying a given condition.
      *
-     * @param ISqlPredicate|string $cond SQL condition
-     * @param array $args list of arguments to <tt>$cond</tt> if passed as a <tt>string</tt>
+     * @param ISqlPredicate|SqlPattern|string $cond SQL condition;
+     *                                  either an {@link ISqlPredicate}, giving SQL string for the WHERE clause, or
+     *                                  an {@link SqlPattern} or string specifying the pattern to be parsed - which
+     *                                    means that the same rules apply to the string as for, e.g.,
+     *                                    {@link IStatementExecution::query()}
+     * @param array $args list of arguments to <tt>$cond</tt> if passed as a <tt>string</tt> or <tt>SqlPattern</tt>
      * @return IRelationRecipe relation containing only those tuples from this relation satisfying <tt>$cond</tt>
      */
     function where($cond, ...$args): IRelationRecipe;
@@ -30,13 +35,30 @@ interface IRelationRecipe
     /**
      * Creates the recipe sorted by one or more sort expressions.
      *
-     * @param (ISqlSortExpression|string)[] $sortExpressions
-     *                                  one or more expressions to sort the relation by;
-     *                                  the rows get sorted by the first expression, ties sorted by the second
-     *                                    expression, etc.
-     * @return IRelationRecipe
+     * Examples:
+     * <code>
+     * $sorted = $recipe->sort('a > %', 0); // ...ORDER BY a > 0
+     * $sorted = $recipe->sort(SqlRelationRecipe::fromPattern('a = %'), 3); // ...ORDER BY a = 3
+     * $sorted = $recipe->sort([
+     *     'a',
+     *     ['b > %', 0],
+     * ]); // ...ORDER BY a, b > 0
+     * </code>
+     *
+     * @param ISqlSortExpression|SqlPattern|string|array $sortExpression the sort expression;
+     *                                  either an {@link ISqlPredicate}, giving SQL string for the ORDER BY clause, or
+     *                                  an {@link SqlPattern} or string specifying the pattern to be parsed - which
+     *                                    means that the same rules apply to the string as for, e.g.,
+     *                                    {@link IStatementExecution::query()}, or
+     *                                  an array, specifying multiple sort expressions at once, where each item may
+     *                                    either be an {@link ISqlPredicate}, {@link SqlPattern} or string pattern
+     *                                    taking no arguments, or an array, the first item of which is a pattern and the
+     *                                    rest items are the positional arguments for the pattern
+     * @param array $args list of arguments to <tt>$sortExpression</tt> if passed as a <tt>string</tt> or
+     *                      <tt>SqlPattern</tt>
+     * @return IRelationRecipe relation sorted primarily by the given sort expression
      */
-    function sort(...$sortExpressions): IRelationRecipe;
+    function sort($sortExpression, ...$args): IRelationRecipe;
 
     /**
      * Creates the recipe limited only to certain number of rows, or starting from a certain row.
