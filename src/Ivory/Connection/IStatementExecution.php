@@ -13,7 +13,6 @@ use Ivory\Result\IResult;
 use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
 
-// TODO: support prepared statements
 /**
  * Execution of statements on the connected database.
  *
@@ -137,8 +136,6 @@ interface IStatementExecution
      *                                     requires
      */
     function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ICommandResult;
-
-//    function dataSource(); // TODO
 
     /**
      * Sends a raw SQL query, as is, to the database, waits for its execution and returns the resulting relation.

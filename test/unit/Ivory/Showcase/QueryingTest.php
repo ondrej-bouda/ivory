@@ -79,9 +79,4 @@ class QueryingTest extends \Ivory\IvoryTestCase
         $serialized = serialize($recipe);
         $this->assertCount(2, $this->conn->query(unserialize($serialized)));
     }
-
-    public function testDataSource()
-    {
-        $this->markTestIncomplete();
-    }
 }

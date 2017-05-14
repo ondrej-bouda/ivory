@@ -7,6 +7,13 @@ Strict Separation to Query and Command
 
 
 
+Refactor Column
+===============
+* Currently, Column is both the pair of name and type, and an accessor to data. Thus, it needs a link to the relation it
+  belongs to, to be able to get the data. Which might hint an overloaded class.
+
+
+
 The Connection Mode
 ===================
 * The default is asynchronous connecting.

@@ -1,3 +1,26 @@
+Range Values
+============
+* Ivory is capable of processing any range type the subtype of which is known to Ivory, provided the subtype has a total
+  order defined on it. Constructing the values, however, is rather complicated - the subtype and the canonical function
+  must be provided for the generic Range class to know how to handle the range.
+* Implement specializations of range types for the standard PostgreSQL ranges. Also, on a specific specialization,
+  further methods might make sense - inspire from actual Ivory users. Suggest the user to define further specialized
+  classes for their custom range types.
+* Implement specializations of range values for the standard PostgreSQL ranges.
+
+
+
+Composite Values
+================
+* Ivory is capable of processing any composite type. Constructing the values, however, is rather complicated - the
+  composite type must be provided.
+* As there are no standard composite types defined by PostgreSQL itself, the only relevant types are the user-defined
+  ones (either defined explicitly, or automatically for a table).
+* Implement a generator for specialized composite type and composite value classes. That could have a simple method for
+  construction
+
+
+
 Cursors
 =======
 * Introduce support for cursors iterating over a relation.
@@ -103,4 +126,32 @@ Global Ivory Methods
 ====================
 * Implement Ivory::query() constructing a QueryRelation, or Ivory::expr() constructing an expression, applied on the
   default connection.
+
+
+
+BLOBS
+=====
+* Implement support for large binary objects.
+
+
+
+Prepared Statements
+===================
+* Ivory has a powerful way to compose queries with placeholders. It does not implement the true prepared statements,
+  which could be cached by the PostgreSQL itself and thus lead to a performance gain.
+* Extend IStatementExecution with methods for preparing a statement and executing it.
+* Allow combining prepared statements with Ivory built-in methods for composing SQL statements.
+
+
+
+Catch All PostgreSQL Notices
+============================
+* Ivory catches all exceptions raised by PostgreSQL. As for notices, though, only the last notice is currently available
+  due to the limitations of the pgsql extension.
+* Try to find a way to catch all notices raised for each statement, not just the last one.
+* E.g., consider file tracing, preferably to a memory-mapped file, and process the file asynchronously, apart from the
+  application itself. Then, write some custom information to the log file, like the stack trace.
+
+
+
 

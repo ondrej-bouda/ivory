@@ -221,7 +221,6 @@ class StatementExecution implements IStatementExecution
             case PGSQL_COMMAND_OK:
                 return new CommandResult($resHandler, $notice);
             case PGSQL_TUPLES_OK:
-                $typeDict = $this->typeCtl->getTypeDictionary();
                 return new QueryResult($resHandler, $this->typeCtl, $notice);
             case PGSQL_COPY_IN:
                 return new CopyInResult($connHandler, $resHandler, $notice);

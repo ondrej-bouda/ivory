@@ -12,15 +12,15 @@ use Ivory\Utils\IComparable;
  * A range of values.
  *
  * The class resembles the range values manipulated by PostgreSQL. Just a brief summary:
- * - the range is defined above a type of values, called "subtype" (see {@link Range::getSubtype()});
- * - the subtype must have a total order;
- * - a range may be empty, meaning it contains nothing (see {@link Range::isEmpty()} for distinguishing it)
- * - a non-empty range has the lower and the upper bounds, either of which may either be inclusive or exclusive (see
- *   {@link Range::getLower()} and {@link Range::getUpper()} for getting the boundaries; also see
- *   {@link Range::isLowerInc()} and {@link Range::isUpperInc()} for finding out whichever boundary is inclusive);
- * - a range may be unbounded in either direction, covering all subtype values from the range towards minus infinity or
- *   towards infinity, respectively;
- * - a range might even cover just a single point ({@link Range::isSinglePoint()} may be used for checking out).
+ * - The range is defined above a type of values, called "subtype" (see {@link Range::getSubtype()}).
+ * - The subtype must have a total order.
+ * - A range may be empty, meaning it contains nothing. See {@link Range::isEmpty()} for distinguishing it.
+ * - A non-empty range has the lower and the upper bounds, either of which may either be inclusive or exclusive. See
+ *   {@link Range::getLower()} and {@link Range::getUpper()} for getting the boundaries. Also see
+ *   {@link Range::isLowerInc()} and {@link Range::isUpperInc()} for finding out whichever boundary is inclusive.
+ * - A range may be unbounded in either direction, covering all subtype values from the range towards minus infinity or
+ *   towards infinity, respectively.
+ * - A range might even cover just a single point. {@link Range::isSinglePoint()} may be used for checking out.
  *
  * Ranges of some types may have a canonical function, the purpose of which is to convert semantically equivalent ranges
  * on {@link \Ivory\Type\IDiscreteType discrete types} to syntactically equivalent ranges. E.g., one such function might
@@ -31,9 +31,9 @@ use Ivory\Utils\IComparable;
  * A range is `IComparable` to another range. Two ranges are equal only if they are above the same subtype and if the
  * effective range equals.
  *
- * Alternatively to the {@link Range::getLower()} and {@link Range::getUpper()} methods, `ArrayAccess` may be used using
- * indexes `0` and `1`, respectively, to get the lower and upper bound. Either of them returns `null` if the range is
- * empty or unbounded in the respective direction.
+ * Alternatively to the {@link Range::getLower()} and {@link Range::getUpper()} methods, `ArrayAccess` is implemented.
+ * Indexes `0` and `1` may be used to get the lower and upper bound, respectively. Either of them returns `null` if the
+ * range is empty or unbounded in the given direction.
  *
  * Note the range value is immutable, i.e., once constructed, its values cannot be changed. Thus, `ArrayAccess` write
  * operations ({@link \ArrayAccess::offsetSet()} and {@link \ArrayAccess::offsetUnset()}) throw an
