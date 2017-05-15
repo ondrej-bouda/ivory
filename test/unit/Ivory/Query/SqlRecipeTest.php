@@ -161,11 +161,36 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
 
     public function testFromFragments()
     {
-        $recip = SqlRelationRecipe::fromFragments(
-            'SELECT %int, %char', 42, 'C', "UNION SELECT %integer, 'D'", 53
+        $recipJoinWithSpace = SqlRelationRecipe::fromFragments(
+            'SELECT 1',
+            'FROM tbl',
+            'WHERE cond'
         );
-        $this->assertSame("SELECT ,  UNION SELECT , 'D'", $recip->getSqlPattern()->getSqlTorso());
-        $this->assertSame("SELECT 42, 'C' UNION SELECT 53, 'D'", $recip->toSql($this->typeDict));
+        $this->assertSame(
+            'SELECT 1 FROM tbl WHERE cond',
+            $recipJoinWithSpace->getSqlPattern()->getSqlTorso(),
+            'Joining using a space between fragments to prevent syntax error.'
+        );
+
+
+        $recipJoinWithoutSpace = SqlRelationRecipe::fromFragments(
+            'SELECT 1',
+            " FROM tbl\n",
+            'WHERE cond',
+            "\nORDER BY 1"
+        );
+        $this->assertSame(
+            "SELECT 1 FROM tbl\nWHERE cond\nORDER BY 1",
+            $recipJoinWithoutSpace->getSqlPattern()->getSqlTorso(),
+            'Joining straight, with no extra space - which is unnecessary due to whitespace at the fragment bounds.'
+        );
+
+
+        $recipWithArgs = SqlRelationRecipe::fromFragments(
+            'SELECT %int, %char', 42, 'C', 'UNION SELECT', "%integer , 'D'", 53
+        );
+        $this->assertSame("SELECT ,  UNION SELECT  , 'D'", $recipWithArgs->getSqlPattern()->getSqlTorso());
+        $this->assertSame("SELECT 42, 'C' UNION SELECT 53 , 'D'", $recipWithArgs->toSql($this->typeDict));
     }
 
     /**

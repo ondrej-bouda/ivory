@@ -84,7 +84,8 @@ trait SqlPatternRecipeMacros
      * {@link SqlRecipe::setParams()} may be used to set them later).
      *
      * The fragments get concatenated to form the resulting SQL pattern. A single space is added between each two
-     * fragments the latter of which does not start with whitespace.
+     * fragments the former of which ends with a non-whitespace character and the latter of which starts with a
+     * non-whitespace character.
      *
      * Named parameters are shared among fragments. In other words, if two fragments use the same named parameter,
      * specifying the parameter by {@link setParam()} will substitute the same value to both fragments.
@@ -104,7 +105,8 @@ trait SqlPatternRecipeMacros
      *
      * @internal Ivory design note: The single space added between each two fragments aspires to be more practical than
      * a mere concatenation, which would require the user to specify spaces where the next fragment immediately
-     * continued with the query.
+     * continued with the query. After all, the method has ambitions to at least partly understand the user wants to
+     * compose an SQL query from several parts, thus, it is legitimate the query is modified appropriately.
      *
      * @param string|SqlPattern $fragment
      * @param array ...$fragmentsAndPositionalParams
@@ -129,6 +131,7 @@ trait SqlPatternRecipeMacros
         $curFragment = $fragment;
         $curFragmentNum = 1;
         $argsProcessed = 0;
+        $overallEndsWithPlaceholder = false;
         do {
             // process the fragment
             if (!$curFragment instanceof SqlPattern) {
@@ -149,12 +152,24 @@ trait SqlPatternRecipeMacros
             }
 
             // add to the overall pattern
-            if ($argsProcessed > 0 && !preg_match('~^\s~', $curFragment->getSqlTorso())) {
+            $curSqlTorso = $curFragment->getSqlTorso();
+            $curPosParams = $curFragment->getPositionalPlaceholders();
+            $curNamedParams = $curFragment->getNamedPlaceholderMap();
+            $fragmentStartsWithPlaceholder = (
+                ($curPosParams ? $curPosParams[0]->getOffset() == 0 : false)
+                ||
+                ($curNamedParams ? current($curNamedParams)[0]->getOffset() == 0 : false)
+            );
+            if (($overallEndsWithPlaceholder || preg_match('~[^ \t\r\n]$~uD', $overallSqlTorso)) &&
+                ($fragmentStartsWithPlaceholder || preg_match('~^[^ \t\r\n]~u', $curSqlTorso)))
+            {
                 $overallSqlTorso .= ' ';
             }
             $sqlTorsoOffset = strlen($overallSqlTorso);
-            $overallSqlTorso .= $curFragment->getSqlTorso();
-            foreach ($curFragment->getPositionalPlaceholders() as $plcHdr) {
+            $sqlTorsoLen = strlen($curSqlTorso);
+            $overallSqlTorso .= $curSqlTorso;
+            $overallEndsWithPlaceholder = false;
+            foreach ($curPosParams as $plcHdr) {
                 $overallPlcHdr = new SqlPatternPlaceholder(
                     $sqlTorsoOffset + $plcHdr->getOffset(),
                     count($overallPosPlaceholders),
@@ -164,6 +179,7 @@ trait SqlPatternRecipeMacros
                     $plcHdr->isSchemaNameQuoted()
                 );
                 $overallPosPlaceholders[] = $overallPlcHdr;
+                $overallEndsWithPlaceholder = ($overallEndsWithPlaceholder || $plcHdr->getOffset() == $sqlTorsoLen);
             }
             foreach ($curFragment->getNamedPlaceholderMap() as $name => $occurrences) {
                 /** @var SqlPatternPlaceholder[] $occurrences */
@@ -180,11 +196,12 @@ trait SqlPatternRecipeMacros
                         $plcHdr->isSchemaNameQuoted()
                     );
                     $overallNamedPlaceholderMap[$name][] = $overallPlcHdr;
+                    $overallEndsWithPlaceholder = ($overallEndsWithPlaceholder || $plcHdr->getOffset() == $sqlTorsoLen);
                 }
             }
 
             // values of parameters
-            $plcHdrCnt = count($curFragment->getPositionalPlaceholders());
+            $plcHdrCnt = count($curPosParams);
             $posParams = array_slice($fragmentsAndPositionalParams, $argsProcessed, $plcHdrCnt);
             if (count($posParams) == $plcHdrCnt) {
                 $overallPosParams = array_merge($overallPosParams, $posParams);

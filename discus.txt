@@ -53,17 +53,3 @@ Iterable Tuple
 * The problem is in repeated keys - e.g., tuple consisting of columns A, A, B, C is correct. Ivory aims to support this,
   and relations are really lists of columns, which may have duplicate names. But what about iteration over ITuple?
 * Might lead to reducing Tuple::$columnNames
-
-
-
-Dibi-Style SQL Fragment Concatenation
-=====================================
-* Při dibi-style skládání dotazu, tj. prokládání několika fragmentů jejich parametry: slepovat fragmenty bez přerušení,
-  nebo navíc vložit mezi fragmenty mezeru?
-** S mezerou odpadá opruz nutnosti dělat mezeru ručně všude; bude to tak pohodlnější a v běžném případě i méně chybové.
-** Může vést k chybě v případě hranice fragmentu v místě, kde mezera má význam.
-*** Na druhou stranu, pokud to tak prostě bude specifikováno, může uživatel přerušit fragment později, až mezera nebude
-    vadit.
-** Zatím zvoleno a implementováno oddělení mezerou, pokud následující fragment nezačíná whitespacem (v tom případě se
-   čistě přilepí) - vhodné zejm. pro fragmenty začínající odřádkováním, ve výsledném SQL pak není mezera na konci řádku.
-
