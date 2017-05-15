@@ -5,6 +5,7 @@ use Ivory\Exception\ResultException;
 use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
 use Ivory\Exception\StatementExceptionFactory;
+use Ivory\Exception\UsageException;
 use Ivory\Ivory;
 use Ivory\Query\ICommandRecipe;
 use Ivory\Query\IRelationRecipe;
@@ -108,13 +109,10 @@ class StatementExecution implements IStatementExecution
         if ($result instanceof IQueryResult) {
             return $result;
         } else {
-            trigger_error(
+            throw new UsageException(
                 'The supplied SQL statement was supposed to be a query, but it did not return a result set. ' .
-                'Returning an empty relation. Consider calling command() or rawCommand() instead. ' .
-                "SQL statement: $sqlQuery",
-                E_USER_WARNING
+                'Did you mean to call command() or rawCommand()?'
             );
-            return new QueryResult($resultHandler, $this->typeCtl, $result->getLastNotice());
         }
     }
 
@@ -124,13 +122,10 @@ class StatementExecution implements IStatementExecution
         if ($result instanceof ICommandResult) {
             return $result;
         } else {
-            trigger_error(
+            throw new UsageException(
                 'The supplied SQL statement was supposed to be a command, but it returned a result set. ' .
-                'Returning an empty result. Consider calling query() or rawQuery() instead. ' .
-                "SQL statement: $sqlCommand",
-                E_USER_WARNING
+                'Did you mean to call query() or rawQuery()?'
             );
-            return new CommandResult($resultHandler, $result->getLastNotice());
         }
     }
 

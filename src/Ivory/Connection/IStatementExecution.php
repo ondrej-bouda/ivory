@@ -3,6 +3,7 @@ namespace Ivory\Connection;
 
 use Ivory\Exception\ResultException;
 use Ivory\Exception\StatementExceptionFactory;
+use Ivory\Exception\UsageException;
 use Ivory\Lang\SqlPattern\SqlPattern;
 use Ivory\Query\ICommandRecipe;
 use Ivory\Query\IRelationRecipe;
@@ -21,10 +22,7 @@ use Ivory\Exception\ConnectionException;
  * - *commands*, the result of which is just a summary information, such as the number of affected rows in a table.
  * Using the {@link IStatementExecution::query()} method with an SQL statement not returning data set (such as a plain
  * `INSERT` without the `RETURNING` clause) is an error, as well as calling {@link IStatementExecution::command()} with
- * an SQL statement returning data (such as `SELECT`). For convenience, mixing the two will not result in an exception,
- * though, so that the already executed statement is not compromised. Instead, a mere warning is issued and a substitute
- * result object is returned (an empty relation for a command executed by {@link IStatementExecution::query()}, and a
- * result reporting the number of returned rows in case of query executed by {@link IStatementExecution::command()}).
+ * an SQL statement returning data (such as `SELECT`), and will result in an {@link UsageException}.
  *
  * @internal Ivory design note: Traditionally, in other database layers (including the pgsql extension), methods like
  * query() serve both for reading data from the database and for writing data to it, requiring the user to use the
@@ -34,6 +32,11 @@ use Ivory\Exception\ConnectionException;
  * {@link IStatementExecution::command()}. After all, processing the result of either of them is fairly different from
  * the result of the other one. And even if one changes a plain <tt>INSERT</tt> to <tt>INSERT ... RETURNING</tt>, the
  * change from <tt>query()</tt> to <tt>command()</tt> will be the tiniest adjustment of the related source code.
+ *
+ * @internal Ivory design note: Originally, intertwined <tt>query()</tt> and <tt>command()</tt> were handled gracefully,
+ * issuing a mere warning and returning a substitute object (empty relation). A stricter approach is applied, now, to
+ * promote the strict separation of the two families of methods, as it clearly signifies a wrong code (e.g., specific
+ * parameter values are irrelevant in the question of whether the statement is a query or a command).
  */
 interface IStatementExecution
 {
@@ -61,7 +64,7 @@ interface IStatementExecution
      * See {@link SqlPattern} documentation for thorough details on SQL patterns.
      *
      * Note the strict distinction of *queries* and *commands* - see the {@link IStatementExecution} docs. If an SQL
-     * command is executed using this method, a relation of no columns and no rows is returned and a warning is issued.
+     * command is executed using this method, a {@link UsageException} is thrown after the command execution.
      *
      * If executing the query immediately is not appropriate, consider using {@link dataSource()} instead.
      *
@@ -80,6 +83,7 @@ interface IStatementExecution
      * @return IQueryResult
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
+     * @throws UsageException if the statement appears to be a command rather than a query
      */
     function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): IQueryResult;
 
@@ -96,6 +100,7 @@ interface IStatementExecution
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      * @throws ResultException when the resulting data set has more than one row, or no row at all
+     * @throws UsageException if the statement appears to be a command rather than a query
      */
     function querySingleTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ITuple;
 
@@ -114,6 +119,7 @@ interface IStatementExecution
      *                                     requires
      * @throws ResultException when the resulting data set has more than one row, or no row at all, or more than one
      *                           column, or no column at all
+     * @throws UsageException if the statement appears to be a command rather than a query
      */
     function querySingleValue($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
 
@@ -126,14 +132,14 @@ interface IStatementExecution
      * 3. an {@link ICommandRecipe} object is given as the only argument.
      *
      * Note the strict distinction of *queries* and *commands* - see the {@link IStatementExecution} docs. If an SQL
-     * query is executed using this method, a result object, reporting as many affected rows as the actual result has,
-     * is returned and a warning is issued.
+     * query is executed using this method, a {@link UsageException} is thrown after the query execution.
      *
      * @param string|SqlPattern|ICommandRecipe $sqlFragmentPatternOrRecipe
      * @param array ...$fragmentsAndParams
      * @return ICommandResult
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
+     * @throws UsageException if the statement appears to be a query rather than a command
      */
     function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ICommandResult;
 
@@ -152,6 +158,7 @@ interface IStatementExecution
      * @throws StatementException when the query is erroneous and PostgreSQL returns an error, or if <tt>$sqlQuery</tt>
      *                              actually contains multiple statements (e.g., separated by a semicolon)
      * @throws ConnectionException when an error occurred while sending the query or processing the database response
+     * @throws UsageException if the statement appears to be a command rather than a query
      */
     function rawQuery(string $sqlQuery): IQueryResult;
 
@@ -171,6 +178,7 @@ interface IStatementExecution
      *                              <tt>$sqlCommand</tt> actually contains multiple statements (e.g., separated by a
      *                              semicolon)
      * @throws ConnectionException when an error occurred while sending the command or processing the database response
+     * @throws UsageException if the statement appears to be a query rather than a command
      */
     function rawCommand(string $sqlCommand): ICommandResult;
 

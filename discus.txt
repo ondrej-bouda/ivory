@@ -1,12 +1,3 @@
-Strict Separation to Query and Command
-======================================
-* In other database layers, query() is commonly used in the more general meaning of statement().
-* Ivory strictly distinguishes between query() and command().
-* Is it OK to complain to the programmer about INSERT being pushed to query(), or the other way round? What about
-  finding a new term instead of query()?
-
-
-
 Refactor Column
 ===============
 * Currently, Column is both the pair of name and type, and an accessor to data. Thus, it needs a link to the relation it
