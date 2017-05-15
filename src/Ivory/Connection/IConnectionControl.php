@@ -46,6 +46,10 @@ interface IConnectionControl
      *
      * The connection is not shared with any other `IConnection` objects. A new connection is always established.
      *
+     * @internal Ivory design note: Asynchronous connection mode is the default used by Ivory. The method does not even
+     * reflect that the connection is asynchronous, so that it is clear that no extra work is needed. Indeed, the fact
+     * that the connection is asynchronous is transparent to the caller.
+     *
      * @param \Closure $initProcedure code to execute after the connection is established, before any queries;
      *                                the closure is given one {@link IConnection} argument - this connection;
      *                                suitable for, e.g., setting up <tt>search_path</tt>, session variables, etc.
