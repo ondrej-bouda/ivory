@@ -2,29 +2,30 @@
 namespace Ivory\Relation;
 
 use Ivory\Exception\UndefinedColumnException;
+use Ivory\Exception\UsageException;
 use Ivory\Relation\Alg\ITupleEvaluator;
 use Ivory\Utils\IComparable;
 
 /**
  * Represents one relation row.
  *
- * From one point of view, a tuple is a `Traversable` list of values. The traversal order is the same as of the column
- * list of the originating relation. The column names are returned as traversal keys.
- *
- * From another point of view, a tuple is a map of offsets or names of the originating columns to the corresponding
- * values. There are two ways of accessing an attribute value:
- * - via the column (zero-based) offset using `ArrayAccess` (e.g., `$tuple[0]` is the value of the first column), or
+ * A tuple is a map of offsets or names of the originating columns to the corresponding values. There are three ways of
+ * accessing an attribute value:
+ * - via the column (zero-based) offset using `ArrayAccess` (e.g., `$tuple[0]` is the value of the first column); or
  * - via the column name using either `ArrayAccess`, for non-numeric names, or dynamic property access (e.g., both
- *   `$tuple['foo']` and `$tuple->foo` expose the value of the column named "foo").
+ *   `$tuple['foo']` and `$tuple->foo` expose the value of the column named "foo"); or
+ * - via the {@link value()} method, which accepts both column offsets and names, and also a custom evaluator function;
+ *   note that the universality of the {@link value()} method comes at the cost of a slight performance penalty compared
+ *   to the first two access methods.
  *
  * Note there might be several columns of the same name defined on the originating relation, or the column name might
- * not be defined at all. Thus:
- * - while traversing a tuple, the same key may be returned several times, or `null` may be returned as the traversal
- *   key for some columns;
- * - when accessing a value by the column name, value of the first column of the given name is returned, the rest being
- *   ignored.
+ * not be defined at all. When accessing a value by the column name, value of the first column of the given name is
+ * returned, the rest being ignored.
+ *
+ * @internal Ivory design note: ITuple is intentionally not iterable as there seems to be no real value with it. It
+ * might be added later with a use case in hand.
  */
-interface ITuple extends \ArrayAccess, \Traversable, IComparable // TODO: test IComparable
+interface ITuple extends \ArrayAccess, IComparable // TODO: test IComparable
 {
     /**
      * Converts the tuple to an associative array of column names to the corresponding values held by this tuple.
@@ -51,13 +52,9 @@ interface ITuple extends \ArrayAccess, \Traversable, IComparable // TODO: test I
      *                                    {@link IRelation::col()} for more details on the column specification.
      * @return mixed
      * @throws UndefinedColumnException if no column matches the specification
+     * @throws UsageException if requesting the value by a column name which is used by multiple columns
      */
     function value($colOffsetOrNameOrEvaluator = 0);
-
-    /**
-     * @return string[] list of column names the tuple consists of
-     */
-    function getColumnNames();
 
     /**
      * @param string $name column name

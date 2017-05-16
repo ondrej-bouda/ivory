@@ -35,12 +35,3 @@ DataSource
 * Would DataSource be useful?
 * Would an analogy for Command be useful?
 
-
-
-Iterable Tuple
-==============
-* Is it reasonable for ITuple to be Traversable?
-* If so, is it reasonable to return column names as keys?
-* The problem is in repeated keys - e.g., tuple consisting of columns A, A, B, C is correct. Ivory aims to support this,
-  and relations are really lists of columns, which may have duplicate names. But what about iteration over ITuple?
-* Might lead to reducing Tuple::$columnNames

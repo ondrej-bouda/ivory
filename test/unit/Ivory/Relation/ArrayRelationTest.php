@@ -1,8 +1,6 @@
 <?php
 namespace Ivory\Relation;
 
-use Ivory\Value\Decimal;
-
 class ArrayRelationTest extends \Ivory\IvoryTestCase
 {
     public function testAutodetect()

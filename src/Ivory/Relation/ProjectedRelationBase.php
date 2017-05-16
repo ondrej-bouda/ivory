@@ -5,8 +5,6 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
 {
     /** @var Column[] */
     private $projectedColumns;
-    /** @var string[] list: column names */
-    private $projectedColNames;
     /** @var int[] map: column name => offset of the first column of the name */
     private $projectedColNameMap;
 
@@ -15,11 +13,9 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
         parent::__construct($source);
         $this->projectedColumns = $columns;
 
-        $this->projectedColNames = [];
         $this->projectedColNameMap = [];
         foreach ($columns as $colOffset => $col) {
             $colName = $col->getName();
-            $this->projectedColNames[] = $colName;
             if (strlen($colName) > 0 && !isset($this->projectedColNameMap[$colName])) {
                 $this->projectedColNameMap[$colName] = $colOffset;
             }
@@ -111,11 +107,6 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
     public function getColumns()
     {
         return $this->projectedColumns;
-    }
-
-    protected function getColNames()
-    {
-        return $this->projectedColNames;
     }
 
     protected function getColNameMap()

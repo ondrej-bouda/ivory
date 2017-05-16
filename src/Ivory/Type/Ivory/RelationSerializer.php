@@ -118,7 +118,7 @@ VAL;
             }
             $result .= '(';
             $colIdx = 0;
-            foreach ($tuple as $val) {
+            foreach ($tuple->toList() as $val) {
                 if ($colIdx > 0) {
                     $result .= ', ';
                 }

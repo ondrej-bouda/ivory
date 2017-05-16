@@ -33,8 +33,8 @@ class RenamedRelationTest extends \Ivory\IvoryTestCase
         );
         $renamed = $rel->rename([1 => 'str', 2 => 'bool', 'd' => 'json']);
         $this->assertSame(
-            ['' => 1, 'str' => 'abc', 'bool' => false, 'c' => true, 'json' => null],
-            iterator_to_array($renamed->tuple())
+            ['str' => 'abc', 'bool' => false, 'c' => true, 'json' => null],
+            $renamed->tuple()->toMap()
         );
     }
 

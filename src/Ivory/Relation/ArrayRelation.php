@@ -12,7 +12,6 @@ use Ivory\Type\ITypeDictionary;
 class ArrayRelation extends RelationBase
 {
     private $cols;
-    private $colNames;
     private $colNameMap;
     private $rows;
     private $numRows;
@@ -61,14 +60,12 @@ class ArrayRelation extends RelationBase
     private function buildCols(array $dataTypes)
     {
         $this->cols = [];
-        $this->colNames = [];
         $this->colNameMap = [];
 
         foreach ($dataTypes as $colName => $type) {
             $colOffset = count($this->cols);
             $col = new Column($this, $colOffset, $colName, $type);
             $this->cols[] = $col;
-            $this->colNames[] = $colName;
             $this->colNameMap[$colName] = $colOffset;
         }
     }
@@ -95,7 +92,7 @@ class ArrayRelation extends RelationBase
             $data[] = ($row[$colName] ?? null);
         }
 
-        return new Tuple($data, $this->colNames, $this->colNameMap);
+        return new Tuple($data, $this->colNameMap);
     }
 
     public function count()

@@ -13,12 +13,10 @@ use Ivory\Utils\ValueUtils;
  * and `ArrayAccess` write operations (namely {@link \ArrayAccess::offsetSet()} and {@link \ArrayAccess::offsetUnset()})
  * throw an {@link \Ivory\Exception\ImmutableException}.
  */
-class Tuple implements \IteratorAggregate, ITuple
+class Tuple implements ITuple
 {
     /** @var array list of data for the corresponding columns; already converted */
     private $data;
-    /** @var string[] list of column names */
-    private $columnNames;
     /** @var int[] map: column name => offset of the first column of the name */
     private $colNameMap;
 
@@ -32,25 +30,21 @@ class Tuple implements \IteratorAggregate, ITuple
     public static function fromMap($map)
     {
         $data = [];
-        $colNames = [];
         $colNameMap = [];
         foreach ($map as $k => $v) {
             $data[] = $v;
-            $colNames[] = $k;
             $colNameMap[$k] = count($data) - 1;
         }
-        return new Tuple($data, $colNames, $colNameMap);
+        return new Tuple($data, $colNameMap);
     }
 
     /**
      * @param array $data list of data for the corresponding columns
-     * @param string[] $columnNames list of column names
      * @param int[] $colNameMap map: column name => offset of the first column of the name
      */
-    public function __construct(array $data, array $columnNames, array $colNameMap)
+    public function __construct(array $data, array $colNameMap)
     {
         $this->data = $data;
-        $this->columnNames = $columnNames;
         $this->colNameMap = $colNameMap;
     }
 
@@ -94,11 +88,6 @@ class Tuple implements \IteratorAggregate, ITuple
         } else {
             throw new \InvalidArgumentException('$colOffsetOrNameOrEvaluator');
         }
-    }
-
-    public function getColumnNames()
-    {
-        return $this->columnNames;
     }
 
     //endregion
@@ -168,17 +157,6 @@ class Tuple implements \IteratorAggregate, ITuple
             return false;
         }
         return ValueUtils::equals($this->data, $object->toList());
-    }
-
-    //endregion
-
-    //region \IteratorAggregate
-
-    public function getIterator()
-    {
-        foreach ($this->data as $i => $val) {
-            yield $this->columnNames[$i] => $val;
-        }
     }
 
     //endregion

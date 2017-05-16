@@ -169,7 +169,9 @@ interface IRelation extends \Traversable, \Countable
      * @return IColumn
      * @throws UndefinedColumnException if no column matches the specification
      */
-    function col($offsetOrNameOrEvaluator): IColumn;
+    function col($offsetOrName): IColumn;
+
+//    function colData($offsetOrNameOrEvaluator): Iterator;
 
     /**
      * Associates values of one column by (combinations of) values of one or more columns.

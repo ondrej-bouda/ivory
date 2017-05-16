@@ -20,8 +20,6 @@ class QueryResult extends Result implements IQueryResult
     private $numRows;
     /** @var Column[] */
     private $columns;
-    /** @var string[] */
-    private $colNames;
     /** @var int[] map: column name => offset of the first column of the name */
     private $colNameMap;
 
@@ -56,7 +54,6 @@ class QueryResult extends Result implements IQueryResult
             throw new ResultException('Error retrieving number of fields of the result.');
         }
         $this->columns = [];
-        $this->colNames = [];
         $this->colNameMap = [];
         for ($i = 0; $i < $numFields; $i++) {
             /* NOTE: pg_field_type() cannot be used for simplicity - multiple types of the same name might exist in
@@ -80,7 +77,6 @@ class QueryResult extends Result implements IQueryResult
             $type = $typeDictionary->requireTypeByOid($typeOid);
 
             $this->columns[] = new Column($this, $i, $name, $type);
-            $this->colNames[] = $name;
             if ($name !== null && !isset($this->colNameMap[$name])) {
                 $this->colNameMap[$name] = $i;
             }
@@ -133,7 +129,7 @@ class QueryResult extends Result implements IQueryResult
             $data[$i] = $col->getType()->parseValue($rawData[$i]);
         }
 
-        return new Tuple($data, $this->colNames, $this->colNameMap);
+        return new Tuple($data, $this->colNameMap);
     }
 
     //endregion
