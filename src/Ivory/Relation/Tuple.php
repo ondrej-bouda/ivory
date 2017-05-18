@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Relation;
 
+use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\ImmutableException;
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Relation\Alg\ITupleEvaluator;
@@ -15,6 +16,8 @@ use Ivory\Utils\ValueUtils;
  */
 class Tuple implements ITuple
 {
+    const AMBIGUOUS_COL = false;
+
     /** @var array list of data for the corresponding columns; already converted */
     private $data;
     /** @var int[] map: column name => offset of the first column of the name */
@@ -40,7 +43,9 @@ class Tuple implements ITuple
 
     /**
      * @param array $data list of data for the corresponding columns
-     * @param int[] $colNameMap map: column name => offset of the first column of the name
+     * @param array $colNameMap map: column name => zero-based offset of the column of the given name, or
+     *                            <tt>Tuple::AMBIGUOUS_COL</tt> for denoting the name of the column is used multiple
+     *                            times within the originating relation
      */
     public function __construct(array $data, array $colNameMap)
     {
@@ -55,6 +60,11 @@ class Tuple implements ITuple
     {
         $res = [];
         foreach ($this->colNameMap as $name => $i) {
+            if ($i === self::AMBIGUOUS_COL) {
+                throw new AmbiguousException(
+                    "There is an ambiguous column `$name`, preventing the tuple to be converted to a map"
+                );
+            }
             $res[$name] = $this->data[$i];
         }
         return $res;
@@ -65,21 +75,13 @@ class Tuple implements ITuple
         return $this->data;
     }
 
-    public function value($colOffsetOrNameOrEvaluator = 0)
+    public function value($colOffsetOrNameOrEvaluator)
     {
         if (is_scalar($colOffsetOrNameOrEvaluator)) {
             if (filter_var($colOffsetOrNameOrEvaluator, FILTER_VALIDATE_INT) !== false) {
-                if (isset($this->data[$colOffsetOrNameOrEvaluator])) {
-                    return $this->data[$colOffsetOrNameOrEvaluator];
-                } else {
-                    throw new UndefinedColumnException("No column at offset $colOffsetOrNameOrEvaluator");
-                }
+                return $this[$colOffsetOrNameOrEvaluator];
             } else {
-                if (isset($this->colNameMap[$colOffsetOrNameOrEvaluator])) {
-                    return $this->data[$this->colNameMap[$colOffsetOrNameOrEvaluator]];
-                } else {
-                    throw new UndefinedColumnException("No column named $colOffsetOrNameOrEvaluator");
-                }
+                return $this->{$colOffsetOrNameOrEvaluator};
             }
         } elseif ($colOffsetOrNameOrEvaluator instanceof ITupleEvaluator) {
             return $colOffsetOrNameOrEvaluator->evaluate($this);
@@ -96,16 +98,28 @@ class Tuple implements ITuple
 
     public function __get($name)
     {
-        if (isset($this->colNameMap[$name])) {
-            return $this->data[$this->colNameMap[$name]];
+        if (!isset($this->colNameMap[$name])) {
+            throw new UndefinedColumnException("No column named $name");
+        } elseif ($this->colNameMap[$name] === self::AMBIGUOUS_COL) {
+            throw new AmbiguousException("There are multiple columns named `$name` in the tuple");
         } else {
-            return null;
+            return $this->data[$this->colNameMap[$name]];
         }
     }
 
     public function __isset($name)
     {
         return isset($this->colNameMap[$name]);
+    }
+
+    public function __set($name, $value)
+    {
+        throw new ImmutableException();
+    }
+
+    public function __unset($name)
+    {
+        throw new ImmutableException();
     }
 
     //endregion
@@ -132,8 +146,7 @@ class Tuple implements ITuple
         if (array_key_exists($key, $this->data)) {
             return $this->data[$key];
         } else {
-            trigger_error("Undefined offset `$offset` for the tuple");
-            return null;
+            throw new UndefinedColumnException("There is no column at offset `$offset` in the tuple");
         }
     }
 
@@ -156,7 +169,7 @@ class Tuple implements ITuple
         if (!$object instanceof ITuple) {
             return false;
         }
-        return ValueUtils::equals($this->data, $object->toList());
+        return ValueUtils::equals($this->data, $object->data);
     }
 
     //endregion

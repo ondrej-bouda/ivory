@@ -19,7 +19,7 @@ class ValueUtils
                 return false;
             }
             foreach ($a as $k => $v) {
-                if (!isset($b[$k])) {
+                if (!array_key_exists($k, $b)) {
                     return false;
                 }
                 if (!self::equals($v, $b[$k])) {
