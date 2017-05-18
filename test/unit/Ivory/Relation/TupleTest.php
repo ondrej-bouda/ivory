@@ -24,6 +24,7 @@ class TupleTest extends \PHPUnit\Framework\TestCase
             'a' => 1,
             'b' => 2,
             'c' => null,
+            'some col' => false,
         ]);
 
         $this->anonymousColsTuple = new Tuple(
@@ -39,14 +40,14 @@ class TupleTest extends \PHPUnit\Framework\TestCase
 
     public function testToList()
     {
-        $this->assertSame([1, 2, null], $this->simpleTuple->toList());
+        $this->assertSame([1, 2, null, false], $this->simpleTuple->toList());
         $this->assertSame([1, 3, null, 4], $this->anonymousColsTuple->toList());
         $this->assertSame([1, 3, 5, 7], $this->ambiguousColsTuple->toList());
     }
 
     public function testToMap()
     {
-        $this->assertSame(['a' => 1, 'b' => 2, 'c' => null], $this->simpleTuple->toMap());
+        $this->assertSame(['a' => 1, 'b' => 2, 'c' => null, 'some col' => false], $this->simpleTuple->toMap());
         $this->assertSame(['a' => 1, 'b' => 3], $this->anonymousColsTuple->toMap());
 
         try {
@@ -59,11 +60,12 @@ class TupleTest extends \PHPUnit\Framework\TestCase
     public function testArrayAccess()
     {
         $this->assertSame(1, $this->simpleTuple[0]);
+        $this->assertSame(false, $this->simpleTuple[3]);
         $this->assertSame(null, $this->anonymousColsTuple[2]);
         $this->assertSame(5, $this->ambiguousColsTuple[2]);
 
         try {
-            $val = $this->simpleTuple[3];
+            $val = $this->simpleTuple[4];
             $this->fail(UndefinedColumnException::class . ' was expected');
         } catch (UndefinedColumnException $e) {
         }
@@ -76,8 +78,8 @@ class TupleTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue(isset($this->simpleTuple[0]));
         $this->assertFalse(isset($this->simpleTuple[-1]));
-        $this->assertTrue(isset($this->simpleTuple[2]));
-        $this->assertFalse(isset($this->simpleTuple[3]));
+        $this->assertTrue(isset($this->simpleTuple[3]));
+        $this->assertFalse(isset($this->simpleTuple[4]));
 
         try {
             $this->simpleTuple[0] = 'x';
@@ -96,6 +98,7 @@ class TupleTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertSame(2, $this->simpleTuple->b);
         $this->assertSame(null, $this->simpleTuple->c);
+        $this->assertSame(false, $this->simpleTuple->{'some col'});
         $this->assertSame(3, $this->anonymousColsTuple->b);
         $this->assertSame(1, $this->ambiguousColsTuple->a);
 
@@ -140,11 +143,11 @@ class TupleTest extends \PHPUnit\Framework\TestCase
             new class() implements ITupleEvaluator {
                 public function evaluate(ITuple $tuple)
                 {
-                    return $tuple['a'] + $tuple['b'];
+                    return $tuple->a + $tuple->b;
                 }
             }
         ));
-        
+
         try {
             $val = $this->simpleTuple->value(-1);
             $this->fail(UndefinedColumnException::class . ' was expected');
@@ -152,7 +155,7 @@ class TupleTest extends \PHPUnit\Framework\TestCase
         }
 
         try {
-            $val = $this->simpleTuple->value(3);
+            $val = $this->simpleTuple->value(4);
             $this->fail(UndefinedColumnException::class . ' was expected');
         } catch (UndefinedColumnException $e) {
         }

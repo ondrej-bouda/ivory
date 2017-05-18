@@ -124,15 +124,33 @@ class RenamedRelationTest extends \Ivory\IvoryTestCase
         $rel = $this->conn->query(
             'SELECT 1 AS a, 2 AS a, 3 AS ab'
         );
-        $this->assertSame(['c' => 1, 'cb' => 3], $rel->rename(['a*' => 'c*'])->tuple()->toMap());
-        $tuple = $rel->rename(['a' => 'c'])->tuple();
-        $expectedVals = [['c', 1], ['c', 2], ['ab', 3]];
-        $i = 0;
-        foreach ($tuple as $nm => $val) {
-            $this->assertSame($expectedVals[$i][0], $nm, "col $nm");
-            $this->assertSame($expectedVals[$i][1], $val, "col $nm");
-            $i++;
+        $renamed = $rel->rename(['a' => 'c']);
+        $expectedColNames = ['c', 'c', 'ab'];
+        foreach ($renamed->getColumns() as $i => $column) {
+            $this->assertSame($expectedColNames[$i], $column->getName(), "iteration $i");
         }
+
+        $renTuple = $renamed->tuple();
+        $this->assertSame([1, 2, 3], $renTuple->toList());
+        $this->assertSame(3, $renTuple->ab);
+        $this->assertTrue(isset($renTuple->c));
+        $this->assertFalse(isset($renTuple->a));
+    }
+
+    public function testMultipleMatchingColumnsWildcard()
+    {
+        $rel = $this->conn->query(
+            'SELECT 1 AS a, 2 AS a, 3 AS ab'
+        );
+        $renamed = $rel->rename(['a*' => 'c*']);
+        $expectedColNames = ['c', 'c', 'cb'];
+        foreach ($renamed->getColumns() as $i => $column) {
+            $this->assertSame($expectedColNames[$i], $column->getName(), "iteration $i");
+        }
+
+        $renTuple = $renamed->tuple();
+        $this->assertSame([1, 2, 3], $renTuple->toList());
+        $this->assertSame(3, $renTuple->cb);
     }
 
     public function testCol()
@@ -153,7 +171,7 @@ class RenamedRelationTest extends \Ivory\IvoryTestCase
 
         $this->assertSame(
             [2, 12, 30],
-            $renamed->col(function (ITuple $tuple) { return $tuple['b'] * $tuple['c']; })->toArray()
+            $renamed->col(function (ITuple $tuple) { return $tuple->b * $tuple->c; })->toArray()
         );
 
         $this->assertSame('c', $renamed->col(0)->getName());

@@ -4,6 +4,7 @@ namespace Ivory\Relation;
 use Ivory\Connection\Config\ConfigParam;
 use Ivory\Connection\IConnection;
 use Ivory\Data\Set\CustomSet;
+use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Value\Composite;
 use Ivory\Value\Box;
@@ -106,7 +107,7 @@ class RelationTest extends \Ivory\IvoryTestCase
         $this->assertSame('The Piano Guys', $rel->value('artist_name', 1));
 
         $evaluator = function (ITuple $tuple) {
-            return sprintf('%s (%d)', $tuple['artist_name'][0], count($tuple['album_names']));
+            return sprintf('%s (%d)', $tuple->artist_name[0], count($tuple->album_names));
         };
         $this->assertSame('T (1)', $rel->value($evaluator, 1));
 
@@ -167,9 +168,9 @@ class RelationTest extends \Ivory\IvoryTestCase
         $ext = $rel->extend([
             'dist' => function (ITuple $tuple) {
                 /** @var Point $a */
-                $a = $tuple['A'];
+                $a = $tuple->A;
                 /** @var Point $b */
-                $b = $tuple['B'];
+                $b = $tuple->B;
                 $x = $a->getX() - $b->getX();
                 $y = $a->getY() - $b->getY();
                 return sqrt($x * $x + $y * $y);
@@ -194,11 +195,11 @@ class RelationTest extends \Ivory\IvoryTestCase
             array_map(function (IColumn $c) { return $c->getName(); }, $ext2->getColumns())
         );
 
-        $this->assertEquals(5, $ext->tuple(0)['dist'], '', 1e-9);
-        $this->assertEquals(8.993886812719, $ext2->tuple(1)['dist'], '', 1e-9);
+        $this->assertEquals(5, $ext->tuple(0)->dist, '', 1e-9);
+        $this->assertEquals(8.993886812719, $ext2->tuple(1)->dist, '', 1e-9);
 
-        $this->assertEquals(Point::fromCoords(0, 4), $ext2->tuple(0)['upleft']);
-        $this->assertEquals(Point::fromCoords(1.3, 4), $ext2->tuple(1)['upleft']);
+        $this->assertEquals(Point::fromCoords(0, 4), $ext2->tuple(0)->upleft);
+        $this->assertEquals(Point::fromCoords(1.3, 4), $ext2->tuple(1)->upleft);
 
         try {
             $c = $ext->col('upleft');
@@ -219,7 +220,7 @@ class RelationTest extends \Ivory\IvoryTestCase
                 ->project([
                     'n',
                     'z' => function (ITuple $tuple) {
-                        return -$tuple['z'];
+                        return -$tuple->z;
                     },
                 ])
                 ->toArray()
@@ -258,11 +259,11 @@ class RelationTest extends \Ivory\IvoryTestCase
         $results = [];
         foreach ($rel as $tuple) {
             $albums = [];
-            foreach ($tuple['albums'] as $album) {
+            foreach ($tuple->albums as $album) {
                 /** @var Composite $album */
                 $albums[] = $album->toMap();
             }
-            $results[$tuple['artist_name']] = $albums;
+            $results[$tuple->artist_name] = $albums;
         }
         $this->assertEquals(
             [
@@ -369,12 +370,12 @@ class RelationTest extends \Ivory\IvoryTestCase
                             '4713-01-01 BC'::DATE AS mn"
                 );
                 $tuple = $rel->tuple();
-                $this->assertEquals(Date::fromParts(2016, 4, 17), $tuple['d'], $dateStyle);
-                $this->assertEquals(Date::fromParts(-1987, 8, 17), $tuple['bc'], $dateStyle);
-                $this->assertEquals(Date::infinity(), $tuple['inf'], $dateStyle);
-                $this->assertEquals(Date::minusInfinity(), $tuple['minus_inf'], $dateStyle);
-                $this->assertEquals(Date::fromParts(5874897, 12, 31), $tuple['mx'], $dateStyle);
-                $this->assertEquals(Date::fromParts(-4713, 1, 1), $tuple['mn'], $dateStyle);
+                $this->assertEquals(Date::fromParts(2016, 4, 17), $tuple->d, $dateStyle);
+                $this->assertEquals(Date::fromParts(-1987, 8, 17), $tuple->bc, $dateStyle);
+                $this->assertEquals(Date::infinity(), $tuple->inf, $dateStyle);
+                $this->assertEquals(Date::minusInfinity(), $tuple->minus_inf, $dateStyle);
+                $this->assertEquals(Date::fromParts(5874897, 12, 31), $tuple->mx, $dateStyle);
+                $this->assertEquals(Date::fromParts(-4713, 1, 1), $tuple->mn, $dateStyle);
             }
         } finally {
             $this->conn->rollback();
@@ -421,10 +422,10 @@ class RelationTest extends \Ivory\IvoryTestCase
         );
 
         $tuple = $rel->tuple();
-        $this->assertEquals(Time::fromPartsStrict(0, 0, 0), $tuple['midnight']);
-        $this->assertEquals(Time::fromPartsStrict(8, 0, .123456), $tuple['leap_sec']);
-        $this->assertEquals(Time::fromPartsStrict(15, 42, 54), $tuple['pm']);
-        $this->assertEquals(Time::fromPartsStrict(24, 0, 0), $tuple['next_midnight']);
+        $this->assertEquals(Time::fromPartsStrict(0, 0, 0), $tuple->midnight);
+        $this->assertEquals(Time::fromPartsStrict(8, 0, .123456), $tuple->leap_sec);
+        $this->assertEquals(Time::fromPartsStrict(15, 42, 54), $tuple->pm);
+        $this->assertEquals(Time::fromPartsStrict(24, 0, 0), $tuple->next_midnight);
     }
 
     public function testTimeTzResult()
@@ -437,10 +438,10 @@ class RelationTest extends \Ivory\IvoryTestCase
         );
 
         $tuple = $rel->tuple();
-        $this->assertEquals(TimeTz::fromPartsStrict(0, 0, 0, 0), $tuple['midnight']);
-        $this->assertEquals(TimeTz::fromPartsStrict(8, 0, .123456, 48600), $tuple['leap_sec']);
-        $this->assertEquals(TimeTz::fromPartsStrict(15, 42, 54, -28800), $tuple['pm']);
-        $this->assertEquals(TimeTz::fromPartsStrict(24, 0, 0, 21600), $tuple['next_midnight']);
+        $this->assertEquals(TimeTz::fromPartsStrict(0, 0, 0, 0), $tuple->midnight);
+        $this->assertEquals(TimeTz::fromPartsStrict(8, 0, .123456, 48600), $tuple->leap_sec);
+        $this->assertEquals(TimeTz::fromPartsStrict(15, 42, 54, -28800), $tuple->pm);
+        $this->assertEquals(TimeTz::fromPartsStrict(24, 0, 0, 21600), $tuple->next_midnight);
     }
 
     public function testTimestampResult()
@@ -463,15 +464,15 @@ class RelationTest extends \Ivory\IvoryTestCase
                             '4713-01-01 00:00:00 BC'::TIMESTAMP AS mn"
                 );
                 $tuple = $rel->tuple();
-                $this->assertEquals(Timestamp::fromParts(2016, 4, 17, 0, 0, 0), $tuple['midnight'], $dateStyle);
-                $this->assertEquals(Timestamp::fromParts(2016, 5, 17, 8, 0, 0.123456), $tuple['leap_sec'], $dateStyle);
-                $this->assertEquals(Timestamp::fromParts(2016, 6, 17, 15, 42, 54), $tuple['pm'], $dateStyle);
-                $this->assertEquals(Timestamp::fromParts(2016, 7, 18, 0, 0, 0), $tuple['next_midnight'], $dateStyle);
-                $this->assertEquals(Timestamp::fromParts(-1987, 8, 17, 13, 1, 2.5), $tuple['bc'], $dateStyle);
-                $this->assertEquals(Timestamp::infinity(), $tuple['inf'], $dateStyle);
-                $this->assertEquals(Timestamp::minusInfinity(), $tuple['minus_inf'], $dateStyle);
-                $this->assertEquals(Timestamp::fromParts(294277, 1, 1, 0, 0, 0), $tuple['mx'], $dateStyle);
-                $this->assertEquals(Timestamp::fromParts(-4713, 1, 1, 0, 0, 0), $tuple['mn'], $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(2016, 4, 17, 0, 0, 0), $tuple->midnight, $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(2016, 5, 17, 8, 0, 0.123456), $tuple->leap_sec, $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(2016, 6, 17, 15, 42, 54), $tuple->pm, $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(2016, 7, 18, 0, 0, 0), $tuple->next_midnight, $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(-1987, 8, 17, 13, 1, 2.5), $tuple->bc, $dateStyle);
+                $this->assertEquals(Timestamp::infinity(), $tuple->inf, $dateStyle);
+                $this->assertEquals(Timestamp::minusInfinity(), $tuple->minus_inf, $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(294277, 1, 1, 0, 0, 0), $tuple->mx, $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(-4713, 1, 1, 0, 0, 0), $tuple->mn, $dateStyle);
             }
         } finally {
             $this->conn->rollback();
@@ -516,18 +517,18 @@ class RelationTest extends \Ivory\IvoryTestCase
                     }
                     $this->assertNoMoreErrors($msg);
 
-                    $this->assertEquals(TimestampTz::fromParts(2016, 1, 17, 0, 0, 0, $tzStd), $tuple['midnight'], $msg);
-                    $this->assertEquals(TimestampTz::fromParts(2016, 6, 17, 15, 42, 54, $tzSmr), $tuple['pm'], $msg);
-                    $this->assertEquals(TimestampTz::fromParts(2016, 7, 18, 0, 0, 0, $tzSmr), $tuple['next_midnight'],
+                    $this->assertEquals(TimestampTz::fromParts(2016, 1, 17, 0, 0, 0, $tzStd), $tuple->midnight, $msg);
+                    $this->assertEquals(TimestampTz::fromParts(2016, 6, 17, 15, 42, 54, $tzSmr), $tuple->pm, $msg);
+                    $this->assertEquals(TimestampTz::fromParts(2016, 7, 18, 0, 0, 0, $tzSmr), $tuple->next_midnight,
                         $msg);
-                    $this->assertEquals(TimestampTz::fromParts(2016, 5, 17, 8, 0, 0.123456, $tzSmr), $tuple['leap_sec'],
+                    $this->assertEquals(TimestampTz::fromParts(2016, 5, 17, 8, 0, 0.123456, $tzSmr), $tuple->leap_sec,
                         $msg);
-                    $this->assertEquals(TimestampTz::infinity(), $tuple['inf'], $msg);
-                    $this->assertEquals(TimestampTz::minusInfinity(), $tuple['minus_inf'], $msg);
-                    $this->assertEquals(TimestampTz::fromParts(-1987, 8, 17, 13, 1, 2.5, $lmtOffset), $tuple['bc'],
+                    $this->assertEquals(TimestampTz::infinity(), $tuple->inf, $msg);
+                    $this->assertEquals(TimestampTz::minusInfinity(), $tuple->minus_inf, $msg);
+                    $this->assertEquals(TimestampTz::fromParts(-1987, 8, 17, 13, 1, 2.5, $lmtOffset), $tuple->bc,
                         $msg);
-                    $this->assertEquals(TimestampTz::fromParts(294277, 1, 1, 0, 0, 0, $tzStd), $tuple['mx'], $msg);
-                    $this->assertEquals(TimestampTz::fromParts(-4713, 1, 1, 0, 0, 0, $lmtOffset), $tuple['mn'], $msg);
+                    $this->assertEquals(TimestampTz::fromParts(294277, 1, 1, 0, 0, 0, $tzStd), $tuple->mx, $msg);
+                    $this->assertEquals(TimestampTz::fromParts(-4713, 1, 1, 0, 0, 0, $lmtOffset), $tuple->mn, $msg);
                 }
             }
         } finally {
@@ -542,7 +543,7 @@ class RelationTest extends \Ivory\IvoryTestCase
              FROM (VALUES (point(0, 0), point(3, 4)), (point(1.3, 4), point(8, -2))) v ("A", "B")'
         );
         $this->assertSame(2, count($rel));
-        $this->assertEquals(Point::fromCoords(0, 0), $rel->tuple(0)['A']);
+        $this->assertEquals(Point::fromCoords(0, 0), $rel->tuple(0)->A);
         $this->assertEquals(Point::fromCoords(0, 0), $rel->value('A', 0));
         $this->assertEquals(
             [
@@ -597,27 +598,27 @@ class RelationTest extends \Ivory\IvoryTestCase
 
         $this->assertEquals(
             TextSearchVector::fromSet(['a', 'and', 'ate', 'cat', 'fat', 'mat', 'on', 'rat', 'sat']),
-            $tuple['list']
+            $tuple->list
         );
 
         $this->assertEquals(
             TextSearchVector::fromSet(['    ', 'contains', 'lexeme', 'spaces', 'the']),
-            $tuple['whitespace']
+            $tuple->whitespace
         );
 
         $this->assertEquals(
             TextSearchVector::fromSet(['a', 'contains', "Joe's", 'lexeme', 'quote', 'the']),
-            $tuple['quotes']
+            $tuple->quotes
         );
 
         $this->assertEquals(
             TextSearchVector::fromList(['a', 'fat', 'cat', 'sat', 'on', 'a', 'mat', 'and', 'ate', 'a', 'fat', 'rat']),
-            $tuple['positioned']
+            $tuple->positioned
         );
 
         $this->assertEquals(
             TextSearchVector::fromMap(['a' => [['1', 'A']], 'fat' => [[2, 'B'], [4, 'C']], 'cat' => [[5, 'D']]]),
-            $tuple['weighted']
+            $tuple->weighted
         );
     }
 
@@ -630,9 +631,9 @@ class RelationTest extends \Ivory\IvoryTestCase
         );
 
         $tuple = $rel->tuple();
-        $this->assertEquals(TextSearchQuery::fromString("!'fat' & ( 'rat':AB | 'cat' )"), $tuple['ops']);
-        $this->assertEquals(TextSearchQuery::fromString("'super':*"), $tuple['star']);
-        $this->assertEquals(TextSearchQuery::fromString("'Jo  e''s'''"), $tuple['quotes']);
+        $this->assertEquals(TextSearchQuery::fromString("!'fat' & ( 'rat':AB | 'cat' )"), $tuple->ops);
+        $this->assertEquals(TextSearchQuery::fromString("'super':*"), $tuple->star);
+        $this->assertEquals(TextSearchQuery::fromString("'Jo  e''s'''"), $tuple->quotes);
     }
 
     public function testIntervalResult()
@@ -651,29 +652,53 @@ class RelationTest extends \Ivory\IvoryTestCase
                 TimeInterval::YEAR => 1, TimeInterval::MONTH => 2, TimeInterval::WEEK => 3, TimeInterval::DAY => 3,
                 TimeInterval::HOUR => 4, TimeInterval::MINUTE => 5, TimeInterval::SECOND => 6,
             ]),
-            $tuple['iso']
+            $tuple->iso
         );
         $this->assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::YEAR => 1, TimeInterval::MONTH => 2, TimeInterval::DAY => 3,
                 TimeInterval::HOUR => 4, TimeInterval::MINUTE => 5, TimeInterval::SECOND => 6,
             ]),
-            $tuple['iso_alt']
+            $tuple->iso_alt
         );
         $this->assertEquals(
             TimeInterval::fromParts([TimeInterval::YEAR => 1, TimeInterval::MONTH => 2]),
-            $tuple['sql_year_mon']
+            $tuple->sql_year_mon
         );
         $this->assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::DAY => 3,
                 TimeInterval::HOUR => 12, TimeInterval::MINUTE => 34, TimeInterval::SECOND => 56,
             ]),
-            $tuple['sql_day_time']
+            $tuple->sql_day_time
         );
         $this->assertEquals(
             TimeInterval::fromParts([TimeInterval::DAY => -4]),
-            $tuple['pg']
+            $tuple->pg
         );
+    }
+
+    public function testAmbiguousColumns()
+    {
+        $tuple = $this->conn->querySingleTuple(
+            'SELECT 1 AS a, 2 AS b, 3 AS b'
+        );
+
+        $this->assertSame([1, 2, 3], $tuple->toList());
+
+        try {
+            $map = $tuple->toMap();
+            $this->fail(AmbiguousException::class . ' was expected');
+        }
+        catch (AmbiguousException $e) {
+        }
+
+        $this->assertSame(1, $tuple->a);
+
+        try {
+            $val = $tuple->b;
+            $this->fail(AmbiguousException::class . ' was expected');
+        } catch (AmbiguousException $e) {
+        }
     }
 }

@@ -45,28 +45,28 @@ SQL
         );
 
         /** @var Range[] $rangeArray */
-        $rangeArray = $tuple['array'];
+        $rangeArray = $tuple->array;
         $this->assertInstanceOf(Range::class, $rangeArray[2]);
         $this->assertSame('19.2.2017', $rangeArray[2]->getUpper()->format('j.n.Y'));
         $this->assertFalse($rangeArray[3]->isFinite());
 
         /** @var Json $json */
-        $json = $tuple['json'];
+        $json = $tuple->json;
         $this->assertInstanceOf(Json::class, $json);
         $this->assertEquals((object)['k1' => 42, 'k2' => false], $json->getValue());
 
         /** @var XmlDocument $xml */
-        $xml = $tuple['xml'];
+        $xml = $tuple->xml;
         $this->assertInstanceOf(XmlContent::class, $xml);
         $this->assertEquals(['Manual'], $xml->toSimpleXMLElement()->xpath('//title/text()'));
 
         /** @var Polygon $polygon */
-        $polygon = $tuple['polygon'];
+        $polygon = $tuple->polygon;
         $this->assertInstanceOf(Polygon::class, $polygon);
         $this->assertEquals(6, $polygon->getArea(), '', 1e-12);
 
         /** @var Composite $row */
-        $row = $tuple['row'];
+        $row = $tuple->row;
         $this->assertInstanceOf(Composite::class, $row);
         $this->assertSame(['1', '2', 'foo'], $row->toList());
     }

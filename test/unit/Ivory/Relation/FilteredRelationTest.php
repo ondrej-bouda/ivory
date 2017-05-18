@@ -24,7 +24,7 @@ class FilteredRelationTest extends \Ivory\IvoryTestCase
              FROM (VALUES (1, 2), (4, 3), (5, 6)) v (a, b)'
         );
         $filtered = $rel->filter(function (ITuple $tuple) {
-            return ($tuple['a'] < $tuple['b']);
+            return ($tuple->a < $tuple->b);
         });
 
         $this->assertSame(2, $filtered->count());
@@ -60,7 +60,7 @@ class FilteredRelationTest extends \Ivory\IvoryTestCase
         $filterMod3 = new class implements ITupleFilter {
             public function accept(ITuple $tuple): bool
             {
-                return ($tuple['b'] % 3 == 0);
+                return ($tuple->b % 3 == 0);
             }
         };
         $filtered = $rel->filter($filterMod3);

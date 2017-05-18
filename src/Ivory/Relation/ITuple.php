@@ -11,16 +11,17 @@ use Ivory\Utils\IComparable;
  *
  * A tuple is a map of offsets or names of the originating columns to the corresponding values. There are three ways of
  * accessing an attribute value:
- * - via the column (zero-based) offset using `ArrayAccess` (e.g., `$tuple[0]` is the value of the first column); or
- * - via the column name using either `ArrayAccess`, for non-numeric names, or dynamic property access (e.g., both
- *   `$tuple['foo']` and `$tuple->foo` expose the value of the column named "foo"); or
- * - via the {@link value()} method, which accepts both column offsets and names, and also a custom evaluator function;
- *   note that the universality of the {@link value()} method comes at the cost of a slight performance penalty compared
- *   to the first two access methods.
+ * - via the column zero-based offset using **`ArrayAccess`** (e.g., `$tuple[0]` is the value of the first column); or
+ * - via the column name using the **dynamic property access** (e.g., `$tuple->foo` exposes the value of the column
+ *   named "foo"; for columns which do not form a correct PHP identifier, use the PHP syntax `$tuple->{'some col'}`); or
+ * - via the **{@link value()} method**, which accepts both column offsets and names, and also a custom evaluator
+ *   function; note that the universality of the {@link value()} method comes at the cost of a slight performance
+ *   penalty compared to the first two access methods.
  *
- * Note there might be several columns of the same name defined on the originating relation, or the column name might
- * not be defined at all. To prevent ambiguity, the tuple throws an `AmbiguousException` when accessing a column by an
- * ambiguous name.
+ * Note there might be several columns of the same name defined on the originating relation. To prevent ambiguity, the
+ * tuple throws an `AmbiguousException` when accessing a column by an ambiguous name.
+ *
+ * There might also be a column with no name. The value of an anonymous column is only accessible by the column offset.
  *
  * @internal Ivory design note: ITuple is intentionally not iterable as there seems to be no real value with it. It
  * might be added later with a use case in hand.
@@ -49,7 +50,8 @@ interface ITuple extends \ArrayAccess, IComparable
      *
      * @internal Ivory design note: The original specification for the case of multiple same-named columns was to return
      * the value of the first column of the group. The current specification goes with the more restrictive API,
-     * throwing exception on ambiguous name, just as PostgreSQL does.
+     * throwing exception on ambiguous name, just as PostgreSQL does. If that proves too strict, the API might be
+     * relaxed in later versions.
      *
      * @return array map: column name => value
      * @throws AmbiguousException

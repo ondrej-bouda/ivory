@@ -19,7 +19,7 @@ class ProjectedRelationTest extends \Ivory\IvoryTestCase
         $this->assertSame([['the_answer' => 42, 'x' => 'abc']], $rel->project([1, 2, 'x' => 0])->toArray());
         $this->assertSame(
             [['sum' => 15]],
-            $rel->project(['sum' => function (ITuple $t) { return $t['a'] + $t['b']; }])->toArray()
+            $rel->project(['sum' => function (ITuple $t) { return $t[3] + $t->b; }])->toArray()
         );
 
         try {
@@ -46,8 +46,7 @@ class ProjectedRelationTest extends \Ivory\IvoryTestCase
         $conn = $this->getIvoryConnection();
         $rel = $conn->query(
             "SELECT 'abc' AS foo, 1, 42 AS the_answer,
-                    7 AS a, 8 AS b, 'John' AS person_firstname, 'Doe' AS person_lastname,
-                    100 AS a"
+                    7 AS a, 8 AS b, 'John' AS person_firstname, 'Doe' AS person_lastname"
         );
         $this->assertSame(
             [['p_firstname' => 'John', 'p_lastname' => 'Doe']],

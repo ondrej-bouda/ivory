@@ -128,23 +128,13 @@ class Tuple implements ITuple
 
     public function offsetExists($offset)
     {
-        if (filter_var($offset, FILTER_VALIDATE_INT) !== false) {
-            return array_key_exists($offset, $this->data);
-        } else {
-            return isset($this->colNameMap[$offset]);
-        }
+        return array_key_exists($offset, $this->data);
     }
 
     public function offsetGet($offset)
     {
-        if (filter_var($offset, FILTER_VALIDATE_INT) !== false) {
-            $key = $offset;
-        } else {
-            $key = $this->colNameMap[$offset];
-        }
-
-        if (array_key_exists($key, $this->data)) {
-            return $this->data[$key];
+        if (array_key_exists($offset, $this->data)) {
+            return $this->data[$offset];
         } else {
             throw new UndefinedColumnException("There is no column at offset `$offset` in the tuple");
         }

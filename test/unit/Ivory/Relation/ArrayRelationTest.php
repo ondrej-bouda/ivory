@@ -17,10 +17,10 @@ class ArrayRelationTest extends \Ivory\IvoryTestCase
             "SELECT * FROM (%rel) AS vals (num, letter, decim, flag, txt) WHERE flag",
             $arrRel
         );
-        $this->assertSame(5, $tuple['num']);
-        $this->assertSame('g', $tuple['letter']);
-        $this->assertEquals(2.81, $tuple['decim'], '', 1e-12);
-        $this->assertSame(true, $tuple['flag']);
-        $this->assertSame('text', $tuple['txt']);
+        $this->assertSame(5, $tuple->num);
+        $this->assertSame('g', $tuple->letter);
+        $this->assertEquals(2.81, $tuple->decim, '', 1e-12);
+        $this->assertSame(true, $tuple->flag);
+        $this->assertSame('text', $tuple->txt);
     }
 }

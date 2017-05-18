@@ -58,7 +58,7 @@ class MapTest extends \Ivory\IvoryTestCase
     {
         $map = $this->artistRel->map('artist');
 
-        $this->assertSame('Black Album', $map['Metallica']['album']);
+        $this->assertSame('Black Album', $map['Metallica']->album);
         $this->assertSame('Black Album', $map->get('Metallica')->value('album'));
         $this->assertSame(
             ['artist' => 'Metallica', 'year' => 1991, 'album' => 'Black Album'],
@@ -79,7 +79,7 @@ class MapTest extends \Ivory\IvoryTestCase
     {
         $map = $this->artistYearRel->map('artist', 'year');
 
-        $this->assertSame('Black Album', $map['Metallica'][1991]['album']);
+        $this->assertSame('Black Album', $map['Metallica'][1991]->album);
         $this->assertSame('S & M', $map['Metallica'][1999]->value('album'));
         $this->assertSame('S & M', $map->get('Metallica')[1999]->value('album'));
         $this->assertSame('S & M', $map->get('Metallica')->get(1999)->value('album'));

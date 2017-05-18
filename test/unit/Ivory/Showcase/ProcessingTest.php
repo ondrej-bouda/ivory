@@ -106,7 +106,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
     {
         $exp = ['Dtn', 'Tir', null, null, null, null];
         foreach ($this->teachers as $i => $tuple) { /** @var ITuple $tuple */
-            $this->assertSame($exp[$i], $tuple['abbr'], "Tuple $i does not match");
+            $this->assertSame($exp[$i], $tuple->abbr, "Tuple $i does not match");
         }
     }
 
@@ -117,7 +117,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         $this->assertSame('Angus', $this->teachers->value(1));
         $this->assertSame('Ada', $this->teachers->value(1, 5));
         $this->assertSame('Ada Lovelace',
-            $this->teachers->value(function (ITuple $t) { return "$t[firstname] $t[lastname]"; }, 5)
+            $this->teachers->value(function (ITuple $t) { return "{$t->firstname} {$t->lastname}"; }, 5)
         );
     }
 
@@ -126,10 +126,10 @@ class ProcessingTest extends \Ivory\IvoryTestCase
      */
     public function testTuple()
     {
-        $this->assertSame(1, $this->teachers->tuple()['id']);
+        $this->assertSame(1, $this->teachers->tuple()->id);
         $this->assertSame('Ada', $this->teachers->tuple(5)->value('firstname'));
         $this->assertSame('Ada Lovelace',
-            $this->teachers->tuple(5)->value(function (ITuple $t) { return "$t[firstname] $t[lastname]"; })
+            $this->teachers->tuple(5)->value(function (ITuple $t) { return "{$t->firstname} {$t->lastname}"; })
         );
 
         $this->assertSame(
@@ -171,7 +171,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         );
 
         $abbrCol = $this->teachers->col(function (ITuple $t) {
-            return ($t['abbr'] ? : mb_substr($t['lastname'], 0, 4));
+            return ($t->abbr ? : mb_substr($t->lastname, 0, 4));
         });
         $expected = ['Dtn', 'Tir', 'Fama', 'Hans', 'Shil', 'Love'];
         foreach ($abbrCol as $i => $v) {
@@ -182,7 +182,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
     public function testFilter()
     {
         $res = $this->teachers->filter(function (ITuple $t) {
-            return ($t['firstname'][0] == 'A');
+            return ($t->firstname[0] == 'A');
         });
 
         $this->assertCount(2, $res);
@@ -196,7 +196,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
     {
         $res = $this->teachers->project([
             'id',
-            'initials' => function (ITuple $t) { return "{$t['firstname'][0]}.{$t['lastname'][0]}."; },
+            'initials' => function (ITuple $t) { return "{$t->firstname[0]}.{$t->lastname[0]}."; },
         ]);
 
         $this->assertSame(
@@ -235,7 +235,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
     public function testAssocSingleLevel()
     {
         $res = $this->teachers->assoc('id', function (ITuple $t) {
-            return ($t['abbr'] ? : mb_substr($t['lastname'], 0, 4));
+            return ($t->abbr ? : mb_substr($t->lastname, 0, 4));
         });
 
         $this->assertCount(6, $res);
@@ -262,11 +262,11 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         $res = $this->teachers->map('id');
 
         $this->assertCount(6, $res);
-        $this->assertSame('Ada', $res[6]['firstname']);
+        $this->assertSame('Ada', $res[6]->firstname);
         $this->assertSame(
             'Ada Lovelace',
             $res[6]->value(function (ITuple $t) {
-                return "$t[firstname] $t[lastname]";
+                return "{$t->firstname} {$t->lastname}";
             })
         );
     }
@@ -275,7 +275,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
     {
         $res = $this->rel->map('teacher_id', 'scheduling_status', 'lesson_id');
 
-        $this->assertSame('Ruby', $res[6]['actual'][2]['lesson_topic']);
+        $this->assertSame('Ruby', $res[6]['actual'][2]->lesson_topic);
         $this->assertCount(2, $res[1]['actual']);
         $this->assertCount(1, $res[1]['scheduled']);
         $this->assertCount(1, $res[2]['scheduled']);
@@ -284,7 +284,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
 
     public function testMultimapSingleLevel()
     {
-        $res = $this->teachers->multimap(function (ITuple $t) { return $t['firstname'][0]; });
+        $res = $this->teachers->multimap(function (ITuple $t) { return $t->firstname[0]; });
 
         $this->assertInstanceOf(IRelation::class, $res['A']);
         $this->assertCount(2, $res['A']);
@@ -356,7 +356,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
         $this->assertFalse($idSet->contains(7));
 
         $abbrSet = $this->teachers->toSet(function (ITuple $t) {
-            return ($t['abbr'] ? : mb_substr($t['lastname'], 0, 4));
+            return ($t->abbr ? : mb_substr($t->lastname, 0, 4));
         });
 
         $this->assertTrue($abbrSet->contains('Dtn'));
@@ -369,7 +369,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
     {
         $res = $this->teachers
             ->project(['id', 'firstname'])
-            ->filter(function (ITuple $t) { return ($t['firstname'][0] == 'A'); })
+            ->filter(function (ITuple $t) { return ($t->firstname[0] == 'A'); })
             ->rename(['firstname' => 'name'])
             ->assoc('name', 'id');
 

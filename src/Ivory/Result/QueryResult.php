@@ -20,7 +20,7 @@ class QueryResult extends Result implements IQueryResult
     private $numRows;
     /** @var Column[] */
     private $columns;
-    /** @var int[] map: column name => offset of the first column of the name */
+    /** @var array map: column name => offset of the first column of the name, or {@link Tuple::AMBIGUOUS_COL} */
     private $colNameMap;
 
 
@@ -77,8 +77,8 @@ class QueryResult extends Result implements IQueryResult
             $type = $typeDictionary->requireTypeByOid($typeOid);
 
             $this->columns[] = new Column($this, $i, $name, $type);
-            if ($name !== null && !isset($this->colNameMap[$name])) {
-                $this->colNameMap[$name] = $i;
+            if ($name !== null) {
+                $this->colNameMap[$name] = (isset($this->colNameMap[$name]) ? Tuple::AMBIGUOUS_COL : $i);
             }
         }
     }

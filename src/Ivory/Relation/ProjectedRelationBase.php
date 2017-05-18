@@ -5,7 +5,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
 {
     /** @var Column[] */
     private $projectedColumns;
-    /** @var int[] map: column name => offset of the first column of the name */
+    /** @var array map: column name => offset of the first column of the name, or {@link Tuple::AMBIGUOUS_COL} */
     private $projectedColNameMap;
 
     public function __construct(IRelation $source, array $columns)
@@ -16,8 +16,11 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
         $this->projectedColNameMap = [];
         foreach ($columns as $colOffset => $col) {
             $colName = $col->getName();
-            if (strlen($colName) > 0 && !isset($this->projectedColNameMap[$colName])) {
-                $this->projectedColNameMap[$colName] = $colOffset;
+            if (strlen($colName) > 0) {
+                $this->projectedColNameMap[$colName] = (isset($this->projectedColNameMap[$colName]) ?
+                    Tuple::AMBIGUOUS_COL :
+                    $colOffset
+                );
             }
         }
     }
