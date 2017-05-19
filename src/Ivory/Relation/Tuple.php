@@ -152,7 +152,7 @@ class Tuple implements ITuple
 
     //endregion
 
-    //region IComparable
+    //region IEqualable
 
     public function equals($object)
     {

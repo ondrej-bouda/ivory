@@ -9,7 +9,7 @@ namespace Ivory\Value;
  * after any other date. There are special factory methods {@link Date::minusInfinity()} and {@link Date::infinity()}
  * for getting these values.
  *
- * Besides being {@link IComparable}, the {@link Date} objects may safely be compared using the `<`, `==`, and `>`
+ * Besides being {@link IEqualable}, the {@link Date} objects may safely be compared using the `<`, `==`, and `>`
  * operators with the expected results.
  *
  * All the operations work correctly beyond the UNIX timestamp range bounded by 32bit integers, i.e., it is no problem

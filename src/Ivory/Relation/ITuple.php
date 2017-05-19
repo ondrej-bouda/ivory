@@ -4,7 +4,7 @@ namespace Ivory\Relation;
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Exception\AmbiguousException;
 use Ivory\Relation\Alg\ITupleEvaluator;
-use Ivory\Utils\IComparable;
+use Ivory\Utils\IEqualable;
 
 /**
  * Represents one relation row.
@@ -26,7 +26,7 @@ use Ivory\Utils\IComparable;
  * @internal Ivory design note: ITuple is intentionally not iterable as there seems to be no real value with it. It
  * might be added later with a use case in hand.
  */
-interface ITuple extends \ArrayAccess, IComparable
+interface ITuple extends \ArrayAccess, IEqualable
 {
     /**
      * Converts the tuple to a list of values from the individual columns.

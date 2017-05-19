@@ -2,7 +2,7 @@
 namespace Ivory\Value;
 
 use Ivory\Exception\NotImplementedException;
-use Ivory\Utils\IComparable;
+use Ivory\Utils\IEqualable;
 
 /**
  * Representation of an IPv4 or IPv6 host or network address.
@@ -12,7 +12,7 @@ use Ivory\Utils\IComparable;
  *
  * The objects are immutable.
  */
-class NetAddress implements IComparable
+class NetAddress implements IEqualable
 {
     private $addrStr;
     private $ipVersion;

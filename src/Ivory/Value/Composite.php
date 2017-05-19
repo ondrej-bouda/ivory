@@ -5,7 +5,7 @@ use Ivory\Exception\ImmutableException;
 use Ivory\Exception\UnsupportedException;
 use Ivory\Type\Postgresql\CompositeType;
 use Ivory\Type\Postgresql\NamedCompositeType;
-use Ivory\Utils\IComparable;
+use Ivory\Utils\IEqualable;
 use Ivory\Utils\ValueUtils;
 
 /**
@@ -26,7 +26,7 @@ use Ivory\Utils\ValueUtils;
  *
  * @see http://www.postgresql.org/docs/9.4/static/rowtypes.html
  */
-class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
+class Composite implements IEqualable, \ArrayAccess, \IteratorAggregate
 {
     /** @var CompositeType type of the composite */
     private $type;

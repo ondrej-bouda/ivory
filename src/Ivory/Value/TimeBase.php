@@ -1,17 +1,17 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\Utils\ComparableWithPhpOperators;
-use Ivory\Utils\IComparable;
+use Ivory\Utils\EqualableWithPhpOperators;
+use Ivory\Utils\IEqualable;
 
 /**
  * Common base for time representations.
  *
  * @internal Only for the purpose of Ivory itself.
  */
-abstract class TimeBase implements IComparable
+abstract class TimeBase implements IEqualable
 {
-    use ComparableWithPhpOperators;
+    use EqualableWithPhpOperators;
 
     /** Number of decimal digits of precision in the fractional seconds part. */
     const PRECISION = 6;

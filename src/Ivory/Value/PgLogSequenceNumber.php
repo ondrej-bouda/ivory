@@ -1,22 +1,22 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\Utils\ComparableWithPhpOperators;
-use Ivory\Utils\IComparable;
+use Ivory\Utils\EqualableWithPhpOperators;
+use Ivory\Utils\IEqualable;
 
 /**
  * Representation of a PostgreSQL log sequence number.
  *
- * Besides being {@link IComparable}, the {@link PgLogSequenceNumber} objects may safely be compared using the `<`,
+ * Besides being {@link IEqualable}, the {@link PgLogSequenceNumber} objects may safely be compared using the `<`,
  * `==`, and `>` operators with the expected results.
  *
  * The objects are immutable.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-pg-lsn.html
  */
-class PgLogSequenceNumber implements IComparable
+class PgLogSequenceNumber implements IEqualable
 {
-    use ComparableWithPhpOperators;
+    use EqualableWithPhpOperators;
 
     /** @var int the higher 32 bits */
     private $hi;

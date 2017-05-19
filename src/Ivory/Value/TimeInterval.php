@@ -1,8 +1,8 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\Utils\ComparableWithPhpOperators;
-use Ivory\Utils\IComparable;
+use Ivory\Utils\EqualableWithPhpOperators;
+use Ivory\Utils\IEqualable;
 
 /**
  * Representation of a time interval.
@@ -18,14 +18,14 @@ use Ivory\Utils\IComparable;
  * When specifying the interval, any quantity may be an arbitrary decimal number. Fractions are added to the lower-order
  * fields using the conversion factors 1 month = 30 days and 1 day = 24 hours.
  *
- * Besides being {@link IComparable}, the {@link Timestamp} objects may safely be compared using the `<`, `==`, and `>`
+ * Besides being {@link IEqualable}, the {@link Timestamp} objects may safely be compared using the `<`, `==`, and `>`
  * operators with the expected results.
  *
  * The objects are immutable, i.e., once constructed, their value cannot be changed.
  */
-class TimeInterval implements IComparable
+class TimeInterval implements IEqualable
 {
-    use ComparableWithPhpOperators;
+    use EqualableWithPhpOperators;
 
     const MILLENNIUM = 'millennium';
     const CENTURY = 'century';

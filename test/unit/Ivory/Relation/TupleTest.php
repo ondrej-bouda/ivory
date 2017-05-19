@@ -5,7 +5,7 @@ use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\ImmutableException;
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Relation\Alg\ITupleEvaluator;
-use Ivory\Utils\IComparable;
+use Ivory\Utils\IEqualable;
 
 class TupleTest extends \PHPUnit\Framework\TestCase
 {
@@ -173,21 +173,21 @@ class TupleTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testComparable()
+    public function testEqualable()
     {
-        $odd1Tuple = Tuple::fromMap(['a' => new TupleTest__Comparable(1), 'b' => null]);
-        $odd2Tuple = Tuple::fromMap(['a' => new TupleTest__Comparable(3), 'b' => null]);
+        $odd1Tuple = Tuple::fromMap(['a' => new TupleTest__Equalable(1), 'b' => null]);
+        $odd2Tuple = Tuple::fromMap(['a' => new TupleTest__Equalable(3), 'b' => null]);
         $this->assertTrue($odd1Tuple->equals($odd2Tuple));
         $this->assertTrue($odd2Tuple->equals($odd1Tuple));
 
-        $evenTuple = Tuple::fromMap(['a' => new TupleTest__Comparable(2), 'b' => null]);
+        $evenTuple = Tuple::fromMap(['a' => new TupleTest__Equalable(2), 'b' => null]);
         $this->assertFalse($odd1Tuple->equals($evenTuple));
         $this->assertFalse($evenTuple->equals($odd1Tuple));
     }
 }
 
 
-class TupleTest__Comparable implements IComparable
+class TupleTest__Equalable implements IEqualable
 {
     private $num;
 
@@ -198,7 +198,7 @@ class TupleTest__Comparable implements IComparable
 
     public function equals($object)
     {
-        if (!$object instanceof TupleTest__Comparable) {
+        if (!$object instanceof TupleTest__Equalable) {
             return false;
         }
         return (($this->num % 2) == ($object->num % 2));

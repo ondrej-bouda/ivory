@@ -9,7 +9,7 @@ class ValueUtils
             return ($b === null);
         }
 
-        if ($a instanceof IComparable) {
+        if ($a instanceof IEqualable) {
             return $a->equals($b);
         } elseif (is_array($a)) {
             if (!is_array($b)) {

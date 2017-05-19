@@ -1,17 +1,17 @@
 <?php
 namespace Ivory\Value;
 
-use Ivory\Utils\ComparableWithPhpOperators;
-use Ivory\Utils\IComparable;
+use Ivory\Utils\EqualableWithPhpOperators;
+use Ivory\Utils\IEqualable;
 
 /**
  * Common base for date and date/time representations.
  *
  * @internal Only for the purpose of Ivory itself.
  */
-abstract class DateBase implements IComparable
+abstract class DateBase implements IEqualable
 {
-    use ComparableWithPhpOperators;
+    use EqualableWithPhpOperators;
 
     // NOTE: the order of the fields is important for the `<` and `>` operators to work correctly
     /** @var int -1, 0, or 1 if this date is <tt>-infinity</tt>, finite, or <tt>infinity</tt> */

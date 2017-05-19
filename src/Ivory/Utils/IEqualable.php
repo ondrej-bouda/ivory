@@ -1,12 +1,10 @@
 <?php
 namespace Ivory\Utils;
 
-// FIXME: the interface name is misleading - one would expect comparing in the sense of < and > operators on top of ==
-
 /**
- * Tells how to compare objects of the implementing class.
+ * Defines logical equality on objects of the implementing class.
  */
-interface IComparable
+interface IEqualable
 {
     /**
      * @param object $object

@@ -11,7 +11,7 @@ namespace Ivory\Value;
  * respectively before or after any other date/time. There are special factory methods
  * {@link Timestamp::minusInfinity()} and {@link Timestamp::infinity()} for getting these values.
  *
- * Besides being {@link IComparable}, the {@link Timestamp} objects may safely be compared using the `<`, `==`, and `>`
+ * Besides being {@link IEqualable}, the {@link Timestamp} objects may safely be compared using the `<`, `==`, and `>`
  * operators with the expected results.
  *
  * All the operations work correctly beyond the UNIX timestamp range bounded by 32bit integers, i.e., it is no problem

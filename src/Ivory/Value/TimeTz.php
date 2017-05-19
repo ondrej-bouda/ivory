@@ -13,7 +13,7 @@ namespace Ivory\Value;
  * the daylight "savings" time is in effect). That differs from the {@link TimestampTz} type, which records the
  * timezone, not just its offset.
  *
- * The objects are {@link IComparable}, which considers two time representations equal only if they have both the time
+ * The objects are {@link IEqualable}, which considers two time representations equal only if they have both the time
  * part and the timezone offset equal. The same logic is used for the PHP `<`, `==`, and `>` operators. To compare the
  * physical time of two {@link TimeTz} objects, use the {@link TimeTz::occursBefore()}, {@link TimeTz::occursAt()} and
  * {@link TimeTz::occursAfter()} methods.

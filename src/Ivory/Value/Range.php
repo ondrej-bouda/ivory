@@ -6,7 +6,7 @@ use Ivory\Exception\UnsupportedException;
 use Ivory\Type\IDiscreteType;
 use Ivory\Type\IRangeCanonicalFunc;
 use Ivory\Type\ITotallyOrderedType;
-use Ivory\Utils\IComparable;
+use Ivory\Utils\IEqualable;
 
 /**
  * A range of values.
@@ -28,7 +28,7 @@ use Ivory\Utils\IComparable;
  * constructing a range. If other than canonical representation of a range is desired, e.g., for presenting the range
  * using both bounds inclusive, method {@link Range::toBounds()} may be useful.
  *
- * A range is `IComparable` to another range. Two ranges are equal only if they are above the same subtype and if the
+ * A range is `IEqualable` to another range. Two ranges are equal only if they are above the same subtype and if the
  * effective range equals.
  *
  * Alternatively to the {@link Range::getLower()} and {@link Range::getUpper()} methods, `ArrayAccess` is implemented.
@@ -41,7 +41,7 @@ use Ivory\Utils\IComparable;
  *
  * @see http://www.postgresql.org/docs/9.4/static/rangetypes.html
  */
-class Range implements IComparable, \ArrayAccess
+class Range implements IEqualable, \ArrayAccess
 {
     /** @var ITotallyOrderedType */
     private $subtype;
@@ -670,7 +670,7 @@ class Range implements IComparable, \ArrayAccess
 
     //endregion
 
-    //region IComparable
+    //region IEqualable
 
     public function equals($object)
     {
@@ -702,7 +702,7 @@ class Range implements IComparable, \ArrayAccess
             if ($object->lower !== null) {
                 return false;
             }
-        } elseif ($this->lower instanceof IComparable) {
+        } elseif ($this->lower instanceof IEqualable) {
             if (!$this->lower->equals($object->lower)) {
                 return false;
             }
@@ -716,7 +716,7 @@ class Range implements IComparable, \ArrayAccess
             if ($object->upper !== null) {
                 return false;
             }
-        } elseif ($this->upper instanceof IComparable) {
+        } elseif ($this->upper instanceof IEqualable) {
             if (!$this->upper->equals($object->upper)) {
                 return false;
             }
