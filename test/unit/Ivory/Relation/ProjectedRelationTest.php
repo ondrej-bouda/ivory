@@ -10,8 +10,7 @@ class ProjectedRelationTest extends \Ivory\IvoryTestCase
         $conn = $this->getIvoryConnection();
         $rel = $conn->query(
             "SELECT 'abc' AS foo, 1, 42 AS the_answer,
-                    7 AS a, 8 AS b, 'John' AS person_firstname, 'Doe' AS person_lastname,
-                    100 AS a"
+                    7 AS a, 8 AS b, 'John' AS person_firstname, 'Doe' AS person_lastname"
         );
         $this->assertSame([['a' => 7, 'b' => 8]], $rel->project(['a', 'b'])->toArray());
         $this->assertSame([7, 8], $rel->project(['a', 'b'])->tuple()->toList());
