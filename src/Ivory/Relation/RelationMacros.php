@@ -9,6 +9,7 @@ use Ivory\Data\Map\IValueMap;
 use Ivory\Data\Map\IWritableValueMap;
 use Ivory\Data\Set\DictionarySet;
 use Ivory\Data\Set\ISet;
+use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Relation\Alg\ITupleEvaluator;
 use Ivory\Data\Map\ArrayTupleMap;
@@ -86,10 +87,12 @@ trait RelationMacros
                     throw new UndefinedColumnException("No column at offset $offsetOrNameOrEvaluator");
                 }
             } else {
-                if (isset($colNameMap[$offsetOrNameOrEvaluator])) {
-                    return $columns[$colNameMap[$offsetOrNameOrEvaluator]];
-                } else {
+                if (!isset($colNameMap[$offsetOrNameOrEvaluator])) {
                     throw new UndefinedColumnException("No column named $offsetOrNameOrEvaluator");
+                } elseif ($colNameMap[$offsetOrNameOrEvaluator] === Tuple::AMBIGUOUS_COL) {
+                    throw new AmbiguousException("Multiple columns named $offsetOrNameOrEvaluator");
+                } else {
+                    return $columns[$colNameMap[$offsetOrNameOrEvaluator]];
                 }
             }
         } elseif (

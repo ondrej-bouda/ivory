@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Relation;
 
+use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\InternalException;
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Relation\Alg\ITupleEvaluator;
@@ -51,9 +52,6 @@ class ProjectedRelation extends ProjectedRelationBase
                         }
                     }
                     $matched = preg_grep($pcre, $cns);
-                    if (!$matchAll) {
-                        $matched = array_slice($matched, 0, 1, true);
-                    }
                 } else {
                     $matched = [];
                     foreach ($srcCols as $i => $c) {
@@ -61,15 +59,15 @@ class ProjectedRelation extends ProjectedRelationBase
                             $newName = preg_replace($pcre, $repl, $c->getName(), 1, $cnt);
                             if ($cnt) {
                                 $matched[$i] = $newName;
-                                if (!$matchAll) {
-                                    break;
-                                }
                             }
                         }
                     }
                 }
                 if (!$matched) {
                     throw new UndefinedColumnException($value);
+                }
+                if (!$matchAll && count($matched) > 1) {
+                    throw new AmbiguousException($value);
                 }
                 foreach ($matched as $i => $cn) {
                     $columns[] = new Column($this, count($this->projectionList), $cn, $srcCols[$i]->getType());

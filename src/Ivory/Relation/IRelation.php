@@ -2,6 +2,7 @@
 namespace Ivory\Relation;
 
 use Ivory\Data\Set\ISet;
+use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Relation\Alg\ITupleComparator;
 use Ivory\Relation\Alg\ITupleEvaluator;
@@ -118,6 +119,8 @@ interface IRelation extends \Traversable, \Countable
      * @return IRelation a new relation with columns according to the <tt>$columns</tt> specification
      * @throw UndefinedColumnException if any <tt>$columns</tt> item refers to an undefined column; this also includes
      *                                   macros - each macro must refer to at least one column
+     * @throws AmbiguousException if any <tt>$columns</tt> item refers to a column by its name, which is used by
+     *                              multiple columns
      */
     function project($columns): IRelation; // TODO: decide whether it is rather expected to interpret the key and values the other way round (see the ProcessingTest)
 
@@ -168,6 +171,7 @@ interface IRelation extends \Traversable, \Countable
      *                                    argument and is expected to return the value to use for the resulting column.
      * @return IColumn
      * @throws UndefinedColumnException if no column matches the specification
+     * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns
      */
     function col($offsetOrName): IColumn;
 
@@ -193,6 +197,7 @@ interface IRelation extends \Traversable, \Countable
      * @param (int|string|ITupleEvaluator|\Closure)[] ...$moreCols additional columns specifying the association
      * @return IValueMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
+     * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns
      */
     function assoc($col1, $col2, ...$moreCols): IValueMap;
 
@@ -220,6 +225,7 @@ interface IRelation extends \Traversable, \Countable
      *                                  optional additional columns specifying the mapping
      * @return ITupleMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
+     * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns
      */
     function map($mappingCol, ...$moreMappingCols): ITupleMap;
 
@@ -238,6 +244,7 @@ interface IRelation extends \Traversable, \Countable
      *                                  optional additional columns specifying further dimensions of the mapping
      * @return IRelationMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
+     * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns
      */
     function multimap($mappingCol, ...$moreMappingCols): IRelationMap;
 
@@ -255,6 +262,7 @@ interface IRelation extends \Traversable, \Countable
      *                    implementing class is used.
      * @return ISet <tt>$set</tt>, or a newly created set
      * @throws UndefinedColumnException if no column matches the specification
+     * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns
      */
     function toSet($colOffsetOrNameOrEvaluator, ISet $set = null): ISet;
 
@@ -319,6 +327,7 @@ interface IRelation extends \Traversable, \Countable
      * @throws \OutOfBoundsException when this relation has fewer than <tt>$tupleOffset+1</tt> tuples, or fewer than
      *                                 <tt>-$tupleOffset</tt> tuples if <tt>$tupleOffset</tt> is negative
      * @throws UndefinedColumnException if no column matches the specification
+     * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns
      */
     function value($colOffsetOrNameOrEvaluator = 0, int $tupleOffset = 0);
 }
