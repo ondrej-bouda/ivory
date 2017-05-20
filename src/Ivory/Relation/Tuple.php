@@ -159,7 +159,7 @@ class Tuple implements ITuple
         if (!$object instanceof ITuple) {
             return false;
         }
-        return ValueUtils::equals($this->data, $object->data);
+        return ValueUtils::equals($this->data, $object->toList());
     }
 
     //endregion
