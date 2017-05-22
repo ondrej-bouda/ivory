@@ -2,7 +2,7 @@
 namespace Ivory\Showcase;
 
 use Ivory\Connection\IConnection;
-use Ivory\Query\SqlRelationRecipe;
+use Ivory\Query\SqlRelationDefinition;
 use Ivory\Type\ITypeDictionary;
 use Ivory\Value\Date;
 use Ivory\Value\Decimal;
@@ -32,14 +32,14 @@ class QueryingTest extends \Ivory\IvoryTestCase
     {
         // Ivory introduces SQL patterns. They are similar to sprintf() but, when serializing to SQL, the actual types
         // defined on the database connection are used. See \Ivory\Lang\SqlPattern\SqlPattern class docs for details.
-        $recipe = SqlRelationRecipe::fromPattern('SELECT %s, %num, %bool', "Ivory's escaping", '3.14', false);
-        $sql = $recipe->toSql($this->typeDict);
+        $relDef = SqlRelationDefinition::fromPattern('SELECT %s, %num, %bool', "Ivory's escaping", '3.14', false);
+        $sql = $relDef->toSql($this->typeDict);
         $this->assertSame("SELECT 'Ivory''s escaping', 3.14, FALSE", $sql);
 
         // Moreover, the types need not be specified explicitly. There are rules for recognizing the type by the data
         // type of the actual value.
-        $recipe = SqlRelationRecipe::fromPattern('SELECT %, %, %', "Automatic type recognition", 3.14, false);
-        $sql = $recipe->toSql($this->typeDict);
+        $relDef = SqlRelationDefinition::fromPattern('SELECT %, %, %', "Automatic type recognition", 3.14, false);
+        $sql = $relDef->toSql($this->typeDict);
         $this->assertSame("SELECT 'Automatic type recognition', 3.14, FALSE", $sql);
 
         // As usual, both the types of placeholders and the rules for recognizing types from values are configurable.
@@ -47,36 +47,36 @@ class QueryingTest extends \Ivory\IvoryTestCase
         $this->conn->getTypeRegister()->addTypeRecognitionRule(\stdClass::class, 'pg_catalog', 'json');
         $this->conn->flushTypeDictionary(); // the type dictionary was changed while in use - explicit flush necessary
 
-        $recipe = SqlRelationRecipe::fromPattern('SELECT %js, %', Json::null(), (object)['a' => 42]);
-        $sql = $recipe->toSql($this->conn->getTypeDictionary());
+        $relDef = SqlRelationDefinition::fromPattern('SELECT %js, %', Json::null(), (object)['a' => 42]);
+        $sql = $relDef->toSql($this->conn->getTypeDictionary());
         $this->assertSame("SELECT pg_catalog.json 'null', pg_catalog.json '{\"a\":42}'", $sql);
 
         // Also, brand new types may be introduced. See \Ivory\Showcase\TypeSystemTest::testCustomType().
     }
 
-    public function testRelationRecipe()
+    public function testRelationDefinition()
     {
-        // Ivory introduces the term "relation recipe" - the definition of a relation. Usually, they are defined using
-        // SQL patterns.
-        $recipe = SqlRelationRecipe::fromPattern('SELECT %bool, %, %num', true, 'str', 3.14);
+        // Ivory speaks in terms of relations and their definitions. Querying the database by supplying a relation
+        // definition, one gets a relation, i.e., the tabular data. Usually, relations are defined using SQL patterns.
+        $relDef = SqlRelationDefinition::fromPattern('SELECT %bool, %, %num', true, 'str', 3.14);
 
-        // The recipe may directly be used for querying the database...
-        $tuple = $this->conn->querySingleTuple($recipe);
+        // The definition may directly be used for querying the database...
+        $tuple = $this->conn->querySingleTuple($relDef);
         $this->assertEquals([true, 'str', Decimal::fromNumber('3.14')], $tuple->toList());
 
-        // ...or as a base for another recipe. Note the construction from "fragments" - parts of the SQL pattern put together.
-        $valsRecipe = SqlRelationRecipe::fromFragments(
+        // ...or as a base for another definition. Note the construction from "fragments" - parts of the SQL pattern put together.
+        $valsDef = SqlRelationDefinition::fromFragments(
             'VALUES (%, %),', 4, Date::fromParts(2017, 2, 25),
             '       (%, %)', 7, null
         );
-        $recipe = SqlRelationRecipe::fromPattern(
+        $relDef = SqlRelationDefinition::fromPattern(
             'SELECT * FROM (%rel) AS t (id, creat)',
-            $valsRecipe
+            $valsDef
         );
-        $this->assertCount(2, $this->conn->query($recipe));
+        $this->assertCount(2, $this->conn->query($relDef));
 
-        // Since the recipe is not tied to a connection, it may be cached and retrieved later.
-        $serialized = serialize($recipe);
+        // Since the definition is not tied to a connection, it may be cached and retrieved later.
+        $serialized = serialize($relDef);
         $this->assertCount(2, $this->conn->query(unserialize($serialized)));
     }
 }

@@ -96,8 +96,8 @@ Flexibility:
 
 Re-Use:
 * There are three kinds of objects:
-** a recipe: connection-independent definition of a relation or command;
-** a data source: a recipe paired to a database connection, ready to be executed;
+** a definition: connection-independent definition of a relation or command;
+** a data source: a definition paired to a database connection, ready to be executed;
 ** a result: database result set, either containing the relation data or a description of the command result.
 
 

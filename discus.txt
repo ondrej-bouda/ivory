@@ -5,24 +5,6 @@ Refactor Column
 
 
 
-Clean up the names
-==================
-* RelationRecipe + Relation:
-** Relation is OK. RelationRecipe is not - the word "recipe" suggests a plan how to get something; instead, the object
-   actually defines what to bring, not how.
-** Other brainstormed, but refused ideas, for RelationRecipe:
-*** DataSource (misleading, it will not hold the connection and thus will not directly be iterable)
-*** SqlBuilder (too specific - SQL will be just one of many ways prescribing a relation)
-*** Prescription (too weird, totally suprising)
-*** RelationBuilder (quite exact, although it directly names the design pattern and "Builder" is not the exact meaning here - it is rather an indirect metaphor)
-** What about RelationDefinition or RelationDef, for short? (as hints the comment in
-   \Ivory\Showcase\QueryingTest::testRelationRecipe())
-* CommandRecipe + CommandResult:
-** Inconsistent with RelationRecipe + Relation.
-** What about renaming to just Command + CommandResult?
-
-
-
 Nested Transaction Method Naming
 ================================
 * Revise the Nested Transactions point in the feature plan.

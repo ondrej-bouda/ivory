@@ -4,7 +4,7 @@ namespace Ivory\Query;
 use Ivory\Connection\IConnection;
 use Ivory\Relation\ITuple;
 
-class LimitedRelationRecipeTest extends \Ivory\IvoryTestCase
+class LimitedRelationDefinitionTest extends \Ivory\IvoryTestCase
 {
     /** @var IConnection */
     private $conn;
@@ -19,10 +19,10 @@ class LimitedRelationRecipeTest extends \Ivory\IvoryTestCase
 
     public function testLimitFirstOne()
     {
-        $recipe = SqlRelationRecipe::fromSql(
+        $relDef = SqlRelationDefinition::fromSql(
             'VALUES (1,2), (3,4), (3,6), (7,8)'
         );
-        $limited = $recipe->limit(1);
+        $limited = $relDef->limit(1);
         $rel = $this->conn->query($limited);
 
         $this->assertSame(1, $rel->count());
@@ -46,10 +46,10 @@ class LimitedRelationRecipeTest extends \Ivory\IvoryTestCase
 
     public function testLimitFirstThree()
     {
-        $recipe = SqlRelationRecipe::fromSql(
+        $relDef = SqlRelationDefinition::fromSql(
             'VALUES (1,2), (3,4), (5,6), (7,8)'
         );
-        $limited = $recipe->limit(3);
+        $limited = $relDef->limit(3);
         $rel = $this->conn->query($limited);
 
         $this->assertSame(3, $rel->count());
@@ -76,10 +76,10 @@ class LimitedRelationRecipeTest extends \Ivory\IvoryTestCase
 
     public function testLimitTwoOffsetOne()
     {
-        $recipe = SqlRelationRecipe::fromSql(
+        $relDef = SqlRelationDefinition::fromSql(
             'VALUES (1,2), (3,4), (5,6), (7,8)'
         );
-        $limited = $recipe->limit(2, 1);
+        $limited = $relDef->limit(2, 1);
         $rel = $this->conn->query($limited);
 
         $this->assertSame(2, $rel->count());
@@ -105,10 +105,10 @@ class LimitedRelationRecipeTest extends \Ivory\IvoryTestCase
 
     public function testLimitTwoOffsetOneNotEnough()
     {
-        $recipe = SqlRelationRecipe::fromSql(
+        $relDef = SqlRelationDefinition::fromSql(
             'VALUES (1,2), (3,4)'
         );
-        $limited = $recipe->limit(2, 1);
+        $limited = $relDef->limit(2, 1);
         $rel = $this->conn->query($limited);
 
         $this->assertSame(1, $rel->count());
@@ -133,10 +133,10 @@ class LimitedRelationRecipeTest extends \Ivory\IvoryTestCase
 
     public function testOffsetOneUnlimited()
     {
-        $recipe = SqlRelationRecipe::fromSql(
+        $relDef = SqlRelationDefinition::fromSql(
             'VALUES (1,2), (3,4), (5,6), (7,8)'
         );
-        $limited = $recipe->limit(null, 1);
+        $limited = $relDef->limit(null, 1);
         $rel = $this->conn->query($limited);
 
         $this->assertSame(3, $rel->count());
@@ -163,12 +163,12 @@ class LimitedRelationRecipeTest extends \Ivory\IvoryTestCase
 
     public function testLimitLimited()
     {
-        $recipe = SqlRelationRecipe::fromSql(
+        $relDef = SqlRelationDefinition::fromSql(
             'SELECT * FROM (VALUES (1,2), (3,4), (5,6), (7,8)) v (a,b)'
         );
-        $limited = $recipe->limit(2, 1);
+        $limited = $relDef->limit(2, 1);
         $limited2 = $limited->limit(1);
-        $otherLimited = $recipe->limit(null, 3);
+        $otherLimited = $relDef->limit(null, 3);
         $otherLimited2 = $otherLimited->limit(2);
 
         $rel = $this->conn->query($limited);

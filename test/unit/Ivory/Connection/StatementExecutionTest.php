@@ -5,7 +5,7 @@ use Ivory\Exception\ResultException;
 use Ivory\Exception\StatementException;
 use Ivory\Exception\UsageException;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
-use Ivory\Query\SqlRelationRecipe;
+use Ivory\Query\SqlRelationDefinition;
 use Ivory\Result\SqlState;
 use Ivory\Result\SqlStateClass;
 
@@ -61,8 +61,8 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         $this->assertSame(1, $result->count());
         $this->assertSame([42, 'wheee'], $result->tuple()->toList());
 
-        $recipe = SqlRelationRecipe::fromPattern('SELECT 42, %s:motto');
-        $result = $this->conn->query($recipe, ['motto' => 'wheee']);
+        $relDef = SqlRelationDefinition::fromPattern('SELECT 42, %s:motto');
+        $result = $this->conn->query($relDef, ['motto' => 'wheee']);
         $this->assertSame(1, $result->count());
         $this->assertSame([42, 'wheee'], $result->tuple()->toList());
 

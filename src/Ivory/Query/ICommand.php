@@ -6,7 +6,7 @@ use Ivory\Type\ITypeDictionary;
 /**
  * Specification for a command.
  */
-interface ICommandRecipe
+interface ICommand
 {
     /**
      * @param ITypeDictionary $typeDictionary

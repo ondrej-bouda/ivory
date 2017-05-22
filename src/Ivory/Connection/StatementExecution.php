@@ -7,11 +7,11 @@ use Ivory\Exception\ConnectionException;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Exception\UsageException;
 use Ivory\Ivory;
-use Ivory\Query\ICommandRecipe;
-use Ivory\Query\IRelationRecipe;
-use Ivory\Query\ISqlPatternRecipe;
-use Ivory\Query\SqlCommandRecipe;
-use Ivory\Query\SqlRelationRecipe;
+use Ivory\Query\ICommand;
+use Ivory\Query\IRelationDefinition;
+use Ivory\Query\ISqlPatternDefinition;
+use Ivory\Query\SqlCommand;
+use Ivory\Query\SqlRelationDefinition;
 use Ivory\Relation\ITuple;
 use Ivory\Result\CommandResult;
 use Ivory\Result\CopyInResult;
@@ -34,21 +34,24 @@ class StatementExecution implements IStatementExecution
         $this->stmtExFactory = new StatementExceptionFactory();
     }
 
-    public function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): IQueryResult
+    public function query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IQueryResult
     {
-        if ($sqlFragmentPatternOrRecipe instanceof IRelationRecipe) {
-            $recipe = $this->setupRecipe($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+        if ($sqlFragmentPatternOrRelationDefinition instanceof IRelationDefinition) {
+            $relDef = $this->setupDefinition($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
         } else {
-            $recipe = SqlRelationRecipe::fromFragments($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+            $relDef = SqlRelationDefinition::fromFragments(
+                $sqlFragmentPatternOrRelationDefinition,
+                ...$fragmentsAndParams
+            );
         }
 
-        $sql = $recipe->toSql($this->typeCtl->getTypeDictionary());
+        $sql = $relDef->toSql($this->typeCtl->getTypeDictionary());
         return $this->rawQuery($sql);
     }
 
-    public function querySingleTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ITuple
+    public function querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ITuple
     {
-        $rel = $this->query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+        $rel = $this->query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
         if ($rel->count() != 1) {
             throw new ResultException(
                 "The query should have resulted in exactly one row, but has {$rel->count()} rows."
@@ -57,9 +60,9 @@ class StatementExecution implements IStatementExecution
         return $rel->tuple();
     }
 
-    public function querySingleValue($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams)
+    public function querySingleValue($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams)
     {
-        $rel = $this->query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+        $rel = $this->query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
         if ($rel->count() != 1) {
             throw new ResultException(
                 "The query should have resulted in exactly one row, but has {$rel->count()} rows."
@@ -74,33 +77,33 @@ class StatementExecution implements IStatementExecution
         return $rel->value();
     }
 
-    public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ICommandResult
+    public function command($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ICommandResult
     {
-        if ($sqlFragmentPatternOrRecipe instanceof ICommandRecipe) {
-            $recipe = $this->setupRecipe($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+        if ($sqlFragmentPatternOrRelationDefinition instanceof ICommand) {
+            $command = $this->setupDefinition($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
         } else {
-            $recipe = SqlCommandRecipe::fromFragments($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+            $command = SqlCommand::fromFragments($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
         }
 
-        $sql = $recipe->toSql($this->typeCtl->getTypeDictionary());
+        $sql = $command->toSql($this->typeCtl->getTypeDictionary());
         return $this->rawCommand($sql);
     }
 
-    private function setupRecipe($recipe, ...$args)
+    private function setupDefinition($definition, ...$args)
     {
         if ($args) {
-            if ($recipe instanceof ISqlPatternRecipe) {
+            if ($definition instanceof ISqlPatternDefinition) {
                 if (count($args) > 1) {
                     throw new \InvalidArgumentException('Too many arguments given.');
                 }
                 $namedParamsMap = $args[0];
-                $recipe->setParams($namedParamsMap);
+                $definition->setParams($namedParamsMap);
             } else {
                 throw new \InvalidArgumentException('Too many arguments given.');
             }
         }
 
-        return $recipe;
+        return $definition;
     }
 
     public function rawQuery(string $sqlQuery): IQueryResult

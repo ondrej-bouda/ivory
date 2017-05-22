@@ -7,7 +7,7 @@ use Ivory\Exception\NoDataException;
  * An immutable representation of an SQL pattern.
  *
  * This class is not intended for direct construction - instead, use {@link SqlPatternParser} to have an `SqlPattern`
- * created, or {@link \Ivory\Query\SqlRelationRecipe} or {@link \Ivory\Query\SqlCommandRecipe} to use it indirectly.
+ * created, or {@link \Ivory\Query\SqlRelationDefinition} or {@link \Ivory\Query\SqlCommand} to use it indirectly.
  *
  * An SQL pattern is a plain SQL string with special placeholders for parameters.
  *
@@ -51,10 +51,10 @@ use Ivory\Exception\NoDataException;
  *   specification. An array placeholder immediately followed by a subscript works as expected: `SELECT %bigint[][2]`
  *   selects the item under index 2 from the provided array.
  * * Names of available types, as well as the rules inferring the type automatically (when the type is not specified),
- *   are defined by the {@link Ivory\Type\TypeDictionary} used by the connection for which the recipe will be serialized
- *   to an SQL string. The standard Ivory deployment registers all types defined in the connected-to database under
- *   their fully qualified names (e.g., `public.sometype`) and also some aliases, especially those corresponding to the
- *   SQL reserved types (e.g., `int`). Besides, some custom types special for being used in SQL patterns may be
+ *   are defined by the {@link Ivory\Type\TypeDictionary} used by the connection for which the pattern will be
+ *   serialized to an SQL string. The standard Ivory deployment registers all types defined in the connected-to database
+ *   under their fully qualified names (e.g., `public.sometype`) and also some aliases, especially those corresponding
+ *   to the SQL reserved types (e.g., `int`). Besides, some custom types special for being used in SQL patterns may be
  *   registered (e.g., `sql`).
  * * Registered types need not be schema-qualified. Just the name of the type is sufficient - the PostgreSQL
  *   `search_path` facility is leveraged to identify the type. Before the `search_path` schemas are actually searched,
@@ -83,14 +83,15 @@ use Ivory\Exception\NoDataException;
  * column names with the relation name, e.g., `person.name`. To parametrize the table name, use `%{ident}.name` to
  * prevent Ivory to search for a type `name` in schema `ident`.
  *
- * Note that even {@link IRelationRecipe} and {@link ICommandRecipe} objects may be used as parameter values to form a
- * more complex recipe, e.g., a
+ * Note that even {@link IRelationDefinition} and {@link ICommand} objects may be used as parameter values to form a
+ * more complex definition, e.g., a
  * {@link https://www.postgresql.org/docs/current/static/queries-with.html Common Table Expression}.
  *
  * @internal Ivory design note: The positional parameters could have been treated as parameters named by their
  * zero-based position. This is not the case, though. If placeholders could refer to positional parameters (e.g.,
  * <tt>%s:0</tt>), it would only complicate the specification without any significant benefit. Especially the
- * {@link SqlRecipe::fromFragments()} would be overcomplicated as the placeholders would have to be re-numbered.
+ * {@link SqlPatternDefinitionMacros::fromFragments()} would be overcomplicated as the placeholders would have to be
+ * re-numbered.
  *
  * @internal Ivory design note: The common placeholder syntax ":name" is intentionally unsupported. PostgreSQL uses
  * <tt>::type</tt> for typecasts, which could be mistaken for the named arguments written as ":name". Moreover, it would

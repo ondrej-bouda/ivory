@@ -46,11 +46,11 @@ class SqlPatternParserTest extends \PHPUnit\Framework\TestCase
 
     public function testNamedTypedPlaceholder()
     {
-        $pattern = $this->parser->parse('SELECT * FROM person WHERE id = %d:id AND is_active');
+        $pattern = $this->parser->parse('SELECT * FROM person WHERE id = %i:id AND is_active');
         $this->assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getSqlTorso());
         $this->assertEmpty($pattern->getPositionalPlaceholders());
         $this->assertEquals(
-            ['id' => [new SqlPatternPlaceholder(32, 'id', 'd')]],
+            ['id' => [new SqlPatternPlaceholder(32, 'id', 'i')]],
             $pattern->getNamedPlaceholderMap()
         );
     }
@@ -110,7 +110,7 @@ class SqlPatternParserTest extends \PHPUnit\Framework\TestCase
     public function testMultiplePlaceholders()
     {
         $pattern = $this->parser->parse(
-            'SELECT * FROM %:tbl WHERE name = % AND %:cond AND ord %% 2 = %d AND %(name) AND %s:cond'
+            'SELECT * FROM %:tbl WHERE name = % AND %:cond AND ord %% 2 = %i AND %(name) AND %s:cond'
         );
 
         $this->assertEquals(
@@ -121,7 +121,7 @@ class SqlPatternParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 new SqlPatternPlaceholder(28, 0, null),
-                new SqlPatternPlaceholder(48, 1, 'd'),
+                new SqlPatternPlaceholder(48, 1, 'i'),
                 new SqlPatternPlaceholder(53, 2, null),
             ],
             $pattern->getPositionalPlaceholders()

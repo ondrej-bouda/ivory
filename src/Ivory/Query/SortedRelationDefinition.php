@@ -5,18 +5,18 @@ use Ivory\Lang\Sql\ISqlSortExpression;
 use Ivory\Lang\SqlPattern\SqlPattern;
 use Ivory\Type\ITypeDictionary;
 
-class SortedRelationRecipe extends RelationRecipe implements IRelationRecipe
+class SortedRelationDefinition extends RelationDefinition implements IRelationDefinition
 {
-    private $relRecipe;
+    private $baseRelDef;
     private $sortExpr;
     private $args;
 
     /**
-     * @param IRelationRecipe $relRecipe recipe for relation to constrain
+     * @param IRelationDefinition $relationDefinition definition of relation to constrain
      * @param ISqlSortExpression|SqlPattern|string|array $sortExpr
      * @param array $args
      */
-    public function __construct(IRelationRecipe $relRecipe, $sortExpr, ...$args)
+    public function __construct(IRelationDefinition $relationDefinition, $sortExpr, ...$args)
     {
         if ($args) {
             if (is_array($sortExpr)) {
@@ -28,14 +28,14 @@ class SortedRelationRecipe extends RelationRecipe implements IRelationRecipe
             }
         }
 
-        $this->relRecipe = $relRecipe;
+        $this->baseRelDef = $relationDefinition;
         $this->sortExpr = $sortExpr;
         $this->args = $args;
     }
 
     public function toSql(ITypeDictionary $typeDictionary): string
     {
-        $relSql = $this->relRecipe->toSql($typeDictionary);
+        $relSql = $this->baseRelDef->toSql($typeDictionary);
 
         $sortSql = self::getSortSql($typeDictionary, $this->sortExpr, ...$this->args);
         if ($sortSql !== null) {
@@ -73,8 +73,8 @@ class SortedRelationRecipe extends RelationRecipe implements IRelationRecipe
             }
             return ($sqlParts ? implode(', ', $sqlParts) : null);
         } else {
-            $condRecipe = SqlRelationRecipe::fromPattern($expr, ...$args);
-            return $condRecipe->toSql($typeDictionary);
+            $sortDef = SqlRelationDefinition::fromPattern($expr, ...$args);
+            return $sortDef->toSql($typeDictionary);
         }
     }
 }

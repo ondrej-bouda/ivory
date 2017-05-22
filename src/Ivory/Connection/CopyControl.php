@@ -22,12 +22,12 @@ class CopyControl implements ICopyControl
         throw new NotImplementedException();
     }
 
-    public function copyToFile(string $file, $tableOrRecipe, $columns = null, $options = []): ICommandResult
+    public function copyToFile(string $file, $tableOrRelationDefinition, $columns = null, $options = []): ICommandResult
     {
         throw new NotImplementedException();
     }
 
-    public function copyToProgram(string $program, $tableOrRecipe, $columns = null, $options = []): ICommandResult
+    public function copyToProgram(string $program, $tableOrRelationDefinition, $columns = null, $options = []): ICommandResult
     {
         throw new NotImplementedException();
     }

@@ -1,10 +1,10 @@
 <?php
 namespace Ivory\Type\Ivory;
 
-use Ivory\Query\ICommandRecipe;
+use Ivory\Query\ICommand;
 
 /**
- * Internal Ivory value serializer for serializing command recipes into SQL statements.
+ * Internal Ivory value serializer for serializing commands into SQL statements.
  *
  * Used in SQL patterns to handle `%cmd` placeholders. These will typically be used combined with the `RETURNING`
  * clause, either as single `INSERT` or `UPDATE` commands for which the caller wants to fetch the written rows, or in
@@ -16,11 +16,11 @@ class CommandSerializer extends ConnectionDependentValueSerializer
 {
     public function serializeValue($val): string
     {
-        if ($val instanceof ICommandRecipe) {
+        if ($val instanceof ICommand) {
             $typeDictionary = $this->getConnection()->getTypeDictionary();
             return $val->toSql($typeDictionary);
         } else {
-            throw new \InvalidArgumentException('Expecting an ' . ICommandRecipe::class . ' object');
+            throw new \InvalidArgumentException('Expecting an ' . ICommand::class . ' object');
         }
     }
 }

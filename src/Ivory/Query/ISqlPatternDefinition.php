@@ -4,11 +4,11 @@ namespace Ivory\Query;
 use Ivory\Lang\SqlPattern\SqlPattern;
 
 /**
- * Recipe defined by a parametrized SQL pattern.
+ * A definition given by a parametrized SQL pattern.
  *
  * @see SqlPattern for thorough details on SQL patterns.
  */
-interface ISqlPatternRecipe
+interface ISqlPatternDefinition
 {
     /**
      * Sets the value of a parameter in the SQL pattern.

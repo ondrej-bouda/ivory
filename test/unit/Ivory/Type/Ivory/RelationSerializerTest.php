@@ -3,7 +3,7 @@ namespace Ivory\Type\Ivory;
 
 use Ivory\Connection\IConnection;
 use Ivory\IvoryTestCase;
-use Ivory\Query\SqlRelationRecipe;
+use Ivory\Query\SqlRelationDefinition;
 use Ivory\Result\IQueryResult;
 use Ivory\Type\Std\BigIntSafeType;
 use Ivory\Type\Std\IntegerType;
@@ -24,14 +24,14 @@ class RelationSerializerTest extends IvoryTestCase
         $this->relationSerializer = new RelationSerializer($this->conn);
     }
 
-    public function testSerializeRelationRecipe()
+    public function testSerializeRelationDefinition()
     {
-        $recipe = SqlRelationRecipe::fromSql(
+        $relDef = SqlRelationDefinition::fromSql(
             "VALUES (1, 'a'), (3, 'b'), (2, 'c')"
         );
         $this->assertSame(
             "VALUES (1, 'a'), (3, 'b'), (2, 'c')",
-            $this->relationSerializer->serializeValue($recipe)
+            $this->relationSerializer->serializeValue($relDef)
         );
     }
 
