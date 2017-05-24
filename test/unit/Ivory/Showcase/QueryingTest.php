@@ -2,6 +2,7 @@
 namespace Ivory\Showcase;
 
 use Ivory\Connection\IConnection;
+use Ivory\Connection\ITxHandle;
 use Ivory\Query\SqlRelationRecipe;
 use Ivory\Type\ITypeDictionary;
 use Ivory\Value\Date;
@@ -15,6 +16,8 @@ class QueryingTest extends \Ivory\IvoryTestCase
 {
     /** @var IConnection */
     private $conn;
+    /** @var ITxHandle */
+    private $transaction;
     /** @var ITypeDictionary */
     private $typeDict;
 
@@ -23,8 +26,15 @@ class QueryingTest extends \Ivory\IvoryTestCase
         parent::setUp();
 
         $this->conn = $this->getIvoryConnection();
-        $this->conn->startTransaction();
+        $this->transaction = $this->conn->startTransaction();
         $this->typeDict = $this->conn->getTypeDictionary();
+    }
+
+    protected function tearDown()
+    {
+        $this->transaction->rollback();
+
+        parent::tearDown();
     }
 
 

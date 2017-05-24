@@ -16,13 +16,15 @@ class TracingTxHandle extends TxHandle
     {
         parent::__construct($stmtExec, $observableTxCtl);
 
-        $this->backtrace = debug_backtrace();
+        $this->backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
     }
 
     public function __destruct()
     {
         parent::__destruct();
 
-        // TODO
+        if ($this->isOpen()) {
+            error_log('The open transaction handle has been created in ' . print_r($this->backtrace, true));
+        }
     }
 }

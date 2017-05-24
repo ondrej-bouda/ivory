@@ -4,6 +4,9 @@ namespace Ivory;
 use Ivory\Cache\ICacheControl;
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
+use Ivory\Connection\IObservableTransactionControl;
+use Ivory\Connection\IStatementExecution;
+use Ivory\Connection\ITxHandle;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Lang\SqlPattern\ISqlPatternParser;
 use Ivory\Type\TypeRegister;
@@ -28,4 +31,9 @@ interface ICoreFactory
     function createSqlPatternParser(ICacheControl $cacheControl = null): ISqlPatternParser;
 
     function createStatementExceptionFactory(): StatementExceptionFactory;
+
+    function createTransactionHandle(
+        IStatementExecution $stmtExec,
+        IObservableTransactionControl $observableTxCtl
+    ): ITxHandle;
 }

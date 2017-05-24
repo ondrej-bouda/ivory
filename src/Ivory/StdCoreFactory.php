@@ -6,6 +6,10 @@ use Ivory\Cache\ICacheControl;
 use Ivory\Connection\Connection;
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
+use Ivory\Connection\IObservableTransactionControl;
+use Ivory\Connection\IStatementExecution;
+use Ivory\Connection\ITxHandle;
+use Ivory\Connection\TxHandle;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Lang;
 use Ivory\Lang\SqlPattern\CachingSqlPatternParser;
@@ -132,5 +136,12 @@ class StdCoreFactory implements ICoreFactory
         }
 
         return new CacheControl(Ivory::getDefaultCacheImpl(), $prefix, $postfix);
+    }
+
+    public function createTransactionHandle(
+        IStatementExecution $stmtExec,
+        IObservableTransactionControl $observableTxCtl
+    ): ITxHandle {
+        return new TxHandle($stmtExec, $observableTxCtl);
     }
 }

@@ -32,7 +32,10 @@ class TxHandle implements ITxHandle
     public function __destruct()
     {
         if ($this->open) {
-            // TODO: notify on an open transaction handle
+            trigger_error(
+                'An open transaction handle has been released from memory. The transaction has probably stayed open.',
+                E_USER_WARNING
+            );
         }
     }
 

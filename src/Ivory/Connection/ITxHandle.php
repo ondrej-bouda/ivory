@@ -131,8 +131,9 @@ interface ITxHandle
      * stored to disk.
      *
      * The prepared transaction can later be committed or rolled back from any session using
-     * {@link commitPreparedTransaction()} or {@link rollbackPreparedTransaction()}, respectively. To list existing
-     * prepared transactions, {@link listPreparedTransactions()} may be helpful.
+     * {@link ITransactionControl::commitPreparedTransaction()} or
+     * {@link ITransactionControl::rollbackPreparedTransaction()}, respectively. To list existing prepared transactions,
+     * {@link ITransactionControl::listPreparedTransactions()} may be helpful.
      *
      * @see http://www.postgresql.org/docs/9.4/static/sql-prepare-transaction.html
      *

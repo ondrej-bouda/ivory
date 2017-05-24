@@ -1,8 +1,8 @@
 <?php
 namespace Ivory\Connection;
 
-use Ivory\Exception\InternalException;
 use Ivory\Exception\InvalidStateException;
+use Ivory\Ivory;
 use Ivory\Result\IQueryResult;
 use Ivory\Type\Std\StringType;
 
@@ -44,7 +44,8 @@ class TransactionControl implements IObservableTransactionControl
         $this->stmtExec->rawCommand($command);
         $this->notifyTransactionStart();
 
-        return new TxHandle($this->stmtExec, $this); // TODO: use a factory method, abstracting from the specific class
+        $coreFactory = Ivory::getCoreFactory();
+        return $coreFactory->createTransactionHandle($this->stmtExec, $this);
     }
 
     public function setupSubsequentTransactions($transactionOptions)

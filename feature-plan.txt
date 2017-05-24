@@ -30,7 +30,7 @@ Cursors
 Nested Transactions
 ===================
 * A nested code block does not need to know whether it actually commits the whole transaction, or if it is just a piece
-  of a wider operation.
+  of a wider operation. All it needs to guarantee is the atomicity - either all the statements get executed, or none.
 * Similarly to output buffering, implement "transaction" nesting.
 * The block tells Ivory it has finished its batch. According to whether this is an outer or inner block, the BEGIN or
   SAVEPOINT command, respectively, is really executed. Similarly, when cancelling the effect of a block, either ROLLBACK
@@ -39,10 +39,8 @@ Nested Transactions
 * With nested transactions, one may easily cause an error simply by not treating every transaction level correctly.
   E.g., if an exception is thrown upon an error and not caught within the same transaction level, the correspondence
   between the opening and closing methods may be broken. To help fight this, the method opening a (nested) transaction
-  block will return a handle. This handle must then be passed to the corresponding block commit/rollback method, which
-  will check whether it is the expected handle, and throw an exception if it does not match. This will be an optional
-  check, i.e., if no handle is passed to the closing method, no check will be performed and more responsibility lies in
-  the programmer's hands.
+  block will return a handle. This handle must then be used for further controlling the transaction block.
+  Checks shall be implemented to verify correct usage, and throw an exception on violation.
 ** To make it clear the returned argument does not represent the transaction itself (which it can't - only one
    transaction may be run on a single connection), represent the handle by a pure integer holding the nesting level.
    Or, on the other way round, to make the thing type-safe, return a custom object, perhaps one only Ivory is capable of
@@ -51,18 +49,19 @@ Nested Transactions
    if mismatch is detected in a nested block, rollback it, throw an exception from the inner block, and allow the outer
    block catch the exception and handle it gracefully.
 * Method names:
-** startBlock
-** commitBlock
-** rollbackBlock
+** startTransactionBlock
+** commit
+** rollback
 * See sandpit/nested_transactions.php.
 * Consider validating the correctness using generated UUIDs for savepoint names. That would require the called to
-  provide the handler retrieved from startBlock() - which might be OK.
+  provide the handler retrieved from startTransactionBlock() - which might be OK.
 ** Another option is to use savepoints named by the nesting levels.
 ** Another option is to use a single fixed name for savepoint names, and leverage the fact Postgres allows one to use a
    single savepoint name repeatedly.
 * Try finding a way how to catch exceptions throw from erroneous queries in inner block, and handle the error within the
   outer block, with as few boilerplate code as possible. The worst would be requiring the user to catch database errors
   in the outer block by hand and forcing them to issue a block rollback and re-throw the exception.
+** Offer the rollbackIfOpen() method on the transaction handle.
 
 
 
