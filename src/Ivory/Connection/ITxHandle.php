@@ -79,6 +79,26 @@ interface ITxHandle
     function rollback();
 
     /**
+     * Rolls back the transaction provided it is still open. If the transaction is closed, this is a no-op.
+     *
+     * The intended usage of this method is to handle exceptions and errors thrown inside a transaction so that the
+     * transaction is rolled back before the throwable gets raised outside of the scope:
+     * <code>
+     * $tx = $conn->startTransaction();
+     * try {
+     *     // statements which might throw an exception or error
+     *     $tx->commit();
+     * }
+     * finally {
+     *     $tx->rollbackIfOpen();
+     * }
+     * </code>
+     *
+     * After the rollback, the transaction is closed and the handle gets stale and, as such, it cannot be used anymore.
+     */
+    function rollbackIfOpen();
+
+    /**
      * Defines a new savepoint within the transaction.
      *
      * Use {@link rollbackToSavepoint()} to go back to the state of the savepoint, or {@link releaseSavepoint()} to

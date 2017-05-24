@@ -96,6 +96,15 @@ class TxHandle implements ITxHandle
         $this->txCtl->notifyTransactionRollback();
     }
 
+    public function rollbackIfOpen()
+    {
+        if ($this->open) {
+            $this->stmtExec->rawCommand('ROLLBACK');
+            $this->open = false;
+            $this->txCtl->notifyTransactionRollback();
+        }
+    }
+
     public function savepoint(string $name)
     {
         $this->assertOpen();

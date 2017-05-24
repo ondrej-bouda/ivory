@@ -61,7 +61,6 @@ Nested Transactions
 * Try finding a way how to catch exceptions throw from erroneous queries in inner block, and handle the error within the
   outer block, with as few boilerplate code as possible. The worst would be requiring the user to catch database errors
   in the outer block by hand and forcing them to issue a block rollback and re-throw the exception.
-** Offer the rollbackIfOpen() method on the transaction handle.
 
 
 

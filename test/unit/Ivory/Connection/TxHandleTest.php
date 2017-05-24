@@ -13,6 +13,31 @@ class TxHandleTest extends \Ivory\IvoryTestCase
         $this->conn = $this->getIvoryConnection();
     }
 
+    public function testRollbackIfOpen()
+    {
+        $observer = new class() extends TransactionControlObserverBase
+        {
+            public $rollbackCalled = 0;
+
+            public function handleTransactionRollback()
+            {
+                $this->rollbackCalled++;
+            }
+        };
+        $this->conn->addTransactionControlObserver($observer);
+
+        $tx = $this->conn->startTransaction();
+        $this->assertTrue($this->conn->inTransaction());
+        $this->assertEquals(0, $observer->rollbackCalled);
+
+        $tx->rollbackIfOpen();
+        $this->assertFalse($this->conn->inTransaction());
+        $this->assertEquals(1, $observer->rollbackCalled);
+
+        $tx->rollbackIfOpen();
+        $this->assertFalse($this->conn->inTransaction());
+        $this->assertEquals(1, $observer->rollbackCalled);
+    }
 
     public function testOrphanedOpen()
     {
