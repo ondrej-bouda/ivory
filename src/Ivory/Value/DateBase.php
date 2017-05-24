@@ -243,7 +243,7 @@ abstract class DateBase implements IEqualable
 
         $wholeSec = (int)$seconds;
         $fracSec = $seconds - $wholeSec;
-        if ($fracSec) {
+        if ($fracSec != 0) {
             // in current PHP, there is no method for modifying the microseconds of a date/time - we must do it by hand
             $resFracSec = $fracSec + $this->dt->format('.u');
             if ($resFracSec < 0) {
@@ -259,7 +259,7 @@ abstract class DateBase implements IEqualable
         $mod = "$yp$years years $mp$months months $dp$days days $hp$hours hours $ip$minutes minutes $sp$wholeSec seconds";
         $dt = $this->dt->modify($mod);
 
-        if ($fracSec) {
+        if ($fracSec != 0) {
             /** @noinspection PhpUndefinedVariableInspection */
             $resFracSecStr = substr($resFracSec, 2); // cut off the leading '0.'
             $dt = new \DateTimeImmutable($dt->format('Y-m-d H:i:s.') . $resFracSecStr, self::getUTCTimeZone());

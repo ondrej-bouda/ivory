@@ -34,41 +34,7 @@ class ProjectedRelation extends ProjectedRelationBase
                 $columns[] = new Column($this, count($this->projectionList), $colName, $srcCols[$value]->getType());
                 $this->projectionList[] = (int)$value;
             } elseif (is_string($value)) { // column name
-                if ($value[0] == '/') { // PCRE macro
-                    $pcre = $value;
-                    $matchAll = true;
-                    $repl = ($nameSpecified ? $key : null);
-                } else {
-                    $pcre = self::simpleMacroPatternToPcre($value, $starCnt);
-                    $matchAll = ($starCnt > 0);
-                    $repl = ($nameSpecified ? self::simpleMacroReplacementToPcre($key) : null);
-                }
-                if ($repl === null) {
-                    $cns = [];
-                    foreach ($srcCols as $i => $c) {
-                        $name = $c->getName();
-                        if ($name !== null) {
-                            $cns[$i] = $name;
-                        }
-                    }
-                    $matched = preg_grep($pcre, $cns);
-                } else {
-                    $matched = [];
-                    foreach ($srcCols as $i => $c) {
-                        if ($c->getName() !== null) {
-                            $newName = preg_replace($pcre, $repl, $c->getName(), 1, $cnt);
-                            if ($cnt) {
-                                $matched[$i] = $newName;
-                            }
-                        }
-                    }
-                }
-                if (!$matched) {
-                    throw new UndefinedColumnException($value);
-                }
-                if (!$matchAll && count($matched) > 1) {
-                    throw new AmbiguousException($value);
-                }
+                $matched = $this->recognizeColsByName($srcCols, $nameSpecified, $key, $value);
                 foreach ($matched as $i => $cn) {
                     $columns[] = new Column($this, count($this->projectionList), $cn, $srcCols[$i]->getType());
                     $this->projectionList[] = $i;
@@ -82,6 +48,56 @@ class ProjectedRelation extends ProjectedRelationBase
         }
 
         return $columns;
+    }
+
+    /**
+     * @param IColumn[] $srcCols
+     * @param bool $nameSpecified
+     * @param $key
+     * @param string $value
+     * @return string[]
+     */
+    private function recognizeColsByName($srcCols, bool $nameSpecified, $key, string $value)
+    {
+        if ($value[0] == '/') { // PCRE macro
+            $pcre = $value;
+            $matchAll = true;
+            $repl = ($nameSpecified ? $key : null);
+        } else {
+            $pcre = self::simpleMacroPatternToPcre($value, $starCnt);
+            $matchAll = ($starCnt > 0);
+            $repl = ($nameSpecified ? self::simpleMacroReplacementToPcre($key) : null);
+        }
+
+        if ($repl === null) {
+            $cns = [];
+            foreach ($srcCols as $i => $c) {
+                $name = $c->getName();
+                if ($name !== null) {
+                    $cns[$i] = $name;
+                }
+            }
+            $matched = preg_grep($pcre, $cns);
+        } else {
+            $matched = [];
+            foreach ($srcCols as $i => $c) {
+                if ($c->getName() !== null) {
+                    $newName = preg_replace($pcre, $repl, $c->getName(), 1, $cnt);
+                    if ($cnt > 0) {
+                        $matched[$i] = $newName;
+                    }
+                }
+            }
+        }
+
+        if (!$matched) {
+            throw new UndefinedColumnException($value);
+        }
+        if (!$matchAll && count($matched) > 1) {
+            throw new AmbiguousException($value);
+        }
+
+        return $matched;
     }
 
     public function tuple(int $offset = 0): ITuple
