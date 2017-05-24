@@ -77,7 +77,7 @@ SQL
      */
     public function testDynamic()
     {
-        $this->conn->startTransaction();
+        $tx = $this->conn->startTransaction();
         try {
             // Create a brand new type.
             $this->conn->command(
@@ -91,7 +91,7 @@ SQL
             $composite = $this->conn->querySingleValue("SELECT (1, 'a')::__ivory_test_composite_type");
             $this->assertSame('a', $composite->chr);
         } finally {
-            $this->conn->rollback();
+            $tx->rollback();
         }
     }
 

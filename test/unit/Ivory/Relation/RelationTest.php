@@ -355,7 +355,7 @@ class RelationTest extends \Ivory\IvoryTestCase
         $this->assertEquals(['name' => 'Live One', 'released' => Date::fromParts(2005, 1, 1)], $list[2]);
         $this->assertEquals(['name' => 'The Piano Guys', 'released' => Date::fromParts(2012, 10, 2)], $list[3]);
 
-        $this->conn->startTransaction();
+        $tx = $this->conn->startTransaction();
 
         try {
             $dateStyles = ['ISO', 'German', 'SQL, DMY', 'SQL, MDY', 'Postgres, DMY', 'Postgres, MDY'];
@@ -378,7 +378,7 @@ class RelationTest extends \Ivory\IvoryTestCase
                 $this->assertEquals(Date::fromParts(-4713, 1, 1), $tuple->mn, $dateStyle);
             }
         } finally {
-            $this->conn->rollback();
+            $tx->rollback();
         }
     }
 
@@ -446,7 +446,7 @@ class RelationTest extends \Ivory\IvoryTestCase
 
     public function testTimestampResult()
     {
-        $this->conn->startTransaction();
+        $tx = $this->conn->startTransaction();
 
         try {
             $dateStyles = ['ISO', 'German', 'SQL, DMY', 'SQL, MDY', 'Postgres, DMY', 'Postgres, MDY'];
@@ -475,13 +475,13 @@ class RelationTest extends \Ivory\IvoryTestCase
                 $this->assertEquals(Timestamp::fromParts(-4713, 1, 1, 0, 0, 0), $tuple->mn, $dateStyle);
             }
         } finally {
-            $this->conn->rollback();
+            $tx->rollback();
         }
     }
 
     public function testTimestampTzResult()
     {
-        $this->conn->startTransaction();
+        $tx = $this->conn->startTransaction();
 
         try {
             $dateStyles = ['ISO', 'German', 'SQL, DMY', 'SQL, MDY', 'Postgres, DMY', 'Postgres, MDY'];
@@ -532,7 +532,7 @@ class RelationTest extends \Ivory\IvoryTestCase
                 }
             }
         } finally {
-            $this->conn->rollback();
+            $tx->rollback();
         }
     }
 

@@ -26,7 +26,7 @@ Clean up the names
 Nested Transaction Method Naming
 ================================
 * Revise the Nested Transactions point in the feature plan.
-* Are the method names OK? Other suggestions for the term instead of "block"?
+* Are the method names OK? Other suggestions for the term instead of "block"? TransactionBlock?
 
 
 

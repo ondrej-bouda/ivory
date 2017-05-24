@@ -2,6 +2,7 @@
 namespace Ivory\Type\Std;
 
 use Ivory\Connection\Config\ConfigParam;
+use Ivory\Connection\ITxHandle;
 use Ivory\IvoryTestCase;
 use Ivory\Result\IQueryResult;
 use Ivory\Utils\System;
@@ -9,18 +10,21 @@ use Ivory\Value\Money;
 
 class MoneyTypeTest extends IvoryTestCase
 {
+    /** @var ITxHandle */
+    private $transaction;
+
     protected function setUp()
     {
         parent::setUp();
 
-        $this->getIvoryConnection()->startTransaction();
+        $this->transaction = $this->getIvoryConnection()->startTransaction();
         $val = (System::isWindows() ? 'Czech_Czech Republic.1250' : 'cs_CZ.utf8');
         $this->getIvoryConnection()->getConfig()->setForTransaction(ConfigParam::LC_MONETARY, $val);
     }
 
     protected function tearDown()
     {
-        $this->getIvoryConnection()->rollback();
+        $this->transaction->rollback();
 
         parent::tearDown();
     }

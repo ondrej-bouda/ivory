@@ -219,59 +219,14 @@ class Connection implements IConnection
         return $this->txCtl->inTransaction();
     }
 
-    public function startTransaction($transactionOptions = 0): bool
+    public function startTransaction($transactionOptions = 0): ITxHandle
     {
         return $this->txCtl->startTransaction($transactionOptions);
-    }
-
-    public function setupTransaction($transactionOptions)
-    {
-        $this->txCtl->setupTransaction($transactionOptions);
     }
 
     public function setupSubsequentTransactions($transactionOptions)
     {
         $this->txCtl->setupSubsequentTransactions($transactionOptions);
-    }
-
-    public function commit(): bool
-    {
-        return $this->txCtl->commit();
-    }
-
-    public function rollback(): bool
-    {
-        return $this->txCtl->rollback();
-    }
-
-    public function savepoint(string $name)
-    {
-        $this->txCtl->savepoint($name);
-    }
-
-    public function rollbackToSavepoint(string $name)
-    {
-        $this->txCtl->rollbackToSavepoint($name);
-    }
-
-    public function releaseSavepoint(string $name)
-    {
-        $this->txCtl->releaseSavepoint($name);
-    }
-
-    public function setTransactionSnapshot(string $snapshotId): bool
-    {
-        return $this->txCtl->setTransactionSnapshot($snapshotId);
-    }
-
-    public function exportTransactionSnapshot()
-    {
-        return $this->txCtl->exportTransactionSnapshot();
-    }
-
-    public function prepareTransaction(string $name): bool
-    {
-        return $this->txCtl->prepareTransaction($name);
     }
 
     public function commitPreparedTransaction(string $name)

@@ -7,10 +7,12 @@ use Ivory\Result\IQueryResult;
 /**
  * Transaction control.
  *
- * Note that some methods, when called in an invalid context, only issue a warning
- * (e.g. {@link ITransactionControl::rollback()} while others (like {@link ITransactionControl::releaseSavepoint()})
- * throw an exception. This mimics the PostgreSQL behaviour, which also raises notices or exceptions, depending on the
- * concrete command used.
+ * Note that the started transaction is represented by an {@link ITxHandle}. Further control over the transaction is
+ * done through this object. Thus, this interface is rather narrow - the rest of the methods one would expect from the
+ * transaction control ({@link ITxHandle::commit() commit()}, {@link ITxHandle::rollback() rollback()}, etc.) are
+ * defined on {@link ITxHandle} instead.
+ *
+ * Also note the API is rather strict - exceptions are thrown when a command is issued in an invalid state.
  */
 interface ITransactionControl
 {
@@ -24,167 +26,37 @@ interface ITransactionControl
     /**
      * Begins a new transaction.
      *
-     * Note that transactions cannot be nested in PostgreSQL (use {@link savepoint()} instead). Thus, if not called
-     * inside an active transaction, just a warning is issued, nothing is actually performed, and `false` is returned.
+     * The started transaction may further be controlled using an {@link ITxHandle} returned by this method.
+     *
+     * Note that transactions cannot be nested in PostgreSQL. Thus, an InvalidStateException is thrown if a transaction
+     * is already active. {@link ITxHandle::savepoint() Savepoints} may be used instead on the returned handle.
      *
      * Transaction options may be specified, overriding the defaults set up by {@link setupSubsequentTransactions()}.
      *
+     * @internal Ivory design note: Usual database access layers only define a thin API for transaction control,
+     * offering all the transaction control commands on the connection itself. In the real world, however, one must keep
+     * track of where exactly the transaction is open and when it comes closed (either committed or rolled back). To
+     * make this fact more explicit, the transaction is represented by a handle, only through which it may further be
+     * controlled. It is clear, then, which methods are expected to be called within an open transaction, and which
+     * control commands are, conversely, to be executed outside of a transaction.
+     *
      * @param int|TxConfig $transactionOptions options for the transaction to be started, overriding the defaults;
      *                                         a {@link TxConfig} object, or a combination of {@link TxConfig} constants
-     * @return bool <tt>true</tt> if a new transaction has actually been started,
-     *              <tt>false</tt> if another transaction is already active and thus this was a no-op
+     * @return ITxHandle handle of the started transaction
+     * @throws InvalidStateException when already inside a transaction
      */
-    function startTransaction($transactionOptions = 0): bool;
-
-    /**
-     * Sets up the current transaction according to the given options.
-     *
-     * @param int|TxConfig $transactionOptions options for the transaction to be started;
-     *                                         a {@link TxConfig} object, or a combination of {@link TxConfig} constants
-     */
-    function setupTransaction($transactionOptions);
+    function startTransaction($transactionOptions = 0): ITxHandle;
 
     /**
      * Sets up the default options for subsequent transactions started in the current session.
      *
-     * The current transaction (if any) is unaffected by this command. See {@link setupTransaction()} instead.
+     * The current transaction (if any) is unaffected by this command. See {@link ITxHandle::setupTransaction()}
+     * instead.
      *
      * @param int|TxConfig $transactionOptions options for the transaction to be started;
      *                                         a {@link TxConfig} object, or a combination of {@link TxConfig} constants
      */
     function setupSubsequentTransactions($transactionOptions);
-
-    /**
-     * Sets the current transaction to run with the same snapshot as another existing (still running) transaction.
-     *
-     * There are several notes on importing snapshots from other transactions. Most notably, it is only allowed at the
-     * beginning of the importing transaction, it only makes sense for the {@link TxConfig::SERIALIZABLE} or the
-     * {@link TxConfig::REPEATABLE_READ} isolation level of the importing transaction, and it merely synchronizes the
-     * transactions with respect to pre-existing data. See the PostgreSQL documentation on
-     * {@link http://www.postgresql.org/docs/9.4/static/sql-set-transaction.html `SQL SET TRANSACTION`} and
-     * {@link http://www.postgresql.org/docs/9.4/static/functions-admin.html#FUNCTIONS-SNAPSHOT-SYNCHRONIZATION Snapshot Synchronization Functions}
-     * for detailed information.
-     *
-     * If no transaction is actually active, just a warning is issued, nothing is performed, and `false` is returned.
-     *
-     * @param string $snapshotId a snapshot identifier exported by another existing transaction using
-     *                             {@link exportTransactionSnapshot()} (or just using a custom call to the
-     *                             <tt>pg_export_snapshot()</tt> PostgreSQL function)
-     * @return bool <tt>true</tt> if the transaction snapshot has actually been imported,
-     *              <tt>false</tt> if no transaction was active and thus this was a no-op
-     */
-    function setTransactionSnapshot(string $snapshotId): bool;
-
-    /**
-     * Saves the current transaction snapshot and returns its identifier for a later use to
-     * {@link setTransactionSnapshot()}.
-     *
-     * See {@link setTransactionSnapshot()} for more information.
-     *
-     * Once a transaction exports its snapshot, it cannot be {@link prepareTransaction() prepared} for a two-phase
-     * commit.
-     *
-     * @return string|null the exported snapshot identifier, or <tt>null</tt> if not inside any transaction
-     */
-    function exportTransactionSnapshot();
-
-    /**
-     * Commits the active transaction.
-     *
-     * If no transaction is actually active, just a warning is issued, nothing is performed, and `false` is returned.
-     *
-     * @return bool <tt>true</tt> if the transaction has actually been committed,
-     *              <tt>false</tt> if no transaction was active and thus this was a no-op
-     */
-    function commit(): bool;
-
-    /**
-     * Rolls back the active transaction.
-     *
-     * If no transaction is actually active, just a warning is issued, nothing is performed, and `false` is returned.
-     *
-     * @return bool <tt>true</tt> if the transaction has actually been rolled back,
-     *              <tt>false</tt> if no transaction was active and thus this was a no-op
-     */
-    function rollback(): bool;
-
-    /**
-     * Defines a new savepoint within the active transaction.
-     *
-     * Use {@link rollbackToSavepoint()} to go back to the state of the savepoint, or {@link releaseSavepoint()} to
-     * release it so that it does not take the database system resources anymore.
-     *
-     * In PostgreSQL, the same name may be used for multiple savepoints within a transaction at a time. The operations
-     * on the savepoints always work with the most recent savepoint of a given name.
-     *
-     * If no transaction is active, an `InvalidStateException` is thrown. Note this is different from operations
-     * controlling the whole transaction, which issue just a warning. This mimics the PostgreSQL behaviour, and is
-     * generally safer for savepoints.
-     *
-     * @param string $name name for the new savepoint
-     * @throws InvalidStateException when not inside a transaction
-     */
-    function savepoint(string $name);
-
-    /**
-     * Rolls back all statements executed after the given savepoint.
-     *
-     * All statements are rolled back, including creation of new savepoints. That is, all savepoints established after
-     * the given savepoint are destroyed. The given savepoint itself remains valid, allowing to roll back to it multiple
-     * times.
-     *
-     * If no transaction is active, an `InvalidStateException` is thrown. Note this is different from operations
-     * controlling the whole transaction, which issue just a warning. This mimics the PostgreSQL behaviour, and is
-     * generally safer for savepoints.
-     *
-     * Database error on trying to roll back to an undefined savepoint is handled and thrown as an
-     * `InvalidStateException`, too.
-     *
-     * @see http://www.postgresql.org/docs/9.4/static/sql-rollback-to.html PostgreSQL docs on details regarding cursors
-     *
-     * @param string $name name of the savepoint to roll back to;
-     *                     if there are multiple savepoints of such name, the most recent is chosen
-     * @throws InvalidStateException when not inside a transaction,
-     *                               or if trying to roll back to an undefined savepoint
-     */
-    function rollbackToSavepoint(string $name);
-
-    /**
-     * Destroys the given savepoint, and all savepoints established after it. Thus, it is not possible to roll back to
-     * those savepoints anymore.
-     *
-     * Note the operation does not undo the effects of statements executed after the given savepoint was established.
-     * It merely frees some database system resources. Use {@link rollbackToSavepoint()} to undo the statements.
-     *
-     * @param string $name name of the savepoint to release;
-     *                     if there are multiple savepoints of such name, the most recent is chosen
-     * @throws InvalidStateException when not inside a transaction,
-     *                               or if trying to release an undefined savepoint,
-     *                               or if the transaction is in an aborted state
-     */
-    function releaseSavepoint(string $name);
-
-    /**
-     * Prepares the current transaction for a two-phase commit.
-     *
-     * Stores the state of the current transaction to disk and rolls it back for the current session. The only exception
-     * are configuration parameter changes, which are committed by this command, and are not part of the transaction
-     * state stored to disk.
-     *
-     * The prepared transaction can later be committed or rolled back from any session using
-     * {@link commitPreparedTransaction()} or {@link rollbackPreparedTransaction()}, respectively. To list existing
-     * prepared transactions, {@link listPreparedTransactions()} may be helpful.
-     *
-     * This command is only relevant inside a transaction. It has no effect when not inside a transaction, just a
-     * warning will be issued.
-     *
-     * @see http://www.postgresql.org/docs/9.4/static/sql-prepare-transaction.html
-     *
-     * @param string $name name for the prepared transaction; must be server-wide unique
-     * @return bool <tt>true</tt> if the transaction has actually been prepared,
-     *              <tt>false</tt> if no transaction was active and thus this was a no-op
-     */
-    function prepareTransaction(string $name): bool;
 
     /**
      * Commits a transaction prepared for a two-phase commit.
@@ -213,7 +85,7 @@ interface ITransactionControl
     /**
      * Lists all transactions which are currently prepared for a two-phase commit.
      *
-     * See {@link prepareTransaction()} for more details on preparing a transaction.
+     * See {@link ITxHandle::prepareTransaction()} for more details on preparing a transaction.
      *
      * @return IQueryResult result of query to all columns of
      *                        {@link http://www.postgresql.org/docs/9.4/static/view-pg-prepared-xacts.html <tt>pg_catalog.pg_prepared_xacts</tt>}

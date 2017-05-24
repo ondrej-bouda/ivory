@@ -1,6 +1,8 @@
 <?php
 namespace Ivory\Connection;
 
+use Ivory\Exception\InternalException;
+
 /**
  * Transaction configuration. To be used, e.g., for {@link Connection::startTransaction()}.
  *
@@ -34,6 +36,15 @@ class TxConfig
     private $readOnly = null;
     private $deferrable = null;
 
+
+    public static function create($transactionOptions)
+    {
+        if ($transactionOptions instanceof TxConfig) {
+            return $transactionOptions;
+        } else {
+            return new TxConfig($transactionOptions);
+        }
+    }
 
     /**
      * @param int $options one or more {@link TxConfig} constants combined together with the <tt>|</tt> operator
@@ -135,5 +146,42 @@ class TxConfig
     {
         $this->deferrable = $deferrable;
         return $this;
+    }
+
+    public function toSql(): string
+    {
+        $clauses = [];
+
+        $il = $this->getIsolationLevel();
+        if ($il !== null) {
+            switch ($il) {
+                case self::ISOLATION_SERIALIZABLE:
+                    $clauses[] = 'ISOLATION LEVEL SERIALIZABLE';
+                    break;
+                case self::ISOLATION_REPEATABLE_READ:
+                    $clauses[] = 'ISOLATION LEVEL REPEATABLE READ';
+                    break;
+                case self::ISOLATION_READ_COMMITTED:
+                    $clauses[] = 'ISOLATION LEVEL READ COMMITTED';
+                    break;
+                case self::ISOLATION_READ_UNCOMMITTED:
+                    $clauses[] = 'ISOLATION LEVEL READ UNCOMMITTED';
+                    break;
+                default:
+                    throw new InternalException('Undefined isolation level');
+            }
+        }
+
+        $ro = $this->isReadOnly();
+        if ($ro !== null) {
+            $clauses[] = ($ro ? 'READ ONLY' : 'READ WRITE');
+        }
+
+        $d = $this->isDeferrable();
+        if ($d !== null) {
+            $clauses[] = ($d ? 'DEFERRABLE' : 'NOT DEFERRABLE');
+        }
+
+        return implode(' ', $clauses);
     }
 }

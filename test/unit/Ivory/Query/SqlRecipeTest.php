@@ -3,6 +3,7 @@ namespace Ivory\Query;
 
 use Ivory\Connection\Config\ConfigParam;
 use Ivory\Connection\IConnection;
+use Ivory\Connection\ITxHandle;
 use Ivory\Exception\UndefinedTypeException;
 use Ivory\Type\ITypeDictionary;
 use Ivory\Value\Box;
@@ -13,6 +14,8 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
 {
     /** @var IConnection */
     private $conn;
+    /** @var ITxHandle */
+    private $transaction;
     /** @var ITypeDictionary */
     private $typeDict;
 
@@ -21,13 +24,13 @@ class SqlRecipeTest extends \Ivory\IvoryTestCase
         parent::setUp();
 
         $this->conn = $this->getIvoryConnection();
-        $this->conn->startTransaction();
+        $this->transaction = $this->conn->startTransaction();
         $this->typeDict = $this->conn->getTypeDictionary();
     }
 
     protected function tearDown()
     {
-        $this->conn->rollback();
+        $this->transaction->rollback();
 
         parent::tearDown();
     }

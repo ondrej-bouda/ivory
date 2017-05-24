@@ -4,6 +4,7 @@ namespace Ivory\Connection;
 use Ivory\Exception\InternalException;
 use Ivory\Exception\InvalidStateException;
 use Ivory\Result\IQueryResult;
+use Ivory\Type\Std\StringType;
 
 class TransactionControl implements IObservableTransactionControl
 {
@@ -26,164 +27,30 @@ class TransactionControl implements IObservableTransactionControl
         return ($txStat == PGSQL_TRANSACTION_INTRANS || $txStat == PGSQL_TRANSACTION_INERROR);
     }
 
-    public function startTransaction($transactionOptions = 0): bool
+    public function startTransaction($transactionOptions = 0): ITxHandle
     {
         if ($this->inTransaction()) {
-            trigger_error('A transaction is already active, cannot start a new one.', E_USER_WARNING);
-            return false;
+            throw new InvalidStateException('A transaction is already active, cannot start a new one.');
         }
 
-        $this->stmtExec->rawCommand('START TRANSACTION');
-        $this->notifyTransactionStart();
-        return true;
-    }
+        $txConfig = TxConfig::create($transactionOptions);
+        $txSql = $txConfig->toSql();
 
-    public function setupTransaction($transactionOptions)
-    {
-        $this->stmtExec->rawCommand('SET TRANSACTION ' . $this->txConfigToSql($transactionOptions));
+        $command = 'START TRANSACTION';
+        if (strlen($txSql) > 0) {
+            $command .= ' ' . $txSql;
+        }
+
+        $this->stmtExec->rawCommand($command);
+        $this->notifyTransactionStart();
+
+        return new TxHandle($this->stmtExec, $this); // TODO: use a factory method, abstracting from the specific class
     }
 
     public function setupSubsequentTransactions($transactionOptions)
     {
-        $this->stmtExec->rawCommand('SET SESSION CHARACTERISTICS AS TRANSACTION ' . $this->txConfigToSql($transactionOptions));
-    }
-
-    private function txConfigToSql($transactionOptions): string
-    {
-        $opts = ($transactionOptions instanceof TxConfig ? $transactionOptions : new TxConfig($transactionOptions));
-
-        $clauses = [];
-
-        $il = $opts->getIsolationLevel();
-        if ($il !== null) {
-            switch ($il) {
-                case TxConfig::ISOLATION_SERIALIZABLE:
-                    $clauses[] = 'ISOLATION LEVEL SERIALIZABLE';
-                    break;
-                case TxConfig::ISOLATION_REPEATABLE_READ:
-                    $clauses[] = 'ISOLATION LEVEL REPEATABLE READ';
-                    break;
-                case TxConfig::ISOLATION_READ_COMMITTED:
-                    $clauses[] = 'ISOLATION LEVEL READ COMMITTED';
-                    break;
-                case TxConfig::ISOLATION_READ_UNCOMMITTED:
-                    $clauses[] = 'ISOLATION LEVEL READ UNCOMMITTED';
-                    break;
-                default:
-                    throw new InternalException('Undefined isolation level');
-            }
-        }
-
-        $ro = $opts->isReadOnly();
-        if ($ro !== null) {
-            $clauses[] = ($ro ? 'READ ONLY' : 'READ WRITE');
-        }
-
-        $d = $opts->isDeferrable();
-        if ($d !== null) {
-            $clauses[] = ($d ? 'DEFERRABLE' : 'NOT DEFERRABLE');
-        }
-
-        return implode(' ', $clauses);
-    }
-
-    public function commit(): bool
-    {
-        if (!$this->inTransaction()) {
-            trigger_error('No transaction is active, nothing to commit.', E_USER_WARNING);
-            return false;
-        }
-
-        $this->stmtExec->rawCommand('COMMIT');
-        $this->notifyTransactionCommit();
-        return true;
-    }
-
-    public function rollback(): bool
-    {
-        if (!$this->inTransaction()) {
-            trigger_error('No transaction is active, nothing to roll back.', E_USER_WARNING);
-            return false;
-        }
-
-        $this->stmtExec->rawCommand('ROLLBACK');
-        $this->notifyTransactionRollback();
-        return true;
-    }
-
-    private function quoteIdent(string $ident) // FIXME: revise; move where appropriate
-    {
-        return '"' . strtr($ident, ['"' => '""']) . '"';
-    }
-
-    private function quoteString(string $str) // FIXME: revise; move where appropriate
-    {
-        return "'" . pg_escape_string($this->connCtl->requireConnection(), $str) . "'";
-    }
-
-    public function savepoint(string $name)
-    {
-        if (!$this->inTransaction()) {
-            throw new InvalidStateException('No transaction is active, cannot create any savepoint.');
-        }
-
-        $this->stmtExec->rawCommand(sprintf('SAVEPOINT %s', $this->quoteIdent($name)));
-        $this->notifySavepointSaved($name);
-    }
-
-    public function rollbackToSavepoint(string $name)
-    {
-        if (!$this->inTransaction()) {
-            throw new InvalidStateException('No transaction is active, cannot roll back to any savepoint.');
-        }
-
-        $this->stmtExec->rawCommand(sprintf('ROLLBACK TO SAVEPOINT %s', $this->quoteIdent($name)));
-        $this->notifyRollbackToSavepoint($name);
-    }
-
-    public function releaseSavepoint(string $name)
-    {
-        if (!$this->inTransaction()) {
-            throw new InvalidStateException('No transaction is active, cannot release any savepoint.');
-        }
-
-        $this->stmtExec->rawCommand(sprintf('RELEASE SAVEPOINT %s', $this->quoteIdent($name)));
-        $this->notifySavepointReleased($name);
-    }
-
-    public function setTransactionSnapshot(string $snapshotId): bool
-    {
-        if (!$this->inTransaction()) {
-            trigger_error('No transaction is active, cannot set the transaction snapshot.', E_USER_WARNING);
-            return false;
-        }
-
-        $this->stmtExec->rawCommand("SET TRANSACTION SNAPSHOT {$this->quoteString($snapshotId)}");
-        return true;
-    }
-
-    public function exportTransactionSnapshot()
-    {
-        if (!$this->inTransaction()) {
-            trigger_error('No transaction is active, cannot export the snapshot.', E_USER_WARNING);
-            return null;
-        }
-
-        /** @var IQueryResult $r */
-        $r = $this->stmtExec->rawQuery('SELECT pg_export_snapshot()');
-        return $r->value();
-    }
-
-    public function prepareTransaction(string $name): bool
-    {
-        if (!$this->inTransaction()) {
-            trigger_error('No transaction is active, nothing to prepare.', E_USER_WARNING);
-            return false;
-        }
-
-        $this->stmtExec->rawCommand("PREPARE TRANSACTION {$this->quoteString($name)}");
-        $this->notifyTransactionPrepared($name);
-        return true;
+        $txConfig = TxConfig::create($transactionOptions);
+        $this->stmtExec->rawCommand('SET SESSION CHARACTERISTICS AS TRANSACTION ' . $txConfig->toSql());
     }
 
     public function commitPreparedTransaction(string $name)
@@ -209,6 +76,15 @@ class TransactionControl implements IObservableTransactionControl
     public function listPreparedTransactions(): IQueryResult
     {
         return $this->stmtExec->rawQuery('SELECT * FROM pg_catalog.pg_prepared_xacts');
+    }
+
+    private function quoteString(string $str)
+    {
+        static $stringSerializer = null;
+        if ($stringSerializer === null) {
+            $stringSerializer = new StringType('pg_catalog', 'text');
+        }
+        return $stringSerializer->serializeValue($str);
     }
 
 

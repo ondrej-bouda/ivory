@@ -1,6 +1,7 @@
 <?php
 namespace Ivory\Connection\Config;
 
+use Ivory\Connection\ITxHandle;
 use Ivory\Exception\StatementException;
 use Ivory\Result\QueryResult;
 use Ivory\Result\SqlState;
@@ -12,18 +13,20 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
 {
     /** @var ConnConfig */
     private $cfg;
+    /** @var ITxHandle */
+    private $transaction;
 
     protected function setUp()
     {
         parent::setUp();
 
         $this->cfg = $this->getIvoryConnection()->getConfig();
-        $this->getIvoryConnection()->startTransaction();
+        $this->transaction = $this->getIvoryConnection()->startTransaction();
     }
 
     protected function tearDown()
     {
-        $this->getIvoryConnection()->rollback();
+        $this->transaction->rollback();
 
         parent::tearDown();
     }
@@ -36,27 +39,27 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
         ];
         foreach ($vars as $var) {
             $this->cfg->setForSession($var, 'Ivorytest');
-            $this->getIvoryConnection()->commit();
-            $this->getIvoryConnection()->startTransaction();
+            $this->transaction->commit();
+            $this->transaction = $this->getIvoryConnection()->startTransaction();
             $this->assertSame('Ivorytest', $this->cfg->get($var));
 
             $this->cfg->setForSession($var, 'foo');
             $this->assertSame('foo', $this->cfg->get($var));
-            $this->getIvoryConnection()->rollback();
+            $this->transaction->rollback();
             $this->assertSame('Ivorytest', $this->cfg->get($var));
-            $this->getIvoryConnection()->startTransaction();
+            $this->transaction = $this->getIvoryConnection()->startTransaction();
 
             $this->cfg->setForSession($var, 'foo');
             $this->assertSame('foo', $this->cfg->get($var));
-            $this->getIvoryConnection()->commit();
+            $this->transaction->commit();
             $this->assertSame('foo', $this->cfg->get($var));
-            $this->getIvoryConnection()->startTransaction();
+            $this->transaction = $this->getIvoryConnection()->startTransaction();
 
             $this->cfg->setForTransaction($var, 'bar');
             $this->assertSame('bar', $this->cfg->get($var));
-            $this->getIvoryConnection()->commit();
+            $this->transaction->commit();
             $this->assertSame('foo', $this->cfg->get($var));
-            $this->getIvoryConnection()->startTransaction();
+            $this->transaction = $this->getIvoryConnection()->startTransaction();
         }
 
         $this->cfg->setForSession(ConfigParam::SEARCH_PATH, 'pg_catalog, public');
@@ -145,7 +148,7 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
         $this->cfg->addObserver($obsSome, 'Ivory.customized');
         $this->cfg->addObserver($obsSome, [ConfigParam::APPLICATION_NAME, ConfigParam::MONEY_DEC_SEP]);
 
-        $this->getIvoryConnection()->commit();
+        $this->transaction->commit();
 
         try {
             $this->cfg->setForSession('Ivory.customized', 'foo');
@@ -198,7 +201,7 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
             $this->assertSame([ConnConfigTestObserver::RESET], $obsAll->fetchObserved());
             $this->assertSame([ConnConfigTestObserver::RESET], $obsSome->fetchObserved());
         } finally {
-            $this->getIvoryConnection()->startTransaction();
+            $this->transaction = $this->getIvoryConnection()->startTransaction();
         }
     }
 
@@ -206,7 +209,7 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
     {
         $conn = $this->getIvoryConnection();
         $this->cfg->setForSession(ConfigParam::APPLICATION_NAME, 'ConnConfigTest');
-        $conn->commit();
+        $this->transaction->commit();
 
         $this->clearPreparedTransaction('t');
 
@@ -215,95 +218,95 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
 
         try {
             // session-wide parameter changes
-            $conn->startTransaction();
+            $tx = $conn->startTransaction();
             $this->cfg->setForSession(ConfigParam::APPLICATION_NAME, 'Ivory');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'Ivory']], $obs->fetchObserved());
-            $conn->commit();
+            $tx->commit();
             $this->assertSame([], $obs->fetchObserved());
 
-            $conn->startTransaction();
+            $tx = $conn->startTransaction();
             $this->cfg->setForSession(ConfigParam::APPLICATION_NAME, 'foo');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'foo']], $obs->fetchObserved());
-            $conn->rollback();
+            $tx->rollback();
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'Ivory']], $obs->fetchObserved());
 
             // transaction-wide parameter changes
-            $conn->startTransaction();
+            $tx = $conn->startTransaction();
             $this->cfg->setForTransaction(ConfigParam::APPLICATION_NAME, 'foo');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'foo']], $obs->fetchObserved());
-            $conn->commit();
+            $tx->commit();
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'Ivory']], $obs->fetchObserved());
 
-            $conn->startTransaction();
+            $tx = $conn->startTransaction();
             $this->cfg->setForTransaction(ConfigParam::APPLICATION_NAME, 'foo');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'foo']], $obs->fetchObserved());
-            $conn->rollback();
+            $tx->rollback();
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'Ivory']], $obs->fetchObserved());
 
             // savepoints
-            $conn->startTransaction();
+            $tx = $conn->startTransaction();
             $this->cfg->setForTransaction(ConfigParam::APPLICATION_NAME, 'foo');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'foo']], $obs->fetchObserved());
-            $conn->savepoint('s1');
+            $tx->savepoint('s1');
             $this->cfg->setForTransaction(ConfigParam::APPLICATION_NAME, 'bar');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'bar']], $obs->fetchObserved());
-            $conn->savepoint('s2');
+            $tx->savepoint('s2');
             $this->cfg->setForTransaction(ConfigParam::APPLICATION_NAME, 'baz');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'baz']], $obs->fetchObserved());
-            $conn->rollbackToSavepoint('s1');
+            $tx->rollbackToSavepoint('s1');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'foo']], $obs->fetchObserved());
-            $conn->commit();
+            $tx->commit();
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'Ivory']], $obs->fetchObserved());
 
             // prepared transactions - session-wide changes
-            $conn->startTransaction();
+            $tx = $conn->startTransaction();
             $this->cfg->setForSession(ConfigParam::APPLICATION_NAME, 'foo');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'foo']], $obs->fetchObserved());
-            $conn->prepareTransaction('t');
+            $tx->prepareTransaction('t');
             $this->assertSame([], $obs->fetchObserved());
             $conn->rollbackPreparedTransaction('t');
 
             // prepared transactions - transaction-wide changes
-            $conn->startTransaction();
+            $tx = $conn->startTransaction();
             $this->cfg->setForTransaction(ConfigParam::APPLICATION_NAME, 'bar');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'bar']], $obs->fetchObserved());
-            $conn->prepareTransaction('t');
+            $tx->prepareTransaction('t');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'foo']], $obs->fetchObserved());
             $conn->rollbackPreparedTransaction('t');
 
             // reset all - notify about the reset again upon rolling back the transaction
-            $conn->startTransaction();
+            $tx = $conn->startTransaction();
             $this->cfg->resetAll();
             $this->assertSame([ConnConfigTestObserver::RESET], $obs->fetchObserved());
             $this->cfg->setForSession(ConfigParam::APPLICATION_NAME, 'baz');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'baz']], $obs->fetchObserved());
-            $conn->rollback();
+            $tx->rollback();
             $this->assertSame([ConnConfigTestObserver::RESET], $obs->fetchObserved());
 
             // reset all - only notify about the reset again upon rolling back to savepoint since which the reset was made
             $this->cfg->setForSession(ConfigParam::APPLICATION_NAME, 'Ivory');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'Ivory']], $obs->fetchObserved());
-            $conn->startTransaction();
+            $tx = $conn->startTransaction();
             $this->cfg->setForSession(ConfigParam::APPLICATION_NAME, 'I');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'I']], $obs->fetchObserved());
-            $conn->savepoint('s1');
+            $tx->savepoint('s1');
             $this->cfg->resetAll();
             $this->assertSame([ConnConfigTestObserver::RESET], $obs->fetchObserved());
-            $conn->savepoint('s2');
+            $tx->savepoint('s2');
             $this->cfg->setForSession(ConfigParam::APPLICATION_NAME, 'bar');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'bar']], $obs->fetchObserved());
-            $conn->rollbackToSavepoint('s2');
+            $tx->rollbackToSavepoint('s2');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, '']], $obs->fetchObserved());
             $this->cfg->setForSession(ConfigParam::APPLICATION_NAME, 'bar');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'bar']], $obs->fetchObserved());
-            $conn->rollbackToSavepoint('s1');
+            $tx->rollbackToSavepoint('s1');
             $this->assertSame([ConnConfigTestObserver::RESET], $obs->fetchObserved());
-            $conn->rollback();
+            $tx->rollback();
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'Ivory']], $obs->fetchObserved());
         } finally {
             $this->clearPreparedTransaction('t');
-            if (!$conn->inTransaction()) {
-                $conn->startTransaction();
+            if (!$this->transaction->isOpen()) {
+                $this->transaction = $conn->startTransaction();
             }
         }
     }
@@ -313,7 +316,7 @@ class ConnConfigTest extends \Ivory\IvoryTestCase
         $conn = $this->getIvoryConnection();
         try {
             if ($conn->inTransaction()) {
-                $conn->rollback();
+                $this->transaction->rollback();
             }
             $conn->rollbackPreparedTransaction($name);
         } catch (StatementException $e) {

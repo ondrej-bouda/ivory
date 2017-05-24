@@ -104,27 +104,7 @@ class ConnConfig implements IObservableConnConfig
     public function get(string $propertyName)
     {
         if (self::isCustomOption($propertyName)) {
-            /* Custom options are always of type string, no need to even worry about the type.
-             * The custom option might not be recognized by PostgreSQL yet and an exception might be thrown, which would
-             * break the current transaction (if any). Hence the savepoint.
-             */
-            $sp = ($this->txCtl->inTransaction() ? 'customized_option' : null);
-            if ($sp) {
-                $this->txCtl->savepoint($sp);
-            }
-            $connHandler = $this->connCtl->requireConnection();
-            $res = @pg_query_params($connHandler, 'SELECT pg_catalog.current_setting($1)', [$propertyName]);
-            if ($sp) {
-                if ($res === false) {
-                    $this->txCtl->rollbackToSavepoint($sp);
-                }
-                $this->txCtl->releaseSavepoint($sp);
-            }
-            if ($res !== false) {
-                return pg_fetch_result($res, 0, 0);
-            } else {
-                return null;
-            }
+            return $this->getCustomOptionValue($propertyName);
         }
 
         static $pgParStatusRecognized = [
@@ -202,6 +182,53 @@ class ConnConfig implements IObservableConnConfig
             return ConfigParamType::createValue($type, $val);
         } else {
             return null;
+        }
+    }
+
+    private function getCustomOptionValue(string $customOptionName)
+    {
+        /* The custom option might not be recognized by PostgreSQL yet and an exception might be thrown, which would
+         * break the current transaction (if any). Hence the savepoint.
+         * Besides, custom options are always of type string, no need to even worry about the type.
+         */
+        $connHandler = $this->connCtl->requireConnection();
+        $inTx = $this->txCtl->inTransaction();
+        $savepoint = false;
+        $needsRollback = false;
+        try {
+            if ($inTx) {
+                $spRes = @pg_query($connHandler, 'SAVEPOINT _ivory_customized_option');
+                if ($spRes === false) {
+                    throw new \RuntimeException('Error retrieving a custom option value.');
+                }
+                $savepoint = true;
+            }
+            $res = @pg_query_params($connHandler, 'SELECT pg_catalog.current_setting($1)', [$customOptionName]);
+            if ($res !== false) {
+                return pg_fetch_result($res, 0, 0);
+            } else {
+                $needsRollback = true;
+                return null;
+            }
+        } finally {
+            // anything might have been thrown, which must not break the (savepoint-release savepoint) pair
+            if ($savepoint) {
+                if ($needsRollback) {
+                    $rbRes = @pg_query($connHandler, 'ROLLBACK TO SAVEPOINT _ivory_customized_option');
+                    if ($rbRes === false) {
+                        throw new \RuntimeException(
+                            'Error restoring the transaction status - it stayed in the aborted state.'
+                        );
+                    }
+                }
+
+                $spRes = @pg_query($connHandler, 'RELEASE SAVEPOINT _ivory_customized_option');
+                if ($spRes === false) {
+                    throw new \RuntimeException(
+                        'Error restoring the transaction status - the savepoint probably stayed defined.'
+                    );
+                }
+            }
         }
     }
 
