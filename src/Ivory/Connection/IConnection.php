@@ -34,6 +34,30 @@ interface IConnection extends
      * @return string name of the connection
      */
     function getName(): string;
+
+
+    /**
+     * Registers a new observer to receive notifications on transaction control operations.
+     *
+     * If the given observer is already observing this object, it is not added for the second time.
+     *
+     * @param ITransactionControlObserver $observer
+     */
+    function addTransactionControlObserver(ITransactionControlObserver $observer);
+
+    /**
+     * Removes a previously registered observer.
+     *
+     * If the given observer was not registered before, this is a no-op.
+     *
+     * @param ITransactionControlObserver $observer
+     */
+    function removeTransactionControlObserver(ITransactionControlObserver $observer);
+
+    /**
+     * Removes any observer registered so far.
+     */
+    function removeAllTransactionControlObservers();
 }
 
 // TODO: do not extend the whole interfaces - some methods are unnecessary to the public, e.g., getTypeDictionary()

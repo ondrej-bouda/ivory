@@ -246,6 +246,25 @@ class Connection implements IConnection
 
     //endregion
 
+    //region Transaction observing
+
+    public function addTransactionControlObserver(ITransactionControlObserver $observer)
+    {
+        $this->txCtl->addObserver($observer);
+    }
+
+    public function removeTransactionControlObserver(ITransactionControlObserver $observer)
+    {
+        $this->txCtl->removeObserver($observer);
+    }
+
+    public function removeAllTransactionControlObservers()
+    {
+        $this->txCtl->removeAllObservers();
+    }
+
+    //endregion
+
     //region IPC Control
 
     public function getBackendPID(): int
