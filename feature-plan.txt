@@ -27,6 +27,25 @@ Cursors
 
 
 
+Auto-Transaction Handle
+=======================
+* ITxHandle::rollbackIfOpen() allows for pretty easy exception handling within open transactions. It still requires one
+  to think of it and type some boilerplate code. In some cases (and arguably in the typical ones), just a single
+  transaction is started and committed/rolled back within a one function/method.
+* Implement ITransactionControl::startAutoTransaction() which would return a specialization of TxHandle, calling
+  rollbackIfOpen() in __destruct(). That would even simplify the typical case:
+  <code>
+  function foo() {
+      $tx = $conn->startAutoTransaction();
+      // do stuff, exceptions expected
+      $tx->commit();
+  }
+  </code>
+* While at it, reconsider whether ICoreFactory::createTransactionHandle() is really reasonable.
+* Also applicable to nested transactions - see the following feature.
+
+
+
 Nested Transactions
 ===================
 * A nested code block does not need to know whether it actually commits the whole transaction, or if it is just a piece
