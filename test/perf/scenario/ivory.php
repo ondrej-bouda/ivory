@@ -36,7 +36,7 @@ class IvoryPerformanceTest implements IPerformanceTest
 
     public function connect(string $connString, string $searchPathSchema)
     {
-        $this->conn = Ivory::setupConnection($connString);
+        $this->conn = Ivory::setupNewConnection($connString);
 
         if ($this->async) {
             $this->conn->connect(function (IConnection $conn) use ($searchPathSchema) {

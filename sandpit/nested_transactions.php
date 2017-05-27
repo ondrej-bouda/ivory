@@ -5,7 +5,7 @@ use Ivory\Ivory;
 require __DIR__ . '/../test/bootstrap.php';
 
 $connString = include __DIR__ . '/../test/conn_params.php';
-$conn = Ivory::setupConnection($connString);
+$conn = Ivory::setupNewConnection($connString);
 $conn->command('START TRANSACTION');
 $conn->command('CREATE TABLE tt ()');
 $conn->command('SAVEPOINT s1');

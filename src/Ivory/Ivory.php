@@ -147,7 +147,7 @@ final class Ivory
      * @throws ConnectionException if connection name is explicitly specified but a connection with the same name
      *                               already exists
      */
-    public static function setupConnection($params, string $connName = null): IConnection // TODO: rename to setupNewConnection() to indicate a new connection is created, not the old one set up to different parameters
+    public static function setupNewConnection($params, string $connName = null): IConnection
     {
         if (!$params instanceof ConnectionParameters) {
             $params = ConnectionParameters::create($params);

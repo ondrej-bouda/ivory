@@ -6,7 +6,7 @@ require_once __DIR__ . '/../test/bootstrap.php';
 
 $connString = include __DIR__ . '/../test/conn_params.php';
 
-$conn = Ivory::setupConnection($connString);
+$conn = Ivory::setupNewConnection($connString);
 $conn->connect();
 $res = $conn->querySingleValue('SELECT 1'); // just to force Ivory initialize the type dictionary
 $dict = $conn->getTypeDictionary();
