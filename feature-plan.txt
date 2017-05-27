@@ -129,6 +129,7 @@ Synchronized Type Dictionary
 Implement Data Source
 =====================
 * Introduce DataSource - an SqlRecipe paired with a database connection, ready to be executed.
+* Useful for a higher level of the application.
 * Both having explicit methods like execute() or query(), and directly iterable, executing the query in the background.
 * Occurrences:
 ** IStatementExecution::dataSource() + implementations
@@ -136,6 +137,7 @@ Implement Data Source
 ** DataSource::fromRecipe(IRelationRecipe, IConnection)
 * Consider specifying a smaller part of IConnection to be held by the data source, just the necessary methods for a
   recipe to be executable.
+* Also consider an analogy for Command.
 
 
 
@@ -168,6 +170,7 @@ Catch All PostgreSQL Notices
 * Try to find a way to catch all notices raised for each statement, not just the last one.
 * E.g., consider file tracing, preferably to a memory-mapped file, and process the file asynchronously, apart from the
   application itself. Then, write some custom information to the log file, like the stack trace.
+* Alternatively, consider extending the pgsql extension.
 
 
 

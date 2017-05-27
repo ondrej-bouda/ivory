@@ -16,15 +16,8 @@ Clean up the names
 *** Prescription (too weird, totally suprising)
 *** RelationBuilder (quite exact, although it directly names the design pattern and "Builder" is not the exact meaning here - it is rather an indirect metaphor)
 ** What about RelationDefinition or RelationDef, for short? (as hints the comment in
-   \Ivory\Showcase\QueryingTest::testRelationRecipe())
+   \Ivory\Showcase\QueryingTest::testRelationDefinition())
 * CommandRecipe + CommandResult:
 ** Inconsistent with RelationRecipe + Relation.
 ** What about renaming to just Command + CommandResult?
-
-
-
-DataSource
-==========
-* Would DataSource be useful?
-* Would an analogy for Command be useful?
 
