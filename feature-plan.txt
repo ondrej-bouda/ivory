@@ -96,7 +96,7 @@ Encapsulation of Database Function Calls
 * Introduce methods to call database functions from PHP code directly, not by composing the function call by hand.
 * Allow one to define classes representing database functions (regardless of whether permanent or temporary), and
   instantiating them to call them.
-* Distinguish void, scalar, and set-returning functions. That would either lead to a relation recipe or command recipe,
+* Distinguish void, scalar, and set-returning functions. That would either lead to a relation definition or command,
   which would also be used in more complex queries. Scalar function results might be used as parameters in complex
   queries, or as just a value to fetch.
 
@@ -128,15 +128,15 @@ Synchronized Type Dictionary
 
 Implement Data Source
 =====================
-* Introduce DataSource - an SqlRecipe paired with a database connection, ready to be executed.
+* Introduce DataSource - an IRelationDefinition paired with a database connection, ready to be executed.
 * Useful for a higher level of the application.
 * Both having explicit methods like execute() or query(), and directly iterable, executing the query in the background.
 * Occurrences:
 ** IStatementExecution::dataSource() + implementations
-** IRelationRecipe::toDataSource(IConnection)
-** DataSource::fromRecipe(IRelationRecipe, IConnection)
+** IRelationDefinition::toDataSource(IConnection)
+** DataSource::fromRelationDefinition(IRelationDefinition, IConnection)
 * Consider specifying a smaller part of IConnection to be held by the data source, just the necessary methods for a
-  recipe to be executable.
+  relation definition to be executable.
 * Also consider an analogy for Command.
 
 

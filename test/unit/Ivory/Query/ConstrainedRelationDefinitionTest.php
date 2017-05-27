@@ -5,19 +5,19 @@ use Ivory\Connection\IConnection;
 use Ivory\Ivory;
 use Ivory\Lang\Sql\ISqlPredicate;
 
-class ConstrainedRelationRecipeTest extends \Ivory\IvoryTestCase
+class ConstrainedRelationDefinitionTest extends \Ivory\IvoryTestCase
 {
     /** @var IConnection */
     private $conn;
-    /** @var IRelationRecipe */
-    private $recipe;
+    /** @var IRelationDefinition */
+    private $relDef;
 
     protected function setUp()
     {
         parent::setUp();
 
         $this->conn = $this->getIvoryConnection();
-        $this->recipe = SqlRelationRecipe::fromSql(
+        $this->relDef = SqlRelationDefinition::fromSql(
             'SELECT * FROM (VALUES (1,2), (4,3), (6,6), (7,8)) v (a, b)'
         );
     }
@@ -25,7 +25,7 @@ class ConstrainedRelationRecipeTest extends \Ivory\IvoryTestCase
 
     public function testStringCondition()
     {
-        $constrained = $this->recipe->where('a %% % = 1', 2);
+        $constrained = $this->relDef->where('a %% % = 1', 2);
         $rel = $this->conn->query($constrained);
 
         $this->assertSame(
@@ -41,7 +41,7 @@ class ConstrainedRelationRecipeTest extends \Ivory\IvoryTestCase
     {
         $parser = Ivory::getSqlPatternParser();
         $pattern = $parser->parse('a %% % = 1');
-        $constrained = $this->recipe->where($pattern, 2);
+        $constrained = $this->relDef->where($pattern, 2);
         $rel = $this->conn->query($constrained);
 
         $this->assertSame(
@@ -61,7 +61,7 @@ class ConstrainedRelationRecipeTest extends \Ivory\IvoryTestCase
                 return 'a >= b';
             }
         };
-        $constrained = $this->recipe->where($predicate);
+        $constrained = $this->relDef->where($predicate);
         $rel = $this->conn->query($constrained);
 
         $this->assertSame(
@@ -75,7 +75,7 @@ class ConstrainedRelationRecipeTest extends \Ivory\IvoryTestCase
 
     public function testMultipleConditions()
     {
-        $constained = $this->recipe
+        $constained = $this->relDef
             ->where('a > %', 1)
             ->where('a < 7')
             ->where('a != b');

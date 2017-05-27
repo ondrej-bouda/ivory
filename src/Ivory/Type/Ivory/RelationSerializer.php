@@ -2,14 +2,14 @@
 namespace Ivory\Type\Ivory;
 
 use Ivory\INamedDbObject;
-use Ivory\Query\IRelationRecipe;
+use Ivory\Query\IRelationDefinition;
 use Ivory\Relation\IRelation;
 use Ivory\Relation\ITuple;
 use Ivory\Type\IValueSerializer;
 use Ivory\Utils\StringUtils;
 
 /**
- * Internal Ivory value serializer for serializing relation and relation recipes into SQL statements.
+ * Internal Ivory value serializer for serializing relations and relation definitions into SQL statements.
  *
  * Used in SQL patterns to handle `%rel` placeholders. These will typically be used in subselects or in
  * {@link https://www.postgresql.org/docs/current/static/queries-with.html `WITH` queries (common table expressions)}.
@@ -22,13 +22,13 @@ class RelationSerializer extends ConnectionDependentValueSerializer
 
     public function serializeValue($val): string
     {
-        if ($val instanceof IRelationRecipe) {
+        if ($val instanceof IRelationDefinition) {
             $typeDictionary = $this->getConnection()->getTypeDictionary();
             return $val->toSql($typeDictionary);
         } elseif ($val instanceof IRelation) {
             return $this->serializeRelation($val);
         } else {
-            $recognizedClasses = [IRelationRecipe::class, IRelation::class];
+            $recognizedClasses = [IRelationDefinition::class, IRelation::class];
             throw new \InvalidArgumentException('Expecting an ' . implode(' or ', $recognizedClasses) . ' object');
         }
     }

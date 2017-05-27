@@ -131,24 +131,24 @@ class Connection implements IConnection
 
     //region Statement Execution
 
-    public function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): IQueryResult
+    public function query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IQueryResult
     {
-        return $this->stmtExec->query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+        return $this->stmtExec->query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
     }
 
-    public function querySingleTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ITuple
+    public function querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ITuple
     {
-        return $this->stmtExec->querySingleTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+        return $this->stmtExec->querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
     }
 
-    public function querySingleValue($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams)
+    public function querySingleValue($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams)
     {
-        return $this->stmtExec->querySingleValue($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+        return $this->stmtExec->querySingleValue($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
     }
 
-    public function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ICommandResult
+    public function command($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ICommandResult
     {
-        return $this->stmtExec->command($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+        return $this->stmtExec->command($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
     }
 
     public function rawQuery(string $sqlQuery): IQueryResult
@@ -195,14 +195,14 @@ class Connection implements IConnection
         return $this->copyCtl->copyFromInput($table, $columns, $options);
     }
 
-    public function copyToFile(string $file, $tableOrRecipe, $columns = null, $options = []): ICommandResult
+    public function copyToFile(string $file, $tableOrRelationDefinition, $columns = null, $options = []): ICommandResult
     {
-        return $this->copyCtl->copyToFile($file, $tableOrRecipe, $columns, $options);
+        return $this->copyCtl->copyToFile($file, $tableOrRelationDefinition, $columns, $options);
     }
 
-    public function copyToProgram(string $program, $tableOrRecipe, $columns = null, $options = []): ICommandResult
+    public function copyToProgram(string $program, $tableOrRelationDefinition, $columns = null, $options = []): ICommandResult
     {
-        return $this->copyCtl->copyToProgram($program, $tableOrRecipe, $columns, $options);
+        return $this->copyCtl->copyToProgram($program, $tableOrRelationDefinition, $columns, $options);
     }
 
     public function copyToArray(string $table, $options = [])

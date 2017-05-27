@@ -9,7 +9,7 @@ use Ivory\Type\ITypeDictionary;
 /**
  * Specification for a relation.
  */
-interface IRelationRecipe
+interface IRelationDefinition
 {
     /**
      * Makes an SQL query which, when executed, produces the desired relation.
@@ -20,7 +20,7 @@ interface IRelationRecipe
     function toSql(ITypeDictionary $typeDictionary): string;
 
     /**
-     * Creates the recipe reduced only to tuples satisfying a given condition.
+     * Creates the definition reduced only to tuples satisfying a given condition.
      *
      * @param ISqlPredicate|SqlPattern|string $cond SQL condition;
      *                                  either an {@link ISqlPredicate}, giving SQL string for the WHERE clause, or
@@ -28,18 +28,18 @@ interface IRelationRecipe
      *                                    means that the same rules apply to the string as for, e.g.,
      *                                    {@link IStatementExecution::query()}
      * @param array $args list of arguments to <tt>$cond</tt> if passed as a <tt>string</tt> or <tt>SqlPattern</tt>
-     * @return IRelationRecipe relation containing only those tuples from this relation satisfying <tt>$cond</tt>
+     * @return IRelationDefinition relation containing only those tuples from this relation satisfying <tt>$cond</tt>
      */
-    function where($cond, ...$args): IRelationRecipe;
+    function where($cond, ...$args): IRelationDefinition;
 
     /**
-     * Creates the recipe sorted by one or more sort expressions.
+     * Creates the definition sorted by one or more sort expressions.
      *
      * Examples:
      * <code>
-     * $sorted = $recipe->sort('a > %', 0); // ...ORDER BY a > 0
-     * $sorted = $recipe->sort(SqlRelationRecipe::fromPattern('a = %'), 3); // ...ORDER BY a = 3
-     * $sorted = $recipe->sort([
+     * $sorted = $relDef->sort('a > %', 0); // ...ORDER BY a > 0
+     * $sorted = $relDef->sort(SqlRelationDefinition::fromPattern('a = %'), 3); // ...ORDER BY a = 3
+     * $sorted = $relDef->sort([
      *     'a',
      *     ['b > %', 0],
      * ]); // ...ORDER BY a, b > 0
@@ -56,17 +56,17 @@ interface IRelationRecipe
      *                                    rest items are the positional arguments for the pattern
      * @param array $args list of arguments to <tt>$sortExpression</tt> if passed as a <tt>string</tt> or
      *                      <tt>SqlPattern</tt>
-     * @return IRelationRecipe relation sorted primarily by the given sort expression
+     * @return IRelationDefinition relation sorted primarily by the given sort expression
      */
-    function sort($sortExpression, ...$args): IRelationRecipe;
+    function sort($sortExpression, ...$args): IRelationDefinition;
 
     /**
-     * Creates the recipe limited only to certain number of rows, or starting from a certain row.
+     * Creates the definition limited only to certain number of rows, or starting from a certain row.
      *
      * @param int|null $limit the number of rows to limit this relation to; <tt>null</tt> means no limit
      * @param int $offset the number of leading rows to skip
-     * @return IRelationRecipe recipe for relation containing at most <tt>$limit</tt> rows, skipping the first
-     *                           <tt>$offset</tt> rows
+     * @return IRelationDefinition definition of relation containing at most <tt>$limit</tt> rows, skipping the first
+     *                               <tt>$offset</tt> rows
      */
     function limit($limit, int $offset = 0);
 }

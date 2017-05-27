@@ -9,7 +9,7 @@ use Ivory\Lang\SqlPattern\SqlPatternPlaceholder;
 use Ivory\Type\ITypeDictionary;
 use Ivory\Utils\StringUtils;
 
-trait SqlPatternRecipeMacros
+trait SqlPatternDefinitionMacros
 {
     /** @var SqlPattern */
     private $sqlPattern;
@@ -20,7 +20,7 @@ trait SqlPatternRecipeMacros
 
 
     /**
-     * Creates an SQL recipe from an SQL string.
+     * Creates an SQL definition from an SQL string.
      *
      * No parameter substitution is performed on the string - it is used as is.
      *
@@ -34,19 +34,24 @@ trait SqlPatternRecipeMacros
     }
 
     /**
-     * Creates a new recipe from an SQL pattern.
+     * Creates a new definition from an SQL pattern.
      *
      * Values for all positional parameters required by the pattern must be given.
      *
      * Example:
-     * <pre>
-     * <?php
-     * $recipe = new SqlRecipe(
-     *   'SELECT * FROM person WHERE role = %d AND email = %s',
-     *   4, 'john@doe.com'
+     * <code>
+     * // relation definition given by "SELECT * FROM person WHERE role = 4 AND email = 'john@doe.com'"
+     * $relDef = SqlRelationDefinition::fromPattern(
+     *     'SELECT * FROM person WHERE role = %i AND email = %s',
+     *     4, 'john@doe.com'
      * );
-     * // results in recipe giving "SELECT * FROM person WHERE role = 4 AND email = 'john@doe.com'"
-     * </pre>
+     *
+     * // command defined by "DELETE FROM mytable WHERE id < 100"
+     * $cmd = SqlCommand::fromPattern(
+     *     'DELETE FROM %ident WHERE id < %i',
+     *     'mytable', 100
+     * );
+     * </code>
      *
      * Performance considerations: parsing the SQL pattern, if given as a string, is done by the parser obtained by
      * {@link \Ivory\Ivory::getSqlPatternParser()}. Depending on Ivory configuration, the parser will cache the results
@@ -77,11 +82,11 @@ trait SqlPatternRecipeMacros
     }
 
     /**
-     * Creates an SQL recipe from one or more fragments, each with its own positional parameters.
+     * Creates an SQL definition from one or more fragments, each with its own positional parameters.
      *
      * Each fragment must be immediately followed by values for all positional parameters it requires. Then, another
      * fragment may follow. As the very last argument, a map of values for named parameters may optionally be given (or
-     * {@link SqlRecipe::setParams()} may be used to set them later).
+     * {@link setParams()} may be used to set them later).
      *
      * The fragments get concatenated to form the resulting SQL pattern. A single space is added between each two
      * fragments the former of which ends with a non-whitespace character and the latter of which starts with a
@@ -91,13 +96,18 @@ trait SqlPatternRecipeMacros
      * specifying the parameter by {@link setParam()} will substitute the same value to both fragments.
      *
      * Example:
-     * <pre>
-     * <?php
-     * $recipe = SqlRecipe::fromFragments(
-     *   'SELECT * FROM person WHERE role = %d', 4, 'AND email = %s', 'john@doe.com'
+     * <code>
+     * // relation definition given by "SELECT * FROM person WHERE role = 4 AND email = 'john@doe.com'"
+     * $relDef = SqlRelationDefinition::fromFragments(
+     *     'SELECT * FROM person WHERE role = %i', 4, 'AND email = %s', 'john@doe.com'
      * );
-     * // results in "SELECT * FROM person WHERE role = 4 AND email = 'john@doe.com'"
-     * </pre>
+     *
+     * // command defined by "DELETE FROM mytable WHERE id < 100"
+     * $cmd = SqlCommand::fromFragments(
+     *     'DELETE FROM %ident', 'mytable',
+     *     'WHERE id < %i', 100
+     * );
+     * </code>
      *
      * Performance considerations: parsing the SQL pattern, if given as a string, is done by the parser obtained by
      * {@link \Ivory\Ivory::getSqlPatternParser()}. Depending on Ivory configuration, the parser will cache the results
@@ -219,9 +229,9 @@ trait SqlPatternRecipeMacros
 
         $overallPattern = new SqlPattern($overallSqlTorso, $overallPosPlaceholders, $overallNamedPlaceholderMap);
 
-        $recipe = new static($overallPattern, $overallPosParams);
-        $recipe->setParams($namedParamValues);
-        return $recipe;
+        $def = new static($overallPattern, $overallPosParams);
+        $def->setParams($namedParamValues);
+        return $def;
     }
 
     final private function __construct(SqlPattern $sqlPattern, array $positionalParameters)

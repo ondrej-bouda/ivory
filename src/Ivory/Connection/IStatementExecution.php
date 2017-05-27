@@ -5,8 +5,8 @@ use Ivory\Exception\ResultException;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Exception\UsageException;
 use Ivory\Lang\SqlPattern\SqlPattern;
-use Ivory\Query\ICommandRecipe;
-use Ivory\Query\IRelationRecipe;
+use Ivory\Query\ICommand;
+use Ivory\Query\IRelationDefinition;
 use Ivory\Relation\ITuple;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\IQueryResult;
@@ -50,10 +50,10 @@ interface IStatementExecution
      *    {@link SqlPattern}s) may be given then, each immediately followed by values for its positional parameters. All
      *    such SQL patterns are combined together as fragments. If any of the fragments has a named parameter, the map
      *    of values for named parameters must be given as the very last argument.
-     * 2. The first argument is an {@link SqlRecipe} object. No positional arguments are expected in this case, only the
-     *    optional map of values for named parameters. As the `SqlRecipe` might have already set all its named
-     *    parameters, even this argument might not be necessary.
-     * 3. The first and the only argument is an {@link IRelationRecipe} object.
+     * 2. The first argument is an {@link SqlRelationDefinition} object. No positional arguments are expected in this
+     *    case, only the optional map of values for named parameters. As the `SqlRelationDefinition` might have already
+     *    set all its named parameters, even this argument might not be necessary.
+     * 3. The first and the only argument is an {@link IRelationDefinition} object.
      *
      * Examples:
      * - `query('SELECT 42')`
@@ -69,23 +69,24 @@ interface IStatementExecution
      * If executing the query immediately is not appropriate, consider using {@link dataSource()} instead.
      *
      * @internal Ivory design note: There does not seem to be a natural way to provide values for named parameters. The
-     * only reasonable solution would be to call <tt>query()</tt> using the "named parameters" proposed for a future
-     * PHP version - see https://wiki.php.net/rfc/named_params#what_are_the_benefits_of_named_arguments
+     * only reasonable solution would be to call <tt>query()</tt> using the "named parameters"
+     * {@link https://wiki.php.net/rfc/named_params#what_are_the_benefits_of_named_arguments proposed} for a future PHP
+     * version.
      * The current interface is considered as the best from all the bad ones. The obvious disadvantage of the current
      * interface is the named parameter values map may easily be confused with a value for a positional parameter in
      * case the caller forgets to provide any of the positional parameter values. Of course, an alternative way is to
-     * avoid specifying all at once, but instead build an {@link SqlRecipe}, fill it with parameter values, and provide
-     * it to <tt>query()</tt>. Another alternative would be to use the {@link dataSource()} method and, again, fill that
-     * with parameter values.
+     * avoid specifying all at once, but instead build an {@link IRelationDefinition}, fill it with parameter values,
+     * and provide it to <tt>query()</tt>. Another alternative would be to use the {@link dataSource()} method and,
+     * again, fill that with parameter values.
      *
-     * @param string|SqlPattern|IRelationRecipe $sqlFragmentPatternOrRecipe
+     * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
      * @param array ...$fragmentsAndParams
      * @return IQueryResult
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      * @throws UsageException if the statement appears to be a command rather than a query
      */
-    function query($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): IQueryResult;
+    function query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IQueryResult;
 
     /**
      * Queries the database for a relation using an SQL pattern, checks it results in exactly one row, and returns it.
@@ -94,7 +95,7 @@ interface IStatementExecution
      * one row, and the row is returned.
      *
      * @see query() for detailed specification
-     * @param string|SqlPattern|IRelationRecipe $sqlFragmentPatternOrRecipe
+     * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
      * @param array ...$fragmentsAndParams
      * @return ITuple
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
@@ -102,7 +103,7 @@ interface IStatementExecution
      * @throws ResultException when the resulting data set has more than one row, or no row at all
      * @throws UsageException if the statement appears to be a command rather than a query
      */
-    function querySingleTuple($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ITuple;
+    function querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ITuple;
 
     /**
      * Queries the database for a relation using an SQL pattern, checks it results in exactly one row with one column,
@@ -112,7 +113,7 @@ interface IStatementExecution
      * one row and one column, and the value is returned.
      *
      * @see query() for detailed specification
-     * @param string|SqlPattern|IRelationRecipe $sqlFragmentPatternOrRecipe
+     * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
      * @param array ...$fragmentsAndParams
      * @return mixed value of the only row from the only column the relation has
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
@@ -121,27 +122,27 @@ interface IStatementExecution
      *                           column, or no column at all
      * @throws UsageException if the statement appears to be a command rather than a query
      */
-    function querySingleValue($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams);
+    function querySingleValue($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
 
     /**
      * Sends a command to the database using an SQL pattern, waits for its execution and returns the command result.
      *
      * This is an overloaded method, like {@link query()}. Either:
      * 1. an SQL pattern is given along with values for its parameters, or
-     * 2. an {@link SqlRecipe} object is passed, optionally with a map of values for named parameters, or
-     * 3. an {@link ICommandRecipe} object is given as the only argument.
+     * 2. an {@link ISqlPatternDefinition} object is passed, optionally with a map of values for named parameters, or
+     * 3. an {@link ICommand} object is given as the only argument.
      *
      * Note the strict distinction of *queries* and *commands* - see the {@link IStatementExecution} docs. If an SQL
      * query is executed using this method, a {@link UsageException} is thrown after the query execution.
      *
-     * @param string|SqlPattern|ICommandRecipe $sqlFragmentPatternOrRecipe
+     * @param string|SqlPattern|ICommand $sqlFragmentPatternOrRelationDefinition
      * @param array ...$fragmentsAndParams
      * @return ICommandResult
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      * @throws UsageException if the statement appears to be a query rather than a command
      */
-    function command($sqlFragmentPatternOrRecipe, ...$fragmentsAndParams): ICommandResult;
+    function command($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ICommandResult;
 
     /**
      * Sends a raw SQL query, as is, to the database, waits for its execution and returns the resulting relation.

@@ -2,7 +2,7 @@
 namespace Ivory\Showcase;
 
 use Ivory\Data\Map\IRelationMap;
-use Ivory\Query\SqlRelationRecipe;
+use Ivory\Query\SqlRelationDefinition;
 use Ivory\Relation\IRelation;
 use Ivory\Relation\ITuple;
 
@@ -41,7 +41,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
 
         $conn = $this->getIvoryConnection();
 
-        $teachersRelRecipe = SqlRelationRecipe::fromSql(
+        $teachersRelDef = SqlRelationDefinition::fromSql(
             "VALUES
              (1, 'Angus', 'Deaton', 'Dtn'),
              (2, 'Jean', 'Tirole', 'Tir'),
@@ -51,7 +51,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
              (6, 'Ada', 'Lovelace', NULL)"
         );
 
-        $this->teachers = $conn->query($teachersRelRecipe)
+        $this->teachers = $conn->query($teachersRelDef)
             ->rename(['id', 'firstname', 'lastname', 'abbr']);
 
         $this->rel = $conn->query(
@@ -92,7 +92,7 @@ class ProcessingTest extends \Ivory\IvoryTestCase
                   JOIN teacher t ON t.id = lt.teacher_id
              ORDER BY l.id, lt.scheduling_status DESC, t.id",
             [
-                'teachersRel' => $teachersRelRecipe,
+                'teachersRel' => $teachersRelDef,
             ]
         );
     }

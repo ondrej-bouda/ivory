@@ -7,19 +7,19 @@ use Ivory\Lang\Sql\ISqlExpression;
 use Ivory\Lang\Sql\ISqlPredicate;
 use Ivory\Lang\Sql\ISqlSortExpression;
 
-class SortedRelationRecipeTest extends \Ivory\IvoryTestCase
+class SortedRelationDefinitionTest extends \Ivory\IvoryTestCase
 {
     /** @var IConnection */
     private $conn;
-    /** @var IRelationRecipe */
-    private $recipe;
+    /** @var IRelationDefinition */
+    private $relDef;
 
     protected function setUp()
     {
         parent::setUp();
 
         $this->conn = $this->getIvoryConnection();
-        $this->recipe = SqlRelationRecipe::fromSql(
+        $this->relDef = SqlRelationDefinition::fromSql(
             'SELECT * FROM (VALUES (1,2), (4,3), (6,6), (7,8)) v (a, b)'
         );
     }
@@ -27,7 +27,7 @@ class SortedRelationRecipeTest extends \Ivory\IvoryTestCase
 
     public function testStringExpr()
     {
-        $sorted = $this->recipe->sort('a %% % = 1 DESC', 2);
+        $sorted = $this->relDef->sort('a %% % = 1 DESC', 2);
         $rel = $this->conn->query($sorted);
 
         $this->assertSame(
@@ -45,7 +45,7 @@ class SortedRelationRecipeTest extends \Ivory\IvoryTestCase
     {
         $parser = Ivory::getSqlPatternParser();
         $pattern = $parser->parse('a %% % = 1 DESC');
-        $sorted = $this->recipe->sort($pattern, 2);
+        $sorted = $this->relDef->sort($pattern, 2);
         $rel = $this->conn->query($sorted);
 
         $this->assertSame(
@@ -77,7 +77,7 @@ class SortedRelationRecipeTest extends \Ivory\IvoryTestCase
                 return ISqlSortExpression::DESC;
             }
         };
-        $sorted = $this->recipe->sort($sortExpr);
+        $sorted = $this->relDef->sort($sortExpr);
         $rel = $this->conn->query($sorted);
 
         $this->assertSame(
@@ -93,7 +93,7 @@ class SortedRelationRecipeTest extends \Ivory\IvoryTestCase
 
     public function testArrayExpr()
     {
-        $sorted = $this->recipe->sort([
+        $sorted = $this->relDef->sort([
             'a > b',
             ['%ident < %', 'a', 7],
         ]);
@@ -112,7 +112,7 @@ class SortedRelationRecipeTest extends \Ivory\IvoryTestCase
 
     public function testMultipleExpressions()
     {
-        $sorted = $this->recipe
+        $sorted = $this->relDef
             ->sort('a > b')
             ->sort('a != b');
         $rel = $this->conn->query($sorted);

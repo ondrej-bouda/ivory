@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Connection;
 
-use Ivory\Query\IRelationRecipe;
+use Ivory\Query\IRelationDefinition;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\ICopyInResult;
 
@@ -146,15 +146,16 @@ interface ICopyControl
      *
      * @param string $file path name of the output file;
      *                     relative or absolute path interpreted from the viewpoint of the database server
-     * @param string|IRelationRecipe $tableOrRecipe either an (optionally schema-qualified) table name or recipe to
-     *                                                relation giving the data to be copied
+     * @param string|IRelationDefinition $tableOrRelationDefinition
+     *                                  either an (optionally schema-qualified) table name or definition of relation of
+     *                                    the data to be copied
      * @param string[]|null $columns list of names of columns values of which will be copied to the given file;
      *                               skipping with <tt>null</tt> yields all the table columns in their definition order
      * @param array $options map of options for <tt>COPY</tt>: option (one of {@link ICopyControl} constants) => value;
      *                       see the constants on what values are accepted for which options
      * @return ICommandResult the result of the `COPY` command
      */
-    function copyToFile(string $file, $tableOrRecipe, $columns = null, $options = []): ICommandResult;
+    function copyToFile(string $file, $tableOrRelationDefinition, $columns = null, $options = []): ICommandResult;
 
     /**
      * Instructs the database server to copy a database table or query result to the input of a program.
@@ -165,15 +166,16 @@ interface ICopyControl
      *
      * @param string $program command executed by the database server, the standard input of which will get fed with
      *                          the table or query result data
-     * @param string|IRelationRecipe $tableOrRecipe either an (optionally schema-qualified) table name or recipe to
-     *                                                relation giving the data to be copied
+     * @param string|IRelationDefinition $tableOrRelationDefinition
+     *                                  either an (optionally schema-qualified) table name or definition of relation of
+     *                                    the data to be copied
      * @param string[]|null $columns list of names of columns values of which will be given to the program;
      *                               skipping with <tt>null</tt> yields all the table columns in their definition order
      * @param array $options map of options for <tt>COPY</tt>: option (one of {@link ICopyControl} constants) => value;
      *                       see the constants on what values are accepted for which options
      * @return ICommandResult the result of the `COPY` command
      */
-    function copyToProgram(string $program, $tableOrRecipe, $columns = null, $options = []): ICommandResult;
+    function copyToProgram(string $program, $tableOrRelationDefinition, $columns = null, $options = []): ICommandResult;
 
     /**
      * Copies a database table to an array of data rows, using the {@link ICopyControl::FORMAT_TEXT `TEXT`} format.
