@@ -2,6 +2,7 @@
 namespace Ivory\Type\Postgresql;
 
 use Ivory\Exception\IncomparableException;
+use Ivory\Exception\ParseException;
 use Ivory\Exception\UnsupportedException;
 use Ivory\Type\IType;
 use Ivory\Type\ITotallyOrderedType;
@@ -10,14 +11,13 @@ use Ivory\Value\Composite;
 /**
  * A composite type is basically a tuple of values.
  *
- * It is optional for a `CompositeType` to have its attributes defined. It is has, it is called "typed", otherwise, we
- * consider it as "untyped".
+ * It is optional for a `CompositeType` to have its attributes defined. If it has, it is called "typed", otherwise, we
+ * call it "untyped".
  * - Typed composite types use the type objects for parsing and serializing the corresponding tuple values.
  * - Untyped composite types parse and serialize every tuple value to a string (or `null` if the value is `NULL`). Note
  *   that PostgreSQL does not differentiate between `ROW()` and `ROW(NULL)` in their external text representation.
  *   As an untyped composite type cannot tell the original expression, it prefers `ROW()`.
  *
- * @todo throw ParseException on parse errors
  * @see http://www.postgresql.org/docs/9.4/static/rowtypes.html
  */
 abstract class CompositeType implements ITotallyOrderedType
@@ -83,8 +83,11 @@ abstract class CompositeType implements ITotallyOrderedType
         }
 
         $strLen = strlen($str);
-        if ($str[0] != '(' || $str[$strLen - 1] != ')') {
-            throw new \InvalidArgumentException('Invalid value for a composite type - not enclosed in parentheses');
+        if ($str[0] != '(') {
+            throw new ParseException('Composite value not enclosed in parentheses', 0);
+        }
+        if ($str[$strLen - 1] != ')') {
+            throw new ParseException('Composite value not enclosed in parentheses', $strLen - 1);
         }
         $strOffset = 1;
 
@@ -101,16 +104,14 @@ abstract class CompositeType implements ITotallyOrderedType
                 if ($str[$strOffset] == ',') {
                     $atts[] = null;
                 } else {
-                    $msg = "Invalid value for a composite type - expecting ',' instead of '{$str[$strOffset]}' at offset $strOffset";
-                    throw new \InvalidArgumentException($msg);
+                    throw new ParseException("Expecting ',' instead of '{$str[$strOffset]}'", $strOffset);
                 }
             }
             $cont = ($att[0] == '"' ? substr($att, 1, -1) : $att);
             $atts[] = preg_replace(['~\\\\(.)~', '~""~'], ['$1', '"'], $cont);
             $strOffset += strlen($att);
             if (!($str[$strOffset] == ',' || ($str[$strOffset] == ')' && $strOffset == $strLen - 1))) {
-                $msg = "Invalid value for a composite type - expecting ',' instead of '{$str[$strOffset]}' at offset $strOffset";
-                throw new \InvalidArgumentException($msg);
+                throw new ParseException("Expecting ',' instead of '{$str[$strOffset]}'", $strOffset);
             }
             $strOffset++;
         }
@@ -118,8 +119,7 @@ abstract class CompositeType implements ITotallyOrderedType
             if ($str[$strOffset] == ',' || ($str[$strOffset] == ')' && $strOffset == $strLen - 1)) {
                 $atts[] = null;
             } else {
-                $msg = "Invalid value for a composite type - expecting ',' instead of '{$str[$strOffset]}' at offset $strOffset";
-                throw new \InvalidArgumentException($msg);
+                throw new ParseException("Expecting ',' instead of '{$str[$strOffset]}'", $strOffset);
             }
         }
 
