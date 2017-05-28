@@ -1,8 +1,6 @@
 <?php
 namespace Ivory\Utils;
 
-use Ivory\Exception\NotImplementedException;
-
 class StringUtils
 {
     /**
@@ -10,7 +8,7 @@ class StringUtils
      * plain array of matches, but an extended array: each item is a pair of the matching portion of the needle and the
      * byte offset to the subject, like {@link preg_match_all()} does with the `PREG_OFFSET_CAPTURE` flag.
      *
-     * @param string|string[] $pattern
+     * @param string $pattern
      * @param callable $callback
      * @param string|string[] $subject
      * @param int $limit
@@ -19,7 +17,7 @@ class StringUtils
      *                           a <tt>string</tt> or <tt>array</tt> is returned
      */
     public static function pregReplaceCallbackWithOffset(
-        $pattern,
+        string $pattern,
         callable $callback,
         $subject,
         int $limit = -1,
@@ -38,17 +36,13 @@ class StringUtils
     }
 
     private static function pregReplaceCallbackWithOffsetImpl(
-        $pattern,
+        string $pattern,
         callable $callback,
         string $subject,
         int $limit = -1,
         int &$count = null
     ): string
     {
-        if (is_array($pattern)) {
-            throw new NotImplementedException(); // TODO
-        }
-
         $count = 0;
 
         $curOffset = 0;
