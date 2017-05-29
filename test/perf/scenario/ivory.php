@@ -65,22 +65,22 @@ class IvoryPerformanceTest implements IPerformanceTest
             exit('Error authenticating the user');
         }
 
-        if ($user['pwd_hash'] !== md5($password)) {
+        if ($user->pwd_hash !== md5($password)) {
             exit('Invalid password');
         }
-        if (!$user['is_active']) {
+        if (!$user->is_active) {
             exit('User inactive');
         }
 
-        $this->conn->command('UPDATE usr SET last_login = CURRENT_TIMESTAMP WHERE id = %int', $user['id']);
-        if ($user['last_login']) {
-            echo 'Welcome back since ' . $user['last_login']->format('n/j/Y H:i:s') . "\n";
+        $this->conn->command('UPDATE usr SET last_login = CURRENT_TIMESTAMP WHERE id = %int', $user->id);
+        if ($user->last_login) {
+            echo 'Welcome back since ' . $user->last_login->format('n/j/Y H:i:s') . "\n";
         }
         else {
             echo "Welcome!\n";
         }
 
-        return $user['id'];
+        return $user->id;
     }
 
     public function starredItems(int $userId)
@@ -102,16 +102,16 @@ class IvoryPerformanceTest implements IPerformanceTest
         );
         echo "Your starred items:\n";
         foreach ($rel as $item) {
-            printf('#%d %s', $item['id'], $item['name']);
-            if ($item['categories']) {
+            printf('#%d %s', $item->id, $item->name);
+            if ($item->categories) {
                 $catStrings = [];
-                foreach ($item['categories'] as $cat) {
+                foreach ($item->categories as $cat) {
                     $catStrings[] = sprintf('#%d %s', $cat[0], $cat[1]);
                 }
                 echo ' (' . implode(', ', $catStrings) . ')';
             }
             echo ': ';
-            echo $item['description'];
+            echo $item->description;
             echo "\n";
         }
     }
@@ -138,11 +138,11 @@ class IvoryPerformanceTest implements IPerformanceTest
         echo "Category $categoryId:\n";
         foreach ($rel as $row) {
             printf('#%d %s, introduced %s: %s',
-                $row['id'], $row['name'],
-                $row['introduction_date']->format('n/j/Y'),
-                $row['description']
+                $row->id, $row->name,
+                $row->introduction_date->format('n/j/Y'),
+                $row->description
             );
-            foreach ($row['params']->getValue() as $parName => $parValue) {
+            foreach ($row->params->getValue() as $parName => $parValue) {
                 echo "; $parName: " . strtr(var_export($parValue, true), "\n", ' ');
             }
             echo "\n";
