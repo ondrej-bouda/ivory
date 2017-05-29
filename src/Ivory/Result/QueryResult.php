@@ -12,6 +12,7 @@ use Ivory\Relation\ProjectedRelation;
 use Ivory\Relation\RelationMacros;
 use Ivory\Relation\RenamedRelation;
 use Ivory\Relation\Tuple;
+use Ivory\Type\IType;
 
 class QueryResult extends Result implements IQueryResult
 {
@@ -22,6 +23,8 @@ class QueryResult extends Result implements IQueryResult
     private $columns;
     /** @var array map: column name => offset of the first column of the name, or {@link Tuple::AMBIGUOUS_COL} */
     private $colNameMap;
+    /** @var IType[] */
+    private $colTypes;
 
 
     /**
@@ -55,6 +58,7 @@ class QueryResult extends Result implements IQueryResult
         }
         $this->columns = [];
         $this->colNameMap = [];
+        $this->colTypes = [];
         for ($i = 0; $i < $numFields; $i++) {
             /* NOTE: pg_field_type() cannot be used for simplicity - multiple types of the same name might exist in
              *       different schemas. Thus, the only reasonable way to recognize the types is using their OIDs,
@@ -80,6 +84,8 @@ class QueryResult extends Result implements IQueryResult
             if ($name !== null) {
                 $this->colNameMap[$name] = (isset($this->colNameMap[$name]) ? Tuple::AMBIGUOUS_COL : $i);
             }
+
+            $this->colTypes[] = $type;
         }
     }
 
@@ -125,8 +131,8 @@ class QueryResult extends Result implements IQueryResult
         }
 
         $data = [];
-        foreach ($this->columns as $i => $col) {
-            $data[$i] = $col->getType()->parseValue($rawData[$i]);
+        foreach ($this->colTypes as $i => $type) {
+            $data[$i] = $type->parseValue($rawData[$i]);
         }
 
         return new Tuple($data, $this->colNameMap);
