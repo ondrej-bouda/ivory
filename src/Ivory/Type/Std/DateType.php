@@ -62,15 +62,18 @@ class DateType extends ConnectionDependentBaseType implements IDiscreteType
     {
         if ($str === null) {
             return null;
-        } elseif ($str == 'infinity') {
-            return Date::infinity();
-        } elseif ($str == '-infinity') {
-            return Date::minusInfinity();
         }
 
         $matched = preg_match('~^(\d+)([-/.])(\d+)(?2)(\d+)(\s+BC)?$~', $str, $m);
         if (!$matched) {
-            throw new \InvalidArgumentException('$str');
+            // NOTE: Infinity values are usually less frequent. Check them only if the string is not a finite date.
+            if ($str == 'infinity') {
+                return Date::infinity();
+            } elseif ($str == '-infinity') {
+                return Date::minusInfinity();
+            } else {
+                throw new \InvalidArgumentException('$str');
+            }
         }
 
         $p = [];
@@ -102,7 +105,8 @@ class DateType extends ConnectionDependentBaseType implements IDiscreteType
             }
         }
 
-        return Date::fromPartsStrict($yearSgn * $year, $mon, $day);
+        // NOTE: Dates from the database are believed to be valid - Date::fromPartsStrict() is not used (performance).
+        return Date::fromParts($yearSgn * $year, $mon, $day);
     }
 
     public function serializeValue($val): string
