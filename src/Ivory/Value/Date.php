@@ -62,20 +62,26 @@ class Date extends DateBase
     public static function fromISOString(string $isoDateString): Date
     {
         // check out for more than 4 digits for the year - something date_create_immutable() does not handle properly
-        $addYears = 0;
-        $dateCreateInput = preg_replace_callback(
-            '~\d{5,}(?=-|\d{4})~', // supports both dash-separated date parts and also the form without dash separators
-            function ($y) use (&$addYears) {
-                $res = $y[0] % 10000;
-                $addYears = $y[0] - $res;
-                return $res;
-            },
-            $isoDateString,
-            1
-        );
-        if ($addYears) {
-            $sgn = ($dateCreateInput[0] == '-' ? '-' : '+');
-            $dateCreateInput .= " $sgn$addYears years";
+        $intPrefix = (int)$isoDateString;
+        if ($intPrefix > -10000 && $intPrefix < 10000) { // optimization for the typical: dash-separated 4-digit years
+            $dateCreateInput = $isoDateString;
+        } else {
+            $addYears = 0;
+            $dateCreateInput = preg_replace_callback(
+                '~\d{5,}(?=-|\d{4})~',
+                // supports both dash-separated date parts and also the form without dash separators
+                function ($y) use (&$addYears) {
+                    $res = $y[0] % 10000;
+                    $addYears = $y[0] - $res;
+                    return $res;
+                },
+                $isoDateString,
+                1
+            );
+            if ($addYears) {
+                $sgn = ($dateCreateInput[0] == '-' ? '-' : '+');
+                $dateCreateInput .= " $sgn$addYears years";
+            }
         }
 
         $dt = date_create_immutable($dateCreateInput, self::getUTCTimeZone()); // using the procedural style as it does not throw the generic Exception
