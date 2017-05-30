@@ -42,71 +42,122 @@ class DateType extends ConnectionDependentBaseType implements IDiscreteType
 {
     use TotallyOrderedByPhpOperators;
 
+    const MODE_ISO = 1;
+    const MODE_SQL_DMY = 2;
+    const MODE_SQL_MDY = 3;
+    const MODE_GERMAN = 4;
+    const MODE_PG_DMY = 5;
+    const MODE_PG_MDY = 6;
+    const MODE_PG_YMD = 7;
+
 
     /** @var ConnConfigValueRetriever */
-    private $dateStyleRetriever;
+    private $modeRetriever = null;
 
     public function attachToConnection(IConnection $connection)
     {
-        $this->dateStyleRetriever = new ConnConfigValueRetriever(
-            $connection->getConfig(), ConfigParam::DATE_STYLE, [DateStyle::class, 'fromString']
+        $this->modeRetriever = new ConnConfigValueRetriever(
+            $connection->getConfig(),
+            ConfigParam::DATE_STYLE,
+            function ($dateStyleStr) {
+                $dateStyle = DateStyle::fromString($dateStyleStr);
+                switch ($dateStyle->getFormat()) {
+                    case DateStyle::FORMAT_ISO:
+                        return self::MODE_ISO;
+
+                    case DateStyle::FORMAT_POSTGRES:
+                        // The PostgreSQL manual says that "the POSTGRES style outputs date-only values in ISO format",
+                        // but that's not quite true: unlike the ISO style, the POSTGRES style applies the d/m/y order.
+                        switch ($dateStyle->getOrder()) {
+                            case DateStyle::ORDER_DMY:
+                                return self::MODE_PG_DMY;
+                            case DateStyle::ORDER_MDY:
+                                return self::MODE_PG_MDY;
+                            case DateStyle::ORDER_YMD:
+                                return self::MODE_PG_YMD;
+                            default:
+                                throw new \UnexpectedValueException('Unknown DateStyle order: ' . $dateStyle->getOrder());
+                        }
+
+                    case DateStyle::FORMAT_GERMAN:
+                        return self::MODE_GERMAN;
+
+                    case DateStyle::FORMAT_SQL:
+                        switch ($dateStyle->getOrder()) {
+                            case DateStyle::ORDER_DMY:
+                                return self::MODE_SQL_DMY;
+                            case DateStyle::ORDER_MDY:
+                                return self::MODE_SQL_MDY;
+                            default:
+                                throw new \UnexpectedValueException('Unknown DateStyle order: ' . $dateStyle->getOrder());
+                        }
+
+                    default:
+                        throw new \UnexpectedValueException('Unknown DateStyle format: ' . $dateStyle->getFormat());
+                }
+            }
         );
     }
 
     public function detachFromConnection()
     {
-        $this->dateStyleRetriever = null;
+        $this->modeRetriever = null;
     }
 
     public function parseValue($str)
     {
         if ($str === null) {
             return null;
+        } elseif ($str == 'infinity') {
+            return Date::infinity();
+        } elseif ($str == '-infinity') {
+            return Date::minusInfinity();
         }
 
-        $matched = preg_match('~^(\d+)([-/.])(\d+)(?2)(\d+)(\s+BC)?$~', $str, $m);
-        if (!$matched) {
-            // NOTE: Infinity values are usually less frequent. Check them only if the string is not a finite date.
-            if ($str == 'infinity') {
-                return Date::infinity();
-            } elseif ($str == '-infinity') {
-                return Date::minusInfinity();
-            } else {
-                throw new \InvalidArgumentException('$str');
-            }
+        $parts = explode(' BC', $str);
+
+        switch ($this->modeRetriever->getValue()) {
+            case self::MODE_ISO: // e.g., 1997-12-17
+            case self::MODE_PG_YMD: // e.g., 1997-12-17
+                if (!isset($parts[1])) {
+                    return Date::fromISOString($str); // optimization of the major case
+                }
+                list($y, $m, $d) = explode('-', $parts[0]);
+                break;
+
+            case self::MODE_GERMAN: // e.g., 17.12.1997
+                list($d, $m, $y) = explode('.', $parts[0]);
+                break;
+
+            case self::MODE_SQL_DMY: // e.g., 17/12/1997
+                list($d, $m, $y) = explode('/', $parts[0]);
+                break;
+
+            case self::MODE_SQL_MDY: // e.g., 12/17/1997
+                list($m, $d, $y) = explode('/', $parts[0]);
+                break;
+
+            case self::MODE_PG_DMY: // e.g., 17-12-1997
+                list($d, $m, $y) = explode('-', $parts[0]);
+                break;
+
+            case self::MODE_PG_MDY: // e.g., 12-17-1997
+                list($m, $d, $y) = explode('-', $parts[0]);
+                break;
+
+            default:
+                throw new \UnexpectedValueException('Invalid parse mode: ' . $this->modeRetriever->getValue());
         }
 
-        $p = [];
-        list(, $p[0], $sep, $p[1], $p[2]) = $m;
-        $yearSgn = (isset($m[5]) ? -1 : 1);
-
-        if ($sep == '.') {
-            list($day, $mon, $year) = $p; // German style, no need to look up the settings
-        } else {
-            /** @var DateStyle $dateStyle */
-            $dateStyle = $this->dateStyleRetriever->getValue();
-            $partsOrder = $dateStyle->getOrder();
-            switch ($partsOrder) {
-                case DateStyle::ORDER_DMY:
-                    list($day, $mon, $year) = $p;
-                    break;
-
-                case DateStyle::ORDER_MDY:
-                    list($mon, $day, $year) = $p;
-                    break;
-
-                default:
-                    trigger_error(
-                        "Unexpected year/month/day order '{$partsOrder}', assuming year-month-day",
-                        E_USER_WARNING
-                    );
-                case DateStyle::ORDER_YMD:
-                    list($year, $mon, $day) = $p;
-            }
+        if (isset($parts[1])) {
+            $y = -$y + 1; // year 2 BC is the ISO year -1
         }
-
-        // NOTE: Dates from the database are believed to be valid - Date::fromPartsStrict() is not used (performance).
-        return Date::fromParts($yearSgn * $year, $mon, $day);
+        $isoStr = "$y-$m-$d";
+        try {
+            return Date::fromISOString($isoStr);
+        } catch (\InvalidArgumentException $e) {
+            throw new \InvalidArgumentException('Invalid date: ' . $str, 0, $e);
+        }
     }
 
     public function serializeValue($val): string
