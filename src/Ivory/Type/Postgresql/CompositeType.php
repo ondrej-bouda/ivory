@@ -73,11 +73,8 @@ abstract class CompositeType implements ITotallyOrderedType
         return ($this->attNameMap[$attName] ?? null);
     }
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
         if ($str == '()' && !$this->attributes) {
             return Composite::fromList($this, []);
         }
@@ -134,7 +131,7 @@ abstract class CompositeType implements ITotallyOrderedType
             } else {
                 $values = [];
                 foreach ($atts as $i => $v) {
-                    $values[] = $types[$i]->parseValue($v);
+                    $values[] = ($v !== null ? $types[$i]->parseValue($v) : null);
                 }
             }
         } else {

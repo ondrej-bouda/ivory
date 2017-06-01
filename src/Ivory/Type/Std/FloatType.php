@@ -12,11 +12,9 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class FloatType extends \Ivory\Type\BaseType implements ITotallyOrderedType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } elseif (is_numeric($str)) {
+        if (is_numeric($str)) {
             return (float)$str;
         } elseif (strcasecmp($str, 'NaN') == 0) {
             return NAN;

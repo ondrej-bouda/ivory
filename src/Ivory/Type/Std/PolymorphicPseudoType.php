@@ -11,13 +11,9 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class PolymorphicPseudoType extends BaseType implements ITotallyOrderedType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } else {
-            throw new InternalException('A non-null value to be parsed for a polymorphic pseudo-type');
-        }
+        throw new InternalException('A non-null value to be parsed for a polymorphic pseudo-type');
     }
 
     public function serializeValue($val): string

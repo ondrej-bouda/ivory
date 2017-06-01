@@ -12,13 +12,9 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class StringType extends \Ivory\Type\BaseType implements ITotallyOrderedType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } else {
-            return $str;
-        }
+        return $str;
     }
 
     public function serializeValue($val): string

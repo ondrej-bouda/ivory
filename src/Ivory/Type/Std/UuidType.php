@@ -17,13 +17,9 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class UuidType extends BaseType implements ITotallyOrderedType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } else {
-            return $str;
-        }
+        return $str;
     }
 
     public function serializeValue($val): string

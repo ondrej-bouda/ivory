@@ -22,11 +22,9 @@ class BigIntSafeType extends \Ivory\Type\BaseType implements IDiscreteType
         }
     }
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } elseif ($str >= PHP_INT_MIN && $str <= PHP_INT_MAX) { // correctness: int does not overflow, but rather gets converted to a float
+        if ($str >= PHP_INT_MIN && $str <= PHP_INT_MAX) { // correctness: int does not overflow, but rather gets converted to a float
             return (int)$str;
         } else {
             return $str;

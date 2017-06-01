@@ -13,12 +13,8 @@ namespace Ivory\Type\Std;
  */
 class HstoreType extends \Ivory\Type\BaseType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         $re = '~
                 \s*
                 (?: " ((?: [^"\\\\] | \\\\" | \\\\\\\\ )*) "

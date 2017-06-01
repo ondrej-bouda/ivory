@@ -13,12 +13,8 @@ use Ivory\Value\Circle;
  */
 class CircleType extends CompoundGeometricType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         $re = '~^ \s*
                 ((\()|(<))? \s*                     # optional opening parenthesis or angle bracket
                 ((?(3)\()[^,]+,[^,]+(?(3)\))) \s*   # center point; parenthesized if the whole circle is parenthesized

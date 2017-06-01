@@ -13,12 +13,8 @@ use Ivory\Value\LineSegment;
  */
 class LineSegmentType extends CompoundGeometricType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         $re = '~^ \s*
                 ((\()|(\[))? \s*                    # optional opening parenthesis or bracket
                 ((?(1)\()[^,]+,[^,]+(?(1)\))) \s*   # the first endpoint; parenthesized if the whole segment is parenthesized

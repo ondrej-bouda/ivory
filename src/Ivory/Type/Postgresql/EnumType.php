@@ -17,13 +17,9 @@ class EnumType implements ITotallyOrderedType
         $this->labelSet = array_flip($labels);
     }
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } else {
-            return $str;
-        }
+        return $str;
     }
 
     public function serializeValue($val): string

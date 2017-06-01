@@ -15,29 +15,26 @@ class TsVectorType extends BaseType
 {
     const DEFAULT_WEIGHT = 'D';
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } else {
-            preg_match_all('~\'((?:[^\']+|\'\')+)\'(?::([\d\w,]+))?~', $str, $matches, PREG_SET_ORDER);
-            $lexemes = [];
-            foreach ($matches as $m) {
-                $lex = strtr($m[1], ["''" => "'"]);
-                if (isset($m[2])) {
-                    $positions = [];
-                    foreach (explode(',', $m[2]) as $pos) {
-                        $p = (int)$pos;
-                        $w = ((string)$p !== $pos ? substr($pos, strlen((string)$p)) : self::DEFAULT_WEIGHT);
-                        $positions[] = [$p, $w];
-                    }
-                } else {
-                    $positions = null;
+        preg_match_all('~\'((?:[^\']+|\'\')+)\'(?::([\d\w,]+))?~', $str, $matches, PREG_SET_ORDER);
+        $lexemes = [];
+        foreach ($matches as $m) {
+            $lex = strtr($m[1], ["''" => "'"]);
+            if (isset($m[2])) {
+                $positions = [];
+                foreach (explode(',', $m[2]) as $pos) {
+                    $p = (int)$pos;
+                    $w = ((string)$p !== $pos ? substr($pos, strlen((string)$p)) : self::DEFAULT_WEIGHT);
+                    $positions[] = [$p, $w];
                 }
-                $lexemes[$lex] = $positions;
+            } else {
+                $positions = null;
             }
-            return TextSearchVector::fromMap($lexemes);
+            $lexemes[$lex] = $positions;
         }
+
+        return TextSearchVector::fromMap($lexemes);
     }
 
     public function serializeValue($val): string

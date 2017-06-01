@@ -43,12 +43,8 @@ class RangeType implements ITotallyOrderedType
         return $this->canonicalFunc;
     }
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         if (preg_match('~^\s*empty\s*$~i', $str)) {
             return Range::createEmpty($this->subtype);
         }

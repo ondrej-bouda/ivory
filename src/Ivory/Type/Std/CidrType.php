@@ -14,12 +14,8 @@ use Ivory\Value\NetAddress;
  */
 class CidrType extends BaseType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         try {
             return NetAddress::fromCidrString($str);
         } catch (\InvalidArgumentException $e) {

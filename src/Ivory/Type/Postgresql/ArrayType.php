@@ -85,12 +85,8 @@ class ArrayType implements ITotallyOrderedType
         throw new ParseException($msg, $offset, 0, $cause);
     }
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         // OPT: The parser processes any string which is legal for the PostgreSQL input. Considering it would only be
         //      used for processing output from PostgreSQL, more limited syntax might be accepted, which would be
         //      simpler and faster; namely, in the output, there are neither whitespace nor backslash-escaped

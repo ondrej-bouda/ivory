@@ -19,7 +19,6 @@ class CompositeTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testParseSimpleUntyped()
     {
-        $this->assertNull($this->adHocComposite->parseValue(null));
         $this->assertSame([], $this->adHocComposite->parseValue('()')->toList());
         $this->assertSame(['1'], $this->adHocComposite->parseValue('(1)')->toList());
         $this->assertSame(['ab'], $this->adHocComposite->parseValue('(ab)')->toList());

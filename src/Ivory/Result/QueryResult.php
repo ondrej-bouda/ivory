@@ -137,7 +137,8 @@ class QueryResult extends Result implements IQueryResult
 
         $data = [];
         foreach ($this->colTypes as $i => $type) {
-            $data[$i] = $type->parseValue($rawData[$i]);
+            $v = $rawData[$i];
+            $data[$i] = ($v !== null ? $type->parseValue($v) : null);
         }
 
         return new Tuple($data, $this->colNameMap);

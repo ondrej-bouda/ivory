@@ -25,7 +25,7 @@ class UndefinedType extends ConnectionDependentBaseType
         $this->connName = null;
     }
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
         throw new UndefinedTypeException("{$this->getSchemaName()}.{$this->getName()} on connection {$this->connName}");
     }

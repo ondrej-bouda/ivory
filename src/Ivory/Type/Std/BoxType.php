@@ -13,12 +13,8 @@ use Ivory\Value\Box;
  */
 class BoxType extends CompoundGeometricType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         $re = '~^ \s*
                 (\()? \s*                           # optional opening parenthesis
                 ((?(1)\()[^,]+,[^,]+(?(1)\))) \s*   # corner; parenthesized if the whole segment is parenthesized

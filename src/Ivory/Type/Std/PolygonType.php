@@ -15,12 +15,8 @@ use Ivory\Value\Polygon;
  */
 class PolygonType extends CompoundGeometricType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         $re = '~^ \s*
                 (\()? \s*                           # optional opening parenthesis
                 (

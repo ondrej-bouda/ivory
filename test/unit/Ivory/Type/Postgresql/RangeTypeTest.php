@@ -36,7 +36,6 @@ class RangeTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testParseSimple()
     {
-        $this->assertNull($this->intRangeType->parseValue(null));
         $this->assertTrue($this->intRangeType->parseValue('[1,4)')->equals($this->intRng(1, 4)));
         $this->assertTrue($this->intRangeType->parseValue('[1,3]')->equals($this->intRng(1, 4)));
         $this->assertTrue($this->intRangeType->parseValue('(0,4)')->equals($this->intRng(1, 4)));

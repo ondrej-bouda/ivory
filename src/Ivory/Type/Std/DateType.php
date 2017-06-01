@@ -104,11 +104,9 @@ class DateType extends ConnectionDependentBaseType implements IDiscreteType
         $this->modeRetriever = null;
     }
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } elseif ($str == 'infinity') {
+        if ($str == 'infinity') {
             return Date::infinity();
         } elseif ($str == '-infinity') {
             return Date::minusInfinity();

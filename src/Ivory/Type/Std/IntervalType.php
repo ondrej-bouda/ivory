@@ -18,12 +18,8 @@ class IntervalType extends BaseType implements ITotallyOrderedType
     use TotallyOrderedByPhpOperators;
 
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         return TimeInterval::fromString($str);
     }
 

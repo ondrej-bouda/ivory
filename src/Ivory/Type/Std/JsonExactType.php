@@ -13,12 +13,8 @@ use Ivory\Value\Json;
  */
 class JsonExactType extends JsonType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         try {
             return Json::fromEncoded($str);
         } catch (\InvalidArgumentException $e) {

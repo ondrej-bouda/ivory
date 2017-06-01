@@ -15,13 +15,9 @@ use Ivory\Value\XmlDocument;
  */
 class XmlType extends \Ivory\Type\BaseType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } else {
-            return XmlContent::fromValue($str);
-        }
+        return XmlContent::fromValue($str);
     }
 
     public function serializeValue($val): string

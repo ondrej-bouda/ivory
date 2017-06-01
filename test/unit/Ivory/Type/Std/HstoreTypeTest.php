@@ -43,7 +43,6 @@ class HstoreTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testParseValue()
     {
-        $this->assertNull($this->hstoreType->parseValue(null));
         $this->assertSame([], $this->hstoreType->parseValue(''));
         $this->assertSame(['a' => 'b'], $this->hstoreType->parseValue('"a"=>"b"'));
         $this->assertSame(

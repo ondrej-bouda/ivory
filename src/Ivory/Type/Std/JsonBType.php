@@ -18,12 +18,8 @@ use Ivory\Value\Json;
  */
 class JsonBType extends JsonType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         try {
             $json = Json::fromEncoded($str);
             return ($json->getValue() === null ? Json::null() : $json->getValue());

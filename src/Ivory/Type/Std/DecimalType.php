@@ -13,12 +13,8 @@ use Ivory\Value\Decimal;
  */
 class DecimalType extends \Ivory\Type\BaseType implements ITotallyOrderedType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         if (strcasecmp($str, 'NaN') == 0) {
             return Decimal::NaN();
         }

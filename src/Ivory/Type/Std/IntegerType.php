@@ -12,13 +12,9 @@ use Ivory\Type\IDiscreteType;
  */
 class IntegerType extends \Ivory\Type\BaseType implements IDiscreteType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } else {
-            return (int)$str;
-        }
+        return (int)$str;
     }
 
     public function serializeValue($val): string

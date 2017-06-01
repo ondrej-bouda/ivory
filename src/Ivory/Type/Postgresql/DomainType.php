@@ -19,7 +19,7 @@ class DomainType implements IDiscreteType
         $this->baseType = $baseType;
     }
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
         return $this->baseType->parseValue($str);
     }

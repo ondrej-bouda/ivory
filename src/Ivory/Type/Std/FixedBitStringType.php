@@ -10,12 +10,8 @@ namespace Ivory\Type\Std;
  */
 class FixedBitStringType extends BitStringType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } else {
-            return \Ivory\Value\FixedBitString::fromString($str);
-        }
+        return \Ivory\Value\FixedBitString::fromString($str);
     }
 }

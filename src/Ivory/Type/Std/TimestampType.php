@@ -58,11 +58,9 @@ class TimestampType extends ConnectionDependentBaseType implements ITotallyOrder
         $this->dateStyleRetriever = null;
     }
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } elseif ($str == 'infinity') {
+        if ($str == 'infinity') {
             return Timestamp::infinity();
         } elseif ($str == '-infinity') {
             return Timestamp::minusInfinity();

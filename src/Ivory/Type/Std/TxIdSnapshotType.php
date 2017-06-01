@@ -13,13 +13,9 @@ use Ivory\Value\TxIdSnapshot;
  */
 class TxIdSnapshotType extends BaseType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } else {
-            return TxIdSnapshot::fromString($str);
-        }
+        return TxIdSnapshot::fromString($str);
     }
 
     public function serializeValue($val): string

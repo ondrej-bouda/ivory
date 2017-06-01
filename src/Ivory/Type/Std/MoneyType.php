@@ -40,12 +40,8 @@ class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedTy
         $this->decSepRetriever = null;
     }
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         $decSep = $this->decSepRetriever->getValue();
         try {
             return Money::fromString($str, $decSep);

@@ -10,12 +10,8 @@ namespace Ivory\Type\Std;
  */
 class VarBitStringType extends BitStringType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } else {
-            return \Ivory\Value\VarBitString::fromString($str);
-        }
+        return \Ivory\Value\VarBitString::fromString($str);
     }
 }

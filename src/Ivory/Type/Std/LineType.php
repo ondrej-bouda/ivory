@@ -26,12 +26,8 @@ class LineType extends CompoundGeometricType
     }
 
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         // the { A, B, C } variant
         $re = '~^ \s*
                 \{ \s*

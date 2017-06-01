@@ -113,12 +113,8 @@ SQL
                 return 'time';
             }
 
-            public function parseValue($str)
+            public function parseValue(string $str)
             {
-                if ($str === null) {
-                    return null;
-                }
-
                 $dt = \DateTime::createFromFormat('H:i:s.u', $str);
                 if ($dt === false) {
                     $dt = \DateTime::createFromFormat('H:i:s', $str);

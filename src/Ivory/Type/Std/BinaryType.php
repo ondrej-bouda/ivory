@@ -12,12 +12,8 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class BinaryType extends \Ivory\Type\BaseType implements ITotallyOrderedType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         /* Depending on the PostgreSQL bytea_output configuration parameter, data may be encoded either in the "hex" or
          * "escape" format, which may be recognized by the '\x' prefix.
          */

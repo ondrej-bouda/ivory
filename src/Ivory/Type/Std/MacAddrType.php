@@ -14,12 +14,8 @@ use Ivory\Value\MacAddr;
  */
 class MacAddrType extends BaseType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         try {
             return MacAddr::fromString($str);
         } catch (\InvalidArgumentException $e) {

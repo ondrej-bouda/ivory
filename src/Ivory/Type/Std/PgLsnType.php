@@ -17,13 +17,9 @@ class PgLsnType extends BaseType implements ITotallyOrderedType
 {
     use TotallyOrderedByPhpOperators;
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } else {
-            return PgLogSequenceNumber::fromString($str);
-        }
+        return PgLogSequenceNumber::fromString($str);
     }
 
     public function serializeValue($val): string

@@ -12,12 +12,8 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class BooleanType extends \Ivory\Type\BaseType implements ITotallyOrderedType
 {
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        }
-
         switch (strtoupper($str)) {
             case 'T':
             case 'TRUE':

@@ -143,8 +143,6 @@ STR
 
     public function testParseSingleDimensional()
     {
-        $this->assertNull($this->intArrayType->parseValue(null));
-
         $this->assertSame([], $this->intArrayType->parseValue('{}'));
         $this->assertSame([], $this->strArrayType->parseValue('{}'));
 

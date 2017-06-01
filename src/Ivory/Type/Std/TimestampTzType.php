@@ -66,11 +66,9 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
         $this->localMeanTimeZoneRetriever = null;
     }
 
-    public function parseValue($str)
+    public function parseValue(string $str)
     {
-        if ($str === null) {
-            return null;
-        } elseif ($str == 'infinity') {
+        if ($str == 'infinity') {
             return TimestampTz::infinity();
         } elseif ($str == '-infinity') {
             return TimestampTz::minusInfinity();
