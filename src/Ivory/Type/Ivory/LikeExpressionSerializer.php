@@ -18,7 +18,7 @@ use Ivory\Type\IValueSerializer;
  * Depending on the mode this serializer is constructed in, the string is prefixed or postfixed with the `%` wildcard so
  * that it matches data ending or starting with the given string.
  *
- * @see https://www.postgresql.org/docs/9.6/static/functions-matching.html#FUNCTIONS-LIKE
+ * @see https://www.postgresql.org/docs/11/functions-matching.html
  */
 class LikeExpressionSerializer implements IValueSerializer
 {

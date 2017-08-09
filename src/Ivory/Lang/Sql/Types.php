@@ -5,7 +5,7 @@ namespace Ivory\Lang\Sql;
 use Ivory\Type\Ivory\IdentifierSerializer;
 
 /**
- * @see https://www.postgresql.org/docs/9.6/static/datatype-numeric.html
+ * @see https://www.postgresql.org/docs/11/datatype-numeric.html
  */
 class Types
 {
@@ -19,8 +19,8 @@ class Types
      * type. That is, whenever a user type was defined with the same name, the user type name would have to be written
      * with quotes. Without quotes, it is interpreted as the SQL type.
      *
-     * See also https://www.postgresql.org/docs/9.6/static/datatype.html - the "Compatibility" box. That list, however,
-     * only seems as an approximation. To get the real list of reserved type names in the sense described above, try to:
+     * See also https://www.postgresql.org/docs/11/datatype.html - the "Compatibility" box. That list, however, only
+     * seems as an approximation. To get the real list of reserved type names in the sense described above, try to:
      * - `CREATE DOMAIN public.<type> AS TEXT` for any type in question;
      * - `SET search_path TO public, pg_catalog`;
      * - `SELECT pg_catalog.format_type('public.<type>'::regtype, NULL)`.

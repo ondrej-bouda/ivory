@@ -90,7 +90,7 @@ interface IConnConfig
 
     /**
      * @return string[] the effective search path - the explicit search path combined with the implicit schemas
-     * @see https://www.postgresql.org/docs/9.6/static/runtime-config-client.html#RUNTIME-CONFIG-CLIENT-STATEMENT
+     * @see https://www.postgresql.org/docs/11/runtime-config-client.html#RUNTIME-CONFIG-CLIENT-STATEMENT
      */
     function getEffectiveSearchPath(): array;
 

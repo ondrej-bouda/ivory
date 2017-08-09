@@ -17,7 +17,7 @@ interface ICursorControl
      * To ensure the cursor will be scrollable, option {@link ICursor::SCROLLABLE} may be used. Conversely, to forbid
      * scrolling, option {@link ICursor::NON_SCROLLABLE} is to be used. If neither of these options is provided,
      * PostgreSQL will decide according to the
-     * {@see https://www.postgresql.org/docs/current/sql-declare.html `DECLARE` specification}.
+     * {@see https://www.postgresql.org/docs/11/sql-declare.html `DECLARE` specification}.
      *
      * The cursor may be declared as binary with option {@link ICursor::BINARY}. Ivory will not be able to fetch from
      * it, though, only manipulate it and pass it around.

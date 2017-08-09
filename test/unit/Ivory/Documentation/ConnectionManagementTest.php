@@ -15,6 +15,6 @@ class ConnectionManagementTest extends IvoryTestCase
         // The following assertions hold:
         self::assertSame($firstConn, Ivory::getConnection()); // the first is the default
         self::assertSame($secondConn, Ivory::getConnection('other')); // identified by the given name
-        self::assertSame($firstConn, Ivory::getConnection('mydb')); // connection name defaults to the database name
+        self::assertSame($firstConn, Ivory::getConnection('mydb')); // name generated from the database name
     }
 }

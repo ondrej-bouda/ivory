@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: "en-US" }}">
+<head>
+    {% if site.google_analytics and jekyll.environment == 'production' %}
+        {% include analytics.html %}
+    {% endif %}
+    <meta charset="UTF-8">
+    <title>{{ site.title }}</title>
+    <meta name="description" content="{{ page.description | default: site.description }}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+</head>
+<body>
+<section class="page-header">
+    <a href="{% link index.md %}" class="btn">Home</a>
+    <a href="{% link getting-started.md %}" class="btn">Getting Started</a>
+    <a href="{% link about.md %}" class="btn">About</a>
+    <a href="{% link features.md %}" class="btn">Features</a>
+    <a href="{% link documentation.md %}" class="btn">Documentation</a>
+    <a href="https://github.com/ondrej-bouda/ivory" class="btn">GitHub</a>
+</section>
+
+<section class="main-content">
+    {{ content }}
+
+    <footer class="site-footer">
+        Copyright © 2015 &ndash; {{ 'now' | date: "%Y" }} Ondřej Bouda
+    </footer>
+</section>
+</body>
+</html>

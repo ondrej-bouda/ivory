@@ -86,7 +86,7 @@ use Ivory\Exception\NoDataException;
  *
  * Note that even {@link IRelationDefinition} and {@link ICommand} objects may be used as parameter values to form a
  * more complex definition, e.g., a
- * {@link https://www.postgresql.org/docs/current/static/queries-with.html Common Table Expression}.
+ * {@link https://www.postgresql.org/docs/current/queries-with.html Common Table Expression}.
  *
  * _Ivory design note: The positional parameters could have been treated as parameters named by their zero-based
  * position. This is not the case, though. If placeholders could refer to positional parameters (e.g., <tt>%s:0</tt>),

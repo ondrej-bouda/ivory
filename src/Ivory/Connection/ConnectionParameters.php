@@ -70,7 +70,7 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
      * Note the usual keywords are defined as constants in this class - e.g., {@link ConnectionParameters::DBNAME}.
      *
      * For details, see the
-     * {@link https://www.postgresql.org/docs/current/static/libpq-connect.html#libpq-paramkeywords PostgreSQL manual}.
+     * {@link https://www.postgresql.org/docs/11/libpq-connect.html#LIBPQ-PARAMKEYWORDS PostgreSQL manual}.
      * Any parameter may be omitted - the default is used then.
      *
      * @param array $params map: connection parameter keyword => value

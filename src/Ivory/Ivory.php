@@ -14,7 +14,7 @@ use Psr\Cache\CacheItemPoolInterface;
 
 final class Ivory
 {
-    const VERSION = '0.1.0a1';
+    const VERSION = '0.1.0';
     
     /** @var ICoreFactory */
     private static $coreFactory = null;

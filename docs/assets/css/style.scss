@@ -1,0 +1,130 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+.page-header {
+  padding: 1rem 0 0;
+  background-image: none;
+}
+
+.site-footer {
+  font-size: small;
+}
+
+a code {
+  color: #1e6bb8 !important;
+}
+
+a[target="_blank"] {
+  background-position: center right;
+  background-repeat: no-repeat;
+  background-image: url(../img/external-link.png);
+  background-image: -o-linear-gradient(transparent,transparent),url(../img/external-link.png);
+  padding-right: 14px;
+}
+
+.main-content dl dt {
+  margin-top: .5em;
+}
+
+.main-content dl dd {
+  margin-bottom: .5em;
+}
+
+//region Signpost
+
+.signpost {
+  margin-bottom: 2em;
+}
+
+.signpost > li {
+  display: block;
+  width: 500px;
+  margin: .5em 0;
+  border: solid darkgrey 1px;
+  background-color: lightgrey;
+  border-radius: 5px;
+  list-style-type: none;
+  font-weight: bold;
+}
+
+.signpost > li > a, .signpost > li > div {
+  display: block;
+  padding: .5em 1em;
+}
+
+.signpost > li:hover {
+  filter: brightness(105%);
+}
+
+.signpost > li:nth-child(even) {
+  margin-left: 100px;
+}
+
+//region Sign colors
+
+.signpost > li:nth-child(6n+1) {
+  border-color: #9d5915;
+  background-color: #e38c35;
+}
+
+.signpost > li:nth-child(6n+2) {
+  border-color: #9d9d15;
+  background-color: #e3e335;
+}
+
+.signpost > li:nth-child(6n+3) {
+  border-color: #599d15;
+  background-color: #8ce335;
+}
+
+.signpost > li:nth-child(6n+4) {
+  border-color: #9d7b15;
+  background-color: #e3b835;
+}
+
+.signpost > li:nth-child(6n+5) {
+  border-color: #59159d;
+  background-color: #d9bcf6;
+}
+
+//endregion
+
+.signpost > li > a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.signpost li ul {
+  padding-left: 0;
+}
+
+.signpost li ul li {
+  font-weight: normal;
+  font-size: small;
+  list-style-type: none;
+}
+
+.signpost li ul li:before {
+  content: "\2003\2002";
+}
+
+.signpost li ul li.time:before {
+  content: "\279c\2002";
+}
+
+.signpost li ul.bullets {
+  padding-left: inherit;
+}
+
+.signpost li ul.bullets li {
+  list-style-type: circle;
+}
+
+.signpost li ul.bullets li:before {
+  content: "";
+}
+
+//endregion
+

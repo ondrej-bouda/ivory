@@ -8,7 +8,7 @@ use Ivory\Value\Composite;
 /**
  * This test shows composites in Ivory.
  *
- * @see https://www.postgresql.org/docs/10/static/rowtypes.html
+ * @see https://www.postgresql.org/docs/11/rowtypes.html
  */
 class CompositeTest extends IvoryTestCase
 {

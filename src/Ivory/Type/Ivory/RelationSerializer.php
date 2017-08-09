@@ -15,7 +15,7 @@ use Ivory\Utils\StringUtils;
  * Internal Ivory value serializer for serializing relations and relation definitions into SQL statements.
  *
  * Used in SQL patterns to handle `%rel` placeholders. These will typically be used in subselects or in
- * {@link https://www.postgresql.org/docs/current/static/queries-with.html `WITH` queries (common table expressions)}.
+ * {@link https://www.postgresql.org/docs/current/queries-with.html `WITH` queries (common table expressions)}.
  *
  * Note that an {@link \InvalidArgumentException} is thrown when serializing `null` as that clearly signifies an error.
  */

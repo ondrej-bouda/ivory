@@ -9,7 +9,7 @@ use Ivory\Query\ICommand;
  *
  * Used in SQL patterns to handle `%cmd` placeholders. These will typically be used combined with the `RETURNING`
  * clause, either as single `INSERT` or `UPDATE` commands for which the caller wants to fetch the written rows, or in
- * {@link https://www.postgresql.org/docs/current/static/queries-with.html `WITH` queries (common table expressions)}.
+ * {@link https://www.postgresql.org/docs/current/queries-with.html `WITH` queries (common table expressions)}.
  *
  * Note that an {@link \InvalidArgumentException} is thrown when serializing `null` as that clearly signifies an error.
  */

@@ -9,7 +9,7 @@ use Ivory\Value\Timestamp;
 /**
  * This test shows ranges in Ivory.
  *
- * @see https://www.postgresql.org/docs/10/static/rangetypes.html#RANGETYPES-EXAMPLES
+ * @see https://www.postgresql.org/docs/11/rangetypes.html#RANGETYPES-EXAMPLES
  */
 class RangeTest extends IvoryTestCase
 {
