@@ -46,11 +46,15 @@ class QueryingTest extends \Ivory\IvoryTestCase
         $sql = $relDef->toSql($this->typeDict);
         $this->assertSame("SELECT 'Ivory''s escaping', 3.14, FALSE", $sql);
 
-        // Moreover, the types need not be specified explicitly. There are rules for recognizing the type by the data
-        // type of the actual value.
+        // Moreover, the types need not be specified explicitly. There are rules for inferring the type from the actual
+        // value.
         $relDef = SqlRelationDefinition::fromPattern('SELECT %, %, %', "Automatic type recognition", 3.14, false);
         $sql = $relDef->toSql($this->typeDict);
         $this->assertSame("SELECT 'Automatic type recognition', 3.14, FALSE", $sql);
+
+        // All the standard PostgreSQL types are already set up in Ivory by default. Besides, there are special value
+        // serializers for specific usage, e.g., LIKE operands.
+        $this->assertTrue($this->conn->querySingleValue("SELECT 'foobar' LIKE %_like_", 'oo'));
 
         // As usual, both the types of placeholders and the rules for recognizing types from values are configurable.
         $this->conn->getTypeRegister()->registerTypeAbbreviation('js', 'pg_catalog', 'json');

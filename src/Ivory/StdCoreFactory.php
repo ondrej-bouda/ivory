@@ -17,6 +17,7 @@ use Ivory\Lang\SqlPattern\ISqlPatternParser;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
 use Ivory\Type\Ivory\CommandSerializer;
 use Ivory\Type\Ivory\IdentifierSerializer;
+use Ivory\Type\Ivory\LikeExpressionSerializer;
 use Ivory\Type\Ivory\QuotedIdentifierSerializer;
 use Ivory\Type\Ivory\RelationSerializer;
 use Ivory\Type\Ivory\SqlSerializer;
@@ -50,6 +51,10 @@ class StdCoreFactory implements ICoreFactory
         $reg->registerValueSerializer('qident', new QuotedIdentifierSerializer());
         $reg->registerValueSerializer('rel', new RelationSerializer());
         $reg->registerValueSerializer('cmd', new CommandSerializer());
+        $reg->registerValueSerializer('like', new LikeExpressionSerializer(LikeExpressionSerializer::WILDCARD_NONE));
+        $reg->registerValueSerializer('like_', new LikeExpressionSerializer(LikeExpressionSerializer::WILDCARD_APPEND));
+        $reg->registerValueSerializer('_like', new LikeExpressionSerializer(LikeExpressionSerializer::WILDCARD_PREPEND));
+        $reg->registerValueSerializer('_like_', new LikeExpressionSerializer(LikeExpressionSerializer::WILDCARD_BOTH));
 
         // standard type abbreviations
         $reg->registerTypeAbbreviation('s', 'pg_catalog', 'text');
