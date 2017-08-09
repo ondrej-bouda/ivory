@@ -1,3 +1,14 @@
+Explicit Typing
+===============
+* Some values, when serialized by an SQL pattern, are output with or without the explicit type specification, depending
+  on the type. While standard Ivory serializers do their best not to use the explicit typing, there are types which are
+  impossible to be used without it, e.g., `money`. Still, explicit typecasts are necessary in certain situations.
+* To allow one to explicitly control the type specification, extend the `%type:name` syntax with an optional `!`
+  following the type name. That should force the type specification, i.e., the value will be passed to PostgreSQL
+  exactly as of the requested type.
+
+
+
 Range Values
 ============
 * Ivory is capable of processing any range type the subtype of which is known to Ivory, provided the subtype has a total
@@ -31,7 +42,7 @@ Auto-Transaction Handle
 =======================
 * ITxHandle::rollbackIfOpen() allows for pretty easy exception handling within open transactions. It still requires one
   to think of it and type some boilerplate code. In some cases (and arguably in the typical ones), just a single
-  transaction is started and committed/rolled back within a one function/method.
+  transaction is started and committed/rolled back within one function/method.
 * Implement ITransactionControl::startAutoTransaction() which would return a specialization of TxHandle, calling
   rollbackIfOpen() in __destruct(). That would even simplify the typical case:
   <code>
@@ -41,6 +52,8 @@ Auto-Transaction Handle
       $tx->commit();
   }
   </code>
+** The term "auto transaction" might mislead one to think even commit() call is implicit. Reconsider the term or
+   behaviour.
 * While at it, reconsider whether ICoreFactory::createTransactionHandle() is really reasonable.
 * Also applicable to nested transactions - see the following feature.
 
