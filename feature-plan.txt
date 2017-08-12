@@ -6,6 +6,8 @@ Explicit Typing
 * To allow one to explicitly control the type specification, extend the `%type:name` syntax with an optional `!`
   following the type name. That should force the type specification, i.e., the value will be passed to PostgreSQL
   exactly as of the requested type.
+* Not having this feature is not critical, though, as one may easily append the explicit type cast after the
+  placeholder.
 
 
 
