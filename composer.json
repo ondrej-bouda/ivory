@@ -20,8 +20,8 @@
   },
   "require-dev": {
     "ext-pdo_pgsql": "*",
-    "phpunit/phpunit": "~6.0",
-    "phpunit/dbunit": "~3.0",
+    "phpunit/phpunit": "^6.3",
+    "phpunit/dbunit": "^3.0",
     "nategood/commando": "*",
     "dibi/dibi": "*",
     "doctrine/dbal": "*",
