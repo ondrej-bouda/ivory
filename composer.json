@@ -13,10 +13,10 @@
     "vendor-dir": "lib/composed"
   },
   "require": {
-    "php": ">= 7.0",
+    "php": "^7.1",
     "ext-mbstring": "*",
     "ext-pgsql": "*",
-    "psr/cache": "~1.0"
+    "psr/cache": "^1.0"
   },
   "require-dev": {
     "ext-pdo_pgsql": "*",
