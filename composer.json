@@ -1,6 +1,12 @@
 {
   "name": "ondrej-bouda/ivory",
-  "description": "A PHP PostgreSQL layer as complete as possible",
+  "description": "A robust PHP PostgreSQL layer, as complete and correct as possible",
+  "type": "library",
+  "keywords": [
+    "PostgreSQL",
+    "database",
+    "access layer"
+  ],
   "homepage": "https://github.com/ondrej-bouda/ivory",
   "license": "BSD-3-Clause",
   "authors": [
@@ -9,9 +15,13 @@
       "email": "bouda@edookit.com"
     }
   ],
+  "support": {
+    "issues": "https://github.com/ondrej-bouda/ivory/issues"
+  },
   "config": {
     "vendor-dir": "lib/composed"
   },
+  "prefer-stable": true,
   "require": {
     "php": "^7.1",
     "ext-mbstring": "*",
@@ -31,5 +41,15 @@
   },
   "suggest": {
     "cache/memcached-adapter": "Some PSR-6 compliant cache pool is essential for Ivory to be fast enough. Use \\Ivory\\Ivory::setDefaultCacheImpl()."
+  },
+  "autoload": {
+    "psr-4": {
+      "Ivory\\": "src/Ivory/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Ivory\\": "test/unit/Ivory/"
+    }
   }
 }
