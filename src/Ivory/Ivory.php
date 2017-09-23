@@ -223,12 +223,15 @@ final class Ivory
     /**
      * Removes a connection from the register so that it no longer occupies memory.
      *
+     * Unless instructed otherwise by the `$disconnect` argument, the connection gets closed if still connected.
+     *
      * @param IConnection|string|null $conn (name of) connection to remove from the register;
      *                                      <tt>null</tt> to remove the default connection
+     * @param bool $disconnect if <tt>true</tt>, the connection to database will be closed
      * @throw \RuntimeException if the default connection is requested but no connection has been setup yet, or if the
      *                            requested connection is not defined
      */
-    public static function dropConnection($conn = null)
+    public static function dropConnection($conn = null, bool $disconnect = true)
     {
         if ($conn instanceof IConnection) {
             $connName = $conn->getName();
@@ -243,10 +246,14 @@ final class Ivory
         }
 
         if (isset(self::$connections[$connName])) {
-            if (self::$connections[$connName] === self::$defaultConn) {
+            $droppedConn = self::$connections[$connName];
+            unset(self::$connections[$connName]);
+            if ($droppedConn === self::$defaultConn) {
                 self::$defaultConn = null;
             }
-            unset(self::$connections[$connName]);
+            if ($disconnect) {
+                $droppedConn->disconnect();
+            }
         } else {
             throw new \RuntimeException('Undefined connection');
         }
