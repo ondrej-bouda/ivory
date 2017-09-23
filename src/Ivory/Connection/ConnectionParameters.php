@@ -14,6 +14,13 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
     private $params = [];
 
     /**
+     * Create connection parameters from an array, a URI, or a connection string.
+     *
+     * For details on passing:
+     * - an array, see {@link __construct()};
+     * - a URI, see {@link fromUri()};
+     * - a connection string, see {@link fromConnectionString()}.
+     *
      * @param array|string $params array of parameters, or URI, or connection string
      * @return ConnectionParameters
      */
