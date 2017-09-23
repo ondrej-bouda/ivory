@@ -157,7 +157,7 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
         return new ConnectionParameters($params);
     }
 
-    private function __construct(array $params)
+    protected function __construct(array $params)
     {
         $this->params = $params;
     }
