@@ -1,55 +1,55 @@
 {
-  "name": "ondrej-bouda/ivory",
-  "description": "A robust PHP PostgreSQL layer, as complete and correct as possible",
-  "type": "library",
-  "keywords": [
-    "PostgreSQL",
-    "database",
-    "access layer"
-  ],
-  "homepage": "https://github.com/ondrej-bouda/ivory",
-  "license": "BSD-3-Clause",
-  "authors": [
-    {
-      "name": "Ondřej Bouda",
-      "email": "bouda@edookit.com"
+    "name": "ondrej-bouda/ivory",
+    "description": "A robust PHP PostgreSQL layer, as complete and correct as possible",
+    "type": "library",
+    "keywords": [
+        "PostgreSQL",
+        "database",
+        "access layer"
+    ],
+    "homepage": "https://github.com/ondrej-bouda/ivory",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Ondřej Bouda",
+            "email": "bouda@edookit.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/ondrej-bouda/ivory/issues"
+    },
+    "config": {
+        "vendor-dir": "lib/composed"
+    },
+    "prefer-stable": true,
+    "require": {
+        "php": "^7.1",
+        "ext-mbstring": "*",
+        "ext-pgsql": "*",
+        "psr/cache": "^1.0"
+    },
+    "require-dev": {
+        "ext-pdo_pgsql": "*",
+        "phpunit/phpunit": "^6.3",
+        "phpunit/dbunit": "^3.0",
+        "nategood/commando": "*",
+        "dibi/dibi": "*",
+        "doctrine/dbal": "*",
+        "illuminate/database": "*",
+        "cache/array-adapter": "*",
+        "cache/filesystem-adapter": "*"
+    },
+    "suggest": {
+        "cache/memcached-adapter": "Some PSR-6 compliant cache pool is essential for Ivory to be fast enough. Use \\Ivory\\Ivory::setDefaultCacheImpl()."
+    },
+    "autoload": {
+        "psr-4": {
+            "Ivory\\": "src/Ivory/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ivory\\": "test/unit/Ivory/"
+        }
     }
-  ],
-  "support": {
-    "issues": "https://github.com/ondrej-bouda/ivory/issues"
-  },
-  "config": {
-    "vendor-dir": "lib/composed"
-  },
-  "prefer-stable": true,
-  "require": {
-    "php": "^7.1",
-    "ext-mbstring": "*",
-    "ext-pgsql": "*",
-    "psr/cache": "^1.0"
-  },
-  "require-dev": {
-    "ext-pdo_pgsql": "*",
-    "phpunit/phpunit": "^6.3",
-    "phpunit/dbunit": "^3.0",
-    "nategood/commando": "*",
-    "dibi/dibi": "*",
-    "doctrine/dbal": "*",
-    "illuminate/database": "*",
-    "cache/array-adapter": "*",
-    "cache/filesystem-adapter": "*"
-  },
-  "suggest": {
-    "cache/memcached-adapter": "Some PSR-6 compliant cache pool is essential for Ivory to be fast enough. Use \\Ivory\\Ivory::setDefaultCacheImpl()."
-  },
-  "autoload": {
-    "psr-4": {
-      "Ivory\\": "src/Ivory/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Ivory\\": "test/unit/Ivory/"
-    }
-  }
 }
