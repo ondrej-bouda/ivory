@@ -274,16 +274,16 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
                 ->buildConnectionString()
         );
 
-        $this->assertSame('', (new ConnectionParameters([]))->buildConnectionString());
+        $this->assertSame('', ConnectionParameters::fromArray([])->buildConnectionString());
 
         $this->assertSame(
             "user='john doe' password='' opt='\\'' opt2='\\\\\\''",
-            (new ConnectionParameters([
+            ConnectionParameters::fromArray([
                 'user' => 'john doe',
                 'password' => '',
                 'opt' => "'",
                 'opt2' => "\\'",
-            ]))->buildConnectionString()
+            ])->buildConnectionString()
         );
     }
 }

@@ -17,17 +17,19 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
      * Create connection parameters from an array, a URI, or a connection string.
      *
      * For details on passing:
-     * - an array, see {@link __construct()};
+     * - an array, see {@link fromArray()};
      * - a URI, see {@link fromUri()};
      * - a connection string, see {@link fromConnectionString()}.
      *
-     * @param array|string $params array of parameters, or URI, or connection string
+     * If a `ConnectionParameters` object is given, a clone is returned.
+     *
+     * @param array|string|ConnectionParameters $params array of parameters, or URI, or connection string, or object
      * @return ConnectionParameters
      */
     public static function create($params): ConnectionParameters
     {
         if (is_array($params)) {
-            return new ConnectionParameters($params);
+            return self::fromArray($params);
         } elseif (is_string($params)) {
             if (preg_match("~^[^=']+://~", $params)) {
                 return self::fromUri($params);
@@ -41,6 +43,29 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
         }
     }
 
+    /**
+     * Initializes the connection parameters from an associative array of keywords to values.
+     *
+     * The most important are the following parameters:
+     * - `host (string)`: the database server to connect to,
+     * - `port (int)`: the port to connect to,
+     * - `user (string)`: username to authenticate as,
+     * - `password (string)`: password for the given username,
+     * - `dbname (string)`: name of the database to connect to,
+     * - `connect_timeout (int)`: connection timeout (0 means to wait indefinitely),
+     * - `options (string)`: the runtime options to send to the server.
+     *
+     * For details, see the
+     * {@link http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS PostgreSQL documentation}.
+     * Any parameter may be omitted - the default is used then.
+     *
+     * @param array $params map: connection parameter keyword => value
+     * @return ConnectionParameters
+     */
+    public static function fromArray(array $params): ConnectionParameters
+    {
+        return new ConnectionParameters($params);
+    }
 
     /**
      * Creates a connection parameters object from an RFC 3986 URI, e.g., `"postgresql://usr@localhost:5433/db"`.
@@ -132,25 +157,7 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
         return new ConnectionParameters($params);
     }
 
-    /**
-     * Initializes the connection parameters from an associative array of keywords to values.
-     *
-     * The most important are the following parameters:
-     * - `host (string)`: the database server to connect to,
-     * - `port (int)`: the port to connect to,
-     * - `user (string)`: username to authenticate as,
-     * - `password (string)`: password for the given username,
-     * - `dbname (string)`: name of the database to connect to,
-     * - `connect_timeout (int)`: connection timeout (0 means to wait indefinitely),
-     * - `options (string)`: the runtime options to send to the server.
-     *
-     * For details, see the
-     * {@link http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS PostgreSQL documentation}.
-     * Any parameter may be omitted - the default is used then.
-     *
-     * @param array $params map: connection parameter keyword => value
-     */
-    public function __construct(array $params)
+    private function __construct(array $params)
     {
         $this->params = $params;
     }
