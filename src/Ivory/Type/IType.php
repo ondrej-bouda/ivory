@@ -13,7 +13,7 @@ interface IType extends IValueSerializer, \Ivory\INamedDbObject
      * Note that `null` values may not be given to this method - they have to be processed separately.
      *
      * @param string $str
-     * @return mixed the value parsed from <tt>$str</tt>, or <tt>null</tt> if <tt>$str</tt> is <tt>null</tt>
+     * @return mixed the value parsed from <tt>$str</tt>
      */
     function parseValue(string $str);
 }
