@@ -105,7 +105,7 @@ class StdCoreFactory implements ICoreFactory
         return $reg;
     }
 
-    public function createSqlPatternParser(ICacheControl $cacheControl = null): ISqlPatternParser
+    public function createSqlPatternParser(?ICacheControl $cacheControl = null): ISqlPatternParser
     {
         if ($cacheControl === null) {
             return new SqlPatternParser();
@@ -124,7 +124,7 @@ class StdCoreFactory implements ICoreFactory
         return new Connection($connName, $params);
     }
 
-    public function createCacheControl(IConnection $connection = null): ICacheControl
+    public function createCacheControl(?IConnection $connection = null): ICacheControl
     {
         $prefix = 'Ivory' . Ivory::VERSION . '.';
 

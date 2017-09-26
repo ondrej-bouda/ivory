@@ -5,10 +5,10 @@ abstract class Result implements IResult
 {
     /** @var resource result handler */
     protected $handler;
-    /** @var string last PostgreSQL notice issued by when returning this result */
+    /** @var string|null last PostgreSQL notice issued by when returning this result */
     private $lastNotice;
 
-    protected function __construct($resultHandler, string $lastNotice = null)
+    protected function __construct($resultHandler, ?string $lastNotice = null)
     {
         if (!is_resource($resultHandler)) {
             throw new \InvalidArgumentException('$handler');
@@ -17,7 +17,7 @@ abstract class Result implements IResult
         $this->lastNotice = $lastNotice;
     }
 
-    final public function getLastNotice()
+    final public function getLastNotice(): ?string
     {
         return $this->lastNotice;
     }

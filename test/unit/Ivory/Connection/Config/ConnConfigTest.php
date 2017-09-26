@@ -343,12 +343,12 @@ class ConnConfigTestObserver implements IConfigObserver
         return $o;
     }
 
-    public function handlePropertyChange(string $propertyName, $newValue)
+    public function handlePropertyChange(string $propertyName, $newValue): void
     {
         $this->observed[] = [$propertyName, $newValue];
     }
 
-    public function handlePropertiesReset(IConnConfig $connConfig)
+    public function handlePropertiesReset(IConnConfig $connConfig): void
     {
         $this->observed[] = self::RESET;
     }

@@ -50,8 +50,11 @@ class ConnConfig implements IObservableConnConfig
     private $observers = [];
 
 
-    public function __construct(ConnectionControl $connCtl, IStatementExecution $stmtExec, IObservableTransactionControl $txCtl)
-    {
+    public function __construct(
+        ConnectionControl $connCtl,
+        IStatementExecution $stmtExec,
+        IObservableTransactionControl $txCtl
+    ) {
         $this->connCtl = $connCtl;
         $this->stmtExec = $stmtExec;
         $this->txCtl = $txCtl;
@@ -96,7 +99,7 @@ class ConnConfig implements IObservableConnConfig
         $this->setForSession($propertyName, $value);
     }
 
-    public function flushCache()
+    public function flushCache(): void
     {
         $this->typeCache = null;
     }
@@ -185,7 +188,7 @@ class ConnConfig implements IObservableConnConfig
         }
     }
 
-    private function getCustomOptionValue(string $customOptionName)
+    private function getCustomOptionValue(string $customOptionName): ?string
     {
         /* The custom option might not be recognized by PostgreSQL yet and an exception might be thrown, which would
          * break the current transaction (if any). Hence the savepoint.
@@ -247,7 +250,7 @@ class ConnConfig implements IObservableConnConfig
         return ($this->get($propertyName) !== null);
     }
 
-    public function setForTransaction(string $propertyName, $value)
+    public function setForTransaction(string $propertyName, $value): void
     {
         if (!$this->txCtl->inTransaction()) {
             return; // setting the option would have no effect as the implicit transaction would end immediately
@@ -260,7 +263,7 @@ class ConnConfig implements IObservableConnConfig
         $this->notifyPropertyChange($propertyName, $value);
     }
 
-    public function setForSession(string $propertyName, $value)
+    public function setForSession(string $propertyName, $value): void
     {
         $connHandler = $this->connCtl->requireConnection();
         pg_query_params($connHandler, 'SELECT pg_catalog.set_config($1, $2, FALSE)', [$propertyName, $value]);
@@ -269,7 +272,7 @@ class ConnConfig implements IObservableConnConfig
         $this->notifyPropertyChange($propertyName, $value);
     }
 
-    public function resetAll()
+    public function resetAll(): void
     {
         $connHandler = $this->connCtl->requireConnection();
         pg_query($connHandler, 'RESET ALL');
@@ -296,7 +299,7 @@ class ConnConfig implements IObservableConnConfig
         );
     }
 
-    private static function createTxConfig(string $isolationLevel, $readOnly, $deferrable)
+    private static function createTxConfig(string $isolationLevel, ?bool $readOnly, ?bool $deferrable): TxConfig
     {
         $txConf = new TxConfig();
         $txConf->setReadOnly($readOnly);
@@ -316,7 +319,7 @@ class ConnConfig implements IObservableConnConfig
         return $txConf;
     }
 
-    public function getEffectiveSearchPath()
+    public function getEffectiveSearchPath(): array
     {
         if ($this->effectiveSearchPathCache === null) {
             $this->initEffectiveSearchPathCache();
@@ -333,12 +336,12 @@ class ConnConfig implements IObservableConnConfig
                         $this->refresher = $refresher;
                     }
 
-                    public function handlePropertyChange(string $propertyName, $newValue)
+                    public function handlePropertyChange(string $propertyName, $newValue): void
                     {
                         call_user_func($this->refresher);
                     }
 
-                    public function handlePropertiesReset(IConnConfig $connConfig)
+                    public function handlePropertiesReset(IConnConfig $connConfig): void
                     {
                         call_user_func($this->refresher);
                     }
@@ -350,7 +353,7 @@ class ConnConfig implements IObservableConnConfig
         return $this->effectiveSearchPathCache;
     }
 
-    private function initEffectiveSearchPathCache()
+    private function initEffectiveSearchPathCache(): void
     {
         $connHandler = $this->connCtl->requireConnection();
         $res = pg_query($connHandler, 'SELECT unnest(pg_catalog.current_schemas(TRUE))');
@@ -377,7 +380,7 @@ class ConnConfig implements IObservableConnConfig
 
     //region IObservableConnConfig
 
-    public function addObserver(IConfigObserver $observer, $parameterName = null)
+    public function addObserver(IConfigObserver $observer, $parameterName = null): void
     {
         if (is_array($parameterName)) {
             foreach ($parameterName as $pn) {
@@ -388,7 +391,7 @@ class ConnConfig implements IObservableConnConfig
         }
     }
 
-    private function addObserverImpl(IConfigObserver $observer, string $parameterName)
+    private function addObserverImpl(IConfigObserver $observer, string $parameterName): void
     {
         if (!isset($this->observers[$parameterName])) {
             $this->observers[$parameterName] = [];
@@ -397,7 +400,7 @@ class ConnConfig implements IObservableConnConfig
         $this->observers[$parameterName][] = $observer;
     }
 
-    public function removeObserver(IConfigObserver $observer)
+    public function removeObserver(IConfigObserver $observer): void
     {
         foreach ($this->observers as $k => $obsList) {
             foreach ($obsList as $i => $obs) {
@@ -408,12 +411,12 @@ class ConnConfig implements IObservableConnConfig
         }
     }
 
-    public function removeAllObservers()
+    public function removeAllObservers(): void
     {
         $this->observers = [];
     }
 
-    public function notifyPropertyChange(string $parameterName, $newValue = null)
+    public function notifyPropertyChange(string $parameterName, $newValue = null): void
     {
         if ($newValue === null) {
             $newValue = $this->get($parameterName);
@@ -432,7 +435,7 @@ class ConnConfig implements IObservableConnConfig
         }
     }
 
-    public function notifyPropertiesReset()
+    public function notifyPropertiesReset(): void
     {
         /** @var IConfigObserver[] $obsSet */
         $obsSet = [];

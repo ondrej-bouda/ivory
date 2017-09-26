@@ -28,7 +28,7 @@ class Types
      * @return string[][] map: lower-cased name of type defined by SQL => pair of schema and type name of the
      *                      implementing PostgreSQL type
      */
-    public static function getReservedTypes()
+    public static function getReservedTypes(): array
     {
         return [
             'bigint' => ['pg_catalog', 'int8'],

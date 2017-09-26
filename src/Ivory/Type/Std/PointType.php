@@ -40,7 +40,7 @@ class PointType extends BaseType implements ITotallyOrderedType
         return sprintf('point(%s,%s)', $val->getX(), $val->getY());
     }
 
-    public function compareValues($a, $b)
+    public function compareValues($a, $b): ?int
     {
         if ($a === null || $b === null) {
             return null;

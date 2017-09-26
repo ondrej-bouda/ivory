@@ -29,13 +29,13 @@ class DictionarySet implements ISet
         return isset($this->data[$key]);
     }
 
-    public function add($value)
+    public function add($value): void
     {
         $key = $this->computeKey($value);
         $this->data[$key] = true;
     }
 
-    public function remove($value)
+    public function remove($value): void
     {
         $key = $this->computeKey($value);
         unset($this->data[$key]);

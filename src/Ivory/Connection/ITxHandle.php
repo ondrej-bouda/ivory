@@ -30,7 +30,7 @@ interface ITxHandle
      *                                         a {@link TxConfig} object, or a combination of {@link TxConfig} constants
      * @throws InvalidStateException if the transaction is not open anymore
      */
-    function setupTransaction($transactionOptions);
+    function setupTransaction($transactionOptions): void;
 
     /**
      * Sets the transaction to run with the same snapshot as another existing (still running) transaction.
@@ -48,7 +48,7 @@ interface ITxHandle
      *                             <tt>pg_export_snapshot()</tt> PostgreSQL function)
      * @throws InvalidStateException if the transaction is not open anymore
      */
-    function setTransactionSnapshot(string $snapshotId);
+    function setTransactionSnapshot(string $snapshotId): void;
 
     /**
      * Saves the transaction snapshot and returns its identifier for a later use by {@link setTransactionSnapshot()}.
@@ -67,7 +67,7 @@ interface ITxHandle
      *
      * @throws InvalidStateException if the transaction is not open anymore
      */
-    function commit();
+    function commit(): void;
 
     /**
      * Rolls back the transaction.
@@ -76,7 +76,7 @@ interface ITxHandle
      *
      * @throws InvalidStateException if the transaction is not open anymore
      */
-    function rollback();
+    function rollback(): void;
 
     /**
      * Rolls back the transaction provided it is still open. If the transaction is closed, this is a no-op.
@@ -96,7 +96,7 @@ interface ITxHandle
      *
      * After the rollback, the transaction is closed and the handle gets stale and, as such, it cannot be used anymore.
      */
-    function rollbackIfOpen();
+    function rollbackIfOpen(): void;
 
     /**
      * Defines a new savepoint within the transaction.
@@ -110,7 +110,7 @@ interface ITxHandle
      * @param string $name name for the new savepoint
      * @throws InvalidStateException if the transaction is not open anymore
      */
-    function savepoint(string $name);
+    function savepoint(string $name): void;
 
     /**
      * Rolls back all statements executed after the given savepoint.
@@ -126,7 +126,7 @@ interface ITxHandle
      * @throws InvalidStateException if the transaction is not open anymore
      * @throws UndefinedSavepointException if trying to roll back to an undefined savepoint
      */
-    function rollbackToSavepoint(string $name);
+    function rollbackToSavepoint(string $name): void;
 
     /**
      * Destroys the given savepoint, and all savepoints established after it. Thus, it is not possible to roll back to
@@ -141,7 +141,7 @@ interface ITxHandle
      *                               or if the transaction is in an aborted state
      * @throws UndefinedSavepointException if trying to roll back to an undefined savepoint
      */
-    function releaseSavepoint(string $name);
+    function releaseSavepoint(string $name): void;
 
     /**
      * Prepares the transaction for a two-phase commit.
@@ -160,5 +160,5 @@ interface ITxHandle
      * @param string $name name for the prepared transaction; must be server-wide unique
      * @throws InvalidStateException if the transaction is not open anymore
      */
-    function prepareTransaction(string $name);
+    function prepareTransaction(string $name): void;
 }

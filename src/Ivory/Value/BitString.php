@@ -83,7 +83,7 @@ abstract class BitString implements IEqualable, \ArrayAccess
      * @param BitString|null $other
      * @return bool|null whether this and the other bit string are of the same type, have the same bits and same length
      */
-    public function equals($other)
+    public function equals($other): ?bool
     {
         if ($other === null) {
             return null;
@@ -140,7 +140,7 @@ abstract class BitString implements IEqualable, \ArrayAccess
      * @return FixedBitString the substring of the bit string
      * @throws UndefinedOperationException when <tt>$for</tt> is negative
      */
-    public function substring(int $from, int $for = null): FixedBitString
+    public function substring(int $from, ?int $for = null): FixedBitString
     {
         if ($for < 0) {
             throw new UndefinedOperationException('negative number of bits to take');

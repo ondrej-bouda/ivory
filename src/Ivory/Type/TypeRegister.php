@@ -54,7 +54,7 @@ class TypeRegister implements ITypeProvider
      *
      * @param IType $type the type to register
      */
-    public function registerType(IType $type)
+    public function registerType(IType $type): void
     {
         $schemaName = $type->getSchemaName();
         $typeName = $type->getName();
@@ -77,7 +77,7 @@ class TypeRegister implements ITypeProvider
      *                                provided in the first argument
      * @return bool whether the type has actually been unregistered (<tt>false</tt> if it was not registered)
      */
-    public function unregisterType($schemaNameOrType, string $typeName = null): bool
+    public function unregisterType($schemaNameOrType, ?string $typeName = null): bool
     {
         if ($schemaNameOrType instanceof IType) {
             if ($typeName !== null) {
@@ -155,7 +155,7 @@ class TypeRegister implements ITypeProvider
         string $funcName,
         ITotallyOrderedType $subtype,
         IRangeCanonicalFunc $func
-    ) {
+    ): void {
         if (!isset($this->rangeCanonFuncs[$schemaName])) {
             $this->rangeCanonFuncs[$schemaName] = [];
         }
@@ -186,8 +186,8 @@ class TypeRegister implements ITypeProvider
      */
     public function unregisterRangeCanonicalFunc(
         $schemaNameOrFunc,
-        string $funcName = null,
-        ITotallyOrderedType $subtype = null
+        ?string $funcName = null,
+        ?ITotallyOrderedType $subtype = null
     ): bool {
         if ($schemaNameOrFunc instanceof IRangeCanonicalFunc) {
             if ($funcName !== null) {
@@ -287,12 +287,12 @@ class TypeRegister implements ITypeProvider
      * @param string $name
      * @param IValueSerializer $valueSerializer
      */
-    public function registerValueSerializer(string $name, IValueSerializer $valueSerializer)
+    public function registerValueSerializer(string $name, IValueSerializer $valueSerializer): void
     {
         $this->valueSerializers[$name] = $valueSerializer;
     }
 
-    public function unregisterValueSerializer(string $name)
+    public function unregisterValueSerializer(string $name): void
     {
         unset($this->valueSerializers[$name]);
     }
@@ -306,7 +306,7 @@ class TypeRegister implements ITypeProvider
      * @param string $schemaName name of schema a referred-to type is defined in
      * @param string $typeName name of type the abbreviation refers to
      */
-    public function registerTypeAbbreviation(string $abbreviation, string $schemaName, string $typeName)
+    public function registerTypeAbbreviation(string $abbreviation, string $schemaName, string $typeName): void
     {
         $this->typeAbbreviations[$abbreviation] = [$schemaName, $typeName];
     }
@@ -318,7 +318,7 @@ class TypeRegister implements ITypeProvider
      *
      * @param string $abbreviation abbreviation for a type name
      */
-    public function unregisterTypeAbbreviation(string $abbreviation)
+    public function unregisterTypeAbbreviation(string $abbreviation): void
     {
         unset($this->typeAbbreviations[$abbreviation]);
     }
@@ -369,7 +369,7 @@ class TypeRegister implements ITypeProvider
      * @param string $schemaName name of schema the recognized type is defined in
      * @param string $typeName name of the recognized type
      */
-    public function addTypeRecognitionRule(string $dataType, string $schemaName, string $typeName)
+    public function addTypeRecognitionRule(string $dataType, string $schemaName, string $typeName): void
     {
         $this->typeRecognitionRules[$dataType] = [$schemaName, $typeName];
     }
@@ -381,7 +381,7 @@ class TypeRegister implements ITypeProvider
      *
      * @param string $dataType
      */
-    public function removeTypeRecognitionRule(string $dataType)
+    public function removeTypeRecognitionRule(string $dataType): void
     {
         unset($this->typeRecognitionRules[$dataType]);
     }
@@ -394,7 +394,7 @@ class TypeRegister implements ITypeProvider
      * @param string $typeName name of the PostgreSQL type to get the type object for
      * @return IType|null the requested type object, or <tt>null</tt> if no corresponding type is registered
      */
-    public function getType(string $schemaName, string $typeName)
+    public function getType(string $schemaName, string $typeName): ?IType
     {
         return ($this->types[$schemaName][$typeName] ?? null);
     }
@@ -404,7 +404,7 @@ class TypeRegister implements ITypeProvider
      *
      * @return ITypeLoader[] list of the registered type loaders, in the registration order
      */
-    public function getTypeLoaders()
+    public function getTypeLoaders(): array
     {
         return $this->typeLoaders;
     }
@@ -418,7 +418,11 @@ class TypeRegister implements ITypeProvider
      * @param ITotallyOrderedType $subtype function argument type
      * @return IRangeCanonicalFunc|null the requested function, or <tt>null</tt> if no such function was registered
      */
-    public function getRangeCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype)
+    public function getRangeCanonicalFunc(
+        string $schemaName,
+        string $funcName,
+        ITotallyOrderedType $subtype
+    ): ?IRangeCanonicalFunc
     {
         return ($this->rangeCanonFuncs[$schemaName][$funcName][spl_object_hash($subtype)] ?? null);
     }
@@ -429,7 +433,7 @@ class TypeRegister implements ITypeProvider
      * @return IRangeCanonicalFuncProvider[] list of the registered range canonical function providers, in the
      *                                         registration order
      */
-    public function getRangeCanonicalFuncProviders()
+    public function getRangeCanonicalFuncProviders(): array
     {
         return $this->rangeCanonFuncProviders;
     }
@@ -437,7 +441,7 @@ class TypeRegister implements ITypeProvider
 
     //region ITypeProvider
 
-    public function provideType(string $schemaName, string $typeName)
+    public function provideType(string $schemaName, string $typeName): ?IType
     {
         $type = $this->getType($schemaName, $typeName);
         if ($type !== null) {
@@ -454,7 +458,11 @@ class TypeRegister implements ITypeProvider
         return null;
     }
 
-    public function provideRangeCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype)
+    public function provideRangeCanonicalFunc(
+        string $schemaName,
+        string $funcName,
+        ITotallyOrderedType $subtype
+    ): ?IRangeCanonicalFunc
     {
         $func = $this->getRangeCanonicalFunc($schemaName, $funcName, $subtype);
         if ($func !== null) {
@@ -471,17 +479,17 @@ class TypeRegister implements ITypeProvider
         return null;
     }
 
-    public function getTypeRecognitionRules()
+    public function getTypeRecognitionRules(): array
     {
         return $this->typeRecognitionRules;
     }
 
-    public function getValueSerializers()
+    public function getValueSerializers(): array
     {
         return $this->valueSerializers;
     }
 
-    public function getTypeAbbreviations()
+    public function getTypeAbbreviations(): array
     {
         return $this->typeAbbreviations;
     }

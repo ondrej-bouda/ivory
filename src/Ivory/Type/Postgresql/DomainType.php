@@ -29,7 +29,7 @@ class DomainType implements IDiscreteType
         return $this->baseType->serializeValue($val);
     }
 
-    public function compareValues($a, $b)
+    public function compareValues($a, $b): ?int
     {
         if ($this->baseType instanceof ITotallyOrderedType) {
             return $this->baseType->compareValues($a, $b);

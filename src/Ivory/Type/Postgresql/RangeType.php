@@ -23,7 +23,7 @@ class RangeType implements ITotallyOrderedType
         string $schemaName,
         string $name,
         ITotallyOrderedType $subtype,
-        IRangeCanonicalFunc $canonicalFunc = null
+        ?IRangeCanonicalFunc $canonicalFunc = null
     ) {
         $this->setName($schemaName, $name);
         $this->subtype = $subtype;
@@ -35,10 +35,7 @@ class RangeType implements ITotallyOrderedType
         return $this->subtype;
     }
 
-    /**
-     * @return IRangeCanonicalFunc|null
-     */
-    public function getCanonicalFunc()
+    public function getCanonicalFunc(): ?IRangeCanonicalFunc
     {
         return $this->canonicalFunc;
     }
@@ -116,7 +113,7 @@ class RangeType implements ITotallyOrderedType
         );
     }
 
-    public function compareValues($a, $b)
+    public function compareValues($a, $b): ?int
     {
         if ($a === null || $b === null) {
             return null;
@@ -152,7 +149,7 @@ class RangeType implements ITotallyOrderedType
         }
     }
 
-    private function compareBounds(int $sgn, $aVal, $aIsInc, $bVal, $bIsInc): int
+    private function compareBounds(int $sgn, $aVal, ?bool $aIsInc, $bVal, ?bool $bIsInc): int
     {
         if ($aVal === null && $bVal === null) {
             return 0;

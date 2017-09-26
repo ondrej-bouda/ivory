@@ -13,7 +13,7 @@ abstract class RelationDefinition implements IRelationDefinition
         return new SortedRelationDefinition($this, $sortExpression, ...$args);
     }
 
-    public function limit($limit, int $offset = 0): IRelationDefinition
+    public function limit(?int $limit, int $offset = 0): IRelationDefinition
     {
         return new LimitedRelationDefinition($this, $limit, $offset);
     }

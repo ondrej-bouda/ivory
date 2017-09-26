@@ -49,29 +49,26 @@ interface ITypeDictionary
      * @param string $name
      * @return IValueSerializer|null value serializer of the given name, or <tt>null</tt> if no such serializer is defined
      */
-    function getValueSerializer(string $name);
+    function getValueSerializer(string $name): ?IValueSerializer;
 
-    /**
-     * @param ITypeDictionaryUndefinedHandler|null $undefinedTypeHandler
-     */
-    function setUndefinedTypeHandler($undefinedTypeHandler);
+    function setUndefinedTypeHandler(?ITypeDictionaryUndefinedHandler $undefinedTypeHandler);
 
     /**
      * @param string[] $schemaList
      */
-    function setTypeSearchPath(array $schemaList);
+    function setTypeSearchPath(array $schemaList): void;
 
     /**
      * Attach connection-dependent objects in this dictionary to a connection.
      *
      * @param IConnection $connection connection to attach the dictionary to
      */
-    function attachToConnection(IConnection $connection);
+    function attachToConnection(IConnection $connection): void;
 
     /**
      * Detach any objects in this dictionary from the database connection.
      *
      * After this operation, the dictionary must be safe for serialization.
      */
-    function detachFromConnection();
+    function detachFromConnection(): void;
 }

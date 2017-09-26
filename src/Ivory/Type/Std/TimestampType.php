@@ -46,14 +46,16 @@ class TimestampType extends ConnectionDependentBaseType implements ITotallyOrder
     /** @var ConnConfigValueRetriever */
     private $dateStyleRetriever;
 
-    public function attachToConnection(IConnection $connection)
+    public function attachToConnection(IConnection $connection): void
     {
         $this->dateStyleRetriever = new ConnConfigValueRetriever(
-            $connection->getConfig(), ConfigParam::DATE_STYLE, [DateStyle::class, 'fromString']
+            $connection->getConfig(),
+            ConfigParam::DATE_STYLE,
+            \Closure::fromCallable([DateStyle::class, 'fromString'])
         );
     }
 
-    public function detachFromConnection()
+    public function detachFromConnection(): void
     {
         $this->dateStyleRetriever = null;
     }

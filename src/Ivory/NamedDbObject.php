@@ -10,7 +10,7 @@ trait NamedDbObject
      * @param string $schemaName
      * @param string $name
      */
-    protected function setName(string $schemaName, string $name)
+    protected function setName(string $schemaName, string $name): void
     {
         $this->schemaName = $schemaName;
         $this->name = $name;

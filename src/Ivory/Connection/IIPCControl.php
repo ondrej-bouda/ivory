@@ -20,7 +20,7 @@ interface IIPCControl
      * @param string|null $payload optional payload to send along with the notification;
      *                             note the maximal accepted length depends on the database configuration
      */
-    function notify(string $channel, string $payload = null);
+    function notify(string $channel, ?string $payload = null): void;
 
     /**
      * Starts listening to the specified channel.
@@ -30,7 +30,7 @@ interface IIPCControl
      *
      * @param string $channel name of channel to listen to
      */
-    function listen(string $channel);
+    function listen(string $channel): void;
 
     /**
      * Stops listening to the specified channel.
@@ -39,19 +39,19 @@ interface IIPCControl
      *
      * @param string $channel name of channel to stop listening to
      */
-    function unlisten(string $channel);
+    function unlisten(string $channel): void;
 
     /**
      * Stops listening to any channel.
      *
      * Use {@link unlisten()} to stop listening only to a specified channel.
      */
-    function unlistenAll();
+    function unlistenAll(): void;
 
     /**
      * Polls the queue of waiting IPC notifications on channels being listened to.
      *
      * @return Notification|null the next notification in the queue, or <tt>null</tt> if there is no notification there
      */
-    function pollNotification();
+    function pollNotification(): ?Notification;
 }

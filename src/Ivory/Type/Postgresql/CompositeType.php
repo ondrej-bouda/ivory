@@ -59,7 +59,7 @@ abstract class CompositeType implements ITotallyOrderedType
     /**
      * @return IType[] ordered map: attribute name => attribute type
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -68,7 +68,7 @@ abstract class CompositeType implements ITotallyOrderedType
      * @param string $attName name of an attribute, previously defined by {@link addAttribute()}
      * @return int|null zero-based position of the given attribute, or <tt>null</tt> if no such attribute is defined
      */
-    public function getAttPos(string $attName)
+    public function getAttPos(string $attName): ?int
     {
         return ($this->attNameMap[$attName] ?? null);
     }
@@ -178,7 +178,7 @@ abstract class CompositeType implements ITotallyOrderedType
         return self::serializeItems($items);
     }
 
-    private static function serializeItems($items): string
+    private static function serializeItems(array $items): string
     {
         $res = '(' . implode(',', $items) . ')';
         if (count($items) < 2) {
@@ -187,7 +187,7 @@ abstract class CompositeType implements ITotallyOrderedType
         return $res;
     }
 
-    public function compareValues($a, $b)
+    public function compareValues($a, $b): ?int
     {
         if ($a === null || $b === null) {
             return null;

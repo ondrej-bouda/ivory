@@ -100,11 +100,11 @@ class Range implements IEqualable, \ArrayAccess
      */
     public static function createFromBounds(
         ITotallyOrderedType $subtype,
-        IRangeCanonicalFunc $canonicalFunc = null,
+        ?IRangeCanonicalFunc $canonicalFunc = null,
         $lower,
         $upper,
         $boundsOrLowerInc = '[)',
-        bool $upperInc = null
+        ?bool $upperInc = null
     ): Range {
         list($loInc, $upInc) = self::processBoundSpec($boundsOrLowerInc, $upperInc);
 
@@ -166,7 +166,7 @@ class Range implements IEqualable, \ArrayAccess
         return new Range($subtype, null, true, null, null, null, null);
     }
 
-    private static function processBoundSpec($boundsOrLowerInc = '[)', $upperInc = null)
+    private static function processBoundSpec($boundsOrLowerInc = '[)', ?bool $upperInc = null)
     {
         if (is_string($boundsOrLowerInc)) {
             if ($upperInc !== null) {
@@ -194,12 +194,12 @@ class Range implements IEqualable, \ArrayAccess
 
     private function __construct(
         ITotallyOrderedType $subtype,
-        $canonicalFunc,
+        ?IRangeCanonicalFunc $canonicalFunc,
         bool $empty,
         $lower,
         $upper,
-        $lowerInc,
-        $upperInc
+        ?bool $lowerInc,
+        ?bool $upperInc
     ) {
         $this->subtype = $subtype;
         $this->canonicalFunc = $canonicalFunc;
@@ -247,7 +247,7 @@ class Range implements IEqualable, \ArrayAccess
      * @return bool|null whether the range includes its lower bound, or <tt>null</tt> if the range is empty;
      *                   for lower-unbounded ranges, <tt>false</tt> is returned by definition
      */
-    final public function isLowerInc()
+    final public function isLowerInc(): ?bool
     {
         return $this->lowerInc;
     }
@@ -256,7 +256,7 @@ class Range implements IEqualable, \ArrayAccess
      * @return bool|null whether the range includes its upper bound, or <tt>null</tt> if the range is empty;
      *                   for upper-unbounded ranges, <tt>false</tt> is returned by definition
      */
-    final public function isUpperInc()
+    final public function isUpperInc(): ?bool
     {
         return $this->upperInc;
     }
@@ -265,7 +265,7 @@ class Range implements IEqualable, \ArrayAccess
      * @return string|null the bounds inclusive/exclusive specification, as accepted by {@link createFromBounds()}, or
      *                     <tt>null</tt> if the range is empty
      */
-    final public function getBoundsSpec()
+    final public function getBoundsSpec(): ?string
     {
         if ($this->empty) {
             return null;
@@ -318,7 +318,7 @@ class Range implements IEqualable, \ArrayAccess
      * @return array|null pair of the lower and upper bound, or <tt>null</tt> if the range is empty
      * @throws UnsupportedException if the range subtype is not an {@link IDiscreteType}
      */
-    public function toBounds($boundsOrLowerInc, $upperInc = null)
+    public function toBounds($boundsOrLowerInc, ?bool $upperInc = null): ?array
     {
         if (!$this->subtype instanceof IDiscreteType) {
             throw new UnsupportedException('Range subtype is not ' . IDiscreteType::class . ', cannot convert bounds');
@@ -377,7 +377,7 @@ class Range implements IEqualable, \ArrayAccess
      * @return bool|null whether this range contains the given element;
      *                   <tt>null</tt> on <tt>null</tt> input
      */
-    public function containsElement($element)
+    public function containsElement($element): ?bool
     {
         if ($element === null) {
             return null;
@@ -409,7 +409,7 @@ class Range implements IEqualable, \ArrayAccess
      *                   <tt>false</tt> otherwise, especially if this range is empty;
      *                   <tt>null</tt> on <tt>null</tt> input
      */
-    public function leftOfElement($element)
+    public function leftOfElement($element): ?bool
     {
         if ($element === null) {
             return null;
@@ -431,7 +431,7 @@ class Range implements IEqualable, \ArrayAccess
      *                   <tt>false</tt> otherwise, especially if this range is empty;
      *                   <tt>null</tt> on <tt>null</tt> input
      */
-    public function rightOfElement($element)
+    public function rightOfElement($element): ?bool
     {
         if ($element === null) {
             return null;
@@ -453,13 +453,10 @@ class Range implements IEqualable, \ArrayAccess
      *                   an empty range is considered to be contained in any range, even an empty one;
      *                   <tt>null</tt> on <tt>null</tt> input
      */
-    public function containsRange($other)
+    public function containsRange(?Range $other): ?bool
     {
         if ($other === null) {
             return null;
-        }
-        if (!$other instanceof Range) {
-            throw new \InvalidArgumentException('$other');
         }
         if ($other->empty) {
             return true;
@@ -499,13 +496,10 @@ class Range implements IEqualable, \ArrayAccess
      *                   an empty range is considered to be contained in any range, even an empty one;
      *                   <tt>null</tt> on <tt>null</tt> input
      */
-    public function containedInRange($other)
+    public function containedInRange(?Range $other): ?bool
     {
         if ($other === null) {
             return null;
-        }
-        if (!$other instanceof Range) {
-            throw new \InvalidArgumentException('$other');
         }
         return $other->containsRange($this);
     }
@@ -515,13 +509,10 @@ class Range implements IEqualable, \ArrayAccess
      * @return bool|null whether this and the other range overlap, i.e., have a non-empty intersection;
      *                   <tt>null</tt> on <tt>null</tt> input
      */
-    public function overlaps($other)
+    public function overlaps(?Range $other): ?bool
     {
         if ($other === null) {
             return null;
-        }
-        if (!$other instanceof Range) {
-            throw new \InvalidArgumentException('$other');
         }
         if ($this->empty || $other->empty) {
             return false;
@@ -549,13 +540,10 @@ class Range implements IEqualable, \ArrayAccess
      * @return Range|null intersection of this and the other range
      *                    <tt>null</tt> on <tt>null</tt> input
      */
-    public function intersect($other)
+    public function intersect(?Range $other): ?Range
     {
         if ($other === null) {
             return null;
-        }
-        if (!$other instanceof Range) {
-            throw new \InvalidArgumentException('$other');
         }
         if ($this->empty) {
             return $this;
@@ -619,17 +607,14 @@ class Range implements IEqualable, \ArrayAccess
     /**
      * @param Range|null $other a range of the same subtype as this range
      * @return bool|null <tt>true</tt> iff this range is strictly left of the other range, i.e., it ends before the
-     *                   +  other starts;
+     *                     other starts;
      *                   <tt>false</tt> otherwise, especially if either range is empty;
      *                   <tt>null</tt> on <tt>null</tt> input
      */
-    public function strictlyLeftOf($other)
+    public function strictlyLeftOf(?Range $other): ?bool
     {
         if ($other === null) {
             return null;
-        }
-        if (!$other instanceof Range) {
-            throw new \InvalidArgumentException('$other');
         }
         if ($this->empty || $other->empty) {
             return false;
@@ -649,13 +634,10 @@ class Range implements IEqualable, \ArrayAccess
      *                   <tt>false</tt> otherwise, especially if either range is empty;;
      *                   <tt>null</tt> on <tt>null</tt> input
      */
-    public function strictlyRightOf($other)
+    public function strictlyRightOf(?Range $other): ?bool
     {
         if ($other === null) {
             return null;
-        }
-        if (!$other instanceof Range) {
-            throw new \InvalidArgumentException('$other');
         }
         if ($this->empty || $other->empty) {
             return false;
@@ -672,7 +654,7 @@ class Range implements IEqualable, \ArrayAccess
 
     //region IEqualable
 
-    public function equals($object)
+    public function equals($object): ?bool
     {
         if ($object === null) {
             return null;

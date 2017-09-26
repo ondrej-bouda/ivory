@@ -97,7 +97,7 @@ class Quantity implements IEqualable
         return new Quantity($val, $unit);
     }
 
-    public static function fromValue($value, string $unit = null): Quantity
+    public static function fromValue($value, ?string $unit = null): Quantity
     {
         if (!is_numeric($value)) {
             throw new \InvalidArgumentException('$value');
@@ -110,7 +110,7 @@ class Quantity implements IEqualable
         return new Quantity($value, $unit);
     }
 
-    private function __construct($value, $unit)
+    private function __construct($value, ?string $unit)
     {
         $this->value = $value;
         $this->unit = $unit;
@@ -127,7 +127,7 @@ class Quantity implements IEqualable
     /**
      * @return string|null
      */
-    public function getUnit()
+    public function getUnit(): ?string
     {
         return $this->unit;
     }
@@ -138,7 +138,7 @@ class Quantity implements IEqualable
      * @return bool|null whether the two quantities are comparable and of equal value (after converting to the same unit
      *                     if convertible)
      */
-    public function equals($quantity)
+    public function equals($quantity): ?bool
     {
         if ($quantity === null) {
             return null;

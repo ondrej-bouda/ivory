@@ -7,14 +7,14 @@ class CopyOutResult extends Result implements ICopyOutResult
 {
     private $connHandler;
 
-    public function __construct($connHandler, $resultHandler, string $lastNotice = null)
+    public function __construct($connHandler, $resultHandler, ?string $lastNotice = null)
     {
         parent::__construct($resultHandler, $lastNotice);
 
         $this->connHandler = $connHandler;
     }
 
-    public function end()
+    public function end(): void
     {
         $res = pg_end_copy($this->connHandler);
         if ($res === false) {

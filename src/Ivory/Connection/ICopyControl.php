@@ -101,7 +101,7 @@ interface ICopyControl
      *                       see the constants on what values are accepted for which options
      * @return ICommandResult the result of the `COPY` command
      */
-    function copyFromFile(string $file, string $table, $columns = null, $options = []): ICommandResult;
+    function copyFromFile(string $file, string $table, ?array $columns = null, array $options = []): ICommandResult;
 
     /**
      * Instructs the database server to executes an external program and copy its output to a database table.
@@ -119,7 +119,7 @@ interface ICopyControl
      *                       see the constants on what values are accepted for which options
      * @return ICommandResult the result of the `COPY` command
      */
-    function copyFromProgram(string $program, string $table, $columns = null, $options = []): ICommandResult;
+    function copyFromProgram(string $program, string $table, ?array $columns = null, array $options = []): ICommandResult;
 
     /**
      * Initiates copying data to a database table.
@@ -135,7 +135,7 @@ interface ICopyControl
      *                       see the constants on what values are accepted for which options
      * @return ICopyInResult the initiated `COPY` command result
      */
-    function copyFromInput(string $table, $columns = null, $options = []): ICopyInResult;
+    function copyFromInput(string $table, ?array $columns = null, array $options = []): ICopyInResult;
 
     /**
      * Instructs the database server to copy a database table or query result to a file.
@@ -155,7 +155,7 @@ interface ICopyControl
      *                       see the constants on what values are accepted for which options
      * @return ICommandResult the result of the `COPY` command
      */
-    function copyToFile(string $file, $tableOrRelationDefinition, $columns = null, $options = []): ICommandResult;
+    function copyToFile(string $file, $tableOrRelationDefinition, ?array $columns = null, array $options = []): ICommandResult;
 
     /**
      * Instructs the database server to copy a database table or query result to the input of a program.
@@ -175,7 +175,7 @@ interface ICopyControl
      *                       see the constants on what values are accepted for which options
      * @return ICommandResult the result of the `COPY` command
      */
-    function copyToProgram(string $program, $tableOrRelationDefinition, $columns = null, $options = []): ICommandResult;
+    function copyToProgram(string $program, $tableOrRelationDefinition, ?array $columns = null, array $options = []): ICommandResult;
 
     /**
      * Copies a database table to an array of data rows, using the {@link ICopyControl::FORMAT_TEXT `TEXT`} format.
@@ -192,5 +192,5 @@ interface ICopyControl
      * @return string[] lines representing individual rows in the {@link ICopyControl::FORMAT_TEXT `TEXT`} format, each
      *                    including the trailing newline character
      */
-    function copyToArray(string $table, $options = []);
+    function copyToArray(string $table, array $options = []): array;
 }

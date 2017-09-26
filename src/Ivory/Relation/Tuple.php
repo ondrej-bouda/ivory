@@ -25,12 +25,12 @@ class Tuple implements ITuple
 
 
     /**
-     * Creates a tuple from an associative array.
+     * Creates a tuple from a key => value map.
      *
-     * @param array|\Traversable $map
+     * @param iterable $map
      * @return Tuple
      */
-    public static function fromMap($map)
+    public static function fromMap(iterable $map): Tuple
     {
         $data = [];
         $colNameMap = [];
@@ -154,7 +154,7 @@ class Tuple implements ITuple
 
     //region IEqualable
 
-    public function equals($object)
+    public function equals($object): ?bool
     {
         if (!$object instanceof ITuple) {
             return false;

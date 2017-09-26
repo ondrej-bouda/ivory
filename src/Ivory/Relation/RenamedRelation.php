@@ -3,12 +3,12 @@ namespace Ivory\Relation;
 
 class RenamedRelation extends ProjectedRelationBase
 {
-    public function __construct(IRelation $source, $renamePairs)
+    public function __construct(IRelation $source, iterable $renamePairs)
     {
         parent::__construct($source, self::defineColumns($source, $renamePairs));
     }
 
-    private static function defineColumns(IRelation $source, $renamePairs)
+    private static function defineColumns(IRelation $source, iterable $renamePairs): array
     {
         /** @var string[] $pcres list of PCREs for renaming columns */
         $pcres = [];

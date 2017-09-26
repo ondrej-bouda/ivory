@@ -45,21 +45,21 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
     }
 
 
-    public function handleSetForTransaction(string $propertyName)
+    public function handleSetForTransaction(string $propertyName): void
     {
         if ($this->inTrans) {
             $this->bySavepoint[$this->tailIdx][self::SCOPE_TRANSACTION][strtolower($propertyName)] = $propertyName;
         }
     }
 
-    public function handleSetForSession(string $propertyName)
+    public function handleSetForSession(string $propertyName): void
     {
         if ($this->inTrans) {
             $this->bySavepoint[$this->tailIdx][self::SCOPE_SESSION][strtolower($propertyName)] = $propertyName;
         }
     }
 
-    public function handleResetAll()
+    public function handleResetAll(): void
     {
         if ($this->inTrans) {
             $this->bySavepoint[$this->tailIdx][self::SCOPE_SESSION][self::RESET_ALL] = self::RESET_ALL;
@@ -69,14 +69,14 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
 
     //region ITransactionControlObserver
 
-    public function handleTransactionStart()
+    public function handleTransactionStart(): void
     {
         $this->inTrans = true;
         $this->tailIdx = 0;
         $this->bySavepoint = [$this->tailIdx => self::$emptyStruct];
     }
 
-    public function handleTransactionCommit()
+    public function handleTransactionCommit(): void
     {
         $props = [];
         assert($this->bySavepoint !== null, new InternalException('bySavepoint list should have been initialized'));
@@ -90,7 +90,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
         $this->tailIdx = null;
     }
 
-    private function handlePropertyChanges($properties)
+    private function handlePropertyChanges($properties): void
     {
         if (isset($properties[self::RESET_ALL])) {
             $this->connConfig->notifyPropertiesReset();
@@ -101,7 +101,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
         }
     }
 
-    public function handleTransactionRollback()
+    public function handleTransactionRollback(): void
     {
         $rolledBack = [];
         assert($this->bySavepoint !== null, new InternalException('bySavepoint list should have been initialized'));
@@ -116,14 +116,14 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
         $this->tailIdx = null;
     }
 
-    public function handleSavepointSaved(string $name)
+    public function handleSavepointSaved(string $name): void
     {
         $this->bySavepoint[$this->tailIdx]['name'] = $name;
         $this->tailIdx++;
         $this->bySavepoint[$this->tailIdx] = self::$emptyStruct;
     }
 
-    public function handleSavepointReleased(string $name)
+    public function handleSavepointReleased(string $name): void
     {
         $idx = $this->findSavepoint($name);
         if ($idx === null) {
@@ -139,7 +139,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
         $this->tailIdx = $idx;
     }
 
-    public function handleRollbackToSavepoint(string $name)
+    public function handleRollbackToSavepoint(string $name): void
     {
         $idx = $this->findSavepoint($name);
         if ($idx === null) {
@@ -167,17 +167,17 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
         return null;
     }
 
-    public function handleTransactionPrepared(string $name)
+    public function handleTransactionPrepared(string $name): void
     {
         $this->handleTransactionCommit();
     }
 
-    public function handlePreparedTransactionCommit(string $name)
+    public function handlePreparedTransactionCommit(string $name): void
     {
         // NOTE: does not affect the properties
     }
 
-    public function handlePreparedTransactionRollback(string $name)
+    public function handlePreparedTransactionRollback(string $name): void
     {
         // NOTE: does not affect the properties
     }

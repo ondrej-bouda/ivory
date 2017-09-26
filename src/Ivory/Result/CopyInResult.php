@@ -7,14 +7,14 @@ class CopyInResult extends Result implements ICopyInResult
 {
     private $connHandler;
 
-    public function __construct($connHandler, $resultHandler, string $lastNotice = null)
+    public function __construct($connHandler, $resultHandler, ?string $lastNotice = null)
     {
         parent::__construct($resultHandler, $lastNotice);
 
         $this->connHandler = $connHandler;
     }
 
-    public function putLine(string $line)
+    public function putLine(string $line): void
     {
         $res = pg_put_line($this->connHandler, $line);
         if ($res === false) {
@@ -23,7 +23,7 @@ class CopyInResult extends Result implements ICopyInResult
         }
     }
 
-    public function end()
+    public function end(): void
     {
         $this->putLine("\\.\n");
 

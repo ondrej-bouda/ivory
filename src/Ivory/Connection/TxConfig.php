@@ -67,7 +67,7 @@ class TxConfig
         );
     }
 
-    private static function initBool(int $options, int $trueBit, int $falseBit, string $errorDesc)
+    private static function initBool(int $options, int $trueBit, int $falseBit, string $errorDesc): ?bool
     {
         if ($options & $trueBit) {
             if ($options & $falseBit) {
@@ -84,7 +84,7 @@ class TxConfig
     /**
      * @return int|null one of the <tt>ISOLATION_*</tt> constants, or <tt>null</tt> if no isolation level is specified
      */
-    public function getIsolationLevel()
+    public function getIsolationLevel(): ?int
     {
         return $this->isolationLevel;
     }
@@ -94,7 +94,7 @@ class TxConfig
      *                                   the isolation level
      * @return $this
      */
-    public function setIsolationLevel($isolationLevel)
+    public function setIsolationLevel(?int $isolationLevel)
     {
         static $levels = [
             null,
@@ -115,34 +115,23 @@ class TxConfig
      * @return bool|null whether the access mode is specified as read-only, or <tt>null</tt> if no access mode is
      *                     specified
      */
-    public function isReadOnly()
+    public function isReadOnly(): ?bool
     {
         return $this->readOnly;
     }
 
-    /**
-     * @param bool|null $readOnly
-     * @return TxConfig
-     */
-    public function setReadOnly($readOnly): TxConfig
+    public function setReadOnly(?bool $readOnly): TxConfig
     {
         $this->readOnly = $readOnly;
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function isDeferrable()
+    public function isDeferrable(): ?bool
     {
         return $this->deferrable;
     }
 
-    /**
-     * @param bool|null $deferrable
-     * @return TxConfig
-     */
-    public function setDeferrable($deferrable): TxConfig
+    public function setDeferrable(?bool $deferrable): TxConfig
     {
         $this->deferrable = $deferrable;
         return $this;

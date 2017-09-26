@@ -16,7 +16,7 @@ class ArrayRelation extends RelationBase
     private $rows;
     private $numRows;
 
-    public static function createAutodetect(array $rows, ITypeDictionary $typeDictionary)
+    public static function createAutodetect(array $rows, ITypeDictionary $typeDictionary): ArrayRelation
     {
         if (!$rows) {
             return new ArrayRelation([], []);
@@ -57,7 +57,7 @@ class ArrayRelation extends RelationBase
         $this->buildCols($dataTypes);
     }
 
-    private function buildCols(array $dataTypes)
+    private function buildCols(array $dataTypes): void
     {
         $this->cols = [];
         $this->colNameMap = [];
@@ -70,7 +70,7 @@ class ArrayRelation extends RelationBase
         }
     }
 
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->cols;
     }

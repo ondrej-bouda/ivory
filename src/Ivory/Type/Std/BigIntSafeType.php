@@ -13,7 +13,7 @@ use Ivory\Type\IDiscreteType;
  */
 class BigIntSafeType extends \Ivory\Type\BaseType implements IDiscreteType
 {
-    public static function createForRange($min, $max, $schemaName, $typeName): IDiscreteType
+    public static function createForRange($min, $max, string $schemaName, string $typeName): IDiscreteType
     {
         if (bccomp($min, PHP_INT_MIN) >= 0 && bccomp($max, PHP_INT_MAX) <= 0) {
             return new IntegerType($schemaName, $typeName);
@@ -46,7 +46,7 @@ class BigIntSafeType extends \Ivory\Type\BaseType implements IDiscreteType
         }
     }
 
-    public function compareValues($a, $b)
+    public function compareValues($a, $b): ?int
     {
         if ($a === null || $b === null) {
             return null;

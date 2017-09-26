@@ -34,7 +34,7 @@ class UuidType extends BaseType implements ITotallyOrderedType
         return "'" . strtr($val, ["'" => "''"]) . "'";
     }
 
-    public function compareValues($a, $b)
+    public function compareValues($a, $b): ?int
     {
         if ($a === null || $b === null) {
             return null;

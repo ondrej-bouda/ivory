@@ -196,7 +196,7 @@ class TupleTest__Equalable implements IEqualable
         $this->num = $num;
     }
 
-    public function equals($object)
+    public function equals($object): ?bool
     {
         if (!$object instanceof TupleTest__Equalable) {
             return false;

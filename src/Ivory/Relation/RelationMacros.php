@@ -29,7 +29,7 @@ trait RelationMacros
     }
 
 
-    protected static function computeColNameMap(IRelation $relation)
+    protected static function computeColNameMap(IRelation $relation): array
     {
         $result = [];
         foreach ($relation->getColumns() as $i => $col) {
@@ -41,7 +41,7 @@ trait RelationMacros
         return $result;
     }
 
-    public function toSet($colOffsetOrNameOrEvaluator, ISet $set = null): ISet
+    public function toSet($colOffsetOrNameOrEvaluator, ?ISet $set = null): ISet
     {
         if ($set === null) {
             $set = new DictionarySet();
@@ -77,7 +77,7 @@ trait RelationMacros
         return $this->tuple($tupleOffset)->value($colOffsetOrNameOrEvaluator);
     }
 
-    final protected function _colImpl($offsetOrNameOrEvaluator, $columns, $colNameMap, IRelation $relation)
+    final protected function _colImpl($offsetOrNameOrEvaluator, $columns, $colNameMap, IRelation $relation): IColumn
     {
         if (is_scalar($offsetOrNameOrEvaluator)) {
             if (filter_var($offsetOrNameOrEvaluator, FILTER_VALIDATE_INT) !== false) {

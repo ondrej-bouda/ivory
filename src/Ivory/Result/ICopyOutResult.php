@@ -20,5 +20,5 @@ interface ICopyOutResult extends IResult
      *
      * @throws ConnectionException if the connection got closed or broken
      */
-    function end();
+    function end(): void;
 }

@@ -17,27 +17,27 @@ class IPCControl implements IIPCControl
         return pg_get_pid($this->connCtl->requireConnection());
     }
 
-    public function notify(string $channel, string $payload = null)
+    public function notify(string $channel, ?string $payload = null): void
     {
         // TODO: Implement notify() method.
     }
 
-    public function listen(string $channel)
+    public function listen(string $channel): void
     {
         // TODO: Implement listen() method.
     }
 
-    public function unlisten(string $channel)
+    public function unlisten(string $channel): void
     {
         // TODO: Implement unlisten() method.
     }
 
-    public function unlistenAll()
+    public function unlistenAll(): void
     {
         // TODO: Implement unlistenAll() method.
     }
 
-    public function pollNotification()
+    public function pollNotification(): ?Notification
     {
         $handler = $this->connCtl->requireConnection();
 

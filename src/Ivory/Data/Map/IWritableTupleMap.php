@@ -13,7 +13,7 @@ interface IWritableTupleMap extends ITupleMap
      * @param mixed $key
      * @param ITuple|ITupleMap $entry
      */
-    function put($key, $entry);
+    function put($key, $entry): void;
 
     /**
      * Puts an entry (either an {@link ITuple} or {@link ITupleMap}) into the map under a given key unless there already

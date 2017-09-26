@@ -49,7 +49,7 @@ trait ArrayMapMacros
         return $data;
     }
 
-    public function put($key, $entry)
+    public function put($key, $entry): void
     {
         $this->map[$key] = $entry;
     }
@@ -85,7 +85,7 @@ trait ArrayMapMacros
         }
     }
 
-    public function getKeys()
+    public function getKeys(): array
     {
         return array_keys($this->map);
     }

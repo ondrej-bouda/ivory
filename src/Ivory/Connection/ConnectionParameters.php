@@ -182,44 +182,29 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
     }
 
 
-    /**
-     * @return string|null
-     */
-    public function getHost()
+    public function getHost(): ?string
     {
-        return (isset($this->params['host']) ? $this->params['host'] : null);
+        return ($this->params['host'] ?? null);
     }
 
-    /**
-     * @return int|null
-     */
-    public function getPort()
+    public function getPort(): ?int
     {
         return (isset($this->params['port']) ? (int)$this->params['port'] : null);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDbName()
+    public function getDbName(): ?string
     {
-        return (isset($this->params['dbname']) ? $this->params['dbname'] : null);
+        return ($this->params['dbname'] ?? null);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getUsername()
+    public function getUsername(): ?string
     {
-        return (isset($this->params['user']) ? $this->params['user'] : null);
+        return ($this->params['user'] ?? null);
     }
 
-    /**
-     * @return string|null
-     */
-    public function getPassword()
+    public function getPassword(): ?string
     {
-        return (isset($this->params['password']) ? $this->params['password'] : null);
+        return ($this->params['password'] ?? null);
     }
 
 

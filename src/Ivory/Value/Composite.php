@@ -54,7 +54,7 @@ class Composite implements IEqualable, \ArrayAccess, \IteratorAggregate
      * @param array $map map: attribute name => value; unspecified attributes get a <tt>null</tt> value
      * @return Composite
      */
-    public static function fromMap(NamedCompositeType $type, $map): Composite
+    public static function fromMap(NamedCompositeType $type, array $map): Composite
     {
         $values = array_fill(0, count($type->getAttributes()), null);
         foreach ($map as $k => $v) {
@@ -81,7 +81,7 @@ class Composite implements IEqualable, \ArrayAccess, \IteratorAggregate
         return $this->type;
     }
 
-    public function equals($other)
+    public function equals($other): ?bool
     {
         if ($other === null) {
             return null;

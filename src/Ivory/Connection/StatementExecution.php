@@ -164,12 +164,8 @@ class StatementExecution implements IStatementExecution
         return $this->processResult($connHandler, $resultHandler, $sqlStatement);
     }
 
-    public function rawMultiStatement($sqlStatements)
+    public function rawMultiStatement(iterable $sqlStatements): array
     {
-        if (!is_array($sqlStatements) && !$sqlStatements instanceof \Traversable) {
-            throw new \InvalidArgumentException('$sqlStatements is neither array nor \Traversable object');
-        }
-
         $results = [];
         foreach ($sqlStatements as $stmtKey => $stmt) {
             $results[$stmtKey] = $this->executeRawStatement($stmt);
@@ -177,7 +173,7 @@ class StatementExecution implements IStatementExecution
         return $results;
     }
 
-    public function runScript(string $sqlScript)
+    public function runScript(string $sqlScript): array
     {
         $connHandler = $this->connCtl->requireConnection();
 
@@ -237,7 +233,7 @@ class StatementExecution implements IStatementExecution
         }
     }
 
-    private function getLastResultNotice()
+    private function getLastResultNotice(): ?string
     {
         $resNotice = pg_last_notice($this->connCtl->requireConnection());
         $connNotice = $this->connCtl->getLastNotice();

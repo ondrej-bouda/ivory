@@ -23,7 +23,7 @@ abstract class RelationBase implements \IteratorAggregate, IRelation
         return new ProjectedRelation($this, $columns);
     }
 
-    public function rename($renamePairs): IRelation
+    public function rename(iterable $renamePairs): IRelation
     {
         return new RenamedRelation($this, $renamePairs);
     }

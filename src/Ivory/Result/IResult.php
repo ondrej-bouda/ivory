@@ -27,7 +27,7 @@ interface IResult
      * @return string|null notice emitted for this result, or <tt>null</tt> if no notice was emitted or it was
      *                       indistinguishable from previous notices
      */
-    function getLastNotice();
+    function getLastNotice(): ?string;
 
     /**
      * @return string the command tag, e.g., <tt>SELECT 2</tt> or <tt>CREATE FUNCTION</tt>

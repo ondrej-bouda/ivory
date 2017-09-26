@@ -32,8 +32,10 @@ abstract class TimestampBase extends DateBase
      * @param \DateTimeZone $forcedTimezone
      * @return \DateTimeImmutable
      */
-    protected static function isoStringToDateTime($isoDateTimeString, $forcedTimezone = null)
-    {
+    protected static function isoStringToDateTime(
+        string $isoDateTimeString,
+        ?\DateTimeZone $forcedTimezone = null
+    ): \DateTimeImmutable {
         // check out for more than 4 digits for the year - something date_create_immutable() does not handle properly
         $addYears = 0;
         $dateCreateInput = preg_replace_callback(
@@ -66,7 +68,7 @@ abstract class TimestampBase extends DateBase
         return $dt;
     }
 
-    protected static function floatToTwoPlaces($float)
+    protected static function floatToTwoPlaces($float): string
     {
         if ($float >= 10) {
             return (string)$float;
@@ -75,7 +77,7 @@ abstract class TimestampBase extends DateBase
         }
     }
 
-    protected static function inRanges($month, $day, $hour, $minute, $second)
+    protected static function inRanges(int $month, int $day, int $hour, int $minute, $second): bool
     {
         return (
             $month >= 1 && $month <= 12 &&
@@ -88,7 +90,7 @@ abstract class TimestampBase extends DateBase
         );
     }
 
-    protected static function assertRanges($year, $month, $day, $hour, $minute, $second)
+    protected static function assertRanges(int $year, int $month, int $day, int $hour, int $minute, $second): void
     {
         if ($year == 0) {
             throw new \InvalidArgumentException('$year zero is undefined');
@@ -115,7 +117,7 @@ abstract class TimestampBase extends DateBase
      * @return int|null the hour part of the date/time;
      *                  <tt>null</tt> iff the date/time is not finite
      */
-    final public function getHour()
+    final public function getHour(): ?int
     {
         return ($this->inf ? null : (int)$this->dt->format('G'));
     }
@@ -124,7 +126,7 @@ abstract class TimestampBase extends DateBase
      * @return int|null the minute part of the date/time;
      *                  <tt>null</tt> iff the date/time is not finite
      */
-    final public function getMinute()
+    final public function getMinute(): ?int
     {
         return ($this->inf ? null : (int)$this->dt->format('i'));
     }
@@ -170,7 +172,7 @@ abstract class TimestampBase extends DateBase
      *                  <tt>$hours</tt> hours, <tt>$minutes</tt> minutes, and <tt>$seconds</tt> seconds after this
      *                  date/time
      */
-    public function addParts($years, $months, $days, $hours, $minutes, $seconds)
+    public function addParts(int $years, int $months, int $days, int $hours, int $minutes, $seconds)
     {
         return $this->addPartsImpl($years, $months, $days, $hours, $minutes, $seconds);
     }
@@ -181,7 +183,7 @@ abstract class TimestampBase extends DateBase
      * @param int $hours
      * @return static the date <tt>$hours</tt> hours after (or before, if negative) this date/time
      */
-    public function addHour($hours = 1)
+    public function addHour(int $hours = 1)
     {
         return $this->addPartsImpl(0, 0, 0, $hours, 0, 0);
     }
@@ -193,7 +195,7 @@ abstract class TimestampBase extends DateBase
      * @param int $minutes
      * @return static the date <tt>$minutes</tt> minutes after (or before, if negative) this date/time
      */
-    public function addMinute($minutes = 1)
+    public function addMinute(int $minutes = 1)
     {
         return $this->addPartsImpl(0, 0, 0, 0, $minutes, 0);
     }

@@ -68,5 +68,5 @@ interface IRelationDefinition
      * @return IRelationDefinition definition of relation containing at most <tt>$limit</tt> rows, skipping the first
      *                               <tt>$offset</tt> rows
      */
-    function limit($limit, int $offset = 0);
+    function limit(?int $limit, int $offset = 0): IRelationDefinition;
 }

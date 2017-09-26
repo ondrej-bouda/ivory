@@ -29,7 +29,7 @@ class TextSearchVector
      * @param string[] $lexemeSet array of lexemes
      * @return TextSearchVector vector containing each lexeme once, without positions
      */
-    public static function fromSet($lexemeSet): TextSearchVector
+    public static function fromSet(array $lexemeSet): TextSearchVector
     {
         $lexemes = array_fill_keys($lexemeSet, null);
         ksort($lexemes);
@@ -40,7 +40,7 @@ class TextSearchVector
      * @param string[] $lexemeList array of lexemes
      * @return TextSearchVector vector containing each lexeme with each of its positions
      */
-    public static function fromList($lexemeList): TextSearchVector
+    public static function fromList(array $lexemeList): TextSearchVector
     {
         $lexemes = array_fill_keys($lexemeList, []);
         $pos = 1;
@@ -58,7 +58,7 @@ class TextSearchVector
      *                           the positions are 1-based
      * @return TextSearchVector
      */
-    public static function fromMap($lexemes): TextSearchVector
+    public static function fromMap(array $lexemes): TextSearchVector
     {
         ksort($lexemes);
         return new TextSearchVector($lexemes);
@@ -84,7 +84,7 @@ class TextSearchVector
         return self::fromList($tokens);
     }
 
-    private static function tokenize(string $str)
+    private static function tokenize(string $str): array
     {
         preg_match_all('~[^\s\']+|\'(?:[^\']+|\'\')*\'~', $str, $matches);
         $tokens = [];
@@ -99,7 +99,7 @@ class TextSearchVector
     }
 
 
-    private function __construct($lexemes)
+    private function __construct(array $lexemes)
     {
         $this->lexemes = $lexemes;
     }
@@ -110,7 +110,7 @@ class TextSearchVector
      *                   sorted by the lexeme;
      *                   the positions are 1-based
      */
-    public function getLexemes()
+    public function getLexemes(): array
     {
         return $this->lexemes;
     }

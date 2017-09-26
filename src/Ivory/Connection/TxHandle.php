@@ -39,7 +39,7 @@ class TxHandle implements ITxHandle
         }
     }
 
-    private function assertOpen()
+    private function assertOpen(): void
     {
         if (!$this->open) {
             if ($this->txCtl->inTransaction()) {
@@ -57,18 +57,17 @@ class TxHandle implements ITxHandle
         return $this->open;
     }
 
-    public function setupTransaction($transactionOptions)
+    public function setupTransaction($transactionOptions): void
     {
         $this->assertOpen();
         $txConfig = TxConfig::create($transactionOptions);
         $this->stmtExec->rawCommand('SET TRANSACTION ' . $txConfig->toSql());
     }
 
-    public function setTransactionSnapshot(string $snapshotId)
+    public function setTransactionSnapshot(string $snapshotId): void
     {
         $this->assertOpen();
         $this->stmtExec->rawCommand("SET TRANSACTION SNAPSHOT {$this->stringSerializer->serializeValue($snapshotId)}");
-        return true;
     }
 
     public function exportTransactionSnapshot(): string
@@ -80,7 +79,7 @@ class TxHandle implements ITxHandle
         return $r->value();
     }
 
-    public function commit()
+    public function commit(): void
     {
         $this->assertOpen();
         $this->stmtExec->rawCommand('COMMIT');
@@ -88,7 +87,7 @@ class TxHandle implements ITxHandle
         $this->txCtl->notifyTransactionCommit();
     }
 
-    public function rollback()
+    public function rollback(): void
     {
         $this->assertOpen();
         $this->stmtExec->rawCommand('ROLLBACK');
@@ -96,7 +95,7 @@ class TxHandle implements ITxHandle
         $this->txCtl->notifyTransactionRollback();
     }
 
-    public function rollbackIfOpen()
+    public function rollbackIfOpen(): void
     {
         if ($this->open) {
             $this->stmtExec->rawCommand('ROLLBACK');
@@ -105,28 +104,28 @@ class TxHandle implements ITxHandle
         }
     }
 
-    public function savepoint(string $name)
+    public function savepoint(string $name): void
     {
         $this->assertOpen();
         $this->stmtExec->rawCommand(sprintf('SAVEPOINT %s', $this->identSerializer->serializeValue($name)));
         $this->txCtl->notifySavepointSaved($name);
     }
 
-    public function rollbackToSavepoint(string $name)
+    public function rollbackToSavepoint(string $name): void
     {
         $this->assertOpen();
         $this->stmtExec->rawCommand(sprintf('ROLLBACK TO SAVEPOINT %s', $this->identSerializer->serializeValue($name)));
         $this->txCtl->notifyRollbackToSavepoint($name);
     }
 
-    public function releaseSavepoint(string $name)
+    public function releaseSavepoint(string $name): void
     {
         $this->assertOpen();
         $this->stmtExec->rawCommand(sprintf('RELEASE SAVEPOINT %s', $this->identSerializer->serializeValue($name)));
         $this->txCtl->notifySavepointReleased($name);
     }
 
-    public function prepareTransaction(string $name)
+    public function prepareTransaction(string $name): void
     {
         $this->assertOpen();
         $this->stmtExec->rawCommand("PREPARE TRANSACTION {$this->stringSerializer->serializeValue($name)}");

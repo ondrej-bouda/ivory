@@ -205,7 +205,7 @@ interface IStatementExecution
      * @throws ConnectionException when an error occurred while sending the statements or processing the database
      *                             response
      */
-    function rawMultiStatement($sqlStatements);
+    function rawMultiStatement(iterable $sqlStatements): array;
 
     /**
      * Sends a script of one or more statements to the database, waits for their execution, and returns the results.
@@ -223,8 +223,7 @@ interface IStatementExecution
      * @throws ConnectionException when an error occurred while sending the statements or processing the database
      *                             response
      */
-    function runScript(string $sqlScript);
-
+    function runScript(string $sqlScript): array;
     /**
      * @return StatementExceptionFactory the local factory used for emitting exceptions upon statement errors
      */

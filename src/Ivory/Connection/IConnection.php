@@ -43,7 +43,7 @@ interface IConnection extends
      *
      * @param ITransactionControlObserver $observer
      */
-    function addTransactionControlObserver(ITransactionControlObserver $observer);
+    function addTransactionControlObserver(ITransactionControlObserver $observer): void;
 
     /**
      * Removes a previously registered observer.
@@ -52,12 +52,12 @@ interface IConnection extends
      *
      * @param ITransactionControlObserver $observer
      */
-    function removeTransactionControlObserver(ITransactionControlObserver $observer);
+    function removeTransactionControlObserver(ITransactionControlObserver $observer): void;
 
     /**
      * Removes any observer registered so far.
      */
-    function removeAllTransactionControlObservers();
+    function removeAllTransactionControlObservers(): void;
 }
 
 // TODO: do not extend the whole interfaces - some methods are unnecessary to the public, e.g., getTypeDictionary()

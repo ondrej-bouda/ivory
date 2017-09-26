@@ -75,7 +75,7 @@ class Json
     {
         $json = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         if ($json === false) {
-            throw new \InvalidArgumentException(self::getJsonErrorMsg());
+            throw new \InvalidArgumentException(json_last_error_msg());
         }
         return $json;
     }
@@ -84,25 +84,8 @@ class Json
     {
         $value = json_decode($json);
         if ($value === null && json_last_error() != JSON_ERROR_NONE) {
-            throw new \InvalidArgumentException(self::getJsonErrorMsg());
+            throw new \InvalidArgumentException(json_last_error_msg());
         }
         return $value;
-    }
-
-    private static function getJsonErrorMsg()
-    {
-        if (PHP_VERSION_ID >= 50500) {
-            return json_last_error_msg();
-        } else {
-            static $messages = [
-                JSON_ERROR_DEPTH => 'Maximum stack depth exceeded',
-                JSON_ERROR_STATE_MISMATCH => 'Underflow or the modes mismatch',
-                JSON_ERROR_CTRL_CHAR => 'Unexpected control character found',
-                JSON_ERROR_SYNTAX => 'Syntax error, malformed JSON',
-                JSON_ERROR_UTF8 => 'Malformed UTF-8 characters, possibly incorrectly encoded',
-            ];
-            $error = json_last_error();
-            return (isset($messages[$error]) ? $messages[$error] : "Unknown JSON error ($error)");
-        }
     }
 }

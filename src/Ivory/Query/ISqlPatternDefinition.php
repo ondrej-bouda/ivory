@@ -28,10 +28,10 @@ interface ISqlPatternDefinition
     /**
      * Sets values of several parameters in the SQL pattern.
      *
-     * @param array|\Traversable $paramMap map: parameter name (or zero-based position) => parameter value
+     * @param iterable $paramMap map: parameter name (or zero-based position) => parameter value
      * @return $this
      */
-    function setParams($paramMap); // PHP 7.1: declare $paramMap as iterable
+    function setParams(iterable $paramMap);
 
     function getSqlPattern(): SqlPattern;
 

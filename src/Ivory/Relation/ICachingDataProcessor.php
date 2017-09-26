@@ -18,10 +18,10 @@ interface ICachingDataProcessor
      * Note that it is usually unnecessary to call this method as the data are fetched and cached automatically upon
      * serving the requests for them.
      */
-    function populate();
+    function populate(): void;
 
     /**
      * Flushes any volatile data already cached.
      */
-    function flush();
+    function flush(): void;
 }

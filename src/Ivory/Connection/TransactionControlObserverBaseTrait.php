@@ -8,39 +8,39 @@ namespace Ivory\Connection;
  */
 trait TransactionControlObserverBaseTrait
 {
-    public function handleTransactionStart()
+    public function handleTransactionStart(): void
     {
     }
 
-    public function handleTransactionCommit()
+    public function handleTransactionCommit(): void
     {
     }
 
-    public function handleTransactionRollback()
+    public function handleTransactionRollback(): void
     {
     }
 
-    public function handleSavepointSaved(string $name)
+    public function handleSavepointSaved(string $name): void
     {
     }
 
-    public function handleSavepointReleased(string $name)
+    public function handleSavepointReleased(string $name): void
     {
     }
 
-    public function handleRollbackToSavepoint(string $name)
+    public function handleRollbackToSavepoint(string $name): void
     {
     }
 
-    public function handleTransactionPrepared(string $name)
+    public function handleTransactionPrepared(string $name): void
     {
     }
 
-    public function handlePreparedTransactionCommit(string $name)
+    public function handlePreparedTransactionCommit(string $name): void
     {
     }
 
-    public function handlePreparedTransactionRollback(string $name)
+    public function handlePreparedTransactionRollback(string $name): void
     {
     }
 }

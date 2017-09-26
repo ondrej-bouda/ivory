@@ -24,7 +24,7 @@ class Column implements \IteratorAggregate, IColumn
      * @param string|null $name name of the column, or <tt>null</tt> if not named
      * @param IType|null $type type of the column values
      */
-    public function __construct(IRelation $relation, $colDef, $name, $type)
+    public function __construct(IRelation $relation, $colDef, ?string $name, ?IType $type)
     {
         $this->relation = $relation;
         $this->colDef = $colDef;
@@ -33,12 +33,12 @@ class Column implements \IteratorAggregate, IColumn
     }
 
 
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function getType()
+    public function getType(): ?IType
     {
         return $this->type;
     }

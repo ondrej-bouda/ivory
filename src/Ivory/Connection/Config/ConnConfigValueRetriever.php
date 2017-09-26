@@ -15,12 +15,12 @@ class ConnConfigValueRetriever implements IConfigObserver
     /**
      * @param IConnConfig $connConfig connection configuration
      * @param string $propertyName name of configuration property to retrieve values of
-     * @param callable|null $valueProcessor a function applied to the retrieved value before it is returned;
+     * @param \Closure|null $valueProcessor a function applied to the retrieved value before it is returned;
      *                                      given a single argument: the value of the property as retrieved from the
      *                                        <tt>$connConfig</tt>;
      *                                      expected to return the value which should be returned by {@link getValue()}
      */
-    public function __construct(IConnConfig $connConfig, string $propertyName, callable $valueProcessor = null)
+    public function __construct(IConnConfig $connConfig, string $propertyName, ?\Closure $valueProcessor = null)
     {
         $this->connConfig = $connConfig;
         $this->propName = $propertyName;
@@ -61,7 +61,7 @@ class ConnConfigValueRetriever implements IConfigObserver
         return $value;
     }
 
-    public function invalidateCache()
+    public function invalidateCache(): void
     {
         $this->isCached = false;
         $this->cachedValue = null;
@@ -70,7 +70,7 @@ class ConnConfigValueRetriever implements IConfigObserver
 
     //region IObservableConnConfig
 
-    public function handlePropertyChange(string $propertyName, $newValue)
+    public function handlePropertyChange(string $propertyName, $newValue): void
     {
         if ($this->valueProcessor !== null) {
             $newValue = call_user_func($this->valueProcessor, $newValue);
@@ -79,7 +79,7 @@ class ConnConfigValueRetriever implements IConfigObserver
         $this->isCached = true;
     }
 
-    public function handlePropertiesReset(IConnConfig $connConfig)
+    public function handlePropertiesReset(IConnConfig $connConfig): void
     {
         $this->invalidateCache();
     }

@@ -3,6 +3,7 @@ namespace Ivory\Relation;
 
 use Ivory\Relation\Alg\CallbackValueFilter;
 use Ivory\Relation\Alg\IValueFilter;
+use Ivory\Type\IType;
 
 class FilteredColumn implements \IteratorAggregate, IColumn, ICachingDataProcessor
 {
@@ -23,7 +24,7 @@ class FilteredColumn implements \IteratorAggregate, IColumn, ICachingDataProcess
 
     //region ICachingDataProcessor
 
-    public function populate()
+    public function populate(): void
     {
         if ($this->data === null) {
             $this->data = [];
@@ -35,7 +36,7 @@ class FilteredColumn implements \IteratorAggregate, IColumn, ICachingDataProcess
         }
     }
 
-    public function flush()
+    public function flush(): void
     {
         $this->data = null;
     }
@@ -44,12 +45,12 @@ class FilteredColumn implements \IteratorAggregate, IColumn, ICachingDataProcess
 
     //region IColumn
 
-    public function getName()
+    public function getName(): ?string
     {
         return $this->baseCol->getName();
     }
 
-    public function getType()
+    public function getType(): ?IType
     {
         return $this->baseCol->getType();
     }

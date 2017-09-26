@@ -247,7 +247,7 @@ class TimestampTz extends TimestampBase
      *                       object;
      *                     <tt>null</tt> iff the date/time is not finite
      */
-    public function toParts()
+    public function toParts(): ?array
     {
         if ($this->inf) {
             return null;

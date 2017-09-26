@@ -16,7 +16,7 @@ class CachingConnConfig extends ConnConfig implements ICachingConnConfig
         return parent::get($propertyName);
     }
 
-    public function invalidateCache($paramName = null)
+    public function invalidateCache($paramName = null): void
     {
         if ($paramName === null) {
             $this->cachedValues = [];
@@ -27,7 +27,7 @@ class CachingConnConfig extends ConnConfig implements ICachingConnConfig
         }
     }
 
-    public function disableCaching($paramName = null) // TODO: consider combination with transactions and savepoints
+    public function disableCaching($paramName = null): void // TODO: consider combination with transactions and savepoints
     {
         if ($paramName === null) {
             $this->cacheEnabled = false;
@@ -45,7 +45,7 @@ class CachingConnConfig extends ConnConfig implements ICachingConnConfig
         $this->invalidateCache($paramName);
     }
 
-    public function enableCaching($paramName = null) // TODO: consider combination with transactions and savepoints
+    public function enableCaching($paramName = null): void // TODO: consider combination with transactions and savepoints
     {
         if ($paramName === null) {
             $this->cacheEnabled = true;

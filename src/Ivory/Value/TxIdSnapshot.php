@@ -25,7 +25,7 @@ class TxIdSnapshot
      * @throws \InvalidArgumentException when <tt>$xmin</tt> or <tt>$xmax</tt> have an invalid value
      * @throws \OutOfRangeException when any <tt>$xipList</tt> item is out of <tt>[$xmin, $xmax)</tt>
      */
-    public static function fromParts(int $xmin, int $xmax, $xipList): TxIdSnapshot
+    public static function fromParts(int $xmin, int $xmax, array $xipList): TxIdSnapshot
     {
         if ($xmin <= 0 || $xmax <= 0 || $xmin > $xmax) {
             throw new \InvalidArgumentException('invalid $xmin or $xmax');
@@ -56,7 +56,7 @@ class TxIdSnapshot
         return self::fromParts((int)$parts[0], (int)$parts[1], $xipList);
     }
 
-    private function __construct(int $xmin, int $xmax, $xipList)
+    private function __construct(int $xmin, int $xmax, array $xipList)
     {
         $this->xmin = $xmin;
         $this->xmax = $xmax;
@@ -76,7 +76,7 @@ class TxIdSnapshot
     /**
      * @return int[]
      */
-    public function getXipList()
+    public function getXipList(): array
     {
         return $this->xipList;
     }

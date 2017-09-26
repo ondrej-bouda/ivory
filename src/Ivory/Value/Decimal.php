@@ -58,10 +58,10 @@ class Decimal implements IEqualable
      *                          the requested scale;
      *                        if greater than the scale of the given number, the number gets padded to have such many
      *                          decimal places;
-     *                        if not given, it is computed from the given number automatically
+     *                        if not given, it is computed from <tt>$decimalNumber</tt> automatically
      * @return Decimal
      */
-    public static function fromNumber($decimalNumber, $scale = null): Decimal
+    public static function fromNumber($decimalNumber, ?int $scale = null): Decimal
     {
         if ($decimalNumber === null) {
             throw new \InvalidArgumentException('decimalNumber');
@@ -144,7 +144,7 @@ class Decimal implements IEqualable
     {
         static $dec = null;
         if ($dec === null) {
-            $dec = new Decimal(0);
+            $dec = new Decimal('0');
         }
         return $dec;
     }
@@ -156,7 +156,7 @@ class Decimal implements IEqualable
      * @param string|null $val
      * @param int|null $scale
      */
-    private function __construct($val, $scale = null)
+    private function __construct(?string $val, ?int $scale = null)
     {
         if ($val === null) {
             $this->val = null;
@@ -242,7 +242,7 @@ class Decimal implements IEqualable
      * @return int|null number of decimal digits in the fractional part, to the right of the decimal point (if any), or
      *                  <tt>null</tt> for the not-a-number
      */
-    public function getScale()
+    public function getScale(): ?int
     {
         return $this->scale;
     }
@@ -255,9 +255,10 @@ class Decimal implements IEqualable
      * though.
      *
      * @param string|int|float|Decimal|object $number number to compare this number with
-     * @return bool whether this number numerically equals to <tt>$number</tt>
+     * @return bool|null whether this number numerically equals to <tt>$number</tt>;
+     *                   <tt>null</tt> for <tt>null</tt> input
      */
-    public function equals($number): bool
+    public function equals($number): ?bool
     {
         if ($number === null) {
             return null;
@@ -531,7 +532,7 @@ class Decimal implements IEqualable
             throw new UndefinedOperationException('Number with a decimal part');
         }
         if ($this->lessThan(2)) {
-            return new Decimal(1);
+            return new Decimal('1');
         }
 
         if (System::hasGMP()) {
@@ -539,8 +540,8 @@ class Decimal implements IEqualable
         }
 
         // OPT: there are more efficient algorithms calculating the factorial; see, e.g., http://www.luschny.de/math/factorial/index.html
-        $result = new Decimal(2);
-        for ($i = new Decimal(3); $i->compareTo($this) <= 0; $i = $i->add(1)) {
+        $result = new Decimal('2');
+        for ($i = new Decimal('3'); $i->compareTo($this) <= 0; $i = $i->add(1)) {
             $result = $result->multiply($i);
         }
         return $result;
@@ -644,7 +645,7 @@ class Decimal implements IEqualable
      *                    <tt>PHP_INT_MIN</tt>);
      *                  <tt>null</tt> is returned if this is the not-a-number
      */
-    public function toInt()
+    public function toInt(): ?int
     {
         return ($this->val === null ? null : (int)$this->val);
     }

@@ -23,5 +23,5 @@ interface ITypeControl
      *
      * Useful when the data types change during the script execution in such a way Ivory is unable to detect it.
      */
-    function flushTypeDictionary();
+    function flushTypeDictionary(): void;
 }

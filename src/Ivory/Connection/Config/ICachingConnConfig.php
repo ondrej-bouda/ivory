@@ -36,7 +36,7 @@ interface ICachingConnConfig extends IConnConfig
      * @param string|string[] one or more names of parameters the cached values of which to invalidate;
      *                        <tt>null</tt> invalidates everything
      */
-    function invalidateCache($paramName = null);
+    function invalidateCache($paramName = null): void;
 
     /**
      * Disables caching of values of a given configuration parameter, or of any configuration parameter.
@@ -48,7 +48,7 @@ interface ICachingConnConfig extends IConnConfig
      * @param string|string[] $paramName one or more names of parameters to disabled caching values of;
      *                                   <tt>null</tt> disables the caching altogether
      */
-    function disableCaching($paramName = null);
+    function disableCaching($paramName = null): void;
 
     /**
      * Enables caching of configuration parameter values again, after it has been disabled by {@link disableCaching()}.
@@ -59,5 +59,5 @@ interface ICachingConnConfig extends IConnConfig
      *
      * @param string|string[] $paramName
      */
-    function enableCaching($paramName = null);
+    function enableCaching($paramName = null): void;
 }

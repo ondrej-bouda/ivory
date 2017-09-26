@@ -27,7 +27,7 @@ class CachingSqlPatternParser implements ISqlPatternParser
         return $pattern;
     }
 
-    private function computeCacheKey(string $sqlPattern)
+    private function computeCacheKey(string $sqlPattern): string
     {
         return self::CACHE_KEY . '.' . md5($sqlPattern);
     }

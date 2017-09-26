@@ -26,12 +26,12 @@ class CacheControl implements ICacheControl
      * @param CacheItemPoolInterface|null $cacheItemPool cache implementation to use, or <tt>null</tt> to use the
      *                                                     default set to {@link Ivory::setDefaultCacheImpl()}
      */
-    public function setCacheImpl($cacheItemPool)
+    public function setCacheImpl(?CacheItemPoolInterface $cacheItemPool): void
     {
         $this->cacheItemPool = $cacheItemPool;
     }
 
-    private function composeCacheKey(string $objectKey)
+    private function composeCacheKey(string $objectKey): string
     {
         // object key before connection key - the connection key might contain anything out of control of Ivory
         $key = $this->prefix . self::safeCacheKey($objectKey) . $this->postfix;

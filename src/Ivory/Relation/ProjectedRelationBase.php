@@ -107,12 +107,12 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
     }
 
 
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->projectedColumns;
     }
 
-    protected function getColNameMap()
+    protected function getColNameMap(): array
     {
         return $this->projectedColNameMap;
     }

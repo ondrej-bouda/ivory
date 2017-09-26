@@ -19,7 +19,7 @@ interface IConnectionDependentObject
      *
      * @param IConnection $connection
      */
-    function attachToConnection(IConnection $connection);
+    function attachToConnection(IConnection $connection): void;
 
     /**
      * Detach the object from the connection.
@@ -29,5 +29,5 @@ interface IConnectionDependentObject
      *
      * Prior to further usage of this object, {@link attachToConnection()} must be called again.
      */
-    function detachFromConnection();
+    function detachFromConnection(): void;
 }

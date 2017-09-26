@@ -44,7 +44,7 @@ class ConnectionControl implements IConnectionControl
         return $this->params;
     }
 
-    public function isConnected()
+    public function isConnected(): ?bool
     {
         if ($this->handler === null) {
             return null;
@@ -53,7 +53,7 @@ class ConnectionControl implements IConnectionControl
         }
     }
 
-    public function isConnectedWait()
+    public function isConnectedWait(): ?bool
     {
         if ($this->handler === null) {
             return null;
@@ -63,7 +63,7 @@ class ConnectionControl implements IConnectionControl
         }
     }
 
-    public function connect(\Closure $initProcedure = null): bool
+    public function connect(?\Closure $initProcedure = null): bool
     {
         if ($this->handler === null) {
             $this->initProcedure = $initProcedure;
@@ -115,17 +115,17 @@ class ConnectionControl implements IConnectionControl
         return true;
     }
 
-    public function registerConnectStartHook(\Closure $closure)
+    public function registerConnectStartHook(\Closure $closure): void
     {
         $this->connectStartHooks[] = $closure;
     }
 
-    public function registerPreDisconnectHook(\Closure $closure)
+    public function registerPreDisconnectHook(\Closure $closure): void
     {
         $this->preDisconnectHooks[] = $closure;
     }
 
-    public function registerPostDisconnectHook(\Closure $closure)
+    public function registerPostDisconnectHook(\Closure $closure): void
     {
         $this->postDisconnectHooks[] = $closure;
     }
@@ -144,7 +144,7 @@ class ConnectionControl implements IConnectionControl
         }
     }
 
-    private function waitForConnection()
+    private function waitForConnection(): void
     {
         if ($this->finishedConnecting) {
             return;
@@ -190,7 +190,7 @@ class ConnectionControl implements IConnectionControl
         }
     }
 
-    private static function isStreamReadable($stream, int $sec, int $usec = null): bool
+    private static function isStreamReadable($stream, int $sec, ?int $usec = null): bool
     {
         $r = [$stream];
         $w = [];
@@ -228,7 +228,7 @@ class ConnectionControl implements IConnectionControl
      *
      * @return string|null last notice received on this connection
      */
-    public function getLastNotice()
+    public function getLastNotice(): ?string
     {
         return $this->lastNotice;
     }
@@ -238,7 +238,7 @@ class ConnectionControl implements IConnectionControl
      *
      * @param string|null $notice last notice received on this connection
      */
-    public function setLastNotice($notice)
+    public function setLastNotice(?string $notice): void
     {
         $this->lastNotice = $notice;
     }

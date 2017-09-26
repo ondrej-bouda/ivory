@@ -19,10 +19,10 @@ interface ISet extends \Countable
     /**
      * @param mixed $value value to add to the set
      */
-    function add($value);
+    function add($value): void;
 
     /**
      * @param mixed $value value to remove from the set
      */
-    function remove($value);
+    function remove($value): void;
 }

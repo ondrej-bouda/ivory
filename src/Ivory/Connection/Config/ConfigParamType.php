@@ -36,7 +36,7 @@ class ConfigParamType
         }
     }
 
-    public static function detectType(string $typeName, $valueString, string $unit = null): int
+    public static function detectType(string $typeName, string $valueString, ?string $unit = null): int
     {
         $withUnit = ($unit || !is_numeric($valueString));
         return self::fromPostgreSQLName($typeName, $withUnit);
@@ -50,7 +50,7 @@ class ConfigParamType
      *                          <tt>null</tt> to take it from <tt>$valueString</tt> if relevant
      * @return bool|string|int|double|Quantity|null <tt>null</tt> iff <tt>$valueString</tt> is <tt>null</tt>
      */
-    public static function createValue($type, $valueString, string $unit = null)
+    public static function createValue($type, ?string $valueString, ?string $unit = null)
     {
         if ($valueString === null) {
             return null;

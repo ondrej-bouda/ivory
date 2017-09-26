@@ -98,7 +98,7 @@ class StatementException extends \RuntimeException
     /**
      * @return string|null the detailed message, if any
      */
-    final public function getMessageDetail()
+    final public function getMessageDetail(): ?string
     {
         return $this->errorFields[PGSQL_DIAG_MESSAGE_DETAIL];
     }
@@ -106,7 +106,7 @@ class StatementException extends \RuntimeException
     /**
      * @return string|null the message hint, if any
      */
-    final public function getMessageHint()
+    final public function getMessageHint(): ?string
     {
         return $this->errorFields[PGSQL_DIAG_MESSAGE_HINT];
     }
@@ -123,7 +123,7 @@ class StatementException extends \RuntimeException
      * @return int|null position of the error within the original statement, returned by {@link getQuery()};
      *                  one-based, measured in characters (not bytes)
      */
-    final public function getStatementPosition()
+    final public function getStatementPosition(): ?int
     {
         return $this->errorFields[PGSQL_DIAG_STATEMENT_POSITION];
     }
@@ -132,7 +132,7 @@ class StatementException extends \RuntimeException
      * @return string|null the text of the internally-generated query which actually caused the error (if any);
      *                     e.g., a query issued from within a PostgreSQL function
      */
-    final public function getInternalQuery()
+    final public function getInternalQuery(): ?string
     {
         return $this->errorFields[PGSQL_DIAG_INTERNAL_QUERY];
     }
@@ -141,9 +141,8 @@ class StatementException extends \RuntimeException
      * @return int|null position of the error within the {@link getInternalQuery() internally-generated query} which
      *                    actually caused the error (if any);
      *                  one-based, measured in characters (not bytes)
-     *
      */
-    final public function getInternalPosition()
+    final public function getInternalPosition(): ?int
     {
         return $this->errorFields[PGSQL_DIAG_INTERNAL_POSITION];
     }
@@ -151,7 +150,7 @@ class StatementException extends \RuntimeException
     /**
      * @return string|null the PostgreSQL context of the error; e.g., the stack trace of functions and internal queries
      */
-    final public function getContext()
+    final public function getContext(): ?string
     {
         return $this->errorFields[PGSQL_DIAG_CONTEXT];
     }

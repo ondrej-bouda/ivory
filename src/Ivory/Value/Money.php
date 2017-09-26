@@ -57,7 +57,7 @@ class Money
         return new Money($decimal, $unit);
     }
 
-    public static function fromNumber($amount, string $unit = null): Money
+    public static function fromNumber($amount, ?string $unit = null): Money
     {
         $decimal = Decimal::fromNumber($amount);
         if ($decimal->isNaN()) {
@@ -68,7 +68,7 @@ class Money
     }
 
 
-    private function __construct(Decimal $amount, $unit)
+    private function __construct(Decimal $amount, ?string $unit)
     {
         $this->amount = $amount;
         $this->unit = $unit;
@@ -85,7 +85,7 @@ class Money
     /**
      * @return string|null the money unit (e.g., <tt>$</tt>), or <tt>null</tt> if no unit is specified for this amount
      */
-    public function getUnit()
+    public function getUnit(): ?string
     {
         return $this->unit;
     }

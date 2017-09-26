@@ -71,7 +71,7 @@ class TimeInterval implements IEqualable
      * @param number[] $parts map of units (any of {@link TimeInterval} constants) to the corresponding quantity
      * @return TimeInterval
      */
-    public static function fromParts($parts): TimeInterval
+    public static function fromParts(array $parts): TimeInterval
     {
         $mon = 0;
         $day = 0;
@@ -226,7 +226,7 @@ class TimeInterval implements IEqualable
         return self::fromParts($parts);
     }
 
-    private static function parseIsoDateStr(string $str)
+    private static function parseIsoDateStr(string $str): array
     {
         if (preg_match('~^(-?\d+)-(-?\d+)-(-?\d+)$~', $str, $m)) {
             return [
@@ -245,7 +245,7 @@ class TimeInterval implements IEqualable
         }
     }
 
-    private static function parseTimeStr(string $str, int $offset = 0, bool $separateMinuteSigns = true)
+    private static function parseTimeStr(string $str, int $offset = 0, bool $separateMinuteSigns = true): array
     {
         $timeRe = '~^
                      ( -? \d+ (?: \.\d+ )? )
@@ -276,7 +276,7 @@ class TimeInterval implements IEqualable
         }
     }
 
-    private static function parsePostgresqlStr(string $str, int $offset = 0)
+    private static function parsePostgresqlStr(string $str, int $offset = 0): array
     {
         static $pgUnits = [
             'millennium' => self::MILLENNIUM,
@@ -333,7 +333,7 @@ class TimeInterval implements IEqualable
         return $parts;
     }
 
-    private static function parseQuantityUnitPairs(string $str, int $offset, $units)
+    private static function parseQuantityUnitPairs(string $str, int $offset, array $units): array
     {
         $result = [];
         // OPT: the regular expression might be cached
@@ -362,7 +362,7 @@ class TimeInterval implements IEqualable
      *                  the order of parts is guaranteed to be as mentioned in the previous sentence, i.e., from years
      *                    to seconds
      */
-    public function toParts()
+    public function toParts(): array
     {
         $result = [];
         $yr = (int)($this->mon / 12);

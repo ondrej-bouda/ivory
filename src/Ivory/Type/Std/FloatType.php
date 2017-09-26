@@ -42,12 +42,12 @@ class FloatType extends \Ivory\Type\BaseType implements ITotallyOrderedType
         }
     }
 
-    public function compareValues($a, $b)
+    public function compareValues($a, $b): ?int
     {
         return self::compareFloats($a, $b);
     }
 
-    public static function compareFloats($a, $b)
+    public static function compareFloats($a, $b): ?int
     {
         if ($a === null || $b === null) {
             return null;

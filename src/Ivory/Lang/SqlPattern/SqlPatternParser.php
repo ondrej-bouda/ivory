@@ -95,7 +95,7 @@ class SqlPatternParser implements ISqlPatternParser
      * @param bool|null $quoted
      * @return string|null <tt>null</tt> iff <tt>$str</tt> is <tt>null</tt>
      */
-    private function unquoteString($str, &$quoted = null)
+    private function unquoteString(?string $str, ?bool &$quoted = null): ?string
     {
         if ($str && $str[0] == '"') {
             assert($str[strlen($str) - 1] == '"');

@@ -32,5 +32,5 @@ interface IValueMap extends IMappedObject
     /**
      * @return array list of all the mapping keys
      */
-    function getKeys();
+    function getKeys(): array;
 }

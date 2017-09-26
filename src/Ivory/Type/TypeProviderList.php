@@ -12,19 +12,19 @@ class TypeProviderList implements ITypeProvider
     /** @var ITypeProvider[] */
     private $typeProviders = [];
 
-    public function appendTypeProvider(ITypeProvider $typeProvider)
+    public function appendTypeProvider(ITypeProvider $typeProvider): void
     {
         $this->typeProviders[] = $typeProvider;
     }
 
-    public function prependTypeProvider(ITypeProvider $typeProvider)
+    public function prependTypeProvider(ITypeProvider $typeProvider): void
     {
         array_unshift($this->typeProviders, $typeProvider);
     }
 
     //region ITypeProvider
 
-    public function provideType(string $schemaName, string $typeName)
+    public function provideType(string $schemaName, string $typeName): ?IType
     {
         foreach ($this->typeProviders as $typeProvider) {
             $type = $typeProvider->provideType($schemaName, $typeName);
@@ -36,7 +36,11 @@ class TypeProviderList implements ITypeProvider
         return null;
     }
 
-    public function provideRangeCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype)
+    public function provideRangeCanonicalFunc(
+        string $schemaName,
+        string $funcName,
+        ITotallyOrderedType $subtype
+    ): ?IRangeCanonicalFunc
     {
         foreach ($this->typeProviders as $typeProvider) {
             $func = $typeProvider->provideRangeCanonicalFunc($schemaName, $funcName, $subtype);
@@ -48,7 +52,7 @@ class TypeProviderList implements ITypeProvider
         return null;
     }
 
-    public function getTypeRecognitionRules()
+    public function getTypeRecognitionRules(): array
     {
         $result = [];
         foreach ($this->typeProviders as $typeProvider) {
@@ -57,7 +61,7 @@ class TypeProviderList implements ITypeProvider
         return $result;
     }
 
-    public function getValueSerializers()
+    public function getValueSerializers(): array
     {
         $result = [];
         foreach ($this->typeProviders as $typeProvider) {
@@ -66,7 +70,7 @@ class TypeProviderList implements ITypeProvider
         return $result;
     }
 
-    public function getTypeAbbreviations()
+    public function getTypeAbbreviations(): array
     {
         $result = [];
         foreach ($this->typeProviders as $typeProvider) {
@@ -77,4 +81,3 @@ class TypeProviderList implements ITypeProvider
 
     //endregion
 }
-

@@ -42,7 +42,7 @@ interface IConnConfig
     /**
      * Flushes any cached information.
      */
-    function flushCache();
+    function flushCache(): void;
 
     /**
      * @param string $propertyName name of a configuration option
@@ -68,7 +68,7 @@ interface IConnConfig
      * @param bool|string|int|float|Quantity $value the new value, or {@link IConnConfig::DEFAULT_VALUE} to use the
      *                                                option's default
      */
-    function setForTransaction(string $propertyName, $value);
+    function setForTransaction(string $propertyName, $value): void;
 
     /**
      * Sets the specified option to the given value with validity until the connection is closed.
@@ -79,14 +79,14 @@ interface IConnConfig
      * @param bool|string|int|float|Quantity $value the new value, or {@link IConnConfig::DEFAULT_VALUE} to use the
      *                                                option's default
      */
-    function setForSession(string $propertyName, $value);
+    function setForSession(string $propertyName, $value): void;
 
     /**
      * Resets the values of all options to their current defaults.
      *
      * It corresponds to the SQL `RESET ALL` command. By definition, the effect is session-wide.
      */
-    function resetAll();
+    function resetAll(): void;
 
     /**
      * @return TxConfig transaction parameters of the current transaction
@@ -102,7 +102,7 @@ interface IConnConfig
      * @return string[] the effective search path - the explicit search path combined with the implicit schemas
      * @see https://www.postgresql.org/docs/9.6/static/runtime-config-client.html#RUNTIME-CONFIG-CLIENT-STATEMENT
      */
-    function getEffectiveSearchPath();
+    function getEffectiveSearchPath(): array;
 
     /**
      * @return string currently configured decimal separator used in values of type <tt>money</tt>;

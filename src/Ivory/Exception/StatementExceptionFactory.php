@@ -89,7 +89,7 @@ class StatementExceptionFactory
     /**
      * Clears all registered exception classes, leaving the factory as in the initial state.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->bySqlStateCodeAndMessage = [];
         $this->bySqlStateCode = [];
@@ -107,14 +107,14 @@ class StatementExceptionFactory
     public function createException(
         $resultHandler,
         string $query,
-        StatementExceptionFactory $fallbackFactory = null
+        ?StatementExceptionFactory $fallbackFactory = null
     ): StatementException {
         $exClass = $this->inferExceptionClass($resultHandler, $fallbackFactory);
         assert(is_a($exClass, StatementException::class, true));
         return new $exClass($resultHandler, $query);
     }
 
-    private function inferExceptionClass($resultHandler, StatementExceptionFactory $fallbackFactory = null): string
+    private function inferExceptionClass($resultHandler, ?StatementExceptionFactory $fallbackFactory = null): string
     {
         if ($this->bySqlStateCodeAndMessage || $this->bySqlStateCode || $this->bySqlStateClass) {
             $sqlStateCode = pg_result_error_field($resultHandler, PGSQL_DIAG_SQLSTATE);

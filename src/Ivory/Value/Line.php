@@ -55,7 +55,7 @@ class Line
         return new Line($a, $b, $c, [$p1, $p2]);
     }
 
-    private function __construct(float $a, float $b, float $c, $points)
+    private function __construct(float $a, float $b, float $c, array $points)
     {
         $this->a = $a;
         $this->b = $b;
@@ -68,7 +68,7 @@ class Line
      *
      * @return float[] the triple of A, B, and C under indices 0, 1, and 2, and also under indices 'a', 'b', and 'c'
      */
-    public function getEquationCoeffs()
+    public function getEquationCoeffs(): array
     {
         return [
             $this->a,

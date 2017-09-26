@@ -25,7 +25,7 @@ class PolymorphicPseudoType extends BaseType implements ITotallyOrderedType
         }
     }
 
-    public function compareValues($a, $b)
+    public function compareValues($a, $b): ?int
     {
         if ($a === null || $b === null) {
             return null;

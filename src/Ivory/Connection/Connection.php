@@ -68,17 +68,17 @@ class Connection implements IConnection
         return $this->connCtl->getParameters();
     }
 
-    public function isConnected()
+    public function isConnected(): ?bool
     {
         return $this->connCtl->isConnected();
     }
 
-    public function isConnectedWait()
+    public function isConnectedWait(): ?bool
     {
         return $this->connCtl->isConnectedWait();
     }
 
-    public function connect(\Closure $initProcedure = null): bool
+    public function connect(?\Closure $initProcedure = null): bool
     {
         return $this->connCtl->connect($initProcedure);
     }
@@ -93,17 +93,17 @@ class Connection implements IConnection
         return $this->connCtl->disconnect();
     }
 
-    public function registerConnectStartHook(\Closure $closure)
+    public function registerConnectStartHook(\Closure $closure): void
     {
         $this->connCtl->registerConnectStartHook($closure);
     }
 
-    public function registerPreDisconnectHook(\Closure $closure)
+    public function registerPreDisconnectHook(\Closure $closure): void
     {
         $this->connCtl->registerPreDisconnectHook($closure);
     }
 
-    public function registerPostDisconnectHook(\Closure $closure)
+    public function registerPostDisconnectHook(\Closure $closure): void
     {
         $this->connCtl->registerPostDisconnectHook($closure);
     }
@@ -122,7 +122,7 @@ class Connection implements IConnection
         return $this->typeCtl->getTypeDictionary();
     }
 
-    public function flushTypeDictionary()
+    public function flushTypeDictionary(): void
     {
         $this->typeCtl->flushTypeDictionary();
     }
@@ -161,12 +161,12 @@ class Connection implements IConnection
         return $this->stmtExec->rawCommand($sqlCommand);
     }
 
-    public function rawMultiStatement($sqlStatements)
+    public function rawMultiStatement(iterable $sqlStatements): array
     {
         return $this->stmtExec->rawMultiStatement($sqlStatements);
     }
 
-    public function runScript(string $sqlScript)
+    public function runScript(string $sqlScript): array
     {
         return $this->stmtExec->runScript($sqlScript);
     }
@@ -180,32 +180,32 @@ class Connection implements IConnection
 
     //region Copy Control
 
-    public function copyFromFile(string $file, string $table, $columns = null, $options = []): ICommandResult
+    public function copyFromFile(string $file, string $table, ?array $columns = null, array $options = []): ICommandResult
     {
         return $this->copyCtl->copyFromFile($file, $table, $columns, $options);
     }
 
-    public function copyFromProgram(string $program, string $table, $columns = null, $options = []): ICommandResult
+    public function copyFromProgram(string $program, string $table, ?array $columns = null, array $options = []): ICommandResult
     {
         return $this->copyCtl->copyFromProgram($program, $table, $columns, $options);
     }
 
-    public function copyFromInput(string $table, $columns = null, $options = []): ICopyInResult
+    public function copyFromInput(string $table, ?array $columns = null, array $options = []): ICopyInResult
     {
         return $this->copyCtl->copyFromInput($table, $columns, $options);
     }
 
-    public function copyToFile(string $file, $tableOrRelationDefinition, $columns = null, $options = []): ICommandResult
+    public function copyToFile(string $file, $tableOrRelationDefinition, ?array $columns = null, array $options = []): ICommandResult
     {
         return $this->copyCtl->copyToFile($file, $tableOrRelationDefinition, $columns, $options);
     }
 
-    public function copyToProgram(string $program, $tableOrRelationDefinition, $columns = null, $options = []): ICommandResult
+    public function copyToProgram(string $program, $tableOrRelationDefinition, ?array $columns = null, array $options = []): ICommandResult
     {
         return $this->copyCtl->copyToProgram($program, $tableOrRelationDefinition, $columns, $options);
     }
 
-    public function copyToArray(string $table, $options = [])
+    public function copyToArray(string $table, array $options = []): array
     {
         return $this->copyCtl->copyToArray($table, $options);
     }
@@ -224,17 +224,17 @@ class Connection implements IConnection
         return $this->txCtl->startTransaction($transactionOptions);
     }
 
-    public function setupSubsequentTransactions($transactionOptions)
+    public function setupSubsequentTransactions($transactionOptions): void
     {
         $this->txCtl->setupSubsequentTransactions($transactionOptions);
     }
 
-    public function commitPreparedTransaction(string $name)
+    public function commitPreparedTransaction(string $name): void
     {
         $this->txCtl->commitPreparedTransaction($name);
     }
 
-    public function rollbackPreparedTransaction(string $name)
+    public function rollbackPreparedTransaction(string $name): void
     {
         $this->txCtl->rollbackPreparedTransaction($name);
     }
@@ -248,17 +248,17 @@ class Connection implements IConnection
 
     //region Transaction observing
 
-    public function addTransactionControlObserver(ITransactionControlObserver $observer)
+    public function addTransactionControlObserver(ITransactionControlObserver $observer): void
     {
         $this->txCtl->addObserver($observer);
     }
 
-    public function removeTransactionControlObserver(ITransactionControlObserver $observer)
+    public function removeTransactionControlObserver(ITransactionControlObserver $observer): void
     {
         $this->txCtl->removeObserver($observer);
     }
 
-    public function removeAllTransactionControlObservers()
+    public function removeAllTransactionControlObservers(): void
     {
         $this->txCtl->removeAllObservers();
     }
@@ -272,27 +272,27 @@ class Connection implements IConnection
         return $this->ipcCtl->getBackendPID();
     }
 
-    public function notify(string $channel, string $payload = null)
+    public function notify(string $channel, ?string $payload = null): void
     {
         $this->ipcCtl->notify($channel, $payload);
     }
 
-    public function listen(string $channel)
+    public function listen(string $channel): void
     {
         $this->ipcCtl->listen($channel);
     }
 
-    public function unlisten(string $channel)
+    public function unlisten(string $channel): void
     {
         $this->ipcCtl->unlisten($channel);
     }
 
-    public function unlistenAll()
+    public function unlistenAll(): void
     {
         $this->ipcCtl->unlistenAll();
     }
 
-    public function pollNotification()
+    public function pollNotification(): ?Notification
     {
         return $this->ipcCtl->pollNotification();
     }

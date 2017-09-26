@@ -6,7 +6,7 @@ namespace Ivory\Utils;
  */
 trait EqualableWithPhpOperators
 {
-    final public function equals($object)
+    final public function equals($object): ?bool
     {
         if ($object === null) {
             return null;

@@ -12,19 +12,19 @@ abstract class ConnectionDependentValueSerializer implements IValueSerializer, I
 {
     private $conn;
 
-    public function __construct(IConnection $connection = null)
+    public function __construct(?IConnection $connection = null)
     {
         if ($connection !== null) {
             $this->attachToConnection($connection);
         }
     }
 
-    public function attachToConnection(IConnection $connection)
+    public function attachToConnection(IConnection $connection): void
     {
         $this->conn = $connection;
     }
 
-    public function detachFromConnection()
+    public function detachFromConnection(): void
     {
         $this->conn = null;
     }

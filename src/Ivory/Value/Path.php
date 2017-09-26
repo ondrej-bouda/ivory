@@ -30,7 +30,7 @@ class Path
      * @param bool $isOpen whether the path is open or closed; {@link Path::OPEN} and {@link Path::CLOSED} may be used
      * @return Path
      */
-    public static function fromPoints($points, $isOpen = self::CLOSED): Path
+    public static function fromPoints(array $points, bool $isOpen = self::CLOSED): Path
     {
         if (count($points) == 0) {
             throw new \InvalidArgumentException('points');
@@ -59,7 +59,7 @@ class Path
         return new Path($normalized, $isOpen);
     }
 
-    private function __construct($points, bool $isOpen)
+    private function __construct(array $points, bool $isOpen)
     {
         $this->points = $points;
         $this->open = $isOpen;
@@ -68,7 +68,7 @@ class Path
     /**
      * @return Point[] the list of vertices determining this path
      */
-    public function getPoints()
+    public function getPoints(): array
     {
         return $this->points;
     }

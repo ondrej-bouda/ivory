@@ -11,7 +11,7 @@ interface IWritableValueMap extends IValueMap
      * @param mixed $key
      * @param mixed|IValueMap $entry
      */
-    function put($key, $entry);
+    function put($key, $entry): void;
 
     /**
      * Puts an entry (either a value or an {@link IValueMap}) into the map under a given key unless there already

@@ -16,7 +16,7 @@ class ProjectedRelation extends ProjectedRelationBase
         parent::__construct($source, $this->defineColumns($source, $colDef));
     }
 
-    private function defineColumns(IRelation $source, $colDef)
+    private function defineColumns(IRelation $source, $colDef): array
     {
         $srcCols = $source->getColumns();
 
@@ -57,7 +57,7 @@ class ProjectedRelation extends ProjectedRelationBase
      * @param string $value
      * @return string[]
      */
-    private function recognizeColsByName($srcCols, bool $nameSpecified, $key, string $value)
+    private function recognizeColsByName(array $srcCols, bool $nameSpecified, $key, string $value): array
     {
         if ($value[0] == '/') { // PCRE macro
             $pcre = $value;

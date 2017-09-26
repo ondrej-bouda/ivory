@@ -118,7 +118,7 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
                         break;
 
                     case 'e':
-                        $labels = (isset($enumLabels[$row['oid']]) ? $enumLabels[$row['oid']] : []);
+                        $labels = ($enumLabels[$row['oid']] ?? []);
                         $type = $this->createEnumType($schemaName, $typeName, $labels);
                         break;
 
@@ -163,7 +163,7 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
         $this->fetchCompositeAttributes($dict);
     }
 
-    private function retrieveEnumLabels()
+    private function retrieveEnumLabels(): array
     {
         $query = 'SELECT enumtypid, enumlabel
                   FROM pg_catalog.pg_enum
@@ -180,7 +180,7 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
         return $labels;
     }
 
-    private function fetchCompositeAttributes(ITypeDictionary $dict)
+    private function fetchCompositeAttributes(ITypeDictionary $dict): void
     {
         $query = 'SELECT pg_type.oid, attname, atttypid
                   FROM pg_catalog.pg_attribute
@@ -244,7 +244,7 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
      * @param string[] $labels list of enumeration labels in the definition order
      * @return IType
      */
-    private function createEnumType(string $schemaName, string $typeName, $labels): IType
+    private function createEnumType(string $schemaName, string $typeName, array $labels): IType
     {
         return new EnumType($schemaName, $typeName, $labels);
     }
@@ -253,7 +253,7 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
         string $schemaName,
         string $typeName,
         ITotallyOrderedType $subtype,
-        IRangeCanonicalFunc $canonicalFunc = null
+        ?IRangeCanonicalFunc $canonicalFunc = null
     ): IType {
         return new RangeType($schemaName, $typeName, $subtype, $canonicalFunc);
     }

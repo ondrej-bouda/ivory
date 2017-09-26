@@ -15,12 +15,12 @@ class UndefinedType extends ConnectionDependentBaseType
 {
     private $connName;
 
-    public function attachToConnection(IConnection $connection)
+    public function attachToConnection(IConnection $connection): void
     {
         $this->connName = $connection->getName();
     }
 
-    public function detachFromConnection()
+    public function detachFromConnection(): void
     {
         $this->connName = null;
     }

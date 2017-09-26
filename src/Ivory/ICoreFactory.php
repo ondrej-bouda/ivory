@@ -26,9 +26,9 @@ interface ICoreFactory
      * @param IConnection|null $connection
      * @return ICacheControl
      */
-    function createCacheControl(IConnection $connection = null): ICacheControl;
+    function createCacheControl(?IConnection $connection = null): ICacheControl;
 
-    function createSqlPatternParser(ICacheControl $cacheControl = null): ISqlPatternParser;
+    function createSqlPatternParser(?ICacheControl $cacheControl = null): ISqlPatternParser;
 
     function createStatementExceptionFactory(): StatementExceptionFactory;
 

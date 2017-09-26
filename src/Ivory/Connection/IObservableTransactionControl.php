@@ -16,7 +16,7 @@ interface IObservableTransactionControl extends ITransactionControl
      *
      * @param ITransactionControlObserver $observer
      */
-    function addObserver(ITransactionControlObserver $observer);
+    function addObserver(ITransactionControlObserver $observer): void;
 
     /**
      * Removes a previously registered observer.
@@ -25,47 +25,47 @@ interface IObservableTransactionControl extends ITransactionControl
      *
      * @param ITransactionControlObserver $observer
      */
-    function removeObserver(ITransactionControlObserver $observer);
+    function removeObserver(ITransactionControlObserver $observer): void;
 
     /**
      * Removes any observer registered so far.
      */
-    function removeAllObservers();
+    function removeAllObservers(): void;
 
 
-    function notifyTransactionStart();
+    function notifyTransactionStart(): void;
 
-    function notifyTransactionCommit();
+    function notifyTransactionCommit(): void;
 
-    function notifyTransactionRollback();
+    function notifyTransactionRollback(): void;
 
     /**
      * @param string $name name of the savepoint to be notified as saved
      */
-    function notifySavepointSaved(string $name);
+    function notifySavepointSaved(string $name): void;
 
     /**
      * @param string $name name of the savepoint to be notified as released
      */
-    function notifySavepointReleased(string $name);
+    function notifySavepointReleased(string $name): void;
 
     /**
      * @param string $name name of the savepoint to be notified as rolled back
      */
-    function notifyRollbackToSavepoint(string $name);
+    function notifyRollbackToSavepoint(string $name): void;
 
     /**
      * @param string $name name of the transaction to be notified as prepared
      */
-    function notifyTransactionPrepared(string $name);
+    function notifyTransactionPrepared(string $name): void;
 
     /**
      * @param string $name name of the prepared transaction to be notified as committed
      */
-    function notifyPreparedTransactionCommit(string $name);
+    function notifyPreparedTransactionCommit(string $name): void;
 
     /**
      * @param string $name name of the prepared transaction to be notified as rolled back
      */
-    function notifyPreparedTransactionRollback(string $name);
+    function notifyPreparedTransactionRollback(string $name): void;
 }

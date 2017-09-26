@@ -132,7 +132,7 @@ class SqlPattern
         $this->initPlaceholderSequence();
     }
 
-    private function initPlaceholderSequence()
+    private function initPlaceholderSequence(): void
     {
         $byOffset = [];
         foreach ($this->positionalPlaceholders as $plcHld) {
@@ -162,7 +162,7 @@ class SqlPattern
      * @return SqlPatternPlaceholder[] list of positional placeholders, in order of appearance, used in the
      *                                       described SQL pattern
      */
-    public function getPositionalPlaceholders()
+    public function getPositionalPlaceholders(): array
     {
         return $this->positionalPlaceholders;
     }
@@ -172,7 +172,7 @@ class SqlPattern
      *                                         of all placeholders (in order of appearance) referring to the parameter
      *                                         name
      */
-    public function getNamedPlaceholderMap()
+    public function getNamedPlaceholderMap(): array
     {
         return $this->namedPlaceholderMap;
     }

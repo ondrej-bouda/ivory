@@ -30,12 +30,12 @@ class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedTy
     /** @var ConnConfigValueRetriever */
     private $decSepRetriever;
 
-    public function attachToConnection(IConnection $connection)
+    public function attachToConnection(IConnection $connection): void
     {
         $this->decSepRetriever = new ConnConfigValueRetriever($connection->getConfig(), ConfigParam::MONEY_DEC_SEP);
     }
 
-    public function detachFromConnection()
+    public function detachFromConnection(): void
     {
         $this->decSepRetriever = null;
     }
@@ -71,7 +71,7 @@ class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedTy
         return $str . '::money';
     }
 
-    public function compareValues($a, $b)
+    public function compareValues($a, $b): ?int
     {
         if ($a === null || $b === null) {
             return null;

@@ -18,7 +18,7 @@ class Polygon
      * @param Point[]|float[][] $points
      * @return Polygon
      */
-    public static function fromPoints($points): Polygon
+    public static function fromPoints(array $points): Polygon
     {
         if (count($points) == 0) {
             throw new \InvalidArgumentException('points');
@@ -38,7 +38,7 @@ class Polygon
         return new Polygon($normalized);
     }
 
-    private function __construct($points)
+    private function __construct(array $points)
     {
         $this->points = $points;
     }
@@ -46,7 +46,7 @@ class Polygon
     /**
      * @return Point[] the list of vertices determining this polygon
      */
-    public function getPoints()
+    public function getPoints(): array
     {
         return $this->points;
     }

@@ -18,12 +18,12 @@ interface IColumn extends \Traversable, \Countable
     /**
      * @return string|null name of the column, if defined
      */
-    function getName();
+    function getName(): ?string;
 
     /**
      * @return IType|null type of the column if known (it is unknown for columns on tuple evaluators)
      */
-    function getType();
+    function getType(): ?IType;
 
     /**
      * @param string $newName

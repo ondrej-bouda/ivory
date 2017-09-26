@@ -24,7 +24,7 @@ interface IRelation extends \Traversable, \Countable
     /**
      * @return IColumn[] list of columns constituting this relation
      */
-    function getColumns();
+    function getColumns(): array;
 
     /**
      * Reduces the relation only to tuples satisfying a given filter.
@@ -154,10 +154,10 @@ interface IRelation extends \Traversable, \Countable
      *
      * If there are multiple columns matching a macro, or even multiple columns of the same name, they all get renamed.
      *
-     * @param string[]|\Traversable $renamePairs old-new name map
+     * @param iterable $renamePairs old-new name map
      * @return IRelation the same relation as this one except that columns in <tt>$renamePairs</tt> are renamed
      */
-    function rename($renamePairs): IRelation;
+    function rename(iterable $renamePairs): IRelation;
 
     /**
      * Projects a single column from this relation.
@@ -173,7 +173,7 @@ interface IRelation extends \Traversable, \Countable
      * @throws UndefinedColumnException if no column matches the specification
      * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns
      */
-    function col($offsetOrName): IColumn;
+    function col($offsetOrNameOrEvaluator): IColumn;
 
 //    function colData($offsetOrNameOrEvaluator): Iterator;
 
@@ -264,7 +264,7 @@ interface IRelation extends \Traversable, \Countable
      * @throws UndefinedColumnException if no column matches the specification
      * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns
      */
-    function toSet($colOffsetOrNameOrEvaluator, ISet $set = null): ISet;
+    function toSet($colOffsetOrNameOrEvaluator, ?ISet $set = null): ISet;
 
     /**
      * Reduces the relation only to unique tuples.

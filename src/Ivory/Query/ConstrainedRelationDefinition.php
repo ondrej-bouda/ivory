@@ -22,7 +22,6 @@ class ConstrainedRelationDefinition extends RelationDefinition implements IRelat
             throw new \InvalidArgumentException('$args not supported for ' . ISqlPredicate::class . ' condition');
         }
 
-
         $this->baseRelDef = $relationDefinition;
         $this->cond = $cond;
         $this->args = $args;

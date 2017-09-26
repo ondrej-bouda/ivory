@@ -19,5 +19,5 @@ interface ICommandResult extends IResult
      *
      * @return int|null number of rows affected by the command, or <tt>null</tt> if irrelevant for the command
      */
-    function getAffectedRows();
+    function getAffectedRows(): ?int;
 }

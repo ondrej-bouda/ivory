@@ -45,7 +45,7 @@ class SortedRelationDefinition extends RelationDefinition implements IRelationDe
         }
     }
 
-    private static function getSortSql(ITypeDictionary $typeDictionary, $expr, ...$args) // PHP 7.1: declare returning ?string
+    private static function getSortSql(ITypeDictionary $typeDictionary, $expr, ...$args): ?string
     {
         if ($expr instanceof ISqlSortExpression) {
             $sortSql = $expr->getExpression()->getSql();

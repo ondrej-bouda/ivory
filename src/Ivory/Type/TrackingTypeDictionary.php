@@ -17,7 +17,7 @@ class TrackingTypeDictionary extends TypeDictionary
      *
      * @param TypeDictionary $typeDictionary
      */
-    public function markAllDictionaryTypesAsUsed(TypeDictionary $typeDictionary)
+    public function markAllDictionaryTypesAsUsed(TypeDictionary $typeDictionary): void
     {
         $typeClasses = [];
         foreach ($typeDictionary->collectObjects(IType::class) as $type) {
@@ -41,28 +41,28 @@ class TrackingTypeDictionary extends TypeDictionary
         }
     }
 
-    private function markTypeUsage(IType $type)
+    private function markTypeUsage(IType $type): void
     {
         $hash = spl_object_hash($type);
         $this->usedTypes[$hash] = true;
     }
 
-    public function enableTypeUsageWatching()
+    public function enableTypeUsageWatching(): void
     {
         $this->watchTypeUsage = true;
     }
 
-    public function disableTypeUsageWatching()
+    public function disableTypeUsageWatching(): void
     {
         $this->watchTypeUsage = false;
     }
 
-    public function resetTypeUsageStats()
+    public function resetTypeUsageStats(): void
     {
         $this->usedTypes = [];
     }
 
-    public function disposeUnusedTypes()
+    public function disposeUnusedTypes(): void
     {
         foreach ($this->collectObjects(IType::class) as $type) {
             assert($type instanceof IType);
@@ -101,7 +101,7 @@ class TrackingTypeDictionary extends TypeDictionary
         return $type;
     }
 
-    public function getValueSerializer(string $name)
+    public function getValueSerializer(string $name): ?IValueSerializer
     {
         $serializer = parent::getValueSerializer($name);
         if ($this->watchTypeUsage && $serializer instanceof IType) {

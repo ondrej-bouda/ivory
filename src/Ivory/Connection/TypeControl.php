@@ -2,6 +2,7 @@
 namespace Ivory\Connection;
 
 use Ivory\Ivory;
+use Ivory\Type\IType;
 use Ivory\Type\ITypeDictionary;
 use Ivory\Type\ITypeDictionaryUndefinedHandler;
 use Ivory\Type\IntrospectingTypeDictionaryCompiler;
@@ -32,23 +33,16 @@ class TypeControl implements ITypeControl
         $this->connCtl = $connCtl;
 
         $this->connCtl->registerConnectStartHook(function () {
-            $this->preloadTypeDictionary();
+            if ($this->typeDictionary === null) {
+                $this->preloadedTypeDictionary = $this->loadTypeDictionaryFromCache();
+            }
         });
         $this->connCtl->registerPostDisconnectHook(function () {
             $this->cacheTypeDictionary();
         });
     }
 
-    private function preloadTypeDictionary()
-    {
-        if ($this->typeDictionary !== null) {
-            return null;
-        }
-
-        $this->preloadedTypeDictionary = $this->loadTypeDictionaryFromCache();
-    }
-
-    private function cacheTypeDictionary()
+    private function cacheTypeDictionary(): void
     {
         if ($this->typeDictionary !== null && $this->typeDictionaryLoadedFromCache !== true &&
             $this->connection->isCacheEnabled())
@@ -61,7 +55,7 @@ class TypeControl implements ITypeControl
         }
     }
 
-    private function loadTypeDictionaryFromCache()
+    private function loadTypeDictionaryFromCache(): ?ITypeDictionary
     {
         $dict = $this->connection->getCached(ITypeControl::TYPE_DICTIONARY_CACHE_KEY);
         if ($dict instanceof ITypeDictionary) {
@@ -70,8 +64,7 @@ class TypeControl implements ITypeControl
                 $dict->disableTypeUsageWatching();
             }
             return $dict;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -126,15 +119,15 @@ class TypeControl implements ITypeControl
         return $dict;
     }
 
-    private function setupTypeDictionarySearchPath(ITypeDictionary $typeDictionary)
+    private function setupTypeDictionarySearchPath(ITypeDictionary $typeDictionary): void
     {
         $sp = $this->connection->getConfig()->getEffectiveSearchPath();
         $typeDictionary->setTypeSearchPath($sp);
     }
 
-    private function setupTypeDictionaryUndefinedHandler()
+    private function setupTypeDictionaryUndefinedHandler(): void
     {
-        $handler = function ($oid, $schemaName, $typeName, $value) {
+        $handler = function (?int $oid, $schemaName, ?string $typeName, $value) {
             $newDict = $this->introspectTypeDictionary();
             $this->setupTypeDictionarySearchPath($newDict);
 
@@ -178,14 +171,14 @@ class TypeControl implements ITypeControl
                 $this->handler = $handler;
             }
 
-            public function handleUndefinedType($oid, $schemaName, $typeName, $value)
+            public function handleUndefinedType(?int $oid, $schemaName, ?string $typeName, $value): IType
             {
                 return call_user_func($this->handler, $oid, $schemaName, $typeName, $value);
             }
         });
     }
 
-    public function flushTypeDictionary()
+    public function flushTypeDictionary(): void
     {
         $this->typeDictionary = null;
     }

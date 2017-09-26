@@ -106,7 +106,7 @@ class TypeDictionary implements ITypeDictionary
         throw new UndefinedTypeException("There is no type defined for converting value of type \"$typeName\"");
     }
 
-    private function recognizeType($value, $ruleSet)
+    private function recognizeType($value, $ruleSet): ?array
     {
         static $gettypeMap = [
             'boolean' => 'bool',
@@ -134,7 +134,7 @@ class TypeDictionary implements ITypeDictionary
         }
     }
 
-    private function recognizeObjectType($value, $ruleSet)
+    private function recognizeObjectType($value, $ruleSet): ?array
     {
         $valueClass = new \ReflectionClass($value);
         $class = $valueClass;
@@ -154,7 +154,7 @@ class TypeDictionary implements ITypeDictionary
         return null;
     }
 
-    private function recognizeArrayType($value, $ruleSet)
+    private function recognizeArrayType($value, $ruleSet): ?array
     {
         $element = $this->findFirstSignificantElement($value);
 
@@ -183,23 +183,17 @@ class TypeDictionary implements ITypeDictionary
         return null;
     }
 
-    public function getValueSerializer(string $name)
+    public function getValueSerializer(string $name): ?IValueSerializer
     {
         return ($this->valueSerializers[$name] ?? null);
     }
 
-    /**
-     * @return ITypeDictionaryUndefinedHandler|null
-     */
-    public function getUndefinedTypeHandler()
+    public function getUndefinedTypeHandler(): ?ITypeDictionaryUndefinedHandler
     {
         return $this->undefinedTypeHandler;
     }
 
-    /**
-     * @param ITypeDictionaryUndefinedHandler|null $undefinedTypeHandler
-     */
-    public function setUndefinedTypeHandler($undefinedTypeHandler)
+    public function setUndefinedTypeHandler(?ITypeDictionaryUndefinedHandler $undefinedTypeHandler)
     {
         $this->undefinedTypeHandler = $undefinedTypeHandler;
     }
@@ -215,7 +209,7 @@ class TypeDictionary implements ITypeDictionary
     /**
      * @param string[] $schemaList
      */
-    public function setTypeSearchPath(array $schemaList)
+    public function setTypeSearchPath(array $schemaList): void
     {
         if ($this->typeSearchPath == $schemaList) {
             return;
@@ -225,7 +219,7 @@ class TypeDictionary implements ITypeDictionary
         $this->recomputeNameCache();
     }
 
-    public function attachToConnection(IConnection $connection)
+    public function attachToConnection(IConnection $connection): void
     {
         $connDepTypes = $this->collectObjects(IConnectionDependentObject::class);
         foreach ($connDepTypes as $type) {
@@ -234,7 +228,7 @@ class TypeDictionary implements ITypeDictionary
         }
     }
 
-    public function detachFromConnection()
+    public function detachFromConnection(): void
     {
         $connDepTypes = $this->collectObjects(IConnectionDependentObject::class);
         foreach ($connDepTypes as $type) {
@@ -247,7 +241,7 @@ class TypeDictionary implements ITypeDictionary
 
     //region content management
 
-    public function defineType(IType $type, int $oid = null)
+    public function defineType(IType $type, ?int $oid = null): void
     {
         if ($oid !== null) {
             $this->oidTypeMap[$oid] = $type;
@@ -264,7 +258,7 @@ class TypeDictionary implements ITypeDictionary
         $this->cacheType($type);
     }
 
-    private function cacheType(IType $type)
+    private function cacheType(IType $type): void
     {
         $schemaName = $type->getSchemaName();
         $typeName = $type->getName();
@@ -291,7 +285,7 @@ class TypeDictionary implements ITypeDictionary
      *
      * @param IType $type
      */
-    public function disposeType(IType $type)
+    public function disposeType(IType $type): void
     {
         $schema = $type->getSchemaName();
         $name = $type->getName();
@@ -310,19 +304,19 @@ class TypeDictionary implements ITypeDictionary
         }
     }
 
-    private static function removeAll(array &$array, $item)
+    private static function removeAll(array &$array, $item): void
     {
         while (($key = array_search($item, $array, true)) !== false) {
             unset($array[$key]);
         }
     }
 
-    public function defineValueSerializer(string $name, IValueSerializer $valueSerializer)
+    public function defineValueSerializer(string $name, IValueSerializer $valueSerializer): void
     {
         $this->valueSerializers[$name] = $valueSerializer;
     }
 
-    public function defineTypeAlias(string $alias, string $schemaName, string $typeName)
+    public function defineTypeAlias(string $alias, string $schemaName, string $typeName): void
     {
         if (!isset($this->qualNameTypeMap[$schemaName])) {
             // necessary for the forward reference to be valid once the aliased type finally appears in the type map
@@ -334,12 +328,12 @@ class TypeDictionary implements ITypeDictionary
     /**
      * @param string[][] $ruleSet map: PHP data type name => pair: (schema name, type name)
      */
-    public function addTypeRecognitionRuleSet(array $ruleSet)
+    public function addTypeRecognitionRuleSet(array $ruleSet): void
     {
         $this->typeRecognitionRuleSets[] = $ruleSet;
     }
 
-    private function recomputeNameCache()
+    private function recomputeNameCache(): void
     {
         $this->searchedNameCache = [];
         foreach ($this->typeSearchPath as $schemaName) {

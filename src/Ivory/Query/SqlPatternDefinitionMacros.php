@@ -149,7 +149,7 @@ trait SqlPatternDefinitionMacros
                     $parser = \Ivory\Ivory::getSqlPatternParser();
                     $curFragment = $parser->parse($curFragment);
                 } elseif (
-                    (is_array($curFragment) || $curFragment instanceof \Traversable) && // PHP 7.1: is_iterable()
+                    is_iterable($curFragment) &&
                     $argsProcessed > 0 &&
                     !array_key_exists($argsProcessed, $fragmentsAndPositionalParams)
                 ) {
@@ -253,7 +253,7 @@ trait SqlPatternDefinitionMacros
         return $this;
     }
 
-    public function setParams($paramMap)
+    public function setParams(iterable $paramMap)
     {
         foreach ($paramMap as $nameOrPosition => $value) {
             $this->setParam($nameOrPosition, $value);

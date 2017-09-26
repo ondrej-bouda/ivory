@@ -54,7 +54,7 @@ class DateType extends ConnectionDependentBaseType implements IDiscreteType
     /** @var ConnConfigValueRetriever */
     private $modeRetriever = null;
 
-    public function attachToConnection(IConnection $connection)
+    public function attachToConnection(IConnection $connection): void
     {
         $this->modeRetriever = new ConnConfigValueRetriever(
             $connection->getConfig(),
@@ -99,7 +99,7 @@ class DateType extends ConnectionDependentBaseType implements IDiscreteType
         );
     }
 
-    public function detachFromConnection()
+    public function detachFromConnection(): void
     {
         $this->modeRetriever = null;
     }

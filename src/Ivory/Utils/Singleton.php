@@ -16,7 +16,9 @@ trait Singleton
      *
      * To be overridden by classes which need to initialize.
      */
-    protected function initializeSingleton() { }
+    protected function initializeSingleton(): void
+    {
+    }
 
     /**
      * Creates the singleton instance, if it has not been created yet, and returns it.

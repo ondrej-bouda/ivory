@@ -11,10 +11,13 @@ interface ITypeDictionaryUndefinedHandler
      * Otherwise, `null` is to be returned.
      *
      * @param int|null $oid
-     * @param string|null $schemaName
-     * @param string|null $typeName
+     * @param string|bool|null $schemaName name of schema the type is defined in;
+     *                                <tt>null</tt> to get the type by its unqualified name (either it is an alias or
+     *                                  the search path is to be used to find the first type by its unqualified name);
+     *                                <tt>false</tt> to only use the search path to figure out the schema name
+     * @param string|null $typeName name of type to get
      * @param mixed $value
      * @return IType|null
      */
-    function handleUndefinedType($oid, $schemaName, $typeName, $value);
+    function handleUndefinedType(?int $oid, $schemaName, ?string $typeName, $value): ?IType;
 }

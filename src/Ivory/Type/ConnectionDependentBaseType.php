@@ -12,7 +12,7 @@ abstract class ConnectionDependentBaseType extends BaseType implements IConnecti
      *                                     if not given, it is necessary to attach this type to the connection later,
      *                                       prior to any usage of this type
      */
-    public function __construct(string $schemaName, string $name, IConnection $connection = null)
+    public function __construct(string $schemaName, string $name, ?IConnection $connection = null)
     {
         parent::__construct($schemaName, $name);
 

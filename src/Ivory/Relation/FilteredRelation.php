@@ -27,7 +27,7 @@ class FilteredRelation extends StreamlinedRelation implements ICachingDataProces
         }
     }
 
-    public function populate()
+    public function populate(): void
     {
         if ($this->acceptMap !== null) {
             return;
@@ -41,7 +41,7 @@ class FilteredRelation extends StreamlinedRelation implements ICachingDataProces
         }
     }
 
-    public function flush()
+    public function flush(): void
     {
         $this->acceptMap = null;
     }

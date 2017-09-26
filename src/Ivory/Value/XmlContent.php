@@ -101,7 +101,7 @@ class XmlContent
     /**
      * @param string $xmlStr
      */
-    private function __construct($xmlStr)
+    private function __construct(string $xmlStr)
     {
         $this->xmlStr = $xmlStr;
     }

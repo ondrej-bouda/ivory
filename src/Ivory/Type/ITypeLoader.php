@@ -14,5 +14,5 @@ interface ITypeLoader
      * @return IType|null the corresponding type object, or <tt>null</tt> if this type loader does not recognize the
      *                      requested type
      */
-    function loadType(string $schemaName, string $typeName);
+    function loadType(string $schemaName, string $typeName): ?IType;
 }

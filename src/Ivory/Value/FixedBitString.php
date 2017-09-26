@@ -29,7 +29,7 @@ class FixedBitString extends BitString
      * @return FixedBitString
      * @throws \InvalidArgumentException if <tt>$length</tt> is a non-positive number (PostgreSQL forbids it)
      */
-    public static function fromString(string $bits, int $length = null): FixedBitString
+    public static function fromString(string $bits, ?int $length = null): FixedBitString
     {
         $bits = (string)$bits;
         $bitsLen = strlen($bits);

@@ -56,7 +56,7 @@ interface ITransactionControl
      * @param int|TxConfig $transactionOptions options for the transaction to be started;
      *                                         a {@link TxConfig} object, or a combination of {@link TxConfig} constants
      */
-    function setupSubsequentTransactions($transactionOptions);
+    function setupSubsequentTransactions($transactionOptions): void;
 
     /**
      * Commits a transaction prepared for a two-phase commit.
@@ -68,7 +68,7 @@ interface ITransactionControl
      * @param string $name name of the prepared transaction
      * @throws InvalidStateException when inside a transaction
      */
-    function commitPreparedTransaction(string $name);
+    function commitPreparedTransaction(string $name): void;
 
     /**
      * Rolls back a transaction prepared for a two-phase commit.
@@ -80,7 +80,7 @@ interface ITransactionControl
      * @param string $name name of the prepared transaction
      * @throws InvalidStateException when inside a transaction
      */
-    function rollbackPreparedTransaction(string $name);
+    function rollbackPreparedTransaction(string $name): void;
 
     /**
      * Lists all transactions which are currently prepared for a two-phase commit.

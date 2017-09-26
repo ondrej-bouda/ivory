@@ -26,12 +26,12 @@ class IntegerType extends \Ivory\Type\BaseType implements IDiscreteType
         }
     }
 
-    public function compareValues($a, $b)
+    public function compareValues($a, $b): ?int
     {
         if ($a === null || $b === null) {
             return null;
         }
-        return (int)$a - (int)$b;
+        return $a <=> $b;
     }
 
     public function step(int $delta, $value)

@@ -338,7 +338,7 @@ class NetAddress implements IEqualable
      *                                     its first argument
      * @return bool|null
      */
-    public function equals($address)
+    public function equals($address): ?bool
     {
         if ($address === null) {
             return null;

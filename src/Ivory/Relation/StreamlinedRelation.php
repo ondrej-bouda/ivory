@@ -14,7 +14,7 @@ abstract class StreamlinedRelation extends RelationBase
     }
 
 
-    public function getColumns()
+    public function getColumns(): array
     {
         if ($this->cols === null) {
             $this->cols = [];

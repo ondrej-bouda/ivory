@@ -32,7 +32,7 @@ class QueryResult extends Result implements IQueryResult
      * @param ITypeControl $typeControl
      * @param string|null $lastNotice last notice captured on the connection
      */
-    public function __construct($resultHandler, ITypeControl $typeControl, string $lastNotice = null)
+    public function __construct($resultHandler, ITypeControl $typeControl, ?string $lastNotice = null)
     {
         parent::__construct($resultHandler, $lastNotice);
 
@@ -50,7 +50,7 @@ class QueryResult extends Result implements IQueryResult
         }
     }
 
-    private function initCols(ITypeControl $typeControl)
+    private function initCols(ITypeControl $typeControl): void
     {
         $numFields = pg_num_fields($this->handler);
         if ($numFields < 0 || $numFields === null) {
@@ -92,7 +92,7 @@ class QueryResult extends Result implements IQueryResult
 
     //region IRelation
 
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->columns;
     }
@@ -107,7 +107,7 @@ class QueryResult extends Result implements IQueryResult
         return new ProjectedRelation($this, $columns);
     }
 
-    public function rename($renamePairs): IRelation
+    public function rename(iterable $renamePairs): IRelation
     {
         return new RenamedRelation($this, $renamePairs);
     }

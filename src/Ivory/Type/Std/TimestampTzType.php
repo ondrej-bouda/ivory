@@ -30,10 +30,12 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
     /** @var ConnConfigValueRetriever */
     private $localMeanTimeZoneRetriever;
 
-    public function attachToConnection(IConnection $connection)
+    public function attachToConnection(IConnection $connection): void
     {
         $this->dateStyleRetriever = new ConnConfigValueRetriever(
-            $connection->getConfig(), ConfigParam::DATE_STYLE, [DateStyle::class, 'fromString']
+            $connection->getConfig(),
+            ConfigParam::DATE_STYLE,
+            \Closure::fromCallable([DateStyle::class, 'fromString'])
         );
         $connName = $connection->getName();
         $this->localMeanTimeZoneRetriever = new ConnConfigValueRetriever(
@@ -60,7 +62,7 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
         );
     }
 
-    public function detachFromConnection()
+    public function detachFromConnection(): void
     {
         $this->dateStyleRetriever = null;
         $this->localMeanTimeZoneRetriever = null;
@@ -151,7 +153,7 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
     }
 
 
-    public function compareValues($a, $b)
+    public function compareValues($a, $b): ?int
     {
         if ($a === null || $b === null || !$a instanceof TimestampTz || !$b instanceof TimestampTz) {
             return null;

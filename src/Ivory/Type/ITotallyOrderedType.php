@@ -14,5 +14,5 @@ interface ITotallyOrderedType extends IType
      *                  respectively), or <tt>null</tt> if either value is <tt>null</tt>
      * @throws IncomparableException if the values are incomparable
      */
-    function compareValues($a, $b);
+    function compareValues($a, $b): ?int;
 }

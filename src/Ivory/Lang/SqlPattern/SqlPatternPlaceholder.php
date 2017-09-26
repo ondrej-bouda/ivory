@@ -27,9 +27,9 @@ class SqlPatternPlaceholder
     public function __construct(
         int $offset,
         $nameOrPosition,
-        string $typeName = null,
+        ?string $typeName = null,
         bool $typeNameQuoted = false,
-        string $schemaName = null,
+        ?string $schemaName = null,
         bool $schemaNameQuoted = false
     ) {
         $this->offset = $offset;
@@ -60,7 +60,7 @@ class SqlPatternPlaceholder
     /**
      * @return string|null name of type specified for the placeholder, or <tt>null</tt> if no type is given
      */
-    public function getTypeName()
+    public function getTypeName(): ?string
     {
         return $this->typeName;
     }
@@ -77,7 +77,7 @@ class SqlPatternPlaceholder
      * @return string|null name of schema of the type specified for the placeholder, or <tt>null</tt> if no schema is
      *                       given
      */
-    public function getSchemaName()
+    public function getSchemaName(): ?string
     {
         return $this->schemaName;
     }

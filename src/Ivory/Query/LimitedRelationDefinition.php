@@ -14,14 +14,14 @@ class LimitedRelationDefinition extends RelationDefinition implements IRelationD
      * @param int|null $limit maximal number of rows to return; <tt>null</tt> for unlimited number of rows
      * @param int $offset a non-negative offset - the number of original rows to skip
      */
-    public function __construct(IRelationDefinition $relationDefinition, $limit, int $offset = 0)
+    public function __construct(IRelationDefinition $relationDefinition, ?int $limit, int $offset = 0)
     {
         if ($offset < 0) {
             throw new \InvalidArgumentException('$offset is negative');
         }
 
         $this->baseRelDef = $relationDefinition;
-        $this->limit = ($limit !== null ? (int)$limit : null); // PHP 7.1: declare the type as ?int
+        $this->limit = $limit;
         $this->offset = $offset;
     }
 

@@ -51,12 +51,12 @@ class ArrayType implements ITotallyOrderedType
         $this->elemNeedsQuotesRegex = '~[{}\\s"\\\\' . preg_quote($delimiter, '~') . ']|^NULL$|^$~i';
     }
 
-    public function switchToPlainMode()
+    public function switchToPlainMode(): void
     {
         $this->ignoreIndexes = true;
     }
 
-    public function switchToStrictMode()
+    public function switchToStrictMode(): void
     {
         $this->ignoreIndexes = false;
     }
@@ -76,7 +76,7 @@ class ArrayType implements ITotallyOrderedType
         string $errMsg = null,
         int $offset = null,
         \Exception $cause = null
-    ) {
+    ): void {
         $elemTypeName = $this->elemType->getSchemaName() . '.' . $this->elemType->getName();
         $msg = "Value '$str' is not valid for an array of type $elemTypeName";
         if (strlen($errMsg) > 0) {
@@ -211,6 +211,10 @@ class ArrayType implements ITotallyOrderedType
      */
     public function serializeValue($val): string
     {
+        if ($val !== null && !is_array($val)) {
+            throw new \InvalidArgumentException("Value '$val' is not valid for array type");
+        }
+
         if ($this->ignoreIndexes) {
             $str = $this->serializeValuePlain($val);
         } else {
@@ -248,14 +252,10 @@ class ArrayType implements ITotallyOrderedType
      * @param int $maxDim the maximal dimension discovered so far
      * @return string the PostgreSQL external representation of <tt>$val</tt>
      */
-    private function serializeValuePlain($val, &$dims = [], int $curDim = 0, int &$maxDim = -1): string
+    private function serializeValuePlain(?array $val, array &$dims = [], int $curDim = 0, int &$maxDim = -1): string
     {
         if ($val === null) {
             return 'NULL';
-        }
-
-        if (!is_array($val)) {
-            throw new \InvalidArgumentException("Value '$val' is not valid for array type");
         }
 
         if ($curDim > $maxDim) {
@@ -302,14 +302,10 @@ class ArrayType implements ITotallyOrderedType
      * @param int $maxDim the maximal dimension discovered so far
      * @return string the PostgreSQL external representation of <tt>$val</tt>
      */
-    private function serializeValueStrict($val, &$bounds = [], int $curDim = 0, int &$maxDim = -1): string
+    private function serializeValueStrict(?array $val, ?array &$bounds = [], int $curDim = 0, int &$maxDim = -1): string
     {
         if ($val === null) {
             return 'NULL';
-        }
-
-        if (!is_array($val)) {
-            throw new \InvalidArgumentException("Value '$val' is not valid for array type");
         }
 
         $arr = $val;
@@ -377,7 +373,7 @@ class ArrayType implements ITotallyOrderedType
         return $out;
     }
 
-    public function compareValues($a, $b)
+    public function compareValues($a, $b): ?int
     {
         if (!$this->elemType instanceof ITotallyOrderedType) {
             $elemTypeName = $this->elemType->getSchemaName() . '.' . $this->elemType->getName();
@@ -391,7 +387,7 @@ class ArrayType implements ITotallyOrderedType
         return $this->compareValuesImpl($a, $b);
     }
 
-    private function compareValuesImpl($a, $b)
+    private function compareValuesImpl($a, $b): int
     {
         reset($b);
         foreach ($a as $av) {

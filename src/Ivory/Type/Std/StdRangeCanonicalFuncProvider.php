@@ -3,6 +3,7 @@ namespace Ivory\Type\Std;
 
 use Ivory\Exception\UnsupportedException;
 use Ivory\Type\IDiscreteType;
+use Ivory\Type\IRangeCanonicalFunc;
 use Ivory\Type\IRangeCanonicalFuncProvider;
 use Ivory\Type\ITotallyOrderedType;
 
@@ -16,7 +17,11 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class StdRangeCanonicalFuncProvider implements IRangeCanonicalFuncProvider
 {
-    public function provideCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype)
+    public function provideCanonicalFunc(
+        string $schemaName,
+        string $funcName,
+        ITotallyOrderedType $subtype
+    ): ?IRangeCanonicalFunc
     {
         if ($schemaName != 'pg_catalog') {
             return null;

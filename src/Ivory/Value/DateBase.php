@@ -44,7 +44,7 @@ abstract class DateBase implements IEqualable
         return $inst;
     }
 
-    protected static function getUTCTimeZone()
+    protected static function getUTCTimeZone(): \DateTimeZone
     {
         static $utc = null;
         if ($utc === null) {
@@ -57,7 +57,7 @@ abstract class DateBase implements IEqualable
     /**
      * @internal Only for the purpose of Ivory itself.
      */
-    final protected function __construct($inf, \DateTimeImmutable $dt = null)
+    final protected function __construct(int $inf, ?\DateTimeImmutable $dt = null)
     {
         $this->inf = $inf;
         $this->dt = $dt;
@@ -82,7 +82,7 @@ abstract class DateBase implements IEqualable
      *                  years before Christ are negative, starting from -1 for year 1 BC, -2 for year 2 BC, etc.;
      *                  <tt>null</tt> iff the date/time is not finite
      */
-    final public function getYear()
+    final public function getYear(): ?int
     {
         $z = $this->getZeroBasedYear();
         if ($z > 0 || $z === null) {
@@ -99,7 +99,7 @@ abstract class DateBase implements IEqualable
      * @return int|null the year of the date/time, basing year 1 BC as zero;
      *                  <tt>null</tt> iff the date/time is not finite
      */
-    final public function getZeroBasedYear() // NOTE: not named getISOYear() to avoid confusion with EXTRACT(ISOYEAR FROM ...)
+    final public function getZeroBasedYear(): ?int // NOTE: not named getISOYear() to avoid confusion with EXTRACT(ISOYEAR FROM ...)
     {
         return ($this->inf ? null : (int)$this->dt->format('Y'));
     }
@@ -108,7 +108,7 @@ abstract class DateBase implements IEqualable
      * @return int|null the month part of the date/time;
      *                  <tt>null</tt> iff the date/time is not finite
      */
-    final public function getMonth()
+    final public function getMonth(): ?int
     {
         return ($this->inf ? null : (int)$this->dt->format('n'));
     }
@@ -117,7 +117,7 @@ abstract class DateBase implements IEqualable
      * @return int|null the day part of the date/time;
      *                  <tt>null</tt> iff the date/time is not finite
      */
-    final public function getDay()
+    final public function getDay(): ?int
     {
         return ($this->inf ? null : (int)$this->dt->format('j'));
     }
@@ -127,7 +127,7 @@ abstract class DateBase implements IEqualable
      * @return string|null the date/time formatted according to <tt>$dateFmt</tt>;
      *                     <tt>null</tt> iff the date/time is not finite
      */
-    final public function format(string $dateFmt)
+    final public function format(string $dateFmt): ?string
     {
         if ($this->inf) {
             return null;
@@ -142,7 +142,7 @@ abstract class DateBase implements IEqualable
      *                     years before Christ represented are using the minus prefix, year 1 BC as <tt>0000</tt>;
      *                     <tt>null</tt> iff the date/time is not finite
      */
-    public function toISOString()
+    public function toISOString(): ?string
     {
         return ($this->inf ? null : $this->dt->format($this->getISOFormat()));
     }
@@ -159,7 +159,7 @@ abstract class DateBase implements IEqualable
      *                    corresponds to usage of PHP functions {@link gmmktime()} and {@link gmdate()} rather than
      *                    {@link mktime()} or {@link date()}
      */
-    public function toUnixTimestamp()
+    public function toUnixTimestamp(): ?int
     {
         return ($this->inf ? null : $this->dt->getTimestamp());
     }
@@ -169,17 +169,17 @@ abstract class DateBase implements IEqualable
      * @return \DateTime|null the date/time represented as a {@link \DateTime} object;
      *                        <tt>null</tt> iff the date/time is not finite
      */
-    public function toDateTime(\DateTimeZone $timezone = null)
+    public function toDateTime(?\DateTimeZone $timezone = null): ?\DateTime
     {
         return ($this->inf ? null : new \DateTime($this->toISOString(), $timezone)); // OPT: \DateTime::createFromFormat() is supposed to be twice as fast as new \DateTime()
     }
 
     /**
      * @param \DateTimeZone $timezone timezone to create the {@link \DateTime} object with
-     * @return \DateTime|null the date/time represented as a {@link \DateTimeImmutable} object;
-     *                        <tt>null</tt> iff the date/time is not finite
+     * @return \DateTimeImmutable|null the date/time represented as a {@link \DateTimeImmutable} object;
+     *                                 <tt>null</tt> iff the date/time is not finite
      */
-    public function toDateTimeImmutable(\DateTimeZone $timezone = null)
+    public function toDateTimeImmutable(?\DateTimeZone $timezone = null): ?\DateTimeImmutable
     {
         if ($this->inf) {
             return null;
@@ -198,7 +198,7 @@ abstract class DateBase implements IEqualable
      * @param int $days
      * @return static the date/time <tt>$days</tt> days after (or before, if negative) this date/time
      */
-    public function addDay($days = 1)
+    public function addDay(int $days = 1)
     {
         return $this->addPartsImpl(0, 0, $days, 0, 0, 0);
     }
@@ -212,7 +212,7 @@ abstract class DateBase implements IEqualable
      * @param int $months
      * @return static the date/time <tt>$months</tt> months after (or before, if negative) this date/time
      */
-    public function addMonth($months = 1)
+    public function addMonth(int $months = 1)
     {
         return $this->addPartsImpl(0, $months, 0, 0, 0, 0);
     }
@@ -223,13 +223,13 @@ abstract class DateBase implements IEqualable
      * @param int $years
      * @return static the date/time <tt>$years</tt> years after (or before, if negative) this date/time
      */
-    public function addYear($years = 1)
+    public function addYear(int $years = 1)
     {
         return $this->addPartsImpl($years, 0, 0, 0, 0, 0);
     }
 
 
-    final protected function addPartsImpl($years, $months, $days, $hours, $minutes, $seconds)
+    final protected function addPartsImpl(int $years, int $months, int $days, int $hours, int $minutes, $seconds)
     {
         if ($this->inf) {
             return $this;

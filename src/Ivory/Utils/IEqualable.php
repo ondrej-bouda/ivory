@@ -12,5 +12,5 @@ interface IEqualable
      *                   <tt>false</tt> if they are not equal,
      *                   <tt>null</tt> iff <tt>$object</tt> is <tt>null</tt>
      */
-    function equals($object);
+    function equals($object): ?bool;
 }

@@ -19,7 +19,7 @@ class TxHandleTest extends \Ivory\IvoryTestCase
         {
             public $rollbackCalled = 0;
 
-            public function handleTransactionRollback()
+            public function handleTransactionRollback(): void
             {
                 $this->rollbackCalled++;
             }

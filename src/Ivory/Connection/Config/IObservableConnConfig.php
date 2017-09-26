@@ -28,19 +28,19 @@ interface IObservableConnConfig extends IConnConfig
      *                                              customized parameter names;
      *                                            <tt>null</tt> to observe any property
      */
-    function addObserver(IConfigObserver $observer, $parameterName = null);
+    function addObserver(IConfigObserver $observer, $parameterName = null): void;
 
     /**
      * Removes a given observer from observing any configuration parameters observed so far.
      *
      * @param IConfigObserver $observer
      */
-    function removeObserver(IConfigObserver $observer);
+    function removeObserver(IConfigObserver $observer): void;
 
     /**
      * Removes any observer registered so far from observing any configuration parameters.
      */
-    function removeAllObservers();
+    function removeAllObservers(): void;
 
     /**
      * Tells all observers of a given property that its value has changed.
@@ -50,7 +50,7 @@ interface IObservableConnConfig extends IConnConfig
      * @param string $parameterName name of the parameter
      * @param bool|float|int|Quantity|string|null $newValue the new value; if not given, it gets queried automatically
      */
-    function notifyPropertyChange(string $parameterName, $newValue = null);
+    function notifyPropertyChange(string $parameterName, $newValue = null): void;
 
     /**
      * Tells all observers of any property that any property might have changed its value.
@@ -58,5 +58,5 @@ interface IObservableConnConfig extends IConnConfig
      * Used after invocation of the `RESET ALL` command, or after any query which might have side-effects on
      * configuration parameters.
      */
-    function notifyPropertiesReset();
+    function notifyPropertiesReset(): void;
 }

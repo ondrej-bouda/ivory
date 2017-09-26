@@ -19,7 +19,7 @@ interface IConnectionControl
      *                     process of (asynchronous) connecting (use {@link isConnectedWait()} instead to distinguish
      *                     the latter)
      */
-    function isConnected();
+    function isConnected(): ?bool;
 
     /**
      * Finds out whether the connection is established. Waits for asynchronous connecting process to finish before
@@ -29,7 +29,7 @@ interface IConnectionControl
      *                   <tt>null</tt> if no connection was requested to be established (yet),
      *                   <tt>false</tt> if the connection is broken
      */
-    function isConnectedWait();
+    function isConnectedWait(): ?bool;
 
     /**
      * Starts establishing a connection with the database according to the current connection parameters, if it has not
@@ -57,7 +57,7 @@ interface IConnectionControl
      *              <tt>false</tt> if the connection has already been open or started opening and thus this was a no-op
      * @throws ConnectionException on error connecting to the database
      */
-    function connect(\Closure $initProcedure = null): bool;
+    function connect(?\Closure $initProcedure = null): bool;
 
     /**
      * Establishes a connection with the database and waits for the connection to be established.
@@ -101,7 +101,7 @@ interface IConnectionControl
      *
      * @param \Closure $closure closure to call, given no arguments
      */
-    function registerConnectStartHook(\Closure $closure);
+    function registerConnectStartHook(\Closure $closure): void;
 
     /**
      * Registers a closure to be called right before disconnecting from the database.
@@ -113,7 +113,7 @@ interface IConnectionControl
      *
      * @param \Closure $closure closure to call, given no arguments
      */
-    function registerPreDisconnectHook(\Closure $closure);
+    function registerPreDisconnectHook(\Closure $closure): void;
 
     /**
      * Registers a closure to be called right after disconnecting from the database.
@@ -125,5 +125,5 @@ interface IConnectionControl
      *
      * @param \Closure $closure closure to call, given no arguments
      */
-    function registerPostDisconnectHook(\Closure $closure);
+    function registerPostDisconnectHook(\Closure $closure): void;
 }

@@ -2,6 +2,7 @@
 namespace Ivory\Type\Std;
 
 use Ivory\Lang\Sql\Types;
+use Ivory\Type\IType;
 use Ivory\Type\Postgresql\AdHocCompositeType;
 
 /**
@@ -9,7 +10,7 @@ use Ivory\Type\Postgresql\AdHocCompositeType;
  */
 class StdTypeLoader implements \Ivory\Type\ITypeLoader
 {
-    public function loadType(string $schemaName, string $typeName)
+    public function loadType(string $schemaName, string $typeName): ?IType
     {
         switch ($schemaName) {
             case 'pg_catalog':

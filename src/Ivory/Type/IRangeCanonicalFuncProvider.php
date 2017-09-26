@@ -15,5 +15,9 @@ interface IRangeCanonicalFuncProvider
      * @return IRangeCanonicalFunc|null the implementation of the range canonical function, or
      *                                  <tt>null</tt> if this provider has no matching implementation
      */
-    function provideCanonicalFunc(string $schemaName, string $funcName, ITotallyOrderedType $subtype);
+    function provideCanonicalFunc(
+        string $schemaName,
+        string $funcName,
+        ITotallyOrderedType $subtype
+    ): ?IRangeCanonicalFunc;
 }
