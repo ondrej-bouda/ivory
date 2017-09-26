@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Utils;
 
 class StringUtilsTest extends \PHPUnit\Framework\TestCase

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use Cache\Adapter\Filesystem\FilesystemCachePool;
 use Cache\Adapter\PHPArray\ArrayCachePool;

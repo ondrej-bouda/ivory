@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Relation;
 
 use Ivory\Exception\NotImplementedException;

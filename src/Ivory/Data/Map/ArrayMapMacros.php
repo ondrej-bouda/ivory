@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Data\Map;
 
 // Until PHP has generics, there will have to be separate interfaces for maps storing different types of objects.

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Type;
 
 use Ivory\Exception\InternalException;
@@ -91,7 +93,7 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
             if ($type === null) {
                 switch ($row['typtype']) {
                     case 'A':
-                        $elemType = $dict->requireTypeByOid($row['parenttype']);
+                        $elemType = $dict->requireTypeByOid((int)$row['parenttype']);
                         assert($elemType instanceof IType,
                             new InternalException('Only named types are supposed to be used as array element types.')
                         );
@@ -110,7 +112,7 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
                         break;
 
                     case 'd':
-                        $baseType = $dict->requireTypeByOid($row['parenttype']);
+                        $baseType = $dict->requireTypeByOid((int)$row['parenttype']);
                         assert($baseType instanceof IType,
                             new InternalException('Only named types are supposed to be used as domain base types.')
                         );
@@ -123,7 +125,7 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
                         break;
 
                     case 'r':
-                        $subtype = $dict->requireTypeByOid($row['parenttype']);
+                        $subtype = $dict->requireTypeByOid((int)$row['parenttype']);
                         if (!$subtype instanceof ITotallyOrderedType) {
                             if ($subtype instanceof UndefinedType) {
                                 $type = new UndefinedType($schemaName, $typeName);
@@ -157,7 +159,7 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
                 }
             }
 
-            yield $row['oid'] => $type;
+            yield (int)$row['oid'] => $type;
         }
 
         $this->fetchCompositeAttributes($dict);
@@ -190,8 +192,8 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
         $errorDesc = 'Error fetching composite type attributes';
         foreach ($this->query($query, $errorDesc) as $row) {
             /** @var CompositeType $compType */
-            $compType = $dict->requireTypeByOid($row['oid']);
-            $attType = $dict->requireTypeByOid($row['atttypid']);
+            $compType = $dict->requireTypeByOid((int)$row['oid']);
+            $attType = $dict->requireTypeByOid((int)$row['atttypid']);
             $compType->addAttribute($row['attname'], $attType);
         }
     }

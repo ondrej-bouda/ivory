@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Type\Std;
 
 use Ivory\Connection\Config\ConfigParam;
@@ -121,7 +123,7 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
         if ($z == 'LMT') {
             $z = $this->localMeanTimeZoneRetriever->getValue();
         }
-        return TimestampTz::fromParts($y, $m, $d, $h, $i, $s, $z);
+        return TimestampTz::fromParts((int)$y, (int)$m, (int)$d, (int)$h, (int)$i, $s, $z);
     }
 
     public function serializeValue($val): string

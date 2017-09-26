@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Value;
 
 /**
@@ -37,8 +39,8 @@ class Time extends TimeBase
             throw new \InvalidArgumentException('$timeString');
         }
 
-        $hour = $m[1];
-        $min = $m[2];
+        $hour = (int)$m[1];
+        $min = (int)$m[2];
         $sec = ($m[3] ?? 0);
 
         return self::fromPartsStrict($hour, $min, $sec);

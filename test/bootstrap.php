@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/../lib/composed/autoload.php';
 
 set_exception_handler(function (Throwable $t) {

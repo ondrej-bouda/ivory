@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Type\Std;
 
 use Ivory\Type\IDiscreteType;
@@ -15,7 +17,7 @@ class BigIntSafeType extends \Ivory\Type\BaseType implements IDiscreteType
 {
     public static function createForRange($min, $max, string $schemaName, string $typeName): IDiscreteType
     {
-        if (bccomp($min, PHP_INT_MIN) >= 0 && bccomp($max, PHP_INT_MAX) <= 0) {
+        if (bccomp($min, (string)PHP_INT_MIN) >= 0 && bccomp($max, (string)PHP_INT_MAX) <= 0) {
             return new IntegerType($schemaName, $typeName);
         } else {
             return new BigIntSafeType($schemaName, $typeName);
@@ -36,7 +38,7 @@ class BigIntSafeType extends \Ivory\Type\BaseType implements IDiscreteType
         if ($val === null) {
             return 'NULL';
         } elseif ($val >= PHP_INT_MIN && $val <= PHP_INT_MAX) {
-            return (int)$val;
+            return (string)(int)$val;
         } else {
             if (preg_match('~^\s*-?[0-9]+\s*$~', $val)) {
                 return (string)$val;

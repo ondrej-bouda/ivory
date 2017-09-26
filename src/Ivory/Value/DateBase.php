@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Value;
 
 use Ivory\Utils\EqualableWithPhpOperators;
@@ -261,7 +263,7 @@ abstract class DateBase implements IEqualable
 
         if ($fracSec != 0) {
             /** @noinspection PhpUndefinedVariableInspection */
-            $resFracSecStr = substr($resFracSec, 2); // cut off the leading '0.'
+            $resFracSecStr = substr((string)$resFracSec, 2); // cut off the leading '0.'
             $dt = new \DateTimeImmutable($dt->format('Y-m-d H:i:s.') . $resFracSecStr, self::getUTCTimeZone());
         }
 

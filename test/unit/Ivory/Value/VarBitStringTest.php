@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Value;
 
 use Ivory\Exception\ImmutableException;
@@ -26,7 +28,7 @@ class VarBitStringTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(VarBitString::fromString('001')->equals(VarBitString::fromString('001')));
         $this->assertFalse(VarBitString::fromString('001', 3)->equals(VarBitString::fromString('001')));
         $this->assertFalse(VarBitString::fromString('001', 4)->equals(VarBitString::fromString('001')));
-        $this->assertTrue(VarBitString::fromString(1101)->equals(VarBitString::fromString('1101')));
+        $this->assertTrue(VarBitString::fromString('1101')->equals(VarBitString::fromString('1101')));
 
         try {
             VarBitString::fromString('10011', 0);
@@ -47,12 +49,6 @@ class VarBitStringTest extends \PHPUnit\Framework\TestCase
         }
 
         try {
-            VarBitString::fromString(10311);
-            $this->fail('InvalidArgumentException expected');
-        } catch (\InvalidArgumentException $e) {
-        }
-
-        try {
             VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);
             $this->fail('a warning is expected due to truncation');
         } catch (\PHPUnit\Framework\Error\Warning $e) {
@@ -65,12 +61,11 @@ class VarBitStringTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertSame('', VarBitString::fromString('', 4)->toString());
         $this->assertSame('101', VarBitString::fromString('101', 4)->toString());
-        $this->assertSame('101', VarBitString::fromString(101, 4)->toString());
         $this->assertSame('1010010110110100111010101011010111001101011010',
             VarBitString::fromString('1010010110110100111010101011010111001101011010')->toString()
         );
 
-        $this->assertSame('101', (string)VarBitString::fromString(101, 4));
+        $this->assertSame('101', (string)VarBitString::fromString('101', 4));
 
         try {
             VarBitString::fromString('1010010110110100111010101011010111001101011010', 4);

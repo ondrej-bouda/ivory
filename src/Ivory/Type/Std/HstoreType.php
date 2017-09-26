@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Type\Std;
 
 /**
@@ -89,7 +91,7 @@ class HstoreType extends \Ivory\Type\BaseType
         if ($atom === null) {
             return 'NULL';
         } else {
-            return '"' . strtr($atom, ['"' => '\\"', '\\' => '\\\\']) . '"';
+            return '"' . strtr((string)$atom, ['"' => '\\"', '\\' => '\\\\']) . '"';
         }
     }
 

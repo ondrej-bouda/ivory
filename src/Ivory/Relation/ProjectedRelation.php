@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Relation;
 
 use Ivory\Exception\AmbiguousException;
@@ -29,7 +31,7 @@ class ProjectedRelation extends ProjectedRelationBase
 
             if (filter_var($value, FILTER_VALIDATE_INT) !== false) { // column offset
                 if (!isset($srcCols[$value])) {
-                    throw new UndefinedColumnException($value);
+                    throw new UndefinedColumnException((string)$value);
                 }
                 $columns[] = new Column($this, count($this->projectionList), $colName, $srcCols[$value]->getType());
                 $this->projectionList[] = (int)$value;

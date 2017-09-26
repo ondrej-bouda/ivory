@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Value;
 
 use Ivory\Exception\UndefinedOperationException;
@@ -29,10 +31,6 @@ class QuantityTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('$', $q->getUnit());
 
         $q = Quantity::fromString('123');
-        $this->assertSame(123, $q->getValue());
-        $this->assertSame(null, $q->getUnit());
-
-        $q = Quantity::fromString(123);
         $this->assertSame(123, $q->getValue());
         $this->assertSame(null, $q->getUnit());
 

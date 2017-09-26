@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Type\Std;
 
 use Ivory\Type\IDiscreteType;
@@ -22,7 +24,7 @@ class IntegerType extends \Ivory\Type\BaseType implements IDiscreteType
         if ($val === null) {
             return 'NULL';
         } else {
-            return (int)$val;
+            return (string)(int)$val;
         }
     }
 

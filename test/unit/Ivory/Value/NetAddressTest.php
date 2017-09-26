@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Value;
 
 use Ivory\Utils\System;
@@ -44,7 +46,7 @@ class NetAddressTest extends \PHPUnit\Framework\TestCase
         }
 
         try {
-            NetAddress::fromString(7);
+            NetAddress::fromString('7');
             $this->fail('\InvalidArgumentException expected');
         } catch (\InvalidArgumentException $e) {
         }
@@ -148,7 +150,7 @@ class NetAddressTest extends \PHPUnit\Framework\TestCase
         }
 
         try {
-            NetAddress::fromCidrString(7);
+            NetAddress::fromCidrString('7');
             $this->fail('\InvalidArgumentException expected');
         } catch (\InvalidArgumentException $e) {
         }
@@ -240,7 +242,7 @@ class NetAddressTest extends \PHPUnit\Framework\TestCase
         }
 
         try {
-            NetAddress::fromByteString(127);
+            NetAddress::fromByteString('127');
             $this->fail('\InvalidArgumentException expected');
         } catch (\InvalidArgumentException $e) {
         }

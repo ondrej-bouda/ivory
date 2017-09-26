@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Relation;
 
 use Ivory\Type\IType;
@@ -45,8 +47,8 @@ class ArrayRelation extends RelationBase
     }
 
     /**
-     * @param array $rows list: map: column name => value
-     * @param IType[] $dataTypes ordered map: column name => type
+     * @param array $rows list: map: string column name => value
+     * @param IType[] $dataTypes ordered map: string column name => type
      */
     protected function __construct(array $rows, array $dataTypes)
     {
@@ -64,7 +66,7 @@ class ArrayRelation extends RelationBase
 
         foreach ($dataTypes as $colName => $type) {
             $colOffset = count($this->cols);
-            $col = new Column($this, $colOffset, $colName, $type);
+            $col = new Column($this, $colOffset, (string)$colName, $type);
             $this->cols[] = $col;
             $this->colNameMap[$colName] = $colOffset;
         }

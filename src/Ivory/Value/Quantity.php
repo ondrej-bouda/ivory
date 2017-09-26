@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Value;
 
 use Ivory\Exception\UndefinedOperationException;
@@ -212,7 +214,7 @@ class Quantity implements IEqualable
     public function toString(): string
     {
         $str = (string)$this->value;
-        if (strlen($this->unit) > 0) {
+        if ($this->unit !== null && $this->unit !== '') {
             $str .= ' ' . $this->unit;
         }
         return $str;

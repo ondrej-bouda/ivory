@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Type\Std;
 
 use Ivory\Connection\Config\ConfigParam;
@@ -110,7 +112,7 @@ class TimestampType extends ConnectionDependentBaseType implements ITotallyOrder
         if (isset($matches[7])) {
             $y = -$y;
         }
-        return Timestamp::fromParts($y, $m, $d, $h, $i, $s);
+        return Timestamp::fromParts((int)$y, (int)$m, (int)$d, (int)$h, (int)$i, $s);
     }
 
     public function serializeValue($val): string

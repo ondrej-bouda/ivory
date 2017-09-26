@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Value;
 
 use Ivory\Exception\ImmutableException;
@@ -29,8 +31,8 @@ class FixedBitStringTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(FixedBitString::fromString('001')->equals(FixedBitString::fromString('001')));
         $this->assertTrue(FixedBitString::fromString('001')->equals(FixedBitString::fromString('001', 3)));
         $this->assertTrue(FixedBitString::fromString('0010')->equals(FixedBitString::fromString('001', 4)));
-        $this->assertTrue(FixedBitString::fromString('1101')->equals(FixedBitString::fromString(1101)));
-        $this->assertTrue(FixedBitString::fromString('11010')->equals(FixedBitString::fromString(1101, 5)));
+        $this->assertTrue(FixedBitString::fromString('1101')->equals(FixedBitString::fromString('1101')));
+        $this->assertTrue(FixedBitString::fromString('11010')->equals(FixedBitString::fromString('1101', 5)));
 
         try {
             FixedBitString::fromString('10011', 0);
@@ -51,12 +53,6 @@ class FixedBitStringTest extends \PHPUnit\Framework\TestCase
         }
 
         try {
-            FixedBitString::fromString(10311);
-            $this->fail('InvalidArgumentException expected');
-        } catch (\InvalidArgumentException $e) {
-        }
-
-        try {
             FixedBitString::fromString('1010010110110100111010101011010111001101011010', 4);
             $this->fail('a warning is expected due to truncation');
         } catch (\PHPUnit\Framework\Error\Warning $e) {
@@ -69,7 +65,6 @@ class FixedBitStringTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertSame('', FixedBitString::fromString('')->toString());
         $this->assertSame('1010', FixedBitString::fromString('101', 4)->toString());
-        $this->assertSame('1010', FixedBitString::fromString(101, 4)->toString());
         $this->assertSame('1010010110110100111010101011010111001101011010',
             FixedBitString::fromString('1010010110110100111010101011010111001101011010')->toString()
         );
@@ -104,13 +99,13 @@ class FixedBitStringTest extends \PHPUnit\Framework\TestCase
         );
 
         try {
-            FixedBitString::fromInt('10011', 0);
+            FixedBitString::fromInt(10011, 0);
             $this->fail('InvalidArgumentException expected');
         } catch (\InvalidArgumentException $e) {
         }
 
         try {
-            FixedBitString::fromInt('10011', -4);
+            FixedBitString::fromInt(10011, -4);
             $this->fail('InvalidArgumentException expected');
         } catch (\InvalidArgumentException $e) {
         }
@@ -191,12 +186,12 @@ class FixedBitStringTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(FixedBitString::fromString('')->bitEquals(FixedBitString::fromString('')));
         $this->assertTrue(FixedBitString::fromString('11001')->bitEquals(FixedBitString::fromString('11001')));
         $this->assertTrue(FixedBitString::fromString('11001', 8)->bitEquals(FixedBitString::fromString('11001000')));
-        $this->assertTrue(FixedBitString::fromString('101')->bitEquals(FixedBitString::fromString(101)));
+        $this->assertTrue(FixedBitString::fromString('101')->bitEquals(FixedBitString::fromString('101')));
 
         $this->assertFalse(FixedBitString::fromString('11001', 8)->bitEquals(FixedBitString::fromString('11001')));
         $this->assertFalse(FixedBitString::fromString('00011001')->bitEquals(FixedBitString::fromString('11001')));
         $this->assertFalse(FixedBitString::fromString('11001', 14)->bitEquals(FixedBitString::fromString('11001', 12)));
-        $this->assertFalse(FixedBitString::fromString('10010')->bitEquals(FixedBitString::fromString(10)));
+        $this->assertFalse(FixedBitString::fromString('10010')->bitEquals(FixedBitString::fromString('10')));
         $this->assertFalse(FixedBitString::fromString('10101')->bitEquals(FixedBitString::fromString('00011001')));
 
         $this->assertTrue(

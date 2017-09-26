@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Lang\SqlPattern;
 
 class SqlPatternParserTest extends \PHPUnit\Framework\TestCase

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Connection;
 
 use Ivory\Exception\UnsupportedException;
@@ -104,11 +106,11 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
 
         $params = array_filter(
             [
-                'host' => (isset($c['host']) ? $c['host'] : null),
-                'port' => (isset($c['port']) ? $c['port'] : null),
+                'host' => ($c['host'] ?? null),
+                'port' => ($c['port'] ?? null),
                 'dbname' => (isset($c['path']) && strlen($c['path']) > 1 ? substr($c['path'], 1) : null),
-                'user' => (isset($c['user']) ? $c['user'] : null),
-                'password' => (isset($c['pass']) ? $c['pass'] : null),
+                'user' => ($c['user'] ?? null),
+                'password' => ($c['pass'] ?? null),
             ],
             'strlen'
         );
@@ -118,7 +120,7 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
         }
 
         foreach ($params as &$par) {
-            $par = rawurldecode($par); // NOTE: neither parse_url() nor parse_str() do that automatically
+            $par = rawurldecode((string)$par); // NOTE: neither parse_url() nor parse_str() do that automatically
         }
 
         return new ConnectionParameters($params);
@@ -169,6 +171,10 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
     {
         $kvPairs = [];
         foreach ($this->params as $k => $v) {
+            if ($v === null) {
+                continue;
+            }
+
             if (strlen($v) == 0 || preg_match("~[\\s']~", $v)) {
                 $vstr = "'" . strtr($v, ["'" => "\\'", '\\' => '\\\\']) . "'";
             } else {

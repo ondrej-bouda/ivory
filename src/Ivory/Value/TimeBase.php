@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Value;
 
 use Ivory\Utils\EqualableWithPhpOperators;
@@ -162,7 +164,7 @@ abstract class TimeBase implements IEqualable
         // microseconds are not supported by gmdate(), and constructing a new \DateTime object would be overkill
         if (strpos($timeFmt, 'u') !== false) {
             $frac = round($ts - (int)$ts, self::PRECISION);
-            $fracPart = ($frac ? substr($frac, 2) : '0'); // cut off the leading "0." for non-zero fractional seconds
+            $fracPart = ($frac ? substr((string)$frac, 2) : '0'); // cut off the leading "0." for non-zero fractional seconds
             $fracStr = str_pad($fracPart, 6, '0', STR_PAD_RIGHT);
 
             $re = '~
@@ -173,7 +175,7 @@ abstract class TimeBase implements IEqualable
             $timeFmt = preg_replace($re, '${1}' . $fracStr, $timeFmt);
         }
 
-        return gmdate($timeFmt, $ts);
+        return gmdate($timeFmt, (int)$ts);
     }
 
     /**
@@ -186,7 +188,7 @@ abstract class TimeBase implements IEqualable
         return sprintf(
             '%02d:%02d:%02d%s',
             $this->getHours(), $this->getMinutes(), $this->getSeconds(),
-            ($frac ? substr($frac, 1) : '') // cut off the leading "0" for non-zero fractional seconds
+            ($frac ? substr((string)$frac, 1) : '') // cut off the leading "0" for non-zero fractional seconds
         );
     }
 }

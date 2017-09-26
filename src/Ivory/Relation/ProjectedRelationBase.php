@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Relation;
 
 abstract class ProjectedRelationBase extends StreamlinedRelation
@@ -16,7 +18,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
         $this->projectedColNameMap = [];
         foreach ($columns as $colOffset => $col) {
             $colName = $col->getName();
-            if (strlen($colName) > 0) {
+            if ($colName !== null && $colName !== '') {
                 $this->projectedColNameMap[$colName] = (isset($this->projectedColNameMap[$colName]) ?
                     Tuple::AMBIGUOUS_COL :
                     $colOffset

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Type\Std;
 
 use Ivory\Type\ITotallyOrderedType;
@@ -22,7 +24,7 @@ class StringType extends \Ivory\Type\BaseType implements ITotallyOrderedType
         if ($val === null) {
             return 'NULL';
         } else {
-            return "'" . strtr($val, ["'" => "''"]) . "'";
+            return "'" . strtr((string)$val, ["'" => "''"]) . "'";
         }
     }
 

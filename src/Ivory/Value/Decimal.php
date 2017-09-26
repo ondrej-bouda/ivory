@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Ivory\Value;
 
 use Ivory\Exception\UndefinedOperationException;
@@ -164,7 +166,7 @@ class Decimal implements IEqualable
             return;
         }
 
-        $this->val = (string)$val;
+        $this->val = $val;
 
         $decPoint = strpos($this->val, '.');
         if ($scale < 0) {
@@ -561,17 +563,22 @@ class Decimal implements IEqualable
      */
     public function floor(): Decimal
     {
+        if ($this->isNaN()) {
+            return $this;
+        }
+
         $decPoint = strpos($this->val, '.');
         if ($decPoint === false) {
             return $this;
         }
+
         if ($this->val[0] != '-') {
             return new Decimal(substr($this->val, 0, $decPoint));
         } elseif ($this->isInteger()) {
             return new Decimal($this->val, 0);
         } else {
             // negative number with non-zero fractional part
-            return new Decimal(bcsub(substr($this->val, 0, $decPoint), 1, 0));
+            return new Decimal(bcsub(substr($this->val, 0, $decPoint), '1', 0));
         }
     }
 
@@ -580,17 +587,22 @@ class Decimal implements IEqualable
      */
     public function ceil(): Decimal
     {
+        if ($this->isNaN()) {
+            return $this;
+        }
+
         $decPoint = strpos($this->val, '.');
         if ($decPoint === false) {
             return $this;
         }
+
         if ($this->val[0] == '-') {
             return new Decimal(substr($this->val, 0, $decPoint));
         } elseif ($this->isInteger()) {
             return new Decimal($this->val, 0);
         } else {
             // non-negative number with non-zero fractional part
-            return new Decimal(bcadd(substr($this->val, 0, $decPoint), 1, 0));
+            return new Decimal(bcadd(substr($this->val, 0, $decPoint), '1', 0));
         }
     }
 
