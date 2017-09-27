@@ -258,8 +258,8 @@ interface IRelation extends \Traversable, \Countable
      * @param int|string|ITupleEvaluator|\Closure $colOffsetOrNameOrEvaluator
      *                                  Specification of column the values of which to hash. See {@link col()} for more
      *                                    details on the column specification.
-     * @param ISet $set A set to add the values to. If not given, the default type of set is provided by the
-     *                    implementing class is used.
+     * @param ISet|null $set A set to add the values to. If not given, the default type of set is provided by the
+     *                         implementing class is used.
      * @return ISet <tt>$set</tt>, or a newly created set
      * @throws UndefinedColumnException if no column matches the specification
      * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns

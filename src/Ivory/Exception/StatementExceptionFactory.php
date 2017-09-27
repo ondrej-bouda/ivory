@@ -103,7 +103,7 @@ class StatementExceptionFactory
     /**
      * @param resource $resultHandler a PostgreSQL query result resource
      * @param string $query the statement, as sent by the client, which caused the error
-     * @param StatementExceptionFactory $fallbackFactory
+     * @param StatementExceptionFactory|null $fallbackFactory
      * @return StatementException
      */
     public function createException(

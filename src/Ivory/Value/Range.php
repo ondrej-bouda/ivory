@@ -77,32 +77,31 @@ class Range implements IEqualable, \ArrayAccess
      * empty range explicitly, see {@link createEmpty()}.
      *
      * @param ITotallyOrderedType $subtype the range subtype
-     * @param IRangeCanonicalFunc $canonicalFunc if given, the range will be created in the canonical form according to
-     *                                             this function;
-     *                                           skip with <tt>null</tt> to create the range as is;
-     *                                           NOTE: while one could expect the canonical function usage at the range
-     *                                             *type* level, passing it to this factory method makes it clear that
-     *                                             if no canonical function is given, the range will not get
-     *                                             canonicalized
+     * @param IRangeCanonicalFunc|null $canonicalFunc
+     *                          if given, the range will be created in the canonical form according to this function;
+     *                          skip with <tt>null</tt> to create the range as is;
+     *                          NOTE: while one could expect the canonical function usage at the range *type* level,
+     *                            passing it to this factory method makes it clear that if no canonical function is
+     *                            given, the range will not get canonicalized
      * @param mixed $lower the range lower bound, or <tt>null</tt> if unbounded
      * @param mixed $upper the range upper bound, or <tt>null</tt> if unbounded
-     * @param bool|string $boundsOrLowerInc either the string of complete bounds specification, or a boolean telling
-     *                                        whether the lower bound is inclusive;
-     *                                      the complete specification is similar to PostgreSQL - it is a two-character
-     *                                        string of <tt>'['</tt> or <tt>'('</tt>, and <tt>']'</tt> or <tt>')'</tt>
-     *                                        (brackets denoting an inclusive bound, parentheses denoting an exclusive
-     *                                        bound;
-     *                                      when the boolean is used, also the <tt>$upperInc</tt> argument is used;
-     *                                      either bound specification is irrelevant if the corresponding range edge is
-     *                                        <tt>null</tt> - the range is open by definition on that side, and thus
-     *                                        will be created as such
-     * @param bool $upperInc whether the upper bound is inclusive;
-     *                       only relevant if <tt>$boundsOrLowerInc</tt> is also boolean
+     * @param bool|string $boundsOrLowerInc
+     *                          either the string of complete bounds specification, or a boolean telling whether the
+     *                            lower bound is inclusive;
+     *                          the complete specification is similar to PostgreSQL - it is a two-character string of
+     *                            <tt>'['</tt> or <tt>'('</tt>, and <tt>']'</tt> or <tt>')'</tt> (brackets denoting an
+     *                            inclusive bound, parentheses denoting an exclusive bound;
+     *                          when the boolean is used, also the <tt>$upperInc</tt> argument is used;
+     *                          either bound specification is irrelevant if the corresponding range edge is
+     *                            <tt>null</tt> - the range is open by definition on that side, and thus will be created
+     *                            as such
+     * @param bool|null $upperInc whether the upper bound is inclusive;
+     *                            only relevant if <tt>$boundsOrLowerInc</tt> is also boolean
      * @return Range
      */
     public static function createFromBounds(
         ITotallyOrderedType $subtype,
-        ?IRangeCanonicalFunc $canonicalFunc = null,
+        ?IRangeCanonicalFunc $canonicalFunc,
         $lower,
         $upper,
         $boundsOrLowerInc = '[)',

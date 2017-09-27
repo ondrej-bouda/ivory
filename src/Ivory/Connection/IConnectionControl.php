@@ -50,9 +50,9 @@ interface IConnectionControl
      * reflect that the connection is asynchronous, so that it is clear that no extra work is needed. Indeed, the fact
      * that the connection is asynchronous is transparent to the caller.
      *
-     * @param \Closure $initProcedure code to execute after the connection is established, before any queries;
-     *                                the closure is given one {@link IConnection} argument - this connection;
-     *                                suitable for, e.g., setting up <tt>search_path</tt>, session variables, etc.
+     * @param \Closure|null $initProcedure code to execute after the connection is established, before any queries;
+     *                                     the closure is given one {@link IConnection} argument - this connection;
+     *                                     suitable for, e.g., setting up <tt>search_path</tt>, session variables, etc.
      * @return bool <tt>true</tt> if the connection has actually started to being established,
      *              <tt>false</tt> if the connection has already been open or started opening and thus this was a no-op
      * @throws ConnectionException on error connecting to the database

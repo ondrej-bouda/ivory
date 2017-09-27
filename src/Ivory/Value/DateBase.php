@@ -146,7 +146,11 @@ abstract class DateBase implements IEqualable
      */
     public function toISOString(): ?string
     {
-        return ($this->inf ? null : $this->dt->format($this->getISOFormat()));
+        if ($this->inf) {
+            return null;
+        } else {
+            return $this->dt->format($this->getISOFormat());
+        }
     }
 
     /**
@@ -163,21 +167,32 @@ abstract class DateBase implements IEqualable
      */
     public function toUnixTimestamp(): ?int
     {
-        return ($this->inf ? null : $this->dt->getTimestamp());
+        if ($this->inf) {
+            return null;
+        } else {
+            return $this->dt->getTimestamp();
+        }
     }
 
     /**
-     * @param \DateTimeZone $timezone timezone to create the {@link \DateTime} object with
+     * @param \DateTimeZone|null $timezone timezone to create the {@link \DateTime} object with;
+     *                                     if omitted, the current timezone is used
      * @return \DateTime|null the date/time represented as a {@link \DateTime} object;
      *                        <tt>null</tt> iff the date/time is not finite
      */
     public function toDateTime(?\DateTimeZone $timezone = null): ?\DateTime
     {
-        return ($this->inf ? null : new \DateTime($this->toISOString(), $timezone)); // OPT: \DateTime::createFromFormat() is supposed to be twice as fast as new \DateTime()
+        if ($this->inf) {
+            return null;
+        } else {
+            // OPT: \DateTime::createFromFormat() is supposed to be twice as fast as new \DateTime()
+            return new \DateTime($this->toISOString(), $timezone);
+        }
     }
 
     /**
-     * @param \DateTimeZone $timezone timezone to create the {@link \DateTime} object with
+     * @param \DateTimeZone|null $timezone timezone to create the {@link \DateTime} object with;
+     *                                     if omitted, the current timezone is used
      * @return \DateTimeImmutable|null the date/time represented as a {@link \DateTimeImmutable} object;
      *                                 <tt>null</tt> iff the date/time is not finite
      */
