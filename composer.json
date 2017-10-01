@@ -18,9 +18,6 @@
     "support": {
         "issues": "https://github.com/ondrej-bouda/ivory/issues"
     },
-    "config": {
-        "vendor-dir": "lib/composed"
-    },
     "prefer-stable": true,
     "require": {
         "php": "^7.1",
