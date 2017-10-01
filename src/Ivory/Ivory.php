@@ -141,8 +141,8 @@ final class Ivory
      *                          <li>a map of connection parameter keywords to values, e.g., <tt>['host' => '/tmp']</tt>
      *                        </ul>
      * @param string|null $connName name for the connection;
-     *                              if not given, the database name is considered if it is given within <tt>$params</tt>
-     *                                or the fallback name <tt>'conn'</tt> is used;
+     *                              if not given, the database name is considered if it is given within
+     *                                <tt>$params</tt>, or the fallback name <tt>'conn'</tt> is used;
      *                              if not given and if the auto-generated name is already taken, it is appended with a
      *                                numeric suffix, e.g., <tt>'conn1'</tt>, <tt>'conn2'</tt>, etc.
      * @return IConnection
@@ -156,16 +156,19 @@ final class Ivory
         }
 
         if ($connName === null) {
-            $connName = ($params['dbname'] ?? 'conn');
-            $safetyBreak = 10000;
-            for ($i = 1; $i < $safetyBreak; $i++) {
-                if (!isset(self::$connections[$connName . $i])) {
-                    $connName .= $i;
-                    break;
+            $connName = ($params->getDbName() ?? 'conn');
+
+            if (isset(self::$connections[$connName])) {
+                $safetyBreak = 10000;
+                for ($i = 1; $i < $safetyBreak; $i++) {
+                    if (!isset(self::$connections[$connName . $i])) {
+                        $connName .= $i;
+                        break;
+                    }
                 }
-            }
-            if ($i >= $safetyBreak) {
-                throw new \RuntimeException('Error auto-generating name for the new connection: all suffixes taken');
+                if ($i >= $safetyBreak) {
+                    throw new \RuntimeException('Error auto-generating name for the new connection: all suffixes taken');
+                }
             }
         }
 
@@ -199,7 +202,7 @@ final class Ivory
         if (isset(self::$connections[$connName])) {
             return self::$connections[$connName];
         } else {
-            throw new \RuntimeException('Undefined connection');
+            throw new \RuntimeException("Undefined connection: '$connName'");
         }
     }
 
