@@ -224,6 +224,7 @@ interface IStatementExecution
      *                             response
      */
     function runScript(string $sqlScript): array;
+
     /**
      * @return StatementExceptionFactory the local factory used for emitting exceptions upon statement errors
      */

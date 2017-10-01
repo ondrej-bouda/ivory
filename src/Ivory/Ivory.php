@@ -156,7 +156,7 @@ final class Ivory
         }
 
         if ($connName === null) {
-            $connName = (isset($params['dbname']) ? $params['dbname'] : 'conn');
+            $connName = ($params['dbname'] ?? 'conn');
             $safetyBreak = 10000;
             for ($i = 1; $i < $safetyBreak; $i++) {
                 if (!isset(self::$connections[$connName . $i])) {
