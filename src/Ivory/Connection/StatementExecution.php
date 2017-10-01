@@ -33,7 +33,7 @@ class StatementExecution implements IStatementExecution
     {
         $this->connCtl = $connCtl;
         $this->typeCtl = $typeCtl;
-        $this->stmtExFactory = new StatementExceptionFactory();
+        $this->stmtExFactory = Ivory::getCoreFactory()->createStatementExceptionFactory($this);
     }
 
     public function query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IQueryResult

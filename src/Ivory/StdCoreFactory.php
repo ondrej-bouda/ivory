@@ -116,7 +116,7 @@ class StdCoreFactory implements ICoreFactory
         }
     }
 
-    public function createStatementExceptionFactory(): StatementExceptionFactory
+    public function createStatementExceptionFactory(?IStatementExecution $stmtExecution = null): StatementExceptionFactory
     {
         return new StatementExceptionFactory();
     }

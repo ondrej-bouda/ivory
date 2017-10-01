@@ -30,7 +30,13 @@ interface ICoreFactory
 
     function createSqlPatternParser(?ICacheControl $cacheControl = null): ISqlPatternParser;
 
-    function createStatementExceptionFactory(): StatementExceptionFactory;
+    /**
+     * Create a factory for exception statements, either for a given connection or for global usage.
+     *
+     * @param IStatementExecution|null $stmtExecution
+     * @return StatementExceptionFactory
+     */
+    function createStatementExceptionFactory(?IStatementExecution $stmtExecution = null): StatementExceptionFactory;
 
     function createTransactionHandle(
         IStatementExecution $stmtExec,
