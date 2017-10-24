@@ -1,4 +1,7 @@
 <?php
+
+use Ivory\Connection\ConnectionParameters;
+
 $connStringRetriever = function () {
     $configFile = realpath(__DIR__ . '/phpunit.xml');
     if ($configFile === false) {
@@ -16,11 +19,11 @@ $connStringRetriever = function () {
     $varElmtList = $phpElmtList->item(0)->getElementsByTagName('var');
     $connStrItems = [];
     $itemMap = [
-        'DB_HOST' => 'host',
-        'DB_PORT' => 'port',
-        'DB_USER' => 'user',
-        'DB_PASSWD' => 'password',
-        'DB_DBNAME' => 'dbname',
+        'DB_HOST' => ConnectionParameters::HOST,
+        'DB_PORT' => ConnectionParameters::PORT,
+        'DB_USER' => ConnectionParameters::USER,
+        'DB_PASSWD' => ConnectionParameters::PASSWORD,
+        'DB_DBNAME' => ConnectionParameters::DBNAME,
     ];
     for ($i = 0; $i < $varElmtList->length; $i++) {
         $varElmt = $varElmtList->item($i);

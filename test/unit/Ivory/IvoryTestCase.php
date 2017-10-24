@@ -263,11 +263,11 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
         if ($this->ivoryConn === null) {
             $coreFactory = Ivory::getCoreFactory();
             $this->ivoryConn = $coreFactory->createConnection('default', ConnectionParameters::fromArray([
-                'host' => ($GLOBALS['DB_HOST'] ? : null),
-                'port' => ($GLOBALS['DB_PORT'] ? : null),
-                'user' => $GLOBALS['DB_USER'],
-                'password' => $GLOBALS['DB_PASSWD'],
-                'dbname' => $GLOBALS['DB_DBNAME'],
+                ConnectionParameters::HOST => ($GLOBALS['DB_HOST'] ? : null),
+                ConnectionParameters::PORT => ($GLOBALS['DB_PORT'] ? : null),
+                ConnectionParameters::USER => $GLOBALS['DB_USER'],
+                ConnectionParameters::PASSWORD => $GLOBALS['DB_PASSWD'],
+                ConnectionParameters::DBNAME => $GLOBALS['DB_DBNAME'],
             ]));
         }
 

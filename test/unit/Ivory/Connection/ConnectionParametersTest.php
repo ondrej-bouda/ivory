@@ -8,14 +8,25 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
     public function testFromConnectionString()
     {
         $this->assertEquals(
-            ['host' => 'localhost', 'port' => 5432, 'dbname' => 'mydb', 'connect_timeout' => 10],
+            [
+                ConnectionParameters::HOST => 'localhost',
+                ConnectionParameters::PORT => 5432,
+                ConnectionParameters::DBNAME => 'mydb',
+                ConnectionParameters::CONNECT_TIMEOUT => 10,
+            ],
             iterator_to_array(
                 ConnectionParameters::fromConnectionString('host=localhost port=5432 dbname=mydb connect_timeout=10')
             )
         );
 
         $this->assertEquals(
-            ['user' => 'johndoe', 'password' => '', 'dbname' => 'foo', 'host' => '/tmp', 'options' => '-c geqo=off'],
+            [
+                ConnectionParameters::USER => 'johndoe',
+                ConnectionParameters::PASSWORD => '',
+                ConnectionParameters::DBNAME => 'foo',
+                ConnectionParameters::HOST => '/tmp',
+                ConnectionParameters::OPTIONS => '-c geqo=off',
+            ],
             iterator_to_array(
                 ConnectionParameters::fromConnectionString("user = johndoe password='' dbname   =foo host=/tmp options='-c geqo=off'")
             )
@@ -51,42 +62,46 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertEquals(
-            ['host' => 'localhost'],
+            [ConnectionParameters::HOST => 'localhost'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://localhost')
             )
         );
 
         $this->assertEquals(
-            ['host' => 'localhost'],
+            [ConnectionParameters::HOST => 'localhost'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgres://localhost')
             )
         );
 
         $this->assertEquals(
-            ['host' => 'localhost', 'port' => 5433],
+            [ConnectionParameters::HOST => 'localhost', ConnectionParameters::PORT => 5433],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://localhost:5433')
             )
         );
 
         $this->assertEquals(
-            ['host' => 'localhost', 'dbname' => 'mydb'],
+            [ConnectionParameters::HOST => 'localhost', ConnectionParameters::DBNAME => 'mydb'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://localhost/mydb')
             )
         );
 
         $this->assertEquals(
-            ['host' => 'localhost', 'user' => 'user'],
+            [ConnectionParameters::HOST => 'localhost', ConnectionParameters::USER => 'user'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://user@localhost')
             )
         );
 
         $this->assertEquals(
-            ['host' => 'localhost', 'user' => 'user', 'password' => 'secret'],
+            [
+                ConnectionParameters::HOST => 'localhost',
+                ConnectionParameters::USER => 'user',
+                ConnectionParameters::PASSWORD => 'secret',
+            ],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://user:secret@localhost')
             )
@@ -94,8 +109,11 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             [
-                'host' => 'localhost', 'user' => 'other', 'dbname' => 'otherdb',
-                'connect_timeout' => 10, 'application_name' => 'myapp',
+                ConnectionParameters::HOST => 'localhost',
+                ConnectionParameters::USER => 'other',
+                ConnectionParameters::DBNAME => 'otherdb',
+                ConnectionParameters::CONNECT_TIMEOUT => 10,
+                ConnectionParameters::APPLICATION_NAME => 'myapp',
             ],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://other@localhost/otherdb?connect_timeout=10&application_name=myapp')
@@ -103,28 +121,32 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertEquals(
-            ['dbname' => 'mydb', 'host' => 'localhost', 'port' => 5433],
+            [
+                ConnectionParameters::DBNAME => 'mydb',
+                ConnectionParameters::HOST => 'localhost',
+                ConnectionParameters::PORT => 5433,
+            ],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql:///mydb?host=localhost&port=5433')
             )
         );
 
         $this->assertEquals(
-            ['host' => '[2001:db8::1234]', 'dbname' => 'database'],
+            [ConnectionParameters::HOST => '[2001:db8::1234]', ConnectionParameters::DBNAME => 'database'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://[2001:db8::1234]/database')
             )
         );
 
         $this->assertEquals(
-            ['dbname' => 'dbname', 'host' => '/var/lib/postgresql'],
+            [ConnectionParameters::DBNAME => 'dbname', ConnectionParameters::HOST => '/var/lib/postgresql'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql:///dbname?host=/var/lib/postgresql')
             )
         );
 
         $this->assertEquals(
-            ['host' => '/var/lib/postgresql', 'dbname' => 'dbname'],
+            [ConnectionParameters::HOST => '/var/lib/postgresql', ConnectionParameters::DBNAME => 'dbname'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://%2Fvar%2Flib%2Fpostgresql/dbname')
             )
@@ -152,14 +174,25 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
     public function testCreate()
     {
         $this->assertEquals(
-            ['host' => 'localhost', 'port' => 5432, 'dbname' => 'mydb', 'connect_timeout' => 10],
+            [
+                ConnectionParameters::HOST => 'localhost',
+                ConnectionParameters::PORT => 5432,
+                ConnectionParameters::DBNAME => 'mydb',
+                ConnectionParameters::CONNECT_TIMEOUT => 10,
+            ],
             iterator_to_array(
                 ConnectionParameters::create('host=localhost port=5432 dbname=mydb connect_timeout=10')
             )
         );
 
         $this->assertEquals(
-            ['user' => 'johndoe', 'password' => '', 'dbname' => 'foo', 'host' => '/tmp', 'options' => '-c geqo=off'],
+            [
+                ConnectionParameters::USER => 'johndoe',
+                ConnectionParameters::PASSWORD => '',
+                ConnectionParameters::DBNAME => 'foo',
+                ConnectionParameters::HOST => '/tmp',
+                ConnectionParameters::OPTIONS => '-c geqo=off',
+            ],
             iterator_to_array(
                 ConnectionParameters::create("user = johndoe password='' dbname   =foo host=/tmp options='-c geqo=off'")
             )
@@ -192,20 +225,26 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertEquals(
-            ['host' => 'localhost', 'dbname' => 'mydb'],
+            [ConnectionParameters::HOST => 'localhost', ConnectionParameters::DBNAME => 'mydb'],
             iterator_to_array(
                 ConnectionParameters::create('postgresql://localhost/mydb')
             )
         );
 
         $this->assertEquals(
-            ['host' => 'localhost', 'dbname' => 'mydb'],
+            [ConnectionParameters::HOST => 'localhost', ConnectionParameters::DBNAME => 'mydb'],
             iterator_to_array(
-                ConnectionParameters::create(['host' => 'localhost', 'dbname' => 'mydb'])
+                ConnectionParameters::create([
+                    ConnectionParameters::HOST => 'localhost',
+                    ConnectionParameters::DBNAME => 'mydb',
+                ])
             )
         );
 
-        $orig = ConnectionParameters::create(['host' => 'localhost', 'dbname' => 'mydb']);
+        $orig = ConnectionParameters::create([
+            ConnectionParameters::HOST => 'localhost',
+            ConnectionParameters::DBNAME => 'mydb',
+            ]);
         $this->assertEquals($orig, ConnectionParameters::create($orig));
         $this->assertNotSame($orig, ConnectionParameters::create($orig));
 
@@ -236,20 +275,20 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
     public function testArrayAccess()
     {
         $cp1 = ConnectionParameters::fromUri('postgresql:///dbname?host=/var/lib/postgresql');
-        $this->assertSame('/var/lib/postgresql', $cp1['host']);
-        $this->assertFalse(isset($cp1['port']));
-        $this->assertSame('dbname', $cp1['dbname']);
+        $this->assertSame('/var/lib/postgresql', $cp1[ConnectionParameters::HOST]);
+        $this->assertFalse(isset($cp1[ConnectionParameters::PORT]));
+        $this->assertSame('dbname', $cp1[ConnectionParameters::DBNAME]);
 
         $cp2 = ConnectionParameters::fromConnectionString('host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10');
-        $this->assertSame('5432', $cp2['port']);
-        $this->assertSame('john', $cp2['user']);
-        $this->assertSame('10', $cp2['connect_timeout']);
-        $this->assertTrue(isset($cp2['password']));
-        unset($cp2['password']);
-        $this->assertFalse(isset($cp2['password']));
-        $cp2['password'] = 1234;
-        $this->assertTrue(isset($cp2['password']));
-        $this->assertSame('1234', $cp2['password']);
+        $this->assertSame('5432', $cp2[ConnectionParameters::PORT]);
+        $this->assertSame('john', $cp2[ConnectionParameters::USER]);
+        $this->assertSame('10', $cp2[ConnectionParameters::CONNECT_TIMEOUT]);
+        $this->assertTrue(isset($cp2[ConnectionParameters::PASSWORD]));
+        unset($cp2[ConnectionParameters::PASSWORD]);
+        $this->assertFalse(isset($cp2[ConnectionParameters::PASSWORD]));
+        $cp2[ConnectionParameters::PASSWORD] = 1234;
+        $this->assertTrue(isset($cp2[ConnectionParameters::PASSWORD]));
+        $this->assertSame('1234', $cp2[ConnectionParameters::PASSWORD]);
     }
 
     public function testBuildConnectionString()

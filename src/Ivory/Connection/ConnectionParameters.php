@@ -8,11 +8,22 @@ use Ivory\Exception\UnsupportedException;
 /**
  * Parameters of a database connection.
  *
- * @todo consider introducing constants for standard parameters (http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS)
  * @todo document usage of \ArrayAccess and \IteratorAggregate interfaces
+ * @todo extend to support specification of multiple hosts, as introduced by PostgreSQL 10
+ * @todo consider renaming to ConnectionParams to be consistent with ConfigParam
  */
 class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
 {
+    const HOST = 'host';
+    const PORT = 'port';
+    const DBNAME = 'dbname';
+    const USER = 'user';
+    const PASSWORD = 'password';
+    const APPLICATION_NAME = 'application_name';
+    const CLIENT_ENCODING = 'client_encoding';
+    const CONNECT_TIMEOUT = 'connect_timeout';
+    const OPTIONS = 'options';
+
     private $params = [];
 
     /**
@@ -57,8 +68,10 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
      * - `connect_timeout (int)`: connection timeout (0 means to wait indefinitely),
      * - `options (string)`: the runtime options to send to the server.
      *
+     * Note the usual keywords are defined as constants in this class - e.g., {@link ConnectionParameters::DBNAME}.
+     *
      * For details, see the
-     * {@link http://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-PARAMKEYWORDS PostgreSQL documentation}.
+     * {@link https://www.postgresql.org/docs/current/static/libpq-connect.html#libpq-paramkeywords PostgreSQL documentation}.
      * Any parameter may be omitted - the default is used then.
      *
      * @param array $params map: connection parameter keyword => value
@@ -106,11 +119,11 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
 
         $params = array_filter(
             [
-                'host' => ($c['host'] ?? null),
-                'port' => ($c['port'] ?? null),
-                'dbname' => (isset($c['path']) && strlen($c['path']) > 1 ? substr($c['path'], 1) : null),
-                'user' => ($c['user'] ?? null),
-                'password' => ($c['pass'] ?? null),
+                self::HOST => ($c['host'] ?? null),
+                self::PORT => ($c['port'] ?? null),
+                self::DBNAME => (isset($c['path']) && strlen($c['path']) > 1 ? substr($c['path'], 1) : null),
+                self::USER => ($c['user'] ?? null),
+                self::PASSWORD => ($c['pass'] ?? null),
             ],
             'strlen'
         );
@@ -190,27 +203,27 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
 
     public function getHost(): ?string
     {
-        return ($this->params['host'] ?? null);
+        return ($this->params[self::HOST] ?? null);
     }
 
     public function getPort(): ?int
     {
-        return (isset($this->params['port']) ? (int)$this->params['port'] : null);
+        return (isset($this->params[self::PORT]) ? (int)$this->params['port'] : null);
     }
 
     public function getDbName(): ?string
     {
-        return ($this->params['dbname'] ?? null);
+        return ($this->params[self::DBNAME] ?? null);
     }
 
     public function getUsername(): ?string
     {
-        return ($this->params['user'] ?? null);
+        return ($this->params[self::USER] ?? null);
     }
 
     public function getPassword(): ?string
     {
-        return ($this->params['password'] ?? null);
+        return ($this->params[self::PASSWORD] ?? null);
     }
 
 
