@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Ivory\Connection;
 
+use Ivory\Exception\InvalidStateException;
 use Ivory\Exception\ResultException;
 use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
@@ -47,7 +48,12 @@ class StatementExecution implements IStatementExecution
             );
         }
 
-        $sql = $relDef->toSql($this->typeCtl->getTypeDictionary());
+        try {
+            $sql = $relDef->toSql($this->typeCtl->getTypeDictionary());
+        } catch (InvalidStateException $e) {
+            throw new \InvalidArgumentException($e->getMessage());
+        }
+
         return $this->rawQuery($sql);
     }
 
@@ -87,7 +93,12 @@ class StatementExecution implements IStatementExecution
             $command = SqlCommand::fromFragments($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
         }
 
-        $sql = $command->toSql($this->typeCtl->getTypeDictionary());
+        try {
+            $sql = $command->toSql($this->typeCtl->getTypeDictionary());
+        } catch (InvalidStateException $e) {
+            throw new \InvalidArgumentException($e->getMessage());
+        }
+
         return $this->rawCommand($sql);
     }
 

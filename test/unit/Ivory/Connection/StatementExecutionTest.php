@@ -196,6 +196,20 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         $this->expectException(StatementExecutionTest__LogarithmException::class);
         $this->conn->query('SELECT log(-10)');
     }
+
+    public function testUnsatisfiedQueryParameters()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Values for parameters "a", "b" and "c" have not been set.');
+        $this->conn->query('SELECT %:a + %:b + %:c + %:d', ['d' => 1]);
+    }
+
+    public function testUnsatisfiedCommandParameters()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Values for parameters "a", "b" and "c" have not been set.');
+        $this->conn->command('INSERT INTO t (x) VALUES (%:a + %:b + %:c + %:d)', ['d' => 1]);
+    }
 }
 
 class StatementExecutionTest__LogarithmException extends StatementException
