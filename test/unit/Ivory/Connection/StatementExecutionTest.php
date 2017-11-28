@@ -7,13 +7,14 @@ use Ivory\Exception\ResultException;
 use Ivory\Exception\StatementException;
 use Ivory\Exception\UsageException;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
+use Ivory\Query\SqlCommand;
 use Ivory\Query\SqlRelationDefinition;
 use Ivory\Result\SqlState;
 use Ivory\Result\SqlStateClass;
 
 class StatementExecutionTest extends \Ivory\IvoryTestCase
 {
-    /** @var IStatementExecution */
+    /** @var IConnection */
     private $conn;
 
     protected function setUp()
@@ -201,14 +202,52 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Values for parameters "a", "b" and "c" have not been set.');
-        $this->conn->query('SELECT %:a + %:b + %:c + %:d', ['d' => 1]);
+        $this->conn->query(
+            'SELECT %:a + %:b + %:c + %:d',
+            ['d' => 1]
+        );
     }
 
     public function testUnsatisfiedCommandParameters()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Values for parameters "a", "b" and "c" have not been set.');
-        $this->conn->command('INSERT INTO t (x) VALUES (%:a + %:b + %:c + %:d)', ['d' => 1]);
+        $this->conn->command(
+            'INSERT INTO t (x) VALUES (%:a + %:b + %:c + %:d)',
+            ['d' => 1]
+        );
+    }
+
+    public function testQueryArgumentPrecedence()
+    {
+        $relDef = SqlRelationDefinition::fromPattern('SELECT %:a + %:b + %:c');
+        $relDef->setParams(['a' => 1, 'b' => 2]);
+
+        $this->assertSame(10, $this->conn->querySingleValue($relDef, ['b' => 3, 'c' => 6]));
+
+        $this->assertSame(9, $this->conn->querySingleValue($relDef, ['c' => 6]));
+    }
+
+    public function testCommandArgumentPrecedence()
+    {
+        $tx = $this->conn->startTransaction();
+
+        try {
+            $this->conn->command('CREATE TEMPORARY TABLE t (x INT) ON COMMIT DROP');
+
+            $cmd = SqlCommand::fromPattern('INSERT INTO t (x) VALUES (%:a), (%:b), (%:c)');
+            $cmd->setParams(['a' => 1, 'b' => 2]);
+
+            $this->conn->command($cmd, ['b' => 3, 'c' => 6]);
+            $this->assertSame(10, $this->conn->querySingleValue('SELECT SUM(x) FROM t'));
+
+            $this->conn->command('TRUNCATE t');
+
+            $this->conn->command($cmd, ['c' => 6]);
+            $this->assertSame(9, $this->conn->querySingleValue('SELECT SUM(x) FROM t'));
+        } finally {
+            $tx->rollback();
+        }
     }
 }
 

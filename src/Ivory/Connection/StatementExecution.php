@@ -40,16 +40,19 @@ class StatementExecution implements IStatementExecution
     public function query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IQueryResult
     {
         if ($sqlFragmentPatternOrRelationDefinition instanceof IRelationDefinition) {
-            $relDef = $this->setupDefinition($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
+            $relDef = $sqlFragmentPatternOrRelationDefinition;
+            $serializeArgs = $fragmentsAndParams;
+            $this->checkDefinitionParams($relDef, $serializeArgs);
         } else {
             $relDef = SqlRelationDefinition::fromFragments(
                 $sqlFragmentPatternOrRelationDefinition,
                 ...$fragmentsAndParams
             );
+            $serializeArgs = [];
         }
 
         try {
-            $sql = $relDef->toSql($this->typeCtl->getTypeDictionary());
+            $sql = $relDef->toSql($this->typeCtl->getTypeDictionary(), ...$serializeArgs);
         } catch (InvalidStateException $e) {
             throw new \InvalidArgumentException($e->getMessage());
         }
@@ -71,30 +74,37 @@ class StatementExecution implements IStatementExecution
     public function querySingleValue($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams)
     {
         $rel = $this->query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
-        if ($rel->count() != 1) {
+
+        $rowCnt = $rel->count();
+        if ($rowCnt != 1) {
             throw new ResultException(
-                "The query should have resulted in exactly one row, but has {$rel->count()} rows."
+                "The query should have resulted in exactly one row, but has $rowCnt rows."
             );
         }
+
         $colCnt = count($rel->getColumns());
         if ($colCnt != 1) {
             throw new ResultException(
                 "The query should have resulted in exactly one column, but has $colCnt columns."
             );
         }
+
         return $rel->value();
     }
 
-    public function command($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ICommandResult
+    public function command($sqlFragmentPatternOrCommand, ...$fragmentsAndParams): ICommandResult
     {
-        if ($sqlFragmentPatternOrRelationDefinition instanceof ICommand) {
-            $command = $this->setupDefinition($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
+        if ($sqlFragmentPatternOrCommand instanceof ICommand) {
+            $command = $sqlFragmentPatternOrCommand;
+            $serializeArgs = $fragmentsAndParams;
+            $this->checkDefinitionParams($command, $serializeArgs);
         } else {
-            $command = SqlCommand::fromFragments($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
+            $command = SqlCommand::fromFragments($sqlFragmentPatternOrCommand, ...$fragmentsAndParams);
+            $serializeArgs = [];
         }
 
         try {
-            $sql = $command->toSql($this->typeCtl->getTypeDictionary());
+            $sql = $command->toSql($this->typeCtl->getTypeDictionary(), ...$serializeArgs);
         } catch (InvalidStateException $e) {
             throw new \InvalidArgumentException($e->getMessage());
         }
@@ -102,21 +112,17 @@ class StatementExecution implements IStatementExecution
         return $this->rawCommand($sql);
     }
 
-    private function setupDefinition($definition, ...$args)
+    private function checkDefinitionParams($definition, $params)
     {
-        if ($args) {
-            if ($definition instanceof ISqlPatternDefinition) {
-                if (count($args) > 1) {
-                    throw new \InvalidArgumentException('Too many arguments given.');
-                }
-                $namedParamsMap = $args[0];
-                $definition->setParams($namedParamsMap);
-            } else {
+        if ($definition instanceof ISqlPatternDefinition) {
+            if (count($params) > 1) {
+                throw new \InvalidArgumentException('Too many arguments given.');
+            }
+        } else {
+            if (count($params) > 0) {
                 throw new \InvalidArgumentException('Too many arguments given.');
             }
         }
-
-        return $definition;
     }
 
     public function rawQuery(string $sqlQuery): IQueryResult

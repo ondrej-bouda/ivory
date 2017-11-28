@@ -274,15 +274,20 @@ trait SqlPatternDefinitionMacros
     }
 
     /**
+     * Serializes this definition into an SQL string.
+     *
      * @param ITypeDictionary $typeDictionary
+     * @param array $namedParameterValues values of named parameters for just this serialization
      * @return string
      * @throws InvalidStateException when values for one or more named parameters has not been set
      * @throws UndefinedTypeException when some of the types used in the pattern are not defined
      */
-    public function toSql(ITypeDictionary $typeDictionary): string
+    public function toSql(ITypeDictionary $typeDictionary, array $namedParameterValues = []): string
     {
-        if ($this->unsatisfiedParams) {
-            $names = array_keys($this->unsatisfiedParams);
+        $unsatisfiedParams = array_diff_key($this->unsatisfiedParams, $namedParameterValues);
+
+        if ($unsatisfiedParams) {
+            $names = array_keys($unsatisfiedParams);
             if (count($names) == 1) {
                 $msg = sprintf('Value for parameter "%s" has not been set.', $names[0]);
             } else {
@@ -299,12 +304,17 @@ trait SqlPatternDefinitionMacros
         while ($gen->valid()) {
             /** @var SqlPatternPlaceholder $placeholder */
             $placeholder = $gen->current();
-            assert(
-                array_key_exists($placeholder->getNameOrPosition(), $this->params),
-                new NoDataException("Value for parameter {$placeholder->getNameOrPosition()} not set.")
-            );
+            $nameOrPos = $placeholder->getNameOrPosition();
 
-            $value = $this->params[$placeholder->getNameOrPosition()];
+            if (array_key_exists($nameOrPos, $namedParameterValues)) {
+                $value = $namedParameterValues[$nameOrPos];
+            } else {
+                assert(
+                    array_key_exists($placeholder->getNameOrPosition(), $this->params),
+                    new NoDataException("Value for parameter {$placeholder->getNameOrPosition()} not set.")
+                );
+                $value = $this->params[$nameOrPos];
+            }
 
             if ($placeholder->getTypeName() !== null) {
                 $typeName = $placeholder->getTypeName();

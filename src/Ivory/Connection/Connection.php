@@ -148,9 +148,9 @@ class Connection implements IConnection
         return $this->stmtExec->querySingleValue($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
     }
 
-    public function command($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ICommandResult
+    public function command($sqlFragmentPatternOrCommand, ...$fragmentsAndParams): ICommandResult
     {
-        return $this->stmtExec->command($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
+        return $this->stmtExec->command($sqlFragmentPatternOrCommand, ...$fragmentsAndParams);
     }
 
     public function rawQuery(string $sqlQuery): IQueryResult

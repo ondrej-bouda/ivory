@@ -51,8 +51,11 @@ interface IStatementExecution
      *    such SQL patterns are combined together as fragments. If any of the fragments has a named parameter, the map
      *    of values for named parameters must be given as the very last argument.
      * 2. The first argument is an {@link SqlRelationDefinition} object. No positional arguments are expected in this
-     *    case, only the optional map of values for named parameters. As the `SqlRelationDefinition` might have already
-     *    set all its named parameters, even this argument might not be necessary.
+     *    case, only the map of values for named parameters if present. As the `SqlRelationDefinition` might have
+     *    already set all its named parameters, even this argument might not be necessary.
+     *    Note that values of named parameters passed as argument to this method have precedence over those already set
+     *    on the `SqlRelationDefinition` object. The object is untouched by this method, just the same-named parameter
+     *    value is ineffective.
      * 3. The first and the only argument is an {@link IRelationDefinition} object.
      *
      * Examples:
@@ -135,14 +138,14 @@ interface IStatementExecution
      * Note the strict distinction of *queries* and *commands* - see the {@link IStatementExecution} docs. If an SQL
      * query is executed using this method, a {@link UsageException} is thrown after the query execution.
      *
-     * @param string|SqlPattern|ICommand $sqlFragmentPatternOrRelationDefinition
+     * @param string|SqlPattern|ICommand $sqlFragmentPatternOrCommand
      * @param array ...$fragmentsAndParams
      * @return ICommandResult
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      * @throws UsageException if the statement appears to be a query rather than a command
      */
-    function command($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ICommandResult;
+    function command($sqlFragmentPatternOrCommand, ...$fragmentsAndParams): ICommandResult;
 
     /**
      * Sends a raw SQL query, as is, to the database, waits for its execution and returns the resulting relation.
