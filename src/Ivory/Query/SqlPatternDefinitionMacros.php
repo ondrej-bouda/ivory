@@ -121,7 +121,7 @@ trait SqlPatternDefinitionMacros
      * compose an SQL query from several parts, thus, it is legitimate the query is modified appropriately.
      *
      * @param string|SqlPattern $fragment
-     * @param array ...$fragmentsAndPositionalParams
+     * @param array ...$fragmentsAndParamValues
      *                                  further fragments (each of which is either a <tt>string</tt> or an
      *                                    {@link SqlPattern} object) and values of their parameters;
      *                                  the very last argument may be a map of values for named parameters to set
@@ -131,7 +131,7 @@ trait SqlPatternDefinitionMacros
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      */
-    public static function fromFragments($fragment, ...$fragmentsAndPositionalParams): self
+    public static function fromFragments($fragment, ...$fragmentsAndParamValues): self
     {
         $overallSqlTorso = '';
         $overallPosPlaceholders = [];
@@ -153,7 +153,7 @@ trait SqlPatternDefinitionMacros
                 } elseif (
                     is_iterable($curFragment) &&
                     $argsProcessed > 0 &&
-                    !array_key_exists($argsProcessed, $fragmentsAndPositionalParams)
+                    !array_key_exists($argsProcessed, $fragmentsAndParamValues)
                 ) {
                     $namedParamValues = $curFragment;
                     break;
@@ -214,7 +214,7 @@ trait SqlPatternDefinitionMacros
 
             // values of parameters
             $plcHdrCnt = count($curPosParams);
-            $posParams = array_slice($fragmentsAndPositionalParams, $argsProcessed, $plcHdrCnt);
+            $posParams = array_slice($fragmentsAndParamValues, $argsProcessed, $plcHdrCnt);
             if (count($posParams) == $plcHdrCnt) {
                 $overallPosParams = array_merge($overallPosParams, $posParams);
             } else {
@@ -225,7 +225,7 @@ trait SqlPatternDefinitionMacros
             $curFragmentNum++;
             $argsProcessed += count($posParams);
 
-            $curFragment =& $fragmentsAndPositionalParams[$argsProcessed];
+            $curFragment =& $fragmentsAndParamValues[$argsProcessed];
             $argsProcessed++;
         } while (isset($curFragment));
 
@@ -288,7 +288,8 @@ trait SqlPatternDefinitionMacros
             } else {
                 $msg = sprintf(
                     'Values for parameters %s and "%s" have not been set.',
-                    array_map(function ($s) { return "\"$s\""; }, array_slice($names, 0, -1))
+                    implode(', ', array_map(function ($s) { return "\"$s\""; }, array_slice($names, 0, -1))),
+                    $names[count($names) - 1]
                 );
             }
             throw new InvalidStateException($msg);
