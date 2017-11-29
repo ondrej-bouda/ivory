@@ -69,11 +69,13 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         $this->assertSame(1, $result->count());
         $this->assertSame([42, 'wheee'], $result->tuple()->toList());
 
-        try {
-            $this->conn->query("DO LANGUAGE plpgsql 'BEGIN END'");
-            $this->fail(UsageException::class . ' is expected due to the mismatch of query() and command()');
-        } catch (UsageException $e) {
-        }
+        $this->assertException(
+            UsageException::class,
+            function () {
+                $this->conn->query("DO LANGUAGE plpgsql 'BEGIN END'");
+            },
+            UsageException::class . ' is expected due to the mismatch of query() and command()'
+        );
     }
 
     public function testQuerySingleTuple()
@@ -99,11 +101,45 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
             'no tuples were returned from the database'
         );
 
-        try {
-            $this->conn->querySingleTuple("DO LANGUAGE plpgsql 'BEGIN END'");
-            $this->fail(UsageException::class . ' is expected due to the mismatch of query() and command()');
-        } catch (UsageException $e) {
-        }
+        $this->assertException(
+            UsageException::class,
+            function () {
+                $this->conn->querySingleTuple("DO LANGUAGE plpgsql 'BEGIN END'");
+            },
+            UsageException::class . ' is expected due to the mismatch of query() and command()'
+        );
+    }
+
+    public function testQuerySingleColumn()
+    {
+        $col = $this->conn->querySingleColumn(
+            'SELECT num FROM (VALUES (4), (-3), (3)) t (num)'
+        );
+        $this->assertSame([4, -3, 3], $col->toArray());
+
+        $this->assertException(
+            ResultException::class,
+            function () {
+                $this->conn->querySingleColumn('SELECT 1, 2');
+            },
+            'multiple columns were returned from the database'
+        );
+
+        $this->assertException(
+            ResultException::class,
+            function () {
+                $this->conn->querySingleColumn('SELECT FROM (VALUES (4), (-3), (3)) t (num)');
+            },
+            'no columns were returned from the database'
+        );
+
+        $this->assertException(
+            UsageException::class,
+            function () {
+                $this->conn->querySingleColumn("DO LANGUAGE plpgsql 'BEGIN END'");
+            },
+            UsageException::class . ' is expected due to the mismatch of query() and command()'
+        );
     }
 
     public function testQuerySingleValue()

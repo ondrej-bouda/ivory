@@ -15,6 +15,7 @@ use Ivory\Query\IRelationDefinition;
 use Ivory\Query\ISqlPatternDefinition;
 use Ivory\Query\SqlCommand;
 use Ivory\Query\SqlRelationDefinition;
+use Ivory\Relation\IColumn;
 use Ivory\Relation\ITuple;
 use Ivory\Result\CommandResult;
 use Ivory\Result\CopyInResult;
@@ -69,6 +70,20 @@ class StatementExecution implements IStatementExecution
             );
         }
         return $rel->tuple();
+    }
+
+    public function querySingleColumn($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IColumn
+    {
+        $rel = $this->query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
+
+        $colCnt = count($rel->getColumns());
+        if ($colCnt != 1) {
+            throw new ResultException(
+                "The query should have resulted in exactly one column, but has $colCnt columns."
+            );
+        }
+
+        return $rel->col(0);
     }
 
     public function querySingleValue($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams)

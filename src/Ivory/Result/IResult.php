@@ -24,6 +24,8 @@ interface IResult
      *   notice must be kept on the whole connection, and a notice found out by get_last_notice() should only be
      *   reported if different from the last one.
      *
+     * @todo update the docs for PHP 7.1, which is currently a requirement for Ivory
+     *
      * @return string|null notice emitted for this result, or <tt>null</tt> if no notice was emitted or it was
      *                       indistinguishable from previous notices
      */

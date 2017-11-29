@@ -7,6 +7,7 @@ use Ivory\Connection\Config\ConnConfig;
 use Ivory\Connection\Config\IConnConfig;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Ivory;
+use Ivory\Relation\IColumn;
 use Ivory\Relation\ITuple;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\ICopyInResult;
@@ -141,6 +142,11 @@ class Connection implements IConnection
     public function querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ITuple
     {
         return $this->stmtExec->querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
+    }
+
+    public function querySingleColumn($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IColumn
+    {
+        return $this->stmtExec->querySingleColumn($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
     }
 
     public function querySingleValue($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams)

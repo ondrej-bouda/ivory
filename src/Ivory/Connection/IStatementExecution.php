@@ -7,6 +7,7 @@ use Ivory\Exception\UsageException;
 use Ivory\Lang\SqlPattern\SqlPattern;
 use Ivory\Query\ICommand;
 use Ivory\Query\IRelationDefinition;
+use Ivory\Relation\IColumn;
 use Ivory\Relation\ITuple;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\IQueryResult;
@@ -85,6 +86,7 @@ interface IStatementExecution
      * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
      * @param array ...$fragmentsAndParams
      * @return IQueryResult
+     * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      * @throws UsageException if the statement appears to be a command rather than a query
@@ -101,12 +103,32 @@ interface IStatementExecution
      * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
      * @param array ...$fragmentsAndParams
      * @return ITuple
+     * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      * @throws ResultException when the resulting data set has more than one row, or no row at all
      * @throws UsageException if the statement appears to be a command rather than a query
      */
     function querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ITuple;
+
+    /**
+     * Queries the database for a relation using an SQL pattern, checks it results in exactly one column, and returns
+     * it.
+     *
+     * The base functionality is the same as in {@link query()}. On top of that, the result is checked on having exactly
+     * one column, and the column is returned.
+     *
+     * @see query() for detailed specification
+     * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
+     * @param array ...$fragmentsAndParams
+     * @return IColumn
+     * @throws StatementException when the query is erroneous and PostgreSQL returns an error
+     * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
+     *                                     requires
+     * @throws ResultException when the resulting data set has more than one column, or no column at all
+     * @throws UsageException if the statement appears to be a command rather than a query
+     */
+    function querySingleColumn($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IColumn;
 
     /**
      * Queries the database for a relation using an SQL pattern, checks it results in exactly one row with one column,
@@ -119,6 +141,7 @@ interface IStatementExecution
      * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
      * @param array ...$fragmentsAndParams
      * @return mixed value of the only row from the only column the relation has
+     * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      * @throws ResultException when the resulting data set has more than one row, or no row at all, or more than one
@@ -141,6 +164,7 @@ interface IStatementExecution
      * @param string|SqlPattern|ICommand $sqlFragmentPatternOrCommand
      * @param array ...$fragmentsAndParams
      * @return ICommandResult
+     * @throws StatementException when the command is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      * @throws UsageException if the statement appears to be a query rather than a command
