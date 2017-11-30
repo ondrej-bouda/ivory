@@ -1,7 +1,7 @@
 <?php
 namespace Ivory\Connection;
 
-use Ivory\Exception\ResultException;
+use Ivory\Exception\ResultDimensionException;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Exception\UsageException;
 use Ivory\Lang\SqlPattern\SqlPattern;
@@ -106,7 +106,7 @@ interface IStatementExecution
      * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
-     * @throws ResultException when the resulting data set has more than one row, or no row at all
+     * @throws ResultDimensionException when the resulting data set has more than one row, or no row at all
      * @throws UsageException if the statement appears to be a command rather than a query
      */
     function querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ITuple;
@@ -125,7 +125,7 @@ interface IStatementExecution
      * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
-     * @throws ResultException when the resulting data set has more than one column, or no column at all
+     * @throws ResultDimensionException when the resulting data set has more than one column, or no column at all
      * @throws UsageException if the statement appears to be a command rather than a query
      */
     function querySingleColumn($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IColumn;
@@ -144,8 +144,8 @@ interface IStatementExecution
      * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
-     * @throws ResultException when the resulting data set has more than one row, or no row at all, or more than one
-     *                           column, or no column at all
+     * @throws ResultDimensionException when the resulting data set has more than one row, or no row at all, or more
+     *                                    than one column, or no column at all
      * @throws UsageException if the statement appears to be a command rather than a query
      */
     function querySingleValue($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);

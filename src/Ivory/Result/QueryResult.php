@@ -5,7 +5,7 @@ namespace Ivory\Result;
 
 use Ivory\Connection\ITypeControl;
 use Ivory\Exception\NotImplementedException;
-use Ivory\Exception\ResultException;
+use Ivory\Exception\InvalidResultException;
 use Ivory\Relation\Column;
 use Ivory\Relation\FilteredRelation;
 use Ivory\Relation\IRelation;
@@ -48,7 +48,7 @@ class QueryResult extends Result implements IQueryResult
         if ($numRows >= 0 && $numRows !== null) { // NOTE: besides -1, pg_num_rows() might return NULL on error
             return $numRows;
         } else {
-            throw new ResultException('Error retrieving number of rows of the result.');
+            throw new InvalidResultException('Error retrieving number of rows of the result.');
         }
     }
 
@@ -56,7 +56,7 @@ class QueryResult extends Result implements IQueryResult
     {
         $numFields = pg_num_fields($this->handler);
         if ($numFields < 0 || $numFields === null) {
-            throw new ResultException('Error retrieving number of fields of the result.');
+            throw new InvalidResultException('Error retrieving number of fields of the result.');
         }
         $this->columns = [];
         $this->colNameMap = [];
@@ -69,14 +69,14 @@ class QueryResult extends Result implements IQueryResult
              */
             $name = pg_field_name($this->handler, $i);
             if ($name === false || $name === null) { // NOTE: besides false, pg_field_name() might return NULL on error
-                throw new ResultException("Error retrieving name of result column $i.");
+                throw new InvalidResultException("Error retrieving name of result column $i.");
             }
             if ($name == '?column?') {
                 $name = null;
             }
             $typeOid = pg_field_type_oid($this->handler, $i);
             if ($typeOid === false || $typeOid === null) { // NOTE: besides false, pg_field_type_oid() might return NULL on error
-                throw new ResultException("Error retrieving type OID of result column $i.");
+                throw new InvalidResultException("Error retrieving type OID of result column $i.");
             }
             // NOTE: the type dictionary may change during the iterations, so taky a fresh one every time
             $typeDictionary = $typeControl->getTypeDictionary();
@@ -134,7 +134,7 @@ class QueryResult extends Result implements IQueryResult
         }
 
         if ($rawData === false || $rawData === null) {
-            throw new ResultException("Error fetching row at offset $offset");
+            throw new InvalidResultException("Error fetching row at offset $offset");
         }
 
         $data = [];

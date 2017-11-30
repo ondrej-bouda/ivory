@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Ivory\Connection;
 
 use Ivory\Exception\InvalidStateException;
-use Ivory\Exception\ResultException;
+use Ivory\Exception\ResultDimensionException;
 use Ivory\Exception\StatementException;
 use Ivory\Exception\ConnectionException;
 use Ivory\Exception\StatementExceptionFactory;
@@ -65,7 +65,7 @@ class StatementExecution implements IStatementExecution
     {
         $rel = $this->query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
         if ($rel->count() != 1) {
-            throw new ResultException(
+            throw new ResultDimensionException(
                 "The query should have resulted in exactly one row, but has {$rel->count()} rows."
             );
         }
@@ -78,7 +78,7 @@ class StatementExecution implements IStatementExecution
 
         $colCnt = count($rel->getColumns());
         if ($colCnt != 1) {
-            throw new ResultException(
+            throw new ResultDimensionException(
                 "The query should have resulted in exactly one column, but has $colCnt columns."
             );
         }
@@ -92,14 +92,14 @@ class StatementExecution implements IStatementExecution
 
         $rowCnt = $rel->count();
         if ($rowCnt != 1) {
-            throw new ResultException(
+            throw new ResultDimensionException(
                 "The query should have resulted in exactly one row, but has $rowCnt rows."
             );
         }
 
         $colCnt = count($rel->getColumns());
         if ($colCnt != 1) {
-            throw new ResultException(
+            throw new ResultDimensionException(
                 "The query should have resulted in exactly one column, but has $colCnt columns."
             );
         }

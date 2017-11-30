@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Ivory\Connection;
 
-use Ivory\Exception\ResultException;
+use Ivory\Exception\ResultDimensionException;
 use Ivory\Exception\StatementException;
 use Ivory\Exception\UsageException;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
@@ -86,7 +86,7 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         $this->assertSame([-3, 4], $tuple->toList());
 
         $this->assertException(
-            ResultException::class,
+            ResultDimensionException::class,
             function () {
                 $this->conn->querySingleTuple('SELECT * FROM (VALUES (4), (-3), (3)) t (num)');
             },
@@ -94,7 +94,7 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         );
 
         $this->assertException(
-            ResultException::class,
+            ResultDimensionException::class,
             function () {
                 $this->conn->querySingleTuple('SELECT 1 WHERE FALSE');
             },
@@ -118,7 +118,7 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         $this->assertSame([4, -3, 3], $col->toArray());
 
         $this->assertException(
-            ResultException::class,
+            ResultDimensionException::class,
             function () {
                 $this->conn->querySingleColumn('SELECT 1, 2');
             },
@@ -126,7 +126,7 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         );
 
         $this->assertException(
-            ResultException::class,
+            ResultDimensionException::class,
             function () {
                 $this->conn->querySingleColumn('SELECT FROM (VALUES (4), (-3), (3)) t (num)');
             },
@@ -146,36 +146,46 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
     {
         $value = $this->conn->querySingleValue('SELECT 1');
         $this->assertSame(1, $value);
+        
+        $this->assertException(
+            ResultDimensionException::class,
+            function () {
+                $this->conn->querySingleValue('SELECT 1, 2');
+            },
+            'multiple columns were returned from the database'
+        );
 
-        try {
-            $this->conn->querySingleValue('SELECT 1, 2');
-            $this->fail(ResultException::class . ' was expected - multiple columns were returned from the database');
-        } catch (ResultException $e) {
-        }
+        $this->assertException(
+            ResultDimensionException::class,
+            function () {
+                $this->conn->querySingleValue('SELECT');
+            },
+            'no columns were returned from the database'
+        );
 
-        try {
-            $this->conn->querySingleValue('SELECT');
-            $this->fail(ResultException::class . ' was expected - no columns were returned from the database');
-        } catch (ResultException $e) {
-        }
+        $this->assertException(
+            ResultDimensionException::class,
+            function () {
+                $this->conn->querySingleValue('SELECT 1 UNION SELECT 2');
+            },
+            'multiple rows were returned from the database'
+        );
 
-        try {
-            $this->conn->querySingleValue('SELECT 1 UNION SELECT 2');
-            $this->fail(ResultException::class . ' was expected - multiple rows were returned from the database');
-        } catch (ResultException $e) {
-        }
+        $this->assertException(
+            ResultDimensionException::class,
+            function () {
+                $this->conn->querySingleValue('SELECT 1 WHERE FALSE');
+            },
+            'no rows were returned from the database'
+        );
 
-        try {
-            $this->conn->querySingleValue('SELECT 1 WHERE FALSE');
-            $this->fail(ResultException::class . ' was expected - no rows were returned from the database');
-        } catch (ResultException $e) {
-        }
-
-        try {
-            $this->conn->querySingleValue("DO LANGUAGE plpgsql 'BEGIN END'");
-            $this->fail(UsageException::class . ' is expected due to the mismatch of query() and command()');
-        } catch (UsageException $e) {
-        }
+        $this->assertException(
+            UsageException::class,
+            function () {
+                $this->conn->querySingleValue("DO LANGUAGE plpgsql 'BEGIN END'");
+            },
+            'mismatch of query() and command()'
+        );
     }
 
     public function testCommand()
@@ -184,18 +194,20 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
         $this->assertSame(0, $result->getAffectedRows());
         $this->assertSame('DO', $result->getCommandTag());
 
-        try {
-            $this->conn->command('VALUES (1),(2)');
-            $this->fail(UsageException::class . ' is expected due to the mismatch of query() and command()');
-        } catch (UsageException $e) {
-        }
+        $this->assertException(
+            UsageException::class,
+            function () {
+                $this->conn->command('VALUES (1),(2)');
+            },
+            'mismatch of query() and command()'
+        );
     }
 
     public function testQueryError()
     {
         try {
             $this->conn->query('SELECT log(-10)');
-            $this->fail('Error expected');
+            $this->fail(StatementException::class . ' expected');
         } catch (StatementException $e) {
             $this->assertSame(SqlState::INVALID_ARGUMENT_FOR_LOGARITHM, $e->getSqlStateCode());
         }
