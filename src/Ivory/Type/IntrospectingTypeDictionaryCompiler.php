@@ -5,12 +5,7 @@ namespace Ivory\Type;
 
 use Ivory\Exception\InternalException;
 use Ivory\Type\Ivory\UndefinedType;
-use Ivory\Type\Postgresql\ArrayType;
 use Ivory\Type\Postgresql\CompositeType;
-use Ivory\Type\Postgresql\DomainType;
-use Ivory\Type\Postgresql\EnumType;
-use Ivory\Type\Postgresql\NamedCompositeType;
-use Ivory\Type\Postgresql\RangeType;
 
 class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
 {
@@ -207,61 +202,5 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
         while (($row = pg_fetch_assoc($result)) !== false) {
             yield $row;
         }
-    }
-
-    /**
-     * Provides the {@link IType} object for the requested type.
-     *
-     * If the requested type is not recognized by the type provider, an {@link \Ivory\Type\UndefinedType} object is
-     * returned.
-     *
-     * @param string $schemaName
-     * @param string $typeName
-     * @param ITypeProvider $typeProvider
-     * @return IType
-     */
-    protected function createBaseType(string $schemaName, string $typeName, ITypeProvider $typeProvider): IType
-    {
-        $type = $typeProvider->provideType($schemaName, $typeName);
-        if ($type !== null) {
-            return $type;
-        } else {
-            return new UndefinedType($schemaName, $typeName);
-        }
-    }
-
-    protected function createCompositeType(string $schemaName, string $typeName): IType
-    {
-        return new NamedCompositeType($schemaName, $typeName);
-    }
-
-    protected function createDomainType(string $schemaName, string $typeName, IType $baseType): IType
-    {
-        return new DomainType($schemaName, $typeName, $baseType);
-    }
-
-    /**
-     * @param string $schemaName
-     * @param string $typeName
-     * @param string[] $labels list of enumeration labels in the definition order
-     * @return IType
-     */
-    private function createEnumType(string $schemaName, string $typeName, array $labels): IType
-    {
-        return new EnumType($schemaName, $typeName, $labels);
-    }
-
-    protected function createRangeType(
-        string $schemaName,
-        string $typeName,
-        ITotallyOrderedType $subtype,
-        ?IRangeCanonicalFunc $canonicalFunc = null
-    ): IType {
-        return new RangeType($schemaName, $typeName, $subtype, $canonicalFunc);
-    }
-
-    protected function createArrayType(IType $elemType, string $delimiter): IType
-    {
-        return new ArrayType($elemType, $delimiter);
     }
 }

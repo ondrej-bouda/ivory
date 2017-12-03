@@ -24,4 +24,18 @@ interface ITypeControl
      * Useful when the data types change during the script execution in such a way Ivory is unable to detect it.
      */
     function flushTypeDictionary(): void;
+
+    /**
+     * Sets an implementation-specific option, driving behaviour of the type control.
+     *
+     * @param int $option
+     */
+    function setTypeControlOption(int $option): void;
+
+    /**
+     * Unsets an implementation-specific option, driving behaviour of the type control.
+     *
+     * @param int $option
+     */
+    function unsetTypeControlOption(int $option): void;
 }

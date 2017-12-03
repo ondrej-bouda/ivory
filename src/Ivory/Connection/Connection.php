@@ -131,6 +131,16 @@ class Connection implements IConnection
         $this->typeCtl->flushTypeDictionary();
     }
 
+    public function setTypeControlOption(int $option): void
+    {
+        $this->typeCtl->setTypeControlOption($option);
+    }
+
+    public function unsetTypeControlOption(int $option): void
+    {
+        $this->typeCtl->unsetTypeControlOption($option);
+    }
+
     //endregion
 
     //region Statement Execution

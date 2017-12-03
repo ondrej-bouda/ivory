@@ -15,6 +15,8 @@ use Ivory\Type\TypeRegister;
 
 class TypeControl implements ITypeControl
 {
+    const OPTION_INTROSPECT_PLAIN_ARRAYS = 1;
+
     private $connection;
     private $connCtl;
     /** @var TypeRegister|null */
@@ -28,6 +30,8 @@ class TypeControl implements ITypeControl
      *                <tt>null</tt> if not yet attempted to load from cache
      */
     private $typeDictionaryLoadedFromCache = null;
+    /** @var int */
+    private $options = 0;
 
     public function __construct(IConnection $connection, ConnectionControl $connCtl)
     {
@@ -112,6 +116,10 @@ class TypeControl implements ITypeControl
     {
         $compiler = new IntrospectingTypeDictionaryCompiler($this->connCtl->requireConnection());
 
+        if ($this->options & self::OPTION_INTROSPECT_PLAIN_ARRAYS) {
+            $compiler->setOption(IntrospectingTypeDictionaryCompiler::OPTION_PLAIN_ARRAYS);
+        }
+
         $typeProvider = new TypeProviderList();
         $typeProvider->appendTypeProvider($this->getTypeRegister());
         $typeProvider->appendTypeProvider(Ivory::getTypeRegister());
@@ -183,6 +191,16 @@ class TypeControl implements ITypeControl
     public function flushTypeDictionary(): void
     {
         $this->typeDictionary = null;
+    }
+
+    public function setTypeControlOption(int $option): void
+    {
+        $this->options = $this->options | $option;
+    }
+
+    public function unsetTypeControlOption(int $option): void
+    {
+        $this->options = $this->options & (~$option);
     }
 
     //endregion

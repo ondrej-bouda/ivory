@@ -5,6 +5,7 @@ namespace Ivory\Showcase;
 
 use Ivory\Connection\IConnection;
 use Ivory\Connection\ITypeControl;
+use Ivory\Query\SqlRelationDefinition;
 use Ivory\Type\IType;
 use Ivory\Value\Composite;
 use Ivory\Value\Json;
@@ -25,6 +26,19 @@ class TypeSystemTest extends \Ivory\IvoryTestCase
     {
         parent::setUp();
         $this->conn = $this->getIvoryConnection();
+    }
+
+    public function testArrayTypes()
+    {
+        $arr = $this->conn->querySingleValue('SELECT %', ['a', 'b', 'c']);
+        $this->assertSame(['a', 'b', 'c'], $arr);
+
+        $arr = $this->conn->querySingleValue('SELECT %', [4 => 'a', 6 => 'c', 5 => 'b']);
+        $this->assertSame([4 => 'a', 5 => 'b', 6 => 'c'], $arr);
+
+        $pattern = SqlRelationDefinition::fromPattern('INSERT INTO t (a) VALUES (%)', ['a', 'b', 'c']);
+        $sql = $pattern->toSql($this->conn->getTypeDictionary());
+        $this->assertSame("INSERT INTO t (a) VALUES ('[0:2]={a,b,c}'::pg_catalog.text[])", $sql);
     }
 
     /**
