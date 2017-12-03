@@ -8,7 +8,7 @@ namespace Ivory\Query;
  *
  * {@inheritdoc}
  */
-class SqlCommand extends Command implements ISqlPatternDefinition
+class SqlCommand extends Command implements ISqlPatternStatement
 {
     use SqlPatternDefinitionMacros;
 }

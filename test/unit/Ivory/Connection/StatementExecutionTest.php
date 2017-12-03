@@ -9,6 +9,8 @@ use Ivory\Exception\UsageException;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
 use Ivory\Query\SqlCommand;
 use Ivory\Query\SqlRelationDefinition;
+use Ivory\Result\ICommandResult;
+use Ivory\Result\IQueryResult;
 use Ivory\Result\SqlState;
 use Ivory\Result\SqlStateClass;
 
@@ -293,6 +295,57 @@ class StatementExecutionTest extends \Ivory\IvoryTestCase
 
             $this->conn->command($cmd, ['c' => 6]);
             $this->assertSame(9, $this->conn->querySingleValue('SELECT SUM(x) FROM t'));
+        } finally {
+            $tx->rollback();
+        }
+    }
+
+    public function testExecuteStatement()
+    {
+        $tx = $this->conn->startTransaction();
+
+        try {
+            $result = $this->conn->executeStatement('CREATE TABLE t (a INT)');
+            $this->assertInstanceOf(ICommandResult::class, $result);
+            assert($result instanceof ICommandResult);
+            $this->assertSame('CREATE TABLE', $result->getCommandTag());
+
+            $relDef = SqlRelationDefinition::fromSql('SELECT 1');
+            $result2 = $this->conn->executeStatement($relDef);
+            $this->assertInstanceOf(IQueryResult::class, $result2);
+            assert($result2 instanceof IQueryResult);
+            $this->assertSame(1, $result2->value());
+        } finally {
+            $tx->rollback();
+        }
+    }
+
+    public function testRunScript()
+    {
+        $tx = $this->conn->startTransaction();
+
+        try {
+            $results = $this->conn->runScript(
+                'CREATE TABLE t (a INT);
+                 INSERT INTO t (a) VALUES (1), (2);
+                 SELECT * FROM t'
+            );
+            $this->assertEquals(3, count($results));
+
+            $this->assertInstanceOf(ICommandResult::class, $results[0]);
+            $this->assertSame('CREATE TABLE', $results[0]->getCommandTag());
+            assert($results[0] instanceof ICommandResult);
+            $this->assertSame(0, $results[0]->getAffectedRows());
+
+            $this->assertInstanceOf(ICommandResult::class, $results[1]);
+            $this->assertSame('INSERT 0 2', $results[1]->getCommandTag());
+            assert($results[1] instanceof ICommandResult);
+            $this->assertSame(2, $results[1]->getAffectedRows());
+
+            $this->assertInstanceOf(IQueryResult::class, $results[2]);
+            $this->assertSame('SELECT 2', $results[2]->getCommandTag());
+            assert($results[2] instanceof IQueryResult);
+            $this->assertSame([1, 2], $results[2]->col('a')->toArray());
         } finally {
             $tx->rollback();
         }

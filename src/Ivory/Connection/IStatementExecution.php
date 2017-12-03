@@ -7,6 +7,7 @@ use Ivory\Exception\UsageException;
 use Ivory\Lang\SqlPattern\SqlPattern;
 use Ivory\Query\ICommand;
 use Ivory\Query\IRelationDefinition;
+use Ivory\Query\ISqlPatternStatement;
 use Ivory\Relation\IColumn;
 use Ivory\Relation\ITuple;
 use Ivory\Result\ICommandResult;
@@ -89,6 +90,7 @@ interface IStatementExecution
      * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
+     * @throws ConnectionException when an error occurred while sending the query or processing the database response
      * @throws UsageException if the statement appears to be a command rather than a query
      */
     function query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IQueryResult;
@@ -107,6 +109,7 @@ interface IStatementExecution
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      * @throws ResultDimensionException when the resulting data set has more than one row, or no row at all
+     * @throws ConnectionException when an error occurred while sending the query or processing the database response
      * @throws UsageException if the statement appears to be a command rather than a query
      */
     function querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ITuple;
@@ -126,6 +129,7 @@ interface IStatementExecution
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      * @throws ResultDimensionException when the resulting data set has more than one column, or no column at all
+     * @throws ConnectionException when an error occurred while sending the query or processing the database response
      * @throws UsageException if the statement appears to be a command rather than a query
      */
     function querySingleColumn($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IColumn;
@@ -146,6 +150,7 @@ interface IStatementExecution
      *                                     requires
      * @throws ResultDimensionException when the resulting data set has more than one row, or no row at all, or more
      *                                    than one column, or no column at all
+     * @throws ConnectionException when an error occurred while sending the query or processing the database response
      * @throws UsageException if the statement appears to be a command rather than a query
      */
     function querySingleValue($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
@@ -155,7 +160,7 @@ interface IStatementExecution
      *
      * This is an overloaded method, like {@link query()}. Either:
      * 1. an SQL pattern is given along with values for its parameters, or
-     * 2. an {@link ISqlPatternDefinition} object is passed, optionally with a map of values for named parameters, or
+     * 2. an {@link ISqlPatternStatement} object is passed, optionally with a map of values for named parameters, or
      * 3. an {@link ICommand} object is given as the only argument.
      *
      * Note the strict distinction of *queries* and *commands* - see the {@link IStatementExecution} docs. If an SQL
@@ -167,6 +172,7 @@ interface IStatementExecution
      * @throws StatementException when the command is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
+     * @throws ConnectionException when an error occurred while sending the command or processing the database response
      * @throws UsageException if the statement appears to be a query rather than a command
      */
     function command($sqlFragmentPatternOrCommand, ...$fragmentsAndParams): ICommandResult;
@@ -174,8 +180,7 @@ interface IStatementExecution
     /**
      * Sends a raw SQL query, as is, to the database, waits for its execution and returns the resulting relation.
      *
-     * Just a single statement may be used. For sending multiple statements at once, use {@link rawMultiQuery()} or
-     * {@link runScript()}.
+     * Just a single statement may be used. For sending multiple statements at once, use {@link runScript()}.
      *
      * The same distinction of statements to queries and commands applies to this method the same as for
      * {@link query()}, including the resolution of commands executed by this method. For sending commands (i.e.,
@@ -193,8 +198,7 @@ interface IStatementExecution
     /**
      * Sends a raw SQL command, as is, to the database, waits for its execution and returns the command result.
      *
-     * Just a single statement may be used. For sending multiple statements at once, use {@link rawMultiQuery()} or
-     * {@link runScript()}.
+     * Just a single statement may be used. For sending multiple statements at once, use {@link runScript()}.
      *
      * The same distinction of statements to queries and commands applies to this method the same as for
      * {@link command()}, including the resolution of queries executed by this method. For sending queries (i.e.,
@@ -211,28 +215,25 @@ interface IStatementExecution
     function rawCommand(string $sqlCommand): ICommandResult;
 
     /**
-     * Sends one or more raw SQL statements to the database, waits for their execution and returns the results.
+     * Sends an SQL statement to the database, waits for its execution, and returns the result.
      *
-     * Note this operation, unlike {@link rawQuery()} or {@link rawCommand()}, does *not* distinguish queries and
-     * commands. The user has to check for the result type.
+     * This is a generic variant which does not distinguish queries from commands. The expected usage is an SQL string
+     * received from input, i.e., when the program itself does not know whether the statement is actually a query or
+     * command.
      *
-     * @param string[]|\Traversable $sqlStatements
-     *                                  list of strings, each containing one SQL statement;
-     *                                  a traversable object of strings may alternatively be used, it is guaranteed to
-     *                                    be iterated over only once;
-     *                                  note it is NOT allowed to pass multiple statements in a single string (e.g.,
-     *                                    separated by a semicolon) - pass them as individual list items, or use
-     *                                    {@link runScript()} instead
-     * @return IResult[] list of results, one for each statement;
-     *                   if <tt>$sqlStatements</tt> is actually an associative array or a {@link \Traversable} object,
-     *                     an associative array of results is returned, with each result stored under the same key and
-     *                     in the same order as the corresponding statement from <tt>$sqlStatements</tt>
-     * @throws StatementException when some of the statements are erroneous and PostgreSQL returns an error, or if there
-     *                            are multiple statements in a single list item
-     * @throws ConnectionException when an error occurred while sending the statements or processing the database
-     *                             response
+     * The statement must be given either as:
+     * - a string containing raw SQL, which is sent to the database as is; or
+     * - an {@link ISqlPatternStatement}, which is serialized to SQL using {@link ISqlPatternStatement::toSql()} with no
+     *   parameter values, i.e., all the parameters must already be set on the object.
+     *
+     * @param string|ISqlPatternStatement $sqlStatement either a raw SQL string, or {@link ISqlPatternStatement}
+     * @return IResult the result of the statement
+     * @throws StatementException when the statement is erroneous and PostgreSQL returns an error, or if
+     *                              <tt>$sqlStatement</tt> actually contains multiple statements (e.g., separated by a
+     *                              semicolon)
+     * @throws ConnectionException when an error occurred while sending the command or processing the database response
      */
-    function rawMultiStatement(iterable $sqlStatements): array;
+    function executeStatement($sqlStatement): IResult;
 
     /**
      * Sends a script of one or more statements to the database, waits for their execution, and returns the results.
@@ -245,7 +246,7 @@ interface IStatementExecution
      *   script and the script contains neither `COMMIT` nor `ROLLBACK`.
      *
      * @param string $sqlScript a string containing one or more semicolon-separated statements
-     * @return IResult[] list of results, one for each statement
+     * @return IResult[] list of results, one for each executed statement
      * @throws StatementException when some of the statements are erroneous and PostgreSQL returns an error
      * @throws ConnectionException when an error occurred while sending the statements or processing the database
      *                             response

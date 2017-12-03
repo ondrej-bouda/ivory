@@ -8,7 +8,7 @@ namespace Ivory\Query;
  *
  * {@inheritdoc}
  */
-class SqlRelationDefinition extends RelationDefinition implements ISqlPatternDefinition
+class SqlRelationDefinition extends RelationDefinition implements ISqlPatternStatement
 {
     use SqlPatternDefinitionMacros;
 }

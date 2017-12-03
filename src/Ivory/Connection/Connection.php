@@ -12,6 +12,7 @@ use Ivory\Relation\ITuple;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\ICopyInResult;
 use Ivory\Result\IQueryResult;
+use Ivory\Result\IResult;
 use Ivory\Type\ITypeDictionary;
 use Ivory\Type\TypeRegister;
 use Ivory\Utils\NotSerializable;
@@ -169,9 +170,9 @@ class Connection implements IConnection
         return $this->stmtExec->rawCommand($sqlCommand);
     }
 
-    public function rawMultiStatement(iterable $sqlStatements): array
+    public function executeStatement($sqlStatement): IResult
     {
-        return $this->stmtExec->rawMultiStatement($sqlStatements);
+        return $this->stmtExec->executeStatement($sqlStatement);
     }
 
     public function runScript(string $sqlScript): array

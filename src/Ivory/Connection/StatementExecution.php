@@ -12,7 +12,7 @@ use Ivory\Exception\UsageException;
 use Ivory\Ivory;
 use Ivory\Query\ICommand;
 use Ivory\Query\IRelationDefinition;
-use Ivory\Query\ISqlPatternDefinition;
+use Ivory\Query\ISqlPatternStatement;
 use Ivory\Query\SqlCommand;
 use Ivory\Query\SqlRelationDefinition;
 use Ivory\Relation\IColumn;
@@ -53,7 +53,8 @@ class StatementExecution implements IStatementExecution
         }
 
         try {
-            $sql = $relDef->toSql($this->typeCtl->getTypeDictionary(), ...$serializeArgs);
+            $typeDict = $this->typeCtl->getTypeDictionary();
+            $sql = $relDef->toSql($typeDict, ...$serializeArgs);
         } catch (InvalidStateException $e) {
             throw new \InvalidArgumentException($e->getMessage());
         }
@@ -119,7 +120,8 @@ class StatementExecution implements IStatementExecution
         }
 
         try {
-            $sql = $command->toSql($this->typeCtl->getTypeDictionary(), ...$serializeArgs);
+            $typeDict = $this->typeCtl->getTypeDictionary();
+            $sql = $command->toSql($typeDict, ...$serializeArgs);
         } catch (InvalidStateException $e) {
             throw new \InvalidArgumentException($e->getMessage());
         }
@@ -129,7 +131,7 @@ class StatementExecution implements IStatementExecution
 
     private function checkDefinitionParams($definition, $params)
     {
-        if ($definition instanceof ISqlPatternDefinition) {
+        if ($definition instanceof ISqlPatternStatement) {
             if (count($params) > 1) {
                 throw new \InvalidArgumentException('Too many arguments given.');
             }
@@ -166,6 +168,22 @@ class StatementExecution implements IStatementExecution
         }
     }
 
+    public function executeStatement($sqlStatement): IResult
+    {
+        if (is_string($sqlStatement)) {
+            $rawStatement = $sqlStatement;
+        } elseif ($sqlStatement instanceof ISqlPatternStatement) {
+            $typeDict = $this->typeCtl->getTypeDictionary();
+            $rawStatement = $sqlStatement->toSql($typeDict);
+        } else {
+            throw new \InvalidArgumentException(
+                '$sqlStatement must either by a string or ' . ISqlPatternStatement::class
+            );
+        }
+
+        return $this->executeRawStatement($rawStatement);
+    }
+
     private function executeRawStatement(string $sqlStatement, &$resultHandler = null): IResult
     {
         $connHandler = $this->connCtl->requireConnection();
@@ -196,15 +214,6 @@ class StatementExecution implements IStatementExecution
         }
 
         return $this->processResult($connHandler, $resultHandler, $sqlStatement);
-    }
-
-    public function rawMultiStatement(iterable $sqlStatements): array
-    {
-        $results = [];
-        foreach ($sqlStatements as $stmtKey => $stmt) {
-            $results[$stmtKey] = $this->executeRawStatement($stmt);
-        }
-        return $results;
     }
 
     public function runScript(string $sqlScript): array

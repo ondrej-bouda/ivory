@@ -1,14 +1,17 @@
 <?php
 namespace Ivory\Query;
 
+use Ivory\Exception\InvalidStateException;
+use Ivory\Exception\UndefinedTypeException;
 use Ivory\Lang\SqlPattern\SqlPattern;
+use Ivory\Type\ITypeDictionary;
 
 /**
  * A definition given by a parametrized SQL pattern.
  *
  * @see SqlPattern for thorough details on SQL patterns.
  */
-interface ISqlPatternDefinition
+interface ISqlPatternStatement
 {
     /**
      * Sets the value of a parameter in the SQL pattern.
@@ -39,4 +42,15 @@ interface ISqlPatternDefinition
      * @return array map: parameter name or zero-based position => parameter value
      */
     function getParams(): array;
+
+    /**
+     * Serializes this definition into an SQL string.
+     *
+     * @param ITypeDictionary $typeDictionary
+     * @param array $namedParameterValues values of named parameters for just this serialization
+     * @return string
+     * @throws InvalidStateException when values for one or more named parameters has not been set
+     * @throws UndefinedTypeException when some of the types used in the pattern are not defined
+     */
+    function toSql(ITypeDictionary $typeDictionary, array $namedParameterValues = []): string;
 }
