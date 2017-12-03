@@ -11,8 +11,8 @@ use Ivory\Query\SqlCommand;
 use Ivory\Query\SqlRelationDefinition;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\IQueryResult;
-use Ivory\Result\SqlState;
-use Ivory\Result\SqlStateClass;
+use Ivory\Lang\Sql\SqlState;
+use Ivory\Lang\Sql\SqlStateClass;
 
 class StatementExecutionTest extends \Ivory\IvoryTestCase
 {

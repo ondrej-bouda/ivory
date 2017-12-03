@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Ivory\Exception;
 
-use Ivory\Result\SqlState;
+use Ivory\Lang\Sql\SqlState;
 
 /**
  * Factory emitting {@link StatementException}s upon errors on querying the database.
@@ -63,7 +63,7 @@ class StatementExceptionFactory
     }
 
     /**
-     * @param string $sqlStateClass see {@link \Ivory\Result\SqlStateClass} constants
+     * @param string $sqlStateClass see {@link \Ivory\Lang\Sql\SqlStateClass} constants
      * @param string $exceptionClass name of class, inheriting from {@link StatementException}, to be thrown upon a
      *                                 statement error with an SQLSTATE code falling under the given SQLSTATE class
      * @return $this
@@ -98,7 +98,6 @@ class StatementExceptionFactory
         $this->bySqlStateClass = [];
         $this->byMessage = [];
     }
-
 
     /**
      * @param resource $resultHandler a PostgreSQL query result resource

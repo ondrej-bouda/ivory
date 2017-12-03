@@ -6,7 +6,7 @@ namespace Ivory\Connection\Config;
 use Ivory\Connection\ITxHandle;
 use Ivory\Exception\StatementException;
 use Ivory\Result\QueryResult;
-use Ivory\Result\SqlState;
+use Ivory\Lang\Sql\SqlState;
 use Ivory\Utils\System;
 use Ivory\Value\Date;
 use Ivory\Value\Quantity;

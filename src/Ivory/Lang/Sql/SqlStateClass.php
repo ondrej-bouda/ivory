@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Ivory\Result;
+namespace Ivory\Lang\Sql;
 
 /**
  * Classes of SQL STATE codes.

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Ivory\Exception;
 
-use Ivory\Result\SqlState;
+use Ivory\Lang\Sql\SqlState;
 
 /**
  * Exception thrown upon errors on querying the database.
