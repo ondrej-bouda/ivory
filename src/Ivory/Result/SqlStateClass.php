@@ -7,7 +7,7 @@ namespace Ivory\Result;
  * Classes of SQL STATE codes.
  *
  * @see SqlState
- * @see http://www.postgresql.org/docs/9.4/static/errcodes-appendix.html
+ * @see http://www.postgresql.org/docs/10/static/errcodes-appendix.html
  */
 class SqlStateClass
 {
@@ -51,6 +51,8 @@ class SqlStateClass
     const OPERATOR_INTERVENTION = '57';
     /* System Error (errors external to PostgreSQL itself) */
     const SYSTEM_ERROR = '58';
+    /** @since PostgreSQL 9.6 */
+    const SNAPSHOT_FAILURE = '72';
     const CONFIG_FILE_ERROR = 'F0';
     /* Foreign Data Wrapper Error (SQL/MED) */
     const FDW_ERROR = 'HV';

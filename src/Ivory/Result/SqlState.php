@@ -7,7 +7,7 @@ namespace Ivory\Result;
  * SQL STATE codes.
  *
  * @see SqlStateClass
- * @see http://www.postgresql.org/docs/9.4/static/errcodes-appendix.html
+ * @see http://www.postgresql.org/docs/10/static/errcodes-appendix.html
  */
 class SqlState
 {
@@ -56,6 +56,8 @@ class SqlState
     const INVALID_ESCAPE_OCTET = '2200D';
     const ZERO_LENGTH_CHARACTER_STRING = '2200F';
     const MOST_SPECIFIC_TYPE_MISMATCH = '2200G';
+    /** @since PostgreSQL 10 */
+    const SEQUENCE_GENERATOR_LIMIT_EXCEEDED = '2200H';
     const NOT_AN_XML_DOCUMENT = '2200L';
     const INVALID_XML_DOCUMENT = '2200M';
     const INVALID_XML_CONTENT = '2200N';
@@ -83,6 +85,10 @@ class SqlState
     const STRING_DATA_LENGTH_MISMATCH = '22026';
     const TRIM_ERROR = '22027';
     const ARRAY_SUBSCRIPT_ERROR = '2202E';
+    /** @since PostgreSQL 9.5 */
+    const INVALID_TABLESAMPLE_REPEAT = '2202G';
+    /** @since PostgreSQL 9.5 */
+    const INVALID_TABLESAMPLE_ARGUMENT = '2202H';
     const FLOATING_POINT_EXCEPTION = '22P01';
     const INVALID_TEXT_REPRESENTATION = '22P02';
     const INVALID_BINARY_REPRESENTATION = '22P03';
@@ -108,6 +114,8 @@ class SqlState
     const HELD_CURSOR_REQUIRES_SAME_ISOLATION_LEVEL = '25008';
     const NO_ACTIVE_SQL_TRANSACTION = '25P01';
     const IN_FAILED_SQL_TRANSACTION = '25P02';
+    /** @since PostgreSQL 9.6 */
+    const IDLE_IN_TRANSACTION_SESSION_TIMEOUT = '25P03';
     const INVALID_SQL_STATEMENT_NAME = '26000';
     const TRIGGERED_DATA_CHANGE_VIOLATION = '27000';
     const INVALID_AUTHORIZATION_SPECIFICATION = '28000';
@@ -131,6 +139,8 @@ class SqlState
     const NULL_VALUE_NOT_ALLOWED_IN_EXTERNAL_ROUTINE = '39004';
     const TRIGGER_PROTOCOL_VIOLATED = '39P01';
     const SRF_PROTOCOL_VIOLATED = '39P02';
+    /** @since PostgreSQL 9.5 */
+    const EVENT_TRIGGER_PROTOCOL_VIOLATED = '39P03';
     const SAVEPOINT_EXCEPTION = '3B000';
     const INVALID_SAVEPOINT_SPECIFICATION = '3B001';
     const INVALID_CATALOG_NAME = '3D000';
@@ -160,6 +170,8 @@ class SqlState
     const INVALID_FOREIGN_KEY = '42830';
     const CANNOT_COERCE = '42846';
     const UNDEFINED_FUNCTION = '42883';
+    /** @since PostgreSQL 10 */
+    const GENERATED_ALWAYS = '428C9';
     const RESERVED_NAME = '42939';
     const UNDEFINED_TABLE = '42P01';
     const UNDEFINED_PARAMETER = '42P02';
@@ -207,6 +219,8 @@ class SqlState
     const IO_ERROR = '58030';
     const UNDEFINED_FILE = '58P01';
     const DUPLICATE_FILE = '58P02';
+    /** @since PostgreSQL 9.6 */
+    const SNAPSHOT_TOO_OLD = '72000';
     const CONFIG_FILE_ERROR = 'F0000';
     const LOCK_FILE_EXISTS = 'F0001';
     const FDW_ERROR = 'HV000';
@@ -240,6 +254,8 @@ class SqlState
     const RAISE_EXCEPTION = 'P0001';
     const NO_DATA_FOUND = 'P0002';
     const TOO_MANY_ROWS = 'P0003';
+    /** @since PostgreSQL 9.5 */
+    const ASSERT_FAILURE = 'P0004';
     const INTERNAL_ERROR = 'XX000';
     const DATA_CORRUPTED = 'XX001';
     const INDEX_CORRUPTED = 'XX002';
