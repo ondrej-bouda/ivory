@@ -144,7 +144,7 @@ class StatementExecution implements IStatementExecution
 
     public function rawQuery(string $sqlQuery): IQueryResult
     {
-        $result = $this->executeRawStatement($sqlQuery, $resultHandler);
+        $result = $this->executeRawStatement($sqlQuery);
         if ($result instanceof IQueryResult) {
             return $result;
         } else {
@@ -157,7 +157,7 @@ class StatementExecution implements IStatementExecution
 
     public function rawCommand(string $sqlCommand): ICommandResult
     {
-        $result = $this->executeRawStatement($sqlCommand, $resultHandler);
+        $result = $this->executeRawStatement($sqlCommand);
         if ($result instanceof ICommandResult) {
             return $result;
         } else {
@@ -184,7 +184,7 @@ class StatementExecution implements IStatementExecution
         return $this->executeRawStatement($rawStatement);
     }
 
-    private function executeRawStatement(string $sqlStatement, &$resultHandler = null): IResult
+    private function executeRawStatement(string $sqlStatement): IResult
     {
         $connHandler = $this->connCtl->requireConnection();
 
