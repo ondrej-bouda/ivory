@@ -157,8 +157,10 @@ interface ITxHandle
      *
      * @see http://www.postgresql.org/docs/9.4/static/sql-prepare-transaction.html
      *
-     * @param string $name name for the prepared transaction; must be server-wide unique
+     * @param string|null $name name for the prepared transaction; must be server-wide unique;
+     *                          if <tt>null</tt> is given, a random name is generated automatically
+     * @return string name of the prepared transaction
      * @throws InvalidStateException if the transaction is not open anymore
      */
-    function prepareTransaction(string $name): void;
+    function prepareTransaction(?string $name = null): string;
 }

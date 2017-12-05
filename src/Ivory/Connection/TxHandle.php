@@ -127,11 +127,20 @@ class TxHandle implements ITxHandle
         $this->txCtl->notifySavepointReleased($name);
     }
 
-    public function prepareTransaction(string $name): void
+    public function prepareTransaction(?string $name = null): string
     {
         $this->assertOpen();
+
+        if ($name === null) {
+            $len = 16;
+            $bytes = random_bytes(ceil($len / 2));
+            $name = substr(bin2hex($bytes), 0, $len);
+        }
+
         $this->stmtExec->rawCommand("PREPARE TRANSACTION {$this->stringSerializer->serializeValue($name)}");
         $this->open = false;
         $this->txCtl->notifyTransactionPrepared($name);
+
+        return $name;
     }
 }
