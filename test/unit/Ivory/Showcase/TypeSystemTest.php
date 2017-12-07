@@ -4,10 +4,14 @@ declare(strict_types=1);
 namespace Ivory\Showcase;
 
 use Ivory\Connection\IConnection;
-use Ivory\Connection\ITypeControl;
 use Ivory\Query\SqlRelationDefinition;
 use Ivory\Type\IType;
+use Ivory\Type\IValueSerializer;
+use Ivory\Type\Postgresql\ArrayType;
+use Ivory\Type\Std\DateType;
+use Ivory\Type\Std\StringType;
 use Ivory\Value\Composite;
+use Ivory\Value\Date;
 use Ivory\Value\Json;
 use Ivory\Value\Polygon;
 use Ivory\Value\Range;
@@ -28,7 +32,7 @@ class TypeSystemTest extends \Ivory\IvoryTestCase
         $this->conn = $this->getIvoryConnection();
     }
 
-    public function testArrayTypes()
+    public function testArrayType()
     {
         $arr = $this->conn->querySingleValue('SELECT %', ['a', 'b', 'c']);
         $this->assertSame(['a', 'b', 'c'], $arr);
@@ -39,6 +43,21 @@ class TypeSystemTest extends \Ivory\IvoryTestCase
         $pattern = SqlRelationDefinition::fromPattern('INSERT INTO t (a) VALUES (%)', ['a', 'b', 'c']);
         $sql = $pattern->toSql($this->conn->getTypeDictionary());
         $this->assertSame("INSERT INTO t (a) VALUES ('[0:2]={a,b,c}'::pg_catalog.text[])", $sql);
+
+
+        $stringArraySerializer = $this->conn->getTypeDictionary()->requireTypeByValue(['a']);
+        assert($stringArraySerializer instanceof ArrayType);
+        $stringArraySerializer->switchToPlainMode();
+        try {
+            $plainArr = $this->conn->querySingleValue("SELECT ARRAY['a', 'b', 'c']");
+            $this->assertSame(['a', 'b', 'c'], $plainArr);
+
+            $plainPattern = SqlRelationDefinition::fromPattern('INSERT INTO t (a) VALUES (%)', ['a', 'b', 'c']);
+            $plainSql = $plainPattern->toSql($this->conn->getTypeDictionary());
+            $this->assertSame("INSERT INTO t (a) VALUES (ARRAY['a','b','c']::pg_catalog.text[])", $plainSql);
+        } finally {
+            $stringArraySerializer->switchToStrictMode();
+        }
     }
 
     /**
@@ -112,6 +131,54 @@ SQL
     }
 
     /**
+     * Serializers of values, like `%like`, may be customized very easily. In this example, we define a `%strlist`
+     * serializer, which produces a `(...)` list, suitable for, e.g., `IN (...)`.
+     */
+    public function testCustomSerializer()
+    {
+        // define the serializer...
+        $strListSerializer = new class implements IValueSerializer
+        {
+            private $stringType;
+
+            public function __construct()
+            {
+                $this->stringType = new StringType('%strlist', 'string'); // it requires some name for identification
+            }
+
+            public function serializeValue($val): string
+            {
+                if (!is_array($val)) {
+                    throw new \InvalidArgumentException('%strlist expects an array');
+                }
+
+                $result = '(';
+                $isFirst = true;
+                foreach ($val as $str) {
+                    if (!$isFirst) {
+                        $result .= ', ';
+                    }
+                    $isFirst = false;
+
+                    $result .= $this->stringType->serializeValue($str);
+                }
+                if ($isFirst) {
+                    throw new \InvalidArgumentException('%strlist list cannot be empty');
+                }
+                $result .= ')';
+
+                return $result;
+            }
+        };
+
+        // ...and register it. Either at the global level, or just for a specific connection.
+        $this->conn->getTypeRegister()->registerValueSerializer('strlist', $strListSerializer);
+
+        $result = $this->conn->querySingleValue('SELECT %s IN %strlist', 'foo', ['a', 'b', 'c']);
+        $this->assertSame(false, $result);
+    }
+
+    /**
      * Type objects for custom user-defined types may easily be plugged into Ivory. Also, any type object shipped with
      * Ivory may be overridden with a custom one.
      */
@@ -157,13 +224,49 @@ SQL
 
         // ...and register it. Either at the global level, or just for a specific connection.
         $this->conn->getTypeRegister()->registerType($customTimeType);
-        // NOTE: necessary as the cached dictionary refers to type objects defined in time of caching the dictionary
-        $this->conn->flushCache(ITypeControl::TYPE_DICTIONARY_CACHE_KEY);
 
         $val = $this->conn->querySingleValue("SELECT TIME '16:42'");
         $this->assertEquals(new \DateTime('16:42:00'), $val);
 
         $eq = $this->conn->querySingleValue("SELECT TIME '13:30' = %time", new \DateTime('13:30:00'));
         $this->assertTrue($eq);
+    }
+
+    /**
+     * If behaviour of a type converter does not suit the needs, it may easily be redefined.
+     */
+    public function testRedefineType()
+    {
+        $dateVal = $this->conn->querySingleValue('SELECT %date::DATE', Date::fromParts(2017, 9, 23));
+        $this->assertInstanceOf(Date::class, $dateVal);
+
+        // Prefer standard \DateTime over the custom Date class:
+        $myDateType = new class('pg_catalog', 'date') extends DateType
+        {
+            public function parseValue(string $str)
+            {
+                $date = parent::parseValue($str);
+                return $date->toDateTime();
+            }
+
+            public function serializeValue($val): string
+            {
+                if ($val instanceof \DateTime) {
+                    return parent::serializeValue(Date::fromDateTime($val));
+                } else {
+                    return parent::serializeValue($val);
+                }
+            }
+        };
+        $this->conn->getTypeRegister()->registerType($myDateType);
+        $this->conn->flushTypeDictionary();
+
+        $dateTimeVal = $this->conn->querySingleValue('SELECT %date::DATE', new \DateTime('2017-09-30'));
+        $this->assertInstanceOf(\DateTime::class, $dateTimeVal);
+        $this->assertEquals(new \DateTime('2017-09-30'), $dateTimeVal);
+
+        // Note, however, that the original DateType class represents a discrete type, enabling the type to be used in
+        // ranges, that it reacts to the PostgreSQL date style setting, that it recognizes `-infinity` and `infinity`
+        // values, and supports years exceeding four digits - nothing of which the simple implementation above handles.
     }
 }
