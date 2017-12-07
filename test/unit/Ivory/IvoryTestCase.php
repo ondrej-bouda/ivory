@@ -258,21 +258,26 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
         return $this->phpUnitConn;
     }
 
-    protected function getIvoryConnection()
+    protected function getIvoryConnection(): IConnection
     {
         if ($this->ivoryConn === null) {
-            $coreFactory = Ivory::getCoreFactory();
-            $params = ConnectionParameters::fromArray([
-                ConnectionParameters::HOST => ($GLOBALS['DB_HOST'] ? : null),
-                ConnectionParameters::PORT => ($GLOBALS['DB_PORT'] ? : null),
-                ConnectionParameters::USER => $GLOBALS['DB_USER'],
-                ConnectionParameters::PASSWORD => $GLOBALS['DB_PASSWD'],
-                ConnectionParameters::DBNAME => $GLOBALS['DB_DBNAME'],
-            ]);
-            $this->ivoryConn = $coreFactory->createConnection('default', $params);
+            $this->ivoryConn = $this->createNewIvoryConnection();
         }
 
         return $this->ivoryConn;
+    }
+
+    protected function createNewIvoryConnection(): IConnection
+    {
+        $params = ConnectionParameters::fromArray([
+            ConnectionParameters::HOST => ($GLOBALS['DB_HOST'] ? : null),
+            ConnectionParameters::PORT => ($GLOBALS['DB_PORT'] ? : null),
+            ConnectionParameters::USER => $GLOBALS['DB_USER'],
+            ConnectionParameters::PASSWORD => $GLOBALS['DB_PASSWD'],
+            ConnectionParameters::DBNAME => $GLOBALS['DB_DBNAME'],
+        ]);
+        $coreFactory = Ivory::getCoreFactory();
+        return $coreFactory->createConnection('default', $params);
     }
 
     protected function newDatabaseTester()

@@ -55,4 +55,47 @@ class TxHandleTest extends \Ivory\IvoryTestCase
             );
         }
     }
+
+    public function testSnapshots()
+    {
+        $conn1 = $this->createNewIvoryConnection();
+        $conn1->connect();
+        $conn2 = $this->createNewIvoryConnection();
+        $conn2->connect();
+
+        $tx1 = null;
+        $tx2 = null;
+
+        $tableName = 't' . mt_rand(1000, 9999);
+        $this->conn->command('CREATE TABLE %ident (i INT)', $tableName);
+        try {
+            $tx1 = $conn1->startTransaction(TxConfig::ISOLATION_REPEATABLE_READ);
+
+            $this->assertSame(0, $conn1->querySingleValue('SELECT COUNT(*) FROM %ident', $tableName));
+
+            $this->conn->command('INSERT INTO %ident (i) VALUES (1)', $tableName);
+
+            $this->assertSame(0, $conn1->querySingleValue('SELECT COUNT(*) FROM %ident', $tableName));
+            $this->assertSame(1, $conn2->querySingleValue('SELECT COUNT(*) FROM %ident', $tableName));
+
+            $snapshotId = $tx1->exportTransactionSnapshot();
+
+            $tx2 = $conn2->startTransaction(TxConfig::ISOLATION_REPEATABLE_READ);
+            $tx2->setTransactionSnapshot($snapshotId);
+
+            $this->assertSame(0, $conn2->querySingleValue('SELECT COUNT(*) FROM %ident', $tableName));
+        } finally {
+            if ($tx1 !== null) {
+                $tx1->rollback();
+            }
+            if ($tx2 !== null) {
+                $tx2->rollback();
+            }
+
+            $conn1->disconnect();
+            $conn2->disconnect();
+
+            $this->conn->command('DROP TABLE %ident', $tableName);
+        }
+    }
 }

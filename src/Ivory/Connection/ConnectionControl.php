@@ -192,7 +192,7 @@ class ConnectionControl implements IConnectionControl
         }
     }
 
-    private static function isStreamReadable($stream, int $sec, ?int $usec = null): bool
+    private static function isStreamReadable($stream, int $sec, int $usec = 0): bool
     {
         $r = [$stream];
         $w = [];
