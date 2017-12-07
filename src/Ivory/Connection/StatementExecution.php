@@ -40,21 +40,25 @@ class StatementExecution implements IStatementExecution
 
     public function query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IQueryResult
     {
-        if ($sqlFragmentPatternOrRelationDefinition instanceof IRelationDefinition) {
-            $relDef = $sqlFragmentPatternOrRelationDefinition;
-            $serializeArgs = $fragmentsAndParams;
-            $this->checkDefinitionParams($relDef, $serializeArgs);
-        } else {
-            $relDef = SqlRelationDefinition::fromFragments(
-                $sqlFragmentPatternOrRelationDefinition,
-                ...$fragmentsAndParams
-            );
-            $serializeArgs = [];
-        }
+        $typeDict = $this->typeCtl->getTypeDictionary();
 
         try {
-            $typeDict = $this->typeCtl->getTypeDictionary();
-            $sql = $relDef->toSql($typeDict, ...$serializeArgs);
+            if ($sqlFragmentPatternOrRelationDefinition instanceof ISqlPatternStatement) {
+                $this->checkMaxArgs($fragmentsAndParams, 1);
+                $sqlRelDef = $sqlFragmentPatternOrRelationDefinition;
+                $serializeArgs = $fragmentsAndParams;
+                $sql = $sqlRelDef->toSql($typeDict, ...$serializeArgs);
+            } elseif ($sqlFragmentPatternOrRelationDefinition instanceof IRelationDefinition) {
+                $this->checkMaxArgs($fragmentsAndParams, 0);
+                $relDef = $sqlFragmentPatternOrRelationDefinition;
+                $sql = $relDef->toSql($typeDict);
+            } else {
+                $relDef = SqlRelationDefinition::fromFragments(
+                    $sqlFragmentPatternOrRelationDefinition,
+                    ...$fragmentsAndParams
+                );
+                $sql = $relDef->toSql($typeDict);
+            }
         } catch (InvalidStateException $e) {
             throw new \InvalidArgumentException($e->getMessage());
         }
@@ -110,18 +114,22 @@ class StatementExecution implements IStatementExecution
 
     public function command($sqlFragmentPatternOrCommand, ...$fragmentsAndParams): ICommandResult
     {
-        if ($sqlFragmentPatternOrCommand instanceof ICommand) {
-            $command = $sqlFragmentPatternOrCommand;
-            $serializeArgs = $fragmentsAndParams;
-            $this->checkDefinitionParams($command, $serializeArgs);
-        } else {
-            $command = SqlCommand::fromFragments($sqlFragmentPatternOrCommand, ...$fragmentsAndParams);
-            $serializeArgs = [];
-        }
+        $typeDict = $this->typeCtl->getTypeDictionary();
 
         try {
-            $typeDict = $this->typeCtl->getTypeDictionary();
-            $sql = $command->toSql($typeDict, ...$serializeArgs);
+            if ($sqlFragmentPatternOrCommand instanceof ISqlPatternStatement) {
+                $this->checkMaxArgs($fragmentsAndParams, 1);
+                $sqlCommand = $sqlFragmentPatternOrCommand;
+                $serializeArgs = $fragmentsAndParams;
+                $sql = $sqlCommand->toSql($typeDict, ...$serializeArgs);
+            } elseif ($sqlFragmentPatternOrCommand instanceof ICommand) {
+                $this->checkMaxArgs($fragmentsAndParams, 0);
+                $command = $sqlFragmentPatternOrCommand;
+                $sql = $command->toSql($typeDict);
+            } else {
+                $command = SqlCommand::fromFragments($sqlFragmentPatternOrCommand, ...$fragmentsAndParams);
+                $sql = $command->toSql($typeDict);
+            }
         } catch (InvalidStateException $e) {
             throw new \InvalidArgumentException($e->getMessage());
         }
@@ -129,16 +137,10 @@ class StatementExecution implements IStatementExecution
         return $this->rawCommand($sql);
     }
 
-    private function checkDefinitionParams($definition, $params)
+    private function checkMaxArgs($args, int $maxCount): void
     {
-        if ($definition instanceof ISqlPatternStatement) {
-            if (count($params) > 1) {
-                throw new \InvalidArgumentException('Too many arguments given.');
-            }
-        } else {
-            if (count($params) > 0) {
-                throw new \InvalidArgumentException('Too many arguments given.');
-            }
+        if (count($args) > $maxCount) {
+            throw new \InvalidArgumentException('Too many arguments given.');
         }
     }
 

@@ -19,12 +19,13 @@ use Ivory\Exception\ConnectionException;
 /**
  * Execution of statements on the connected database.
  *
- * For type safety and transparency reasons, Ivory strictly distinguishes the executed statements to
+ * For type safety and transparency reasons, Ivory strictly distinguishes the executed statements to:
  * - *queries*, which result in a relation, and
  * - *commands*, the result of which is just a summary information, such as the number of affected rows in a table.
+ *
  * Using the {@link IStatementExecution::query()} method with an SQL statement not returning data set (such as a plain
  * `INSERT` without the `RETURNING` clause) is an error, as well as calling {@link IStatementExecution::command()} with
- * an SQL statement returning data (such as `SELECT`), and will result in an {@link UsageException}.
+ * an SQL statement returning data (such as `SELECT`), and will result in a {@link UsageException}.
  *
  * @internal Ivory design note: Traditionally, in other database layers (including the pgsql extension), methods like
  * query() serve both for reading data from the database and for writing data to it, requiring the user to use the
@@ -52,12 +53,12 @@ interface IStatementExecution
      *    {@link SqlPattern}s) may be given then, each immediately followed by values for its positional parameters. All
      *    such SQL patterns are combined together as fragments. If any of the fragments has a named parameter, the map
      *    of values for named parameters must be given as the very last argument.
-     * 2. The first argument is an {@link SqlRelationDefinition} object. No positional arguments are expected in this
-     *    case, only the map of values for named parameters if present. As the `SqlRelationDefinition` might have
-     *    already set all its named parameters, even this argument might not be necessary.
-     *    Note that values of named parameters passed as argument to this method have precedence over those already set
-     *    on the `SqlRelationDefinition` object. The object is untouched by this method, just the same-named parameter
-     *    value is ineffective.
+     * 2. The first argument is an {@link ISqlPatternStatement} object (such as {@link SqlRelationDefinition}). No
+     *    positional arguments are expected in this case, only the map of values for named parameters if present. As the
+     *    `SqlRelationDefinition` might have already set all its named parameters, even this argument might not be
+     *    necessary. Note that values of named parameters passed as argument to this method have precedence over those
+     *    already set on the `SqlRelationDefinition` object. The object is untouched by this method, just the same-named
+     *    parameter value is ineffective.
      * 3. The first and the only argument is an {@link IRelationDefinition} object.
      *
      * Examples:
