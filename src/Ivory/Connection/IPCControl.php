@@ -6,47 +6,54 @@ namespace Ivory\Connection;
 class IPCControl implements IIPCControl
 {
     private $connCtl;
+    private $stmtExec;
 
 
-    public function __construct(ConnectionControl $connCtl)
+    public function __construct(ConnectionControl $connCtl, IStatementExecution $stmtExec)
     {
         $this->connCtl = $connCtl;
+        $this->stmtExec = $stmtExec;
     }
 
 
     public function getBackendPID(): int
     {
-        return pg_get_pid($this->connCtl->requireConnection());
+        $handler = $this->connCtl->requireConnection();
+        return pg_get_pid($handler);
     }
 
     public function notify(string $channel, ?string $payload = null): void
     {
-        // TODO: Implement notify() method.
+        if ($payload === null) {
+            $this->stmtExec->command('NOTIFY %ident', $channel);
+        } else {
+            $this->stmtExec->command('NOTIFY %ident, %s', $channel, $payload);
+        }
     }
 
     public function listen(string $channel): void
     {
-        // TODO: Implement listen() method.
+        $this->stmtExec->command('LISTEN %ident', $channel);
     }
 
     public function unlisten(string $channel): void
     {
-        // TODO: Implement unlisten() method.
+        $this->stmtExec->command('UNLISTEN %ident', $channel);
     }
 
     public function unlistenAll(): void
     {
-        // TODO: Implement unlistenAll() method.
+        $this->stmtExec->rawCommand('UNLISTEN *');
     }
 
     public function pollNotification(): ?Notification
     {
         $handler = $this->connCtl->requireConnection();
-
         $res = pg_get_notify($handler, PGSQL_ASSOC);
         if ($res === false) {
             return null;
         }
-        return new Notification($res['message'], $res['pid'], (string)$res['payload']);
+        $payload = ($res['payload'] !== '' ? $res['payload'] : null);
+        return new Notification($res['message'], $res['pid'], $payload);
     }
 }

@@ -58,9 +58,9 @@ class TxHandleTest extends \Ivory\IvoryTestCase
 
     public function testSnapshots()
     {
-        $conn1 = $this->createNewIvoryConnection();
+        $conn1 = $this->createNewIvoryConnection('conn1');
         $conn1->connect();
-        $conn2 = $this->createNewIvoryConnection();
+        $conn2 = $this->createNewIvoryConnection('conn2');
         $conn2->connect();
 
         $tx1 = null;

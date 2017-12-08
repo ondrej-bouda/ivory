@@ -14,7 +14,7 @@ class Notification
     private $pid;
     private $payload;
 
-    public function __construct(string $channel, int $pid, string $payload)
+    public function __construct(string $channel, int $pid, ?string $payload)
     {
         $this->channel = $channel;
         $this->pid = $pid;
@@ -32,15 +32,15 @@ class Notification
     /**
      * @return int ID of the database server process which sent the notification
      */
-    public function getPid(): int
+    public function getSenderBackendPID(): int
     {
         return $this->pid;
     }
 
     /**
-     * @return string the notification payload (empty string denotes no payload)
+     * @return string|null the notification payload, or <tt>null</tt> if no payload is contained
      */
-    public function getPayload(): string
+    public function getPayload(): ?string
     {
         return $this->payload;
     }

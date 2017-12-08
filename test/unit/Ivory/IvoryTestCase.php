@@ -267,7 +267,7 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
         return $this->ivoryConn;
     }
 
-    protected function createNewIvoryConnection(): IConnection
+    protected function createNewIvoryConnection(string $name = 'default'): IConnection
     {
         $params = ConnectionParameters::fromArray([
             ConnectionParameters::HOST => ($GLOBALS['DB_HOST'] ? : null),
@@ -277,7 +277,7 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
             ConnectionParameters::DBNAME => $GLOBALS['DB_DBNAME'],
         ]);
         $coreFactory = Ivory::getCoreFactory();
-        return $coreFactory->createConnection('default', $params);
+        return $coreFactory->createConnection($name, $params);
     }
 
     protected function newDatabaseTester()
