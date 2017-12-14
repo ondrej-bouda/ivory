@@ -73,7 +73,7 @@ interface IRelation extends \Traversable, \Countable
      * - The full form specifies both the array key and value of the `$columns` item - key specifying the name of the
      *   new column, value specifying its value. The value may either be a plain string or integer referring to values
      *   of an existing column of this relation (similarly to the short form mentioned above), or a dynamic tuple
-     *   evaluator, computing the value from the whole tuple. The tuple evaluator may either be a
+     *   evaluator, computing the value from the whole tuple. The tuple evaluator may either be an
      *   {@link ITupleEvaluator} object which gets called its {@link ITupleEvaluator::evaluate()} method, or a `Closure`
      *   which is given one {@link ITuple} argument holding the current tuple and is expected to return the value
      *   computed from the tuple for the column.

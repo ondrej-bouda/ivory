@@ -61,12 +61,12 @@ interface IRelationDefinition
     function sort($sortExpression, ...$args): IRelationDefinition;
 
     /**
-     * Creates the definition limited only to certain number of rows, or starting from a certain row.
+     * Creates the definition limited only to certain number of tuples or starting from a certain tuple.
      *
-     * @param int|null $limit the number of rows to limit this relation to; <tt>null</tt> means no limit
-     * @param int $offset the number of leading rows to skip
-     * @return IRelationDefinition definition of relation containing at most <tt>$limit</tt> rows, skipping the first
-     *                               <tt>$offset</tt> rows
+     * @param int|null $limit the number of tuples to limit this relation to; <tt>null</tt> means no limit
+     * @param int $offset the number of leading tuples to skip
+     * @return IRelationDefinition definition of relation containing at most <tt>$limit</tt> tuples, skipping the first
+     *                               <tt>$offset</tt> tuples
      */
     function limit(?int $limit, int $offset = 0): IRelationDefinition;
 }
