@@ -48,6 +48,28 @@ class TxConfig
         }
     }
 
+    public static function createFromParams(?string $isolationLevel, ?bool $readOnly, ?bool $deferrable): TxConfig
+    {
+        $txConf = new TxConfig();
+        $txConf->setReadOnly($readOnly);
+        $txConf->setDeferrable($deferrable);
+
+        if ($isolationLevel !== null) {
+            static $isolationLevels = [
+                'serializable' => TxConfig::ISOLATION_SERIALIZABLE,
+                'repeatable read' => TxConfig::ISOLATION_REPEATABLE_READ,
+                'read committed' => TxConfig::ISOLATION_READ_COMMITTED,
+                'read uncommitted' => TxConfig::ISOLATION_READ_UNCOMMITTED,
+            ];
+            if (!isset($isolationLevels[$isolationLevel])) {
+                throw new \InvalidArgumentException("Unrecognized transaction isolation level: '$isolationLevel'");
+            }
+            $txConf->setIsolationLevel($isolationLevels[$isolationLevel]);
+        }
+
+        return $txConf;
+    }
+
     /**
      * @param int $options one or more {@link TxConfig} constants combined together with the <tt>|</tt> operator
      */

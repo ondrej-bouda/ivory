@@ -98,4 +98,33 @@ class TxHandleTest extends \Ivory\IvoryTestCase
             $this->conn->command('DROP TABLE %ident', $tableName);
         }
     }
+
+    public function testConfig()
+    {
+        $conn1 = $this->createNewIvoryConnection('conn1');
+        $tx = null;
+        try {
+            $conn1->setupSubsequentTransactions(TxConfig::create(
+                TxConfig::ISOLATION_READ_UNCOMMITTED | TxConfig::ACCESS_READ_WRITE
+            ));
+            $tx = $conn1->startTransaction();
+            $actualConfig = $tx->getTxConfig();
+            $this->assertSame(TxConfig::ISOLATION_READ_UNCOMMITTED, $actualConfig->getIsolationLevel());
+            $this->assertFalse($actualConfig->isReadOnly());
+            $this->assertFalse($actualConfig->isDeferrable());
+            $tx->rollback();
+
+            $tx = $conn1->startTransaction(TxConfig::ACCESS_READ_ONLY | TxConfig::NOT_DEFERRABLE);
+            $tx->setupTransaction(TxConfig::create(TxConfig::ISOLATION_SERIALIZABLE));
+            $actualConfig = $tx->getTxConfig();
+            $this->assertSame(TxConfig::ISOLATION_SERIALIZABLE, $actualConfig->getIsolationLevel());
+            $this->assertTrue($actualConfig->isReadOnly());
+            $this->assertFalse($actualConfig->isDeferrable());
+        } finally {
+            if ($tx !== null) {
+                $tx->rollbackIfOpen();
+            }
+            $conn1->disconnect();
+        }
+    }
 }

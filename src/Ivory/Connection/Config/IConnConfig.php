@@ -89,11 +89,10 @@ interface IConnConfig
     function resetAll(): void;
 
     /**
-     * @return TxConfig transaction parameters of the current transaction
-     */
-    function getTxConfig(): TxConfig;
-
-    /**
+     * Retrieves the transaction parameters effective for new transactions.
+     *
+     * To get the current transaction parameters, use {@link ITxHandle::getTxConfig()} on the transaction handle.
+     *
      * @return TxConfig default transaction parameters for new transactions
      */
     function getDefaultTxConfig(): TxConfig;

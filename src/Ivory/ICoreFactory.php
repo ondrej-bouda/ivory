@@ -5,6 +5,7 @@ use Ivory\Cache\ICacheControl;
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
 use Ivory\Connection\IObservableTransactionControl;
+use Ivory\Connection\ISessionControl;
 use Ivory\Connection\IStatementExecution;
 use Ivory\Connection\ITxHandle;
 use Ivory\Exception\StatementExceptionFactory;
@@ -40,6 +41,7 @@ interface ICoreFactory
 
     function createTransactionHandle(
         IStatementExecution $stmtExec,
-        IObservableTransactionControl $observableTxCtl
+        IObservableTransactionControl $observableTxCtl,
+        ISessionControl $sessionCtl
     ): ITxHandle;
 }

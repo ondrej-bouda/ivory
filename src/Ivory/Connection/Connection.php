@@ -48,7 +48,7 @@ class Connection implements IConnection
         $this->typeCtl = new TypeControl($this, $this->connCtl);
         $this->stmtExec = new StatementExecution($this->connCtl, $this->typeCtl);
         $this->copyCtl = new CopyControl();
-        $this->txCtl = new TransactionControl($this->connCtl, $this->stmtExec);
+        $this->txCtl = new TransactionControl($this->connCtl, $this->stmtExec, $this);
         $this->ipcCtl = new IPCControl($this->connCtl, $this->stmtExec);
         $this->config = new ConnConfig($this->connCtl, $this->stmtExec, $this->txCtl);
         $this->cacheCtl = Ivory::getCoreFactory()->createCacheControl($this); // TODO: consider moving cacheCtl initialization out of Connection itself (let the core factory set it up), or do not hold cache control here but rather besides the connection register at Ivory

@@ -19,6 +19,11 @@ interface ITxHandle
     function isOpen(): bool;
 
     /**
+     * @return TxConfig transaction parameters of the transaction
+     */
+    function getTxConfig(): TxConfig;
+
+    /**
      * Sets up the transaction according to the given options.
      *
      * Note that some options may only be set up before the first query or data-modifying statement is executed within

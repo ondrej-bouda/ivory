@@ -12,14 +12,16 @@ class TransactionControl implements IObservableTransactionControl
 {
     private $connCtl;
     private $stmtExec;
+    private $sessionCtl;
     /** @var ITransactionControlObserver[] */
     private $observers = [];
 
 
-    public function __construct(ConnectionControl $connCtl, IStatementExecution $stmtExec)
+    public function __construct(ConnectionControl $connCtl, IStatementExecution $stmtExec, ISessionControl $sessionCtl)
     {
         $this->connCtl = $connCtl;
         $this->stmtExec = $stmtExec;
+        $this->sessionCtl = $sessionCtl;
     }
 
     public function inTransaction(): bool
@@ -47,7 +49,7 @@ class TransactionControl implements IObservableTransactionControl
         $this->notifyTransactionStart();
 
         $coreFactory = Ivory::getCoreFactory();
-        return $coreFactory->createTransactionHandle($this->stmtExec, $this);
+        return $coreFactory->createTransactionHandle($this->stmtExec, $this, $this->sessionCtl);
     }
 
     public function setupSubsequentTransactions($transactionOptions): void

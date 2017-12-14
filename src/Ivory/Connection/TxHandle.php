@@ -20,13 +20,18 @@ class TxHandle implements ITxHandle
     private $open = true;
     private $stmtExec;
     private $txCtl;
+    private $sessionCtl;
     private $identSerializer;
     private $stringSerializer;
 
-    public function __construct(IStatementExecution $stmtExec, IObservableTransactionControl $observableTxCtl)
-    {
+    public function __construct(
+        IStatementExecution $stmtExec,
+        IObservableTransactionControl $observableTxCtl,
+        ISessionControl $sessionCtl
+    ) {
         $this->stmtExec = $stmtExec;
         $this->txCtl = $observableTxCtl;
+        $this->sessionCtl = $sessionCtl;
         $this->identSerializer = new IdentifierSerializer();
         $this->stringSerializer = new StringType('pg_catalog', 'text');
     }
@@ -57,6 +62,17 @@ class TxHandle implements ITxHandle
     public function isOpen(): bool
     {
         return $this->open;
+    }
+
+    public function getTxConfig(): TxConfig
+    {
+        $this->assertOpen();
+        $connConfig = $this->sessionCtl->getConfig();
+        return TxConfig::createFromParams(
+            $connConfig->get('transaction_isolation'),
+            $connConfig->get('transaction_read_only'),
+            $connConfig->get('transaction_deferrable')
+        );
     }
 
     public function setupTransaction($transactionOptions): void

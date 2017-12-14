@@ -9,6 +9,7 @@ use Ivory\Connection\Connection;
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
 use Ivory\Connection\IObservableTransactionControl;
+use Ivory\Connection\ISessionControl;
 use Ivory\Connection\IStatementExecution;
 use Ivory\Connection\ITxHandle;
 use Ivory\Connection\TxHandle;
@@ -147,8 +148,9 @@ class StdCoreFactory implements ICoreFactory
 
     public function createTransactionHandle(
         IStatementExecution $stmtExec,
-        IObservableTransactionControl $observableTxCtl
+        IObservableTransactionControl $observableTxCtl,
+        ISessionControl $sessionCtl
     ): ITxHandle {
-        return new TxHandle($stmtExec, $observableTxCtl);
+        return new TxHandle($stmtExec, $observableTxCtl, $sessionCtl);
     }
 }

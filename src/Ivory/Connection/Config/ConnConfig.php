@@ -283,42 +283,13 @@ class ConnConfig implements IObservableConnConfig
         $this->notifyPropertiesReset();
     }
 
-    public function getTxConfig(): TxConfig
-    {
-        return self::createTxConfig(
-            $this->transaction_isolation,
-            $this->transaction_read_only,
-            $this->transaction_deferrable
-        );
-    }
-
     public function getDefaultTxConfig(): TxConfig
     {
-        return self::createTxConfig(
+        return TxConfig::createFromParams(
             $this->get(ConfigParam::DEFAULT_TRANSACTION_ISOLATION),
             $this->get(ConfigParam::DEFAULT_TRANSACTION_READ_ONLY),
             $this->get(ConfigParam::DEFAULT_TRANSACTION_DEFERRABLE)
         );
-    }
-
-    private static function createTxConfig(string $isolationLevel, ?bool $readOnly, ?bool $deferrable): TxConfig
-    {
-        $txConf = new TxConfig();
-        $txConf->setReadOnly($readOnly);
-        $txConf->setDeferrable($deferrable);
-
-        static $isolationLevels = [
-            'serializable' => TxConfig::ISOLATION_SERIALIZABLE,
-            'repeatable read' => TxConfig::ISOLATION_REPEATABLE_READ,
-            'read committed' => TxConfig::ISOLATION_READ_COMMITTED,
-            'read uncommitted' => TxConfig::ISOLATION_READ_UNCOMMITTED,
-        ];
-        if (!isset($isolationLevels[$isolationLevel])) {
-            throw new \InvalidArgumentException("Unrecognized transaction isolation level: '$isolationLevel'");
-        }
-        $txConf->setIsolationLevel($isolationLevels[$isolationLevel]);
-
-        return $txConf;
     }
 
     public function getEffectiveSearchPath(): array
