@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Ivory\Connection;
 
+use Ivory\Connection\Config\ConfigParam;
 use Ivory\Exception\InvalidStateException;
 use Ivory\Ivory;
 use Ivory\Result\IQueryResult;
@@ -56,6 +57,16 @@ class TransactionControl implements IObservableTransactionControl
     {
         $txConfig = TxConfig::create($transactionOptions);
         $this->stmtExec->rawCommand('SET SESSION CHARACTERISTICS AS TRANSACTION ' . $txConfig->toSql());
+    }
+
+    public function getDefaultTxConfig(): TxConfig
+    {
+        $connConfig = $this->sessionCtl->getConfig();
+        return TxConfig::createFromParams(
+            $connConfig->get(ConfigParam::DEFAULT_TRANSACTION_ISOLATION),
+            $connConfig->get(ConfigParam::DEFAULT_TRANSACTION_READ_ONLY),
+            $connConfig->get(ConfigParam::DEFAULT_TRANSACTION_DEFERRABLE)
+        );
     }
 
     public function commitPreparedTransaction(string $name): void

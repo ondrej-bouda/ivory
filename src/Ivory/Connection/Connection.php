@@ -248,6 +248,11 @@ class Connection implements IConnection
         $this->txCtl->setupSubsequentTransactions($transactionOptions);
     }
 
+    public function getDefaultTxConfig(): TxConfig
+    {
+        return $this->txCtl->getDefaultTxConfig();
+    }
+
     public function commitPreparedTransaction(string $name): void
     {
         $this->txCtl->commitPreparedTransaction($name);

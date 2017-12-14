@@ -48,7 +48,7 @@ interface ITransactionControl
     function startTransaction($transactionOptions = 0): ITxHandle;
 
     /**
-     * Sets up the default options for subsequent transactions started in the current session.
+     * Sets up the default options for new transactions started in the current session.
      *
      * The current transaction (if any) is unaffected by this command. See {@link ITxHandle::setupTransaction()}
      * instead.
@@ -57,6 +57,15 @@ interface ITransactionControl
      *                                         a {@link TxConfig} object, or a combination of {@link TxConfig} constants
      */
     function setupSubsequentTransactions($transactionOptions): void;
+
+    /**
+     * Retrieves the transaction parameters effective for new transactions.
+     *
+     * To get the current transaction parameters, use {@link ITxHandle::getTxConfig()} on the transaction handle.
+     *
+     * @return TxConfig default transaction parameters for new transactions
+     */
+    function getDefaultTxConfig(): TxConfig;
 
     /**
      * Commits a transaction prepared for a two-phase commit.

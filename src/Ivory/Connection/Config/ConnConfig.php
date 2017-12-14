@@ -283,15 +283,6 @@ class ConnConfig implements IObservableConnConfig
         $this->notifyPropertiesReset();
     }
 
-    public function getDefaultTxConfig(): TxConfig
-    {
-        return TxConfig::createFromParams(
-            $this->get(ConfigParam::DEFAULT_TRANSACTION_ISOLATION),
-            $this->get(ConfigParam::DEFAULT_TRANSACTION_READ_ONLY),
-            $this->get(ConfigParam::DEFAULT_TRANSACTION_DEFERRABLE)
-        );
-    }
-
     public function getEffectiveSearchPath(): array
     {
         if ($this->effectiveSearchPathCache === null) {

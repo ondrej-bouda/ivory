@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Ivory\Connection;
 
-class TxHandleTest extends \Ivory\IvoryTestCase
+class TransactionControlTest extends \Ivory\IvoryTestCase
 {
     /** @var IConnection */
     private $conn;
@@ -107,6 +107,10 @@ class TxHandleTest extends \Ivory\IvoryTestCase
             $conn1->setupSubsequentTransactions(TxConfig::create(
                 TxConfig::ISOLATION_READ_UNCOMMITTED | TxConfig::ACCESS_READ_WRITE
             ));
+            $newDefaultConfig = $conn1->getDefaultTxConfig();
+            $this->assertSame(TxConfig::ISOLATION_READ_UNCOMMITTED, $newDefaultConfig->getIsolationLevel());
+            $this->assertFalse($newDefaultConfig->isReadOnly());
+
             $tx = $conn1->startTransaction();
             $actualConfig = $tx->getTxConfig();
             $this->assertSame(TxConfig::ISOLATION_READ_UNCOMMITTED, $actualConfig->getIsolationLevel());

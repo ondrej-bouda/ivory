@@ -89,15 +89,6 @@ interface IConnConfig
     function resetAll(): void;
 
     /**
-     * Retrieves the transaction parameters effective for new transactions.
-     *
-     * To get the current transaction parameters, use {@link ITxHandle::getTxConfig()} on the transaction handle.
-     *
-     * @return TxConfig default transaction parameters for new transactions
-     */
-    function getDefaultTxConfig(): TxConfig;
-
-    /**
      * @return string[] the effective search path - the explicit search path combined with the implicit schemas
      * @see https://www.postgresql.org/docs/9.6/static/runtime-config-client.html#RUNTIME-CONFIG-CLIENT-STATEMENT
      */
