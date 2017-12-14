@@ -5,6 +5,7 @@ namespace Ivory\Connection;
 
 use Ivory\Exception\InvalidStateException;
 use Ivory\Result\IQueryResult;
+use Ivory\Type\IValueSerializer;
 use Ivory\Type\Ivory\IdentifierSerializer;
 use Ivory\Type\Std\StringType;
 
@@ -21,8 +22,8 @@ class TxHandle implements ITxHandle
     private $stmtExec;
     private $txCtl;
     private $sessionCtl;
-    private $identSerializer;
-    private $stringSerializer;
+    private $identSerializer = null;
+    private $stringSerializer = null;
 
     public function __construct(
         IStatementExecution $stmtExec,
@@ -32,8 +33,6 @@ class TxHandle implements ITxHandle
         $this->stmtExec = $stmtExec;
         $this->txCtl = $observableTxCtl;
         $this->sessionCtl = $sessionCtl;
-        $this->identSerializer = new IdentifierSerializer();
-        $this->stringSerializer = new StringType('pg_catalog', 'text');
     }
 
     public function __destruct()
@@ -44,6 +43,22 @@ class TxHandle implements ITxHandle
                 E_USER_WARNING
             );
         }
+    }
+
+    private function ensureIdentSerializer(): IValueSerializer
+    {
+        if ($this->identSerializer === null) {
+            $this->identSerializer = new IdentifierSerializer();
+        }
+        return $this->identSerializer;
+    }
+
+    private function ensureStringSerializer(): IValueSerializer
+    {
+        if ($this->stringSerializer === null) {
+            $this->stringSerializer = new StringType('pg_catalog', 'text');
+        }
+        return $this->stringSerializer;
     }
 
     private function assertOpen(): void
@@ -85,7 +100,8 @@ class TxHandle implements ITxHandle
     public function setTransactionSnapshot(string $snapshotId): void
     {
         $this->assertOpen();
-        $this->stmtExec->rawCommand("SET TRANSACTION SNAPSHOT {$this->stringSerializer->serializeValue($snapshotId)}");
+        $str = $this->ensureStringSerializer()->serializeValue($snapshotId);
+        $this->stmtExec->rawCommand("SET TRANSACTION SNAPSHOT $str");
     }
 
     public function exportTransactionSnapshot(): string
@@ -125,21 +141,24 @@ class TxHandle implements ITxHandle
     public function savepoint(string $name): void
     {
         $this->assertOpen();
-        $this->stmtExec->rawCommand(sprintf('SAVEPOINT %s', $this->identSerializer->serializeValue($name)));
+        $ident = $this->ensureIdentSerializer()->serializeValue($name);
+        $this->stmtExec->rawCommand("SAVEPOINT $ident");
         $this->txCtl->notifySavepointSaved($name);
     }
 
     public function rollbackToSavepoint(string $name): void
     {
         $this->assertOpen();
-        $this->stmtExec->rawCommand(sprintf('ROLLBACK TO SAVEPOINT %s', $this->identSerializer->serializeValue($name)));
+        $ident = $this->ensureIdentSerializer()->serializeValue($name);
+        $this->stmtExec->rawCommand("ROLLBACK TO SAVEPOINT $ident");
         $this->txCtl->notifyRollbackToSavepoint($name);
     }
 
     public function releaseSavepoint(string $name): void
     {
         $this->assertOpen();
-        $this->stmtExec->rawCommand(sprintf('RELEASE SAVEPOINT %s', $this->identSerializer->serializeValue($name)));
+        $ident = $this->ensureIdentSerializer()->serializeValue($name);
+        $this->stmtExec->rawCommand("RELEASE SAVEPOINT $ident");
         $this->txCtl->notifySavepointReleased($name);
     }
 
@@ -153,7 +172,8 @@ class TxHandle implements ITxHandle
             $name = substr(bin2hex($bytes), 0, $len);
         }
 
-        $this->stmtExec->rawCommand("PREPARE TRANSACTION {$this->stringSerializer->serializeValue($name)}");
+        $str = $this->ensureStringSerializer()->serializeValue($name);
+        $this->stmtExec->rawCommand("PREPARE TRANSACTION $str");
         $this->open = false;
         $this->txCtl->notifyTransactionPrepared($name);
 
