@@ -39,7 +39,7 @@ class Quantity implements IEqualable
     const HOUR = 'h';
     const DAY = 'd';
 
-    private static $conversion = [
+    private const CONVERSION = [
         self::BYTE => [self::BYTE, 1],
         self::KILOBYTE => [self::BYTE, 1024],
         self::MEGABYTE => [self::BYTE, 1024 * 1024],
@@ -52,7 +52,7 @@ class Quantity implements IEqualable
         self::HOUR => [self::SECOND, 60 * 60],
         self::DAY => [self::SECOND, 24 * 60 * 60],
     ];
-    private static $epsilon = 1e-9;
+    private const EPSILON = 1e-9;
 
 
     private $value;
@@ -153,12 +153,12 @@ class Quantity implements IEqualable
             $thisNormValue = $this->value;
             $quanNormValue = $quantity->value;
         } else {
-            if (!isset(self::$conversion[$this->unit], self::$conversion[$quantity->unit])) {
+            if (!isset(self::CONVERSION[$this->unit], self::CONVERSION[$quantity->unit])) {
                 return false;
             }
 
-            list($thisBase, $thisMult) = self::$conversion[$this->unit];
-            list($quanBase, $quanMult) = self::$conversion[$quantity->unit];
+            list($thisBase, $thisMult) = self::CONVERSION[$this->unit];
+            list($quanBase, $quanMult) = self::CONVERSION[$quantity->unit];
             if ($thisBase != $quanBase) {
                 return false;
             }
@@ -167,7 +167,7 @@ class Quantity implements IEqualable
             $quanNormValue = $quantity->value * $quanMult;
         }
 
-        return (abs($thisNormValue - $quanNormValue) < self::$epsilon);
+        return (abs($thisNormValue - $quanNormValue) < self::EPSILON);
     }
 
     /**
@@ -187,21 +187,21 @@ class Quantity implements IEqualable
                 throw new UndefinedOperationException('Conversion from/to dimensionless quantity is undefined.');
             }
         }
-        if (!isset(self::$conversion[$this->unit])) {
+        if (!isset(self::CONVERSION[$this->unit])) {
             throw new UnsupportedException("Conversion from an unsupported unit '$this->unit'");
         }
-        if (!isset(self::$conversion[$destUnit])) {
+        if (!isset(self::CONVERSION[$destUnit])) {
             throw new UnsupportedException("Conversion to an unsupported unit '$destUnit'");
         }
 
-        list($thisBase, $thisMult) = self::$conversion[$this->unit];
-        list($destBase, $destMult) = self::$conversion[$destUnit];
+        list($thisBase, $thisMult) = self::CONVERSION[$this->unit];
+        list($destBase, $destMult) = self::CONVERSION[$destUnit];
         if ($thisBase != $destBase) {
             throw new UndefinedOperationException("Conversion from '$this->unit' to '$destUnit' is not defined.");
         }
 
         $destValue = $this->value * $thisMult / $destMult;
-        if (abs($destValue - (int)$destValue) < self::$epsilon) {
+        if (abs($destValue - (int)$destValue) < self::EPSILON) {
             $destValue = (int)$destValue;
         }
 

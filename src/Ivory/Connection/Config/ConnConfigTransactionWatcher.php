@@ -13,7 +13,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
 
     const RESET_ALL = '';
 
-    private static $emptyStruct = [
+    private const EMPTY_STRUCT = [
         'name' => null,
         self::SCOPE_TRANSACTION => [],
         self::SCOPE_SESSION => [],
@@ -75,7 +75,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
     {
         $this->inTrans = true;
         $this->tailIdx = 0;
-        $this->bySavepoint = [$this->tailIdx => self::$emptyStruct];
+        $this->bySavepoint = [$this->tailIdx => self::EMPTY_STRUCT];
     }
 
     public function handleTransactionCommit(): void
@@ -122,7 +122,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
     {
         $this->bySavepoint[$this->tailIdx]['name'] = $name;
         $this->tailIdx++;
-        $this->bySavepoint[$this->tailIdx] = self::$emptyStruct;
+        $this->bySavepoint[$this->tailIdx] = self::EMPTY_STRUCT;
     }
 
     public function handleSavepointReleased(string $name): void
@@ -132,7 +132,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
             return;
         }
 
-        $unsaved = self::$emptyStruct;
+        $unsaved = self::EMPTY_STRUCT;
         for ($i = $idx; $i <= $this->tailIdx; $i++) {
             $unsaved[self::SCOPE_TRANSACTION] += $this->bySavepoint[$i][self::SCOPE_TRANSACTION];
             $unsaved[self::SCOPE_SESSION] += $this->bySavepoint[$i][self::SCOPE_SESSION];
@@ -153,7 +153,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
             $rolledBack += $this->bySavepoint[$i][self::SCOPE_TRANSACTION];
             $rolledBack += $this->bySavepoint[$i][self::SCOPE_SESSION];
         }
-        array_splice($this->bySavepoint, $idx + 1, count($this->bySavepoint), [self::$emptyStruct]);
+        array_splice($this->bySavepoint, $idx + 1, count($this->bySavepoint), [self::EMPTY_STRUCT]);
         $this->tailIdx = $idx + 1;
 
         $this->handlePropertyChanges($rolledBack);

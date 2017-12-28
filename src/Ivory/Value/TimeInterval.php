@@ -42,8 +42,8 @@ class TimeInterval implements IEqualable
     const MILLISECOND = 'millisecond';
     const MICROSECOND = 'microsecond';
 
-    private static $PRECISION = 7;
-    private static $UNIT_ISO_ABBR = [
+    private const PRECISION = 7;
+    private const UNIT_ISO_ABBR = [
         self::YEAR => 'Y',
         self::MONTH => 'M',
         self::WEEK => 'W',
@@ -52,7 +52,7 @@ class TimeInterval implements IEqualable
         self::MINUTE => 'M',
         self::SECOND => 'S',
     ];
-    private static $TIME_UNIT_HASH = [
+    private const TIME_UNIT_HASH = [
         self::HOUR => true,
         self::MINUTE => true,
         self::SECOND => true,
@@ -87,7 +87,7 @@ class TimeInterval implements IEqualable
 
         for (; ($pair = current($queue)) !== false; next($queue)) {
             list($unit, $quantity) = $pair;
-            $intQuantity = (int)round($quantity, self::$PRECISION);
+            $intQuantity = (int)round($quantity, self::PRECISION);
             $fracQuantity = $quantity - $intQuantity;
 
             switch ($unit) {
@@ -146,13 +146,13 @@ class TimeInterval implements IEqualable
                     }
                     break;
                 case self::SECOND:
-                    $sec += round($quantity, self::$PRECISION);
+                    $sec += round($quantity, self::PRECISION);
                     break;
                 case self::MILLISECOND:
-                    $sec += round($quantity / 1000, self::$PRECISION);
+                    $sec += round($quantity / 1000, self::PRECISION);
                     break;
                 case self::MICROSECOND:
-                    $sec += round($quantity / 100000, self::$PRECISION);
+                    $sec += round($quantity / 100000, self::PRECISION);
                     break;
                 default:
                     throw new \InvalidArgumentException("Undefined unit: '$unit'");
@@ -402,11 +402,11 @@ class TimeInterval implements IEqualable
         $str = '';
         $inDatePart = true;
         foreach ($this->toParts() as $unit => $quantity) {
-            if ($inDatePart && isset(self::$TIME_UNIT_HASH[$unit])) {
+            if ($inDatePart && isset(self::TIME_UNIT_HASH[$unit])) {
                 $str .= 'T';
                 $inDatePart = false;
             }
-            $str .= $quantity . self::$UNIT_ISO_ABBR[$unit];
+            $str .= $quantity . self::UNIT_ISO_ABBR[$unit];
         }
         return ($str ? "P$str" : 'PT0S');
     }

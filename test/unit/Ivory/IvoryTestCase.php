@@ -159,7 +159,7 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
         }
     }
 
-    private static $errorTypes = [
+    private const ERROR_TYPES = [
         E_ERROR => 'E_ERROR',
         E_WARNING => 'E_WARNING',
         E_PARSE => 'E_PARSE',
@@ -182,7 +182,7 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
         $contained = [];
         $absent = [];
 
-        $mx = max(array_keys(self::$errorTypes));
+        $mx = max(array_keys(self::ERROR_TYPES));
         for ($i = 1; $i <= $mx; $i <<= 1) {
             if ($errorTypeBitmask & $i) {
                 $contained[] = $i;
@@ -208,7 +208,7 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
 
     private static function errorTypeToString($errorType)
     {
-        return (self::$errorTypes[$errorType] ?? $errorType);
+        return (self::ERROR_TYPES[$errorType] ?? $errorType);
     }
 
     /**
