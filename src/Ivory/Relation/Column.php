@@ -66,7 +66,7 @@ class Column implements \IteratorAggregate, IColumn
                 return (is_int($value) || is_string($value) ? $value : serialize($value));
             });
         } elseif ($hasher === 1) {
-            $hasher = new CallbackValueHasher(function ($value) {
+            $hasher = new CallbackValueHasher(function (/** @noinspection PhpUnusedParameterInspection */ $value) {
                 return 1;
             });
         } elseif (!$hasher instanceof IValueHasher) {
