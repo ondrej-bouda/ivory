@@ -65,11 +65,6 @@ abstract class DateBase implements IEqualable
     {
         $this->inf = $inf;
         $this->dt = $dt;
-
-        // there was a bug in some PHP versions that \DateTime objects comparison did not take fractional seconds into account
-        if (PHP_VERSION_ID < 50619 || (PHP_VERSION_ID >= 70000 && PHP_VERSION_ID < 70004)) {
-            $this->frac = ($dt !== null ? $dt->format('u') : null);
-        }
     }
 
     /**
