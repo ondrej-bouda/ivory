@@ -99,21 +99,42 @@ class Quantity implements IEqualable
         return new Quantity($val, $unit);
     }
 
+    /**
+     * @param string|int|float $value number of {@link is_numeric() numeric} string
+     * @param string|null $unit unit of the quantity, or empty string or <tt>null</tt> for dimensionless quantity
+     * @return Quantity
+     */
     public static function fromValue($value, ?string $unit = null): Quantity
     {
         if (!is_numeric($value)) {
             throw new \InvalidArgumentException('$value');
         }
 
+        if (is_string($value)) {
+            if ((string)(int)$value === $value) {
+                $number = (int)$value;
+            } else {
+                $number = (float)$value;
+            }
+        } else {
+            $number = $value;
+        }
+
         if ($unit === '') {
             $unit = null;
         }
 
-        return new Quantity($value, $unit);
+        return new Quantity($number, $unit);
     }
 
+    /**
+     * @param number $value
+     * @param string|null $unit
+     */
     private function __construct($value, ?string $unit)
     {
+        assert(is_int($value) || is_float($value));
+
         $this->value = $value;
         $this->unit = $unit;
     }

@@ -55,6 +55,10 @@ class QuantityTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(-123.0, $q->getValue());
         $this->assertSame(null, $q->getUnit());
 
+        $q = Quantity::fromValue('5', 'apple');
+        $this->assertSame(5, $q->getValue());
+        $this->assertSame('apple', $q->getUnit());
+
         try {
             Quantity::fromValue('5 apples', 'unit');
             $this->fail('\InvalidArgumentException expected');
