@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Ivory\Value;
 
-use Ivory\Exception\NotImplementedException;
-
 /**
  * Fixed-length bit string - a string of 1's and 0's.
  *
