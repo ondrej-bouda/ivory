@@ -155,6 +155,7 @@ class ConnectionControl implements IConnectionControl
             throw new InvalidStateException('Expected to be called only on a started connection.');
         }
 
+        /** @noinspection PhpUndefinedFunctionInspection PhpStorm bug WI-39406 */
         $pollStatus = pg_connect_poll($this->handler);
         if ($pollStatus === PGSQL_POLLING_OK) {
             $this->finishedConnecting = true;
@@ -164,6 +165,7 @@ class ConnectionControl implements IConnectionControl
             return;
         }
 
+        /** @noinspection PhpUndefinedFunctionInspection PhpStorm bug WI-39406 */
         $socket = pg_socket($this->handler);
         if (!$socket) {
             throw new ConnectionException('Error retrieving the connection socket while trying to wait for connection');
@@ -189,6 +191,7 @@ class ConnectionControl implements IConnectionControl
                 // TODO: make the micro sleep duration configurable, allowing 0 to effectively force busy wait
             }
 
+            /** @noinspection PhpUndefinedFunctionInspection PhpStorm bug WI-39406s */
             $pollStatus = pg_connect_poll($this->handler);
         }
     }

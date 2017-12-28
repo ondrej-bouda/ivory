@@ -263,7 +263,7 @@ class RelationTest extends IvoryTestCase
         foreach ($rel as $tuple) {
             $albums = [];
             foreach ($tuple->albums as $album) {
-                /** @var Composite $album */
+                assert($album instanceof Composite);
                 $albums[] = $album->toMap();
             }
             $results[$tuple->artist_name] = $albums;
@@ -284,9 +284,11 @@ class RelationTest extends IvoryTestCase
             $results
         );
 
+        $album = $rel->value('albums', 2)[1];
+        assert($album instanceof Composite);
         $this->assertEquals(
             ['id' => 4, 'name' => 'Live One', 'year' => 2005, 'released' => Date::fromISOString('2005-01-01')],
-            $rel->value('albums', 2)[1]->toMap()
+            $album->toMap()
         );
         $this->assertSame('Live One', $rel->value('albums', 2)[1][1]);
         $this->assertSame('Live One', $rel->value('albums', 2)[1]['name']);

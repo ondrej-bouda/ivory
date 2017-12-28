@@ -121,9 +121,13 @@ class DibiPerformanceTest implements IPerformanceTest
         );
         echo "Category $categoryId:\n";
         foreach ($res as $row) {
-            printf('#%d %s, introduced %s: %s',
-                $row['id'], $row['name'],
-                $row['introduction_date']->format('n/j/Y'),
+            $introDate = $row['introduction_date'];
+            assert($introDate instanceof \DateTimeInterface);
+            printf(
+                '#%d %s, introduced %s: %s',
+                $row['id'],
+                $row['name'],
+                $introDate->format('n/j/Y'),
                 $row['description']
             );
             foreach (json_decode($row['params']) as $parName => $parValue) {

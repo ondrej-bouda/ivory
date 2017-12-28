@@ -32,6 +32,7 @@ class PgLogSequenceNumber implements IEqualable
      */
     public static function fromString(string $str): PgLogSequenceNumber
     {
+        /** @noinspection PhpUndefinedVariableInspection PhpStorm bug WI-10662 */
         $scanned = sscanf($str, '%X/%X', $hi, $lo);
         if ($scanned == 2) {
             return new PgLogSequenceNumber($hi, $lo);

@@ -83,6 +83,7 @@ trait ArrayMapMacros
             if (!$this->isNestedMap($inner)) {
                 throw new \InvalidArgumentException("Invalid key `$k`");
             }
+            assert($inner instanceof IWritableValueMap);
             return $inner->remove(...array_slice($key, 1));
         }
     }
