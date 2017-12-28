@@ -43,10 +43,11 @@ class Line
      * @param Point $p1
      * @param Point $p2
      * @return Line
+     * @throws \InvalidArgumentException if the points are the same, and thus do not determine a line
      */
     public static function fromPoints(Point $p1, Point $p2): Line
     {
-        if ($p1 == $p2) {
+        if ($p1->equals($p2)) {
             throw new \InvalidArgumentException('$p1 and $p2 must be different for determining a line');
         }
 

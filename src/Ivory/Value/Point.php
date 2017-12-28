@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace Ivory\Value;
 
+use Ivory\Utils\IEqualable;
+
 /**
  * Representation of a point on a plane.
  *
  * The objects are immutable.
  */
-class Point
+class Point implements IEqualable
 {
     private $x;
     private $y;
@@ -72,5 +74,26 @@ class Point
     public function __toString()
     {
         return "({$this->x},{$this->y})";
+    }
+
+    /**
+     * @param object $object
+     * @return bool|null <tt>true</tt> if <tt>$this</tt> and the other <tt>$object</tt> are equal to each other,
+     *                   <tt>false</tt> if they are not equal,
+     *                   <tt>null</tt> iff <tt>$object</tt> is <tt>null</tt>
+     */
+    public function equals($object): ?bool
+    {
+        if ($object === null) {
+            return null;
+        }
+        if (!$object instanceof Point) {
+            return false;
+        }
+        return (
+            $this->getX() == $object->getX()
+            &&
+            $this->getY() == $object->getY()
+        );
     }
 }
