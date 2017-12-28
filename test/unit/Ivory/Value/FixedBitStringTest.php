@@ -143,16 +143,6 @@ class FixedBitStringTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testFromNumber()
-    {
-        $this->markTestIncomplete(); // TODO once the interface is specified
-    }
-
-    public function testToNumber()
-    {
-        $this->markTestIncomplete(); // TODO once the interface is specified
-    }
-
     public function testGetLength()
     {
         $this->assertSame(0, FixedBitString::fromString('')->getLength());

@@ -98,25 +98,4 @@ class FixedBitString extends BitString
     {
         return bindec(substr($this->bits, -(PHP_INT_SIZE * 8 - 1)));
     }
-
-    public static function fromNumber($number)
-    {
-        // TODO: make up an object of the class for representing arbitrary-length integers, and fix the interface (method name) and phpdoc
-        throw new NotImplementedException();
-    }
-
-    /**
-     * Returns a non-negative arbitrary-length integer encoded by the bits in the bit string.
-     *
-     * The standard binary encoding is used. The rightmost bit in the string is the least significant in the integer.
-     *
-     * Contrary to {@link toInt()}, this method uses all the bits to constitute the result.
-     *
-     * @return object
-     */
-    public function toNumber()
-    {
-        // TODO: make up an object of the class for representing arbitrary-length integers, and fix the interface (method name) and phpdoc
-        throw new NotImplementedException();
-    }
 }
