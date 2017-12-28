@@ -1,5 +1,5 @@
 <?php
-namespace Ivory\Sandpit;
+namespace Ivory\Dev;
 
 $conn = pg_connect('dbname=ivory_scratch user=ivory password=ivory');
 

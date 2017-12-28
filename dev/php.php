@@ -1,5 +1,5 @@
 <?php
-namespace Ivory\Sandpit;
+namespace Ivory\Dev;
 
 class Foo { }
 

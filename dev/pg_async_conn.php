@@ -15,7 +15,7 @@
  * Anyway, the sample code shows asynchronous connecting to the database at least.
  */
 
-namespace Ivory\Sandpit;
+namespace Ivory\Dev;
 
 $connStr = 'dbname=ivory_scratch user=ivory password=ivory';
 $conn = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW | PGSQL_CONNECT_ASYNC);

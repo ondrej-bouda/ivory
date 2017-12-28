@@ -1,6 +1,6 @@
 filter:
     excluded_paths:
-        - 'sandpit/*'
+        - 'dev/*'
         - 'showcase/*'
         - 'test/*'
 checks:

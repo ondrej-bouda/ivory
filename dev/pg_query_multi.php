@@ -8,7 +8,7 @@
  * - implicit COMMIT is issued after the batch unless there is an explicit BEGIN in this or any of the previous batches with no following explicit COMMIT or ROLLBACK
  */
 
-namespace Ivory\Sandpit;
+namespace Ivory\Dev;
 
 $conn = pg_connect('dbname=ivory_scratch user=ivory password=ivory', PGSQL_CONNECT_FORCE_NEW);
 if ($conn === false) {
