@@ -42,6 +42,9 @@ class RelationSerializerTest extends IvoryTestCase
      *
      * Using this helper, the test cases do not check for a specific serialization of a given relation. Instead, the
      * tests check whether a relation build on the serialized values has the expected form.
+     *
+     * @param string $sqlQuery
+     * @return IQueryResult
      */
     private function queryUsingSerializedRelation(string $sqlQuery): IQueryResult
     {

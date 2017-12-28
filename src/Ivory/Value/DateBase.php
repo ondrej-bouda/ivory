@@ -58,6 +58,8 @@ abstract class DateBase implements IEqualable
 
     /**
      * @internal Only for the purpose of Ivory itself.
+     * @param int $inf
+     * @param \DateTimeImmutable|null $dt
      */
     final protected function __construct(int $inf, ?\DateTimeImmutable $dt = null)
     {
