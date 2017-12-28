@@ -76,12 +76,12 @@ class TimestampTz extends TimestampBase
         } else {
             // there should not be any other implementation of \DateTimeInterface, but PHP is not that predictable
             return self::fromParts(
-                $dateTime->format('Y'),
-                $dateTime->format('n'),
-                $dateTime->format('j'),
-                $dateTime->format('G'),
-                $dateTime->format('i'),
-                $dateTime->format('s') + ($dateTime->format('u') ? $dateTime->format('u') / 1000000 : 0),
+                (int)$dateTime->format('Y'),
+                (int)$dateTime->format('n'),
+                (int)$dateTime->format('j'),
+                (int)$dateTime->format('G'),
+                (int)$dateTime->format('i'),
+                (int)$dateTime->format('s') + (int)$dateTime->format('u') / 1000000,
                 $dateTime->format('e')
             );
         }

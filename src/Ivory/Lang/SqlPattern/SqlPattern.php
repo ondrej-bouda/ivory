@@ -193,7 +193,7 @@ class SqlPattern
      * take the next placeholder. After iterating over all placeholders for which a value was requested, the final SQL
      * string may be retrieved by calling {@link \Generator::getReturn()} on the generator.
      *
-     * The encoded values sent to the generator are treated as strings. They has to either be strings or other types
+     * The encoded values sent to the generator are treated as strings. They have to either be strings or other types
      * convertible to strings. `null`, however, is considered as if the caller forgot to provide a value at all, and a
      * `NoDataException` is thrown in such a case.
      *
@@ -214,6 +214,7 @@ class SqlPattern
      * echo $gen->getReturn(); // prints "SELECT id FROM person UNION SELECT object_id FROM log WHERE table = 'person'"
      * </code>
      *
+     * @return \Generator coroutine encoding the placeholders arguments; returns the final SQL as a plain string
      * @throws NoDataException if no encoded value is sent for a yielded parameter
      */
     public function generateSql(): \Generator

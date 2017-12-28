@@ -54,6 +54,6 @@ class BooleanType extends \Ivory\Type\BaseType implements ITotallyOrderedType
         if ($a === null || $b === null) {
             return null;
         }
-        return (bool)$a - (bool)$b;
+        return (bool)$a <=> (bool)$b;
     }
 }

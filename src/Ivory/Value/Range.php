@@ -335,7 +335,7 @@ class Range implements IEqualable, \ArrayAccess
             $lo = null;
         } else {
             $lo = $this->lower;
-            $step = $loInc - $this->lowerInc;
+            $step = (int)$loInc - (int)$this->lowerInc;
             if ($step) {
                 $lo = $this->subtype->step($step, $lo);
             }
@@ -345,7 +345,7 @@ class Range implements IEqualable, \ArrayAccess
             $up = null;
         } else {
             $up = $this->upper;
-            $step = $this->upperInc - $upInc;
+            $step = (int)$this->upperInc - (int)$upInc;
             if ($step) {
                 $up = $this->subtype->step($step, $up);
             }

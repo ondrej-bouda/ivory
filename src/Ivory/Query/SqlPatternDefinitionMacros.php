@@ -336,6 +336,8 @@ trait SqlPatternDefinitionMacros
             $gen->send($serializedValue);
         }
 
-        return $gen->getReturn();
+        $sql = $gen->getReturn();
+        assert(is_string($sql));
+        return $sql;
     }
 }

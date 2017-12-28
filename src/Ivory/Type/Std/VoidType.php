@@ -46,7 +46,7 @@ class VoidType extends BaseType implements ITotallyOrderedType
             return null;
         }
         if ($a === self::void() && $b === self::void()) {
-            return true;
+            return 0;
         }
         throw new IncomparableException('Invalid values to compare as ' . VoidType::class);
     }
