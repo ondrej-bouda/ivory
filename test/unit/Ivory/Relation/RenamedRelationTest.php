@@ -5,8 +5,9 @@ namespace Ivory\Relation;
 
 use Ivory\Connection\IConnection;
 use Ivory\Exception\UndefinedColumnException;
+use Ivory\IvoryTestCase;
 
-class RenamedRelationTest extends \Ivory\IvoryTestCase
+class RenamedRelationTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;

@@ -5,6 +5,7 @@ namespace Ivory\Query;
 
 use Ivory\Exception\InvalidStateException;
 use Ivory\Exception\NoDataException;
+use Ivory\Ivory;
 use Ivory\Lang\SqlPattern\SqlPattern;
 use Ivory\Lang\SqlPattern\SqlPatternPlaceholder;
 use Ivory\Type\ITypeDictionary;
@@ -67,7 +68,7 @@ trait SqlPatternDefinitionMacros
     public static function fromPattern($sqlPattern, ...$positionalParameters): self
     {
         if (!$sqlPattern instanceof SqlPattern) {
-            $parser = \Ivory\Ivory::getSqlPatternParser();
+            $parser = Ivory::getSqlPatternParser();
             $sqlPattern = $parser->parse($sqlPattern);
         }
 
@@ -147,7 +148,7 @@ trait SqlPatternDefinitionMacros
             // process the fragment
             if (!$curFragment instanceof SqlPattern) {
                 if (is_string($curFragment)) {
-                    $parser = \Ivory\Ivory::getSqlPatternParser();
+                    $parser = Ivory::getSqlPatternParser();
                     $curFragment = $parser->parse($curFragment);
                 } elseif (
                     is_iterable($curFragment) &&

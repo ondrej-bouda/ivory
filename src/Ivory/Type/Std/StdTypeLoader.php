@@ -5,12 +5,13 @@ namespace Ivory\Type\Std;
 
 use Ivory\Lang\Sql\Types;
 use Ivory\Type\IType;
+use Ivory\Type\ITypeLoader;
 use Ivory\Type\Postgresql\AdHocCompositeType;
 
 /**
  * Type loader for the standard PostgreSQL base types.
  */
-class StdTypeLoader implements \Ivory\Type\ITypeLoader
+class StdTypeLoader implements ITypeLoader
 {
     public function loadType(string $schemaName, string $typeName): ?IType
     {

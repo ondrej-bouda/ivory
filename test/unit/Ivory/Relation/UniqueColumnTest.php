@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Ivory\Relation;
 
-class UniqueColumnTest extends \Ivory\IvoryTestCase
+use Ivory\IvoryTestCase;
+
+class UniqueColumnTest extends IvoryTestCase
 {
     /** @var IColumn */
     private $baseCol;

@@ -8,6 +8,7 @@ use Ivory\Connection\IConnection;
 use Ivory\Data\Set\CustomSet;
 use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\UndefinedColumnException;
+use Ivory\IvoryTestCase;
 use Ivory\Value\Composite;
 use Ivory\Value\Box;
 use Ivory\Value\Date;
@@ -22,7 +23,7 @@ use Ivory\Value\TimestampTz;
 use Ivory\Value\TimeTz;
 use Ivory\Value\TxIdSnapshot;
 
-class RelationTest extends \Ivory\IvoryTestCase
+class RelationTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;

@@ -5,10 +5,11 @@ namespace Ivory\Query;
 
 use Ivory\Connection\IConnection;
 use Ivory\Ivory;
+use Ivory\IvoryTestCase;
 use Ivory\Lang\Sql\ISqlExpression;
 use Ivory\Lang\Sql\ISqlSortExpression;
 
-class SortedRelationDefinitionTest extends \Ivory\IvoryTestCase
+class SortedRelationDefinitionTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;

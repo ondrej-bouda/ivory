@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace Ivory;
 
 use PHPUnit\DbUnit\DataSet\AbstractDataSet;
+use PHPUnit\DbUnit\DataSet\DefaultTable;
+use PHPUnit\DbUnit\DataSet\DefaultTableIterator;
+use PHPUnit\DbUnit\DataSet\DefaultTableMetadata;
 use PHPUnit\DbUnit\DataSet\ITable;
 
 /**
@@ -24,8 +27,8 @@ class ArrayDataSet extends AbstractDataSet
                 $columns = array_keys($rows[0]);
             }
 
-            $metaData = new \PHPUnit\DbUnit\DataSet\DefaultTableMetadata($tableName, $columns);
-            $table = new \PHPUnit\DbUnit\DataSet\DefaultTable($metaData);
+            $metaData = new DefaultTableMetadata($tableName, $columns);
+            $table = new DefaultTable($metaData);
 
             foreach ($rows as $row) {
                 $table->addRow($row);
@@ -36,7 +39,7 @@ class ArrayDataSet extends AbstractDataSet
 
     protected function createIterator($reverse = false)
     {
-        return new \PHPUnit\DbUnit\DataSet\DefaultTableIterator($this->tables, $reverse);
+        return new DefaultTableIterator($this->tables, $reverse);
     }
 
     public function getTable($tableName)

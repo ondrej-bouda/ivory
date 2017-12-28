@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Ivory\Connection;
 
-class IPCControlTest extends \Ivory\IvoryTestCase
+use Ivory\IvoryTestCase;
+
+class IPCControlTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn1;

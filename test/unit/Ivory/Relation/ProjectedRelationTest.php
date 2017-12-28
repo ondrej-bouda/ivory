@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace Ivory\Relation;
 
 use Ivory\Exception\UndefinedColumnException;
+use Ivory\IvoryTestCase;
 
-class ProjectedRelationTest extends \Ivory\IvoryTestCase
+class ProjectedRelationTest extends IvoryTestCase
 {
     public function testSingleColSpec()
     {

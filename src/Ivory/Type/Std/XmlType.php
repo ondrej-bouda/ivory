@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Ivory\Type\Std;
 
+use Ivory\Type\BaseType;
 use Ivory\Value\XmlContent;
 use Ivory\Value\XmlDocument;
 
@@ -15,7 +16,7 @@ use Ivory\Value\XmlDocument;
  * @see http://www.postgresql.org/docs/9.4/static/functions-xml.html
  * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
-class XmlType extends \Ivory\Type\BaseType
+class XmlType extends BaseType
 {
     public function parseValue(string $str)
     {

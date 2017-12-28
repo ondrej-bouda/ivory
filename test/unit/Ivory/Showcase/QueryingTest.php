@@ -5,6 +5,7 @@ namespace Ivory\Showcase;
 
 use Ivory\Connection\IConnection;
 use Ivory\Connection\ITxHandle;
+use Ivory\IvoryTestCase;
 use Ivory\Query\SqlRelationDefinition;
 use Ivory\Type\ITypeDictionary;
 use Ivory\Value\Date;
@@ -14,7 +15,7 @@ use Ivory\Value\Json;
 /**
  * This test presents the measures for querying the database.
  */
-class QueryingTest extends \Ivory\IvoryTestCase
+class QueryingTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;

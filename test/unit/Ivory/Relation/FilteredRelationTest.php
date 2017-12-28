@@ -4,9 +4,10 @@ declare(strict_types=1);
 namespace Ivory\Relation;
 
 use Ivory\Connection\IConnection;
+use Ivory\IvoryTestCase;
 use Ivory\Relation\Alg\ITupleFilter;
 
-class FilteredRelationTest extends \Ivory\IvoryTestCase
+class FilteredRelationTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Ivory\Type\Std;
 
 use Ivory\Exception\IncomparableException;
+use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\BitString;
 
@@ -12,7 +13,7 @@ use Ivory\Value\BitString;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-bit.html
  */
-abstract class BitStringType extends \Ivory\Type\BaseType implements ITotallyOrderedType
+abstract class BitStringType extends BaseType implements ITotallyOrderedType
 {
     public function serializeValue($val): string
     {

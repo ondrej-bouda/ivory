@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Ivory\Data;
 
 use Ivory\Connection\IConnection;
+use Ivory\Ivory;
 
 class Relation
 {
@@ -18,7 +19,7 @@ class Relation
     public function getConnection(): IConnection
     {
         if ($this->connection === null) {
-            $this->connection = \Ivory\Ivory::getConnection();
+            $this->connection = Ivory::getConnection();
         }
 
         return $this->connection;

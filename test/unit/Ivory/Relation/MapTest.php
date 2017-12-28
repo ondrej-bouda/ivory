@@ -5,8 +5,9 @@ namespace Ivory\Relation;
 
 use Ivory\Data\Map\ITupleMap;
 use Ivory\Exception\UndefinedColumnException;
+use Ivory\IvoryTestCase;
 
-class MapTest extends \Ivory\IvoryTestCase
+class MapTest extends IvoryTestCase
 {
     /** @var IRelation relation with all tuples */
     private $fullRel;

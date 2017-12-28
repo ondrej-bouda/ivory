@@ -6,6 +6,7 @@ namespace Ivory\Connection;
 use Ivory\Exception\ResultDimensionException;
 use Ivory\Exception\StatementException;
 use Ivory\Exception\UsageException;
+use Ivory\IvoryTestCase;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
 use Ivory\Query\SqlCommand;
 use Ivory\Query\SqlRelationDefinition;
@@ -14,7 +15,7 @@ use Ivory\Result\IQueryResult;
 use Ivory\Lang\Sql\SqlState;
 use Ivory\Lang\Sql\SqlStateClass;
 
-class StatementExecutionTest extends \Ivory\IvoryTestCase
+class StatementExecutionTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;

@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace Ivory\Relation;
 
 use Ivory\Exception\AmbiguousException;
+use Ivory\IvoryTestCase;
 
-class AmbiguousRelationTest extends \Ivory\IvoryTestCase
+class AmbiguousRelationTest extends IvoryTestCase
 {
     /** @var IRelation */
     private $rel;

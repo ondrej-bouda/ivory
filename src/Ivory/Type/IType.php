@@ -1,10 +1,12 @@
 <?php
 namespace Ivory\Type;
 
+use Ivory\INamedDbObject;
+
 /**
  * PostgreSQL data type.
  */
-interface IType extends IValueSerializer, \Ivory\INamedDbObject
+interface IType extends IValueSerializer, INamedDbObject
 {
     /**
      * Parses a value of the represented type from its external representation.

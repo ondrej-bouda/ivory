@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Ivory\Showcase;
 
 use Ivory\Data\Map\IRelationMap;
+use Ivory\IvoryTestCase;
 use Ivory\Query\SqlRelationDefinition;
 use Ivory\Relation\IRelation;
 use Ivory\Relation\ITuple;
@@ -26,7 +27,7 @@ use Ivory\Relation\ITuple;
  * - `scheduled_timerange`, and
  * - `actual_timerange` (this might be `NULL` meaning the lesson has been cancelled).
  */
-class ProcessingTest extends \Ivory\IvoryTestCase
+class ProcessingTest extends IvoryTestCase
 {
     /** @var IRelation */
     private $teachers;

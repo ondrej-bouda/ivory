@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Ivory\Type\Std;
 
+use Ivory\Value\VarBitString;
+
 /**
  * Variable-length bit string.
  *
@@ -14,6 +16,6 @@ class VarBitStringType extends BitStringType
 {
     public function parseValue(string $str)
     {
-        return \Ivory\Value\VarBitString::fromString($str);
+        return VarBitString::fromString($str);
     }
 }

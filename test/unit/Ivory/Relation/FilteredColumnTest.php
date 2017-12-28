@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace Ivory\Relation;
 
+use Ivory\IvoryTestCase;
 use Ivory\Relation\Alg\IValueFilter;
 
-class FilteredColumnTest extends \Ivory\IvoryTestCase
+class FilteredColumnTest extends IvoryTestCase
 {
     /** @var IColumn */
     private $baseCol;

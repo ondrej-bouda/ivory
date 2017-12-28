@@ -5,13 +5,14 @@ namespace Ivory\Connection\Config;
 
 use Ivory\Connection\ITxHandle;
 use Ivory\Exception\StatementException;
+use Ivory\IvoryTestCase;
 use Ivory\Result\QueryResult;
 use Ivory\Lang\Sql\SqlState;
 use Ivory\Utils\System;
 use Ivory\Value\Date;
 use Ivory\Value\Quantity;
 
-class ConnConfigTest extends \Ivory\IvoryTestCase
+class ConnConfigTest extends IvoryTestCase
 {
     /** @var ConnConfig */
     private $cfg;

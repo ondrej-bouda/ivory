@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Ivory\Connection;
 
-class TransactionControlTest extends \Ivory\IvoryTestCase
+use Ivory\IvoryTestCase;
+
+class TransactionControlTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;
