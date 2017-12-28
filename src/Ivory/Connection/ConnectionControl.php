@@ -180,6 +180,7 @@ class ConnectionControl implements IConnectionControl
                 case PGSQL_POLLING_FAILED:
                     throw new ConnectionException('Failed waiting for connection');
                 case PGSQL_POLLING_READING:
+                    /** @noinspection PhpStatementHasEmptyBodyInspection */
                     while (!self::isStreamReadable($socket, 1)) { // TODO: make the timeout configurable
                     }
                     break;
