@@ -23,7 +23,6 @@ abstract class TimeBase implements IEqualable
 
 
     /**
-     * @internal
      * @param int $hour
      * @param int $minute
      * @param int|float $second
@@ -44,7 +43,6 @@ abstract class TimeBase implements IEqualable
     }
 
     /**
-     * @internal
      * @param int $hour
      * @param int $minute
      * @param int|float $second
@@ -73,7 +71,6 @@ abstract class TimeBase implements IEqualable
     }
 
     /**
-     * @internal
      * @param int|float $timestamp
      * @return int|float
      */
