@@ -16,7 +16,7 @@ use Ivory\Data\Map\IValueMap;
  * A client-side relation.
  *
  * A relation is essentially a `Countable` `Traversable` list of {@link ITuple}s, each conforming to the same scheme -
- * the relation columns. Note the relation is intentionally not `ArrayAccess`ible - use the {@link IRelation::tuple()}
+ * the relation columns. Note that the relation does not implement `ArrayAccess` - use the {@link IRelation::tuple()}
  * method to get to specific rows.
  */
 interface IRelation extends \Traversable, \Countable
