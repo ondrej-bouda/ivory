@@ -126,13 +126,14 @@ trait SqlPatternDefinitionMacros
      *                                    {@link SqlPattern} object) and values of their parameters;
      *                                  the very last argument may be a map of values for named parameters to set
      *                                    immediately
-     *
      * @return static
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
      */
     public static function fromFragments($fragment, ...$fragmentsAndParamValues): self
     {
+        // OPT: consider caching the overall pattern, saving the most of the hard work
+
         $overallSqlTorso = '';
         $overallPosPlaceholders = [];
         $overallNamedPlaceholderMap = [];
@@ -166,15 +167,7 @@ trait SqlPatternDefinitionMacros
             // add to the overall pattern
             $curSqlTorso = $curFragment->getSqlTorso();
             $curPosParams = $curFragment->getPositionalPlaceholders();
-            $curNamedParams = $curFragment->getNamedPlaceholderMap();
-            $fragmentStartsWithPlaceholder = (
-                ($curPosParams ? $curPosParams[0]->getOffset() == 0 : false)
-                ||
-                ($curNamedParams ? current($curNamedParams)[0]->getOffset() == 0 : false)
-            );
-            if (($overallEndsWithPlaceholder || preg_match('~[^ \t\r\n]$~uD', $overallSqlTorso)) &&
-                ($fragmentStartsWithPlaceholder || preg_match('~^[^ \t\r\n]~u', $curSqlTorso)))
-            {
+            if (self::needsSpaceAsGlue($curFragment, $overallSqlTorso, $overallEndsWithPlaceholder)) {
                 $overallSqlTorso .= ' ';
             }
             $sqlTorsoOffset = strlen($overallSqlTorso);
@@ -234,6 +227,39 @@ trait SqlPatternDefinitionMacros
         $def = new static($overallPattern, $overallPosParams);
         $def->setParams($namedParamValues);
         return $def;
+    }
+
+    private static function needsSpaceAsGlue(
+        SqlPattern $curFragment,
+        string $overallSqlTorso,
+        bool $overallEndsWithPlaceholder
+    ): bool {
+        /**
+         * The glue is needed if the overall part ends with a non-space character or placeholder and, at the same time,
+         * the current fragment starts with a non-space character or placeholder.
+         */
+
+        if (!$overallEndsWithPlaceholder && !preg_match('~[^ \t\r\n]$~uD', $overallSqlTorso)) {
+            return false;
+        }
+
+        $curPosParams = $curFragment->getPositionalPlaceholders();
+        if ($curPosParams && $curPosParams[0]->getOffset() == 0) {
+            return true;
+        }
+
+        $curNamedParams = $curFragment->getNamedPlaceholderMap();
+        // OPT: Require SqlPattern::$namedPlaceholderMap to be sorted by offset of the first occurrence of the name.
+        //      Then, take just the first item instead of iterating over all names.
+        foreach ($curNamedParams as $name => $occurrences) {
+            /** @var SqlPatternPlaceholder[] $occurrences */
+            if ($occurrences[0]->getOffset() == 0) { // occurrences are sorted, so checking only the first is sufficient
+                return true;
+            }
+        }
+
+        $curSqlTorso = $curFragment->getSqlTorso();
+        return (bool)preg_match('~^[^ \t\r\n]~u', $curSqlTorso);
     }
 
     final private function __construct(SqlPattern $sqlPattern, array $positionalParameters)
