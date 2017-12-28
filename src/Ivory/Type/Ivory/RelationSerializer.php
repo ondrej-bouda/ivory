@@ -135,10 +135,10 @@ VAL;
             $result .= ')';
             $isFirstTuple = false;
         }
-        $result .= <<<SQL
+        $result .= <<<VAL
 
 ) t (
-SQL;
+VAL;
         $identSerializer = $this->getIdentifierSerializer();
         foreach ($columns as $i => list($name, $serializer)) {
             if ($i > 0) {

@@ -57,7 +57,6 @@ class ProcessingTest extends \Ivory\IvoryTestCase
             ->rename(['id', 'firstname', 'lastname', 'abbr']);
 
         $this->rel = $conn->query(
-            /** @lang PostgreSQL */
             "WITH lesson (id, topic, scheduled_timerange, actual_timerange) AS (
                VALUES
                  (1, '1+1',  tsrange('2015-09-01 08:00', '2015-09-01 08:45'), tsrange('2015-09-01 08:00', '2015-09-01 08:45')),
