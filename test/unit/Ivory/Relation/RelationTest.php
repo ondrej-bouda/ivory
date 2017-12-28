@@ -689,6 +689,7 @@ class RelationTest extends \Ivory\IvoryTestCase
         $this->assertSame([1, 2, 3], $tuple->toList());
 
         try {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $map = $tuple->toMap();
             $this->fail(AmbiguousException::class . ' was expected');
         }
@@ -698,6 +699,7 @@ class RelationTest extends \Ivory\IvoryTestCase
         $this->assertSame(1, $tuple->a);
 
         try {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $val = $tuple->b;
             $this->fail(AmbiguousException::class . ' was expected');
         } catch (AmbiguousException $e) {

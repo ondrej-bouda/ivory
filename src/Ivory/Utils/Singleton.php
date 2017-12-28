@@ -41,5 +41,6 @@ trait Singleton
 
     final private function __clone() { }
 
+    /** @noinspection PhpUnusedPrivateMethodInspection */
     final private function __wakeup() { }
 }
