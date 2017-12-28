@@ -1,5 +1,5 @@
 <?php
-namespace Ivory\Showcase;
+namespace Ivory\Dev\Ideas;
 
 use Ivory\Data\DbTableRelation;
 use Ivory\Data\DbViewRelation;

@@ -1,4 +1,6 @@
 <?php
+namespace Ivory\Dev;
+
 use Ivory\Exception\StatementException;
 use Ivory\Ivory;
 

@@ -1,4 +1,6 @@
 <?php
+namespace Ivory\Dev\Php;
+
 // Handling of forward references to array items.
 // Necessary for TypeDictionary::$typeAliases.
 

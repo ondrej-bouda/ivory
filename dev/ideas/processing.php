@@ -10,7 +10,7 @@
  * proves to be a much more efficient data cruncher, so using this API is
  * recommended only for reasonably small result sets.
  */
-namespace Ivory\Showcase\Issues;
+namespace Ivory\Dev\Ideas;
 
 use Ivory\Data\StatementRelation;
 

@@ -8,5 +8,6 @@ namespace Ivory\Data;
  */
 class DbTableRelation extends Relation
 {
-
+    // TODO: design interface to allow querying table data easily; see /dev/ideas/DbTableRelation.php
+    // TODO: consider even joining tables
 }

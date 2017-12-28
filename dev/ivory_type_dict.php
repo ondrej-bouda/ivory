@@ -1,4 +1,6 @@
 <?php
+namespace Ivory\Dev;
+
 use Ivory\Ivory;
 use Ivory\Type\ITypeDictionary;
 

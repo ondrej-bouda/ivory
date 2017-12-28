@@ -4,7 +4,7 @@
  * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-custom.html customized options}.
  */
 
-namespace Ivory\Dev;
+namespace Ivory\Dev\Pgsql;
 
 use Ivory\Connection\Config\ConfigParam;
 

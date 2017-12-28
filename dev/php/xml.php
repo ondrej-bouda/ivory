@@ -1,4 +1,10 @@
 <?php
+namespace Ivory\Dev\Php;
+
+use DOMDocument;
+use DOMImplementation;
+use XMLReader;
+
 function first() {
     $doc = new DOMDocument();
     $doc->loadXML("<root/>");

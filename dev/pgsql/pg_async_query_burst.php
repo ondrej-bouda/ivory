@@ -3,7 +3,7 @@
  * Test of asynchronous queries, results collected only after sending the whole batch.
  */
 
-namespace Ivory\Dev;
+namespace Ivory\Dev\Pgsql;
 
 $conn = pg_connect('dbname=ivory_scratch user=ivory password=ivory', PGSQL_CONNECT_FORCE_NEW);
 if ($conn === false) {

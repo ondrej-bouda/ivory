@@ -1,4 +1,5 @@
 <?php
+namespace Ivory\Dev\Php;
 
 function foo(string $s, bool $b, int $i, float $f, /*null*/ $n)
 {

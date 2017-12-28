@@ -1,4 +1,6 @@
 <?php
+namespace Ivory\Dev\Php;
+
 function foo($lead1, $lead2, ...$varArgs) // non-variable trailing arguments would lead to a parse error
 {
 	var_export($varArgs);

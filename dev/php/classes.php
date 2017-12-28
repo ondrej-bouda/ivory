@@ -1,5 +1,5 @@
 <?php
-namespace Ivory\Dev;
+namespace Ivory\Dev\Php;
 
 class Foo { }
 
