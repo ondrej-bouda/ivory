@@ -5,7 +5,6 @@ namespace Ivory\Query;
 
 use Ivory\Exception\InvalidStateException;
 use Ivory\Exception\NoDataException;
-use Ivory\Exception\UndefinedTypeException;
 use Ivory\Lang\SqlPattern\SqlPattern;
 use Ivory\Lang\SqlPattern\SqlPatternPlaceholder;
 use Ivory\Type\ITypeDictionary;

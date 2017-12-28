@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Ivory\Relation;
 
-use Ivory\Exception\NotImplementedException;
 use Ivory\Relation\Alg\CallbackValueComparator;
 use Ivory\Relation\Alg\CallbackValueHasher;
 use Ivory\Relation\Alg\ITupleEvaluator;

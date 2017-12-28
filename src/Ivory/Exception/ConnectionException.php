@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Ivory\Exception;
 
 use Exception;
-use RuntimeException;
 
 /**
  * An exception above a database connection.

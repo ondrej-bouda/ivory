@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 namespace Ivory\Type\Std;
 
-use Ivory\Value\Line;
-use Ivory\Value\LineSegment;
 use Ivory\Value\Path;
-use Ivory\Value\Polygon;
 
 /**
  * Path on a plane.

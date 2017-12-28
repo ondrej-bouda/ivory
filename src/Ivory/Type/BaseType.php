@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Ivory\Type;
 
-use Ivory\Connection\IConnection;
 use Ivory\NamedDbObject;
 
 abstract class BaseType implements IType
