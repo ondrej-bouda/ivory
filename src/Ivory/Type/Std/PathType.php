@@ -40,10 +40,10 @@ class PathType extends CompoundGeometricType
                 }
                 return Path::fromPoints($points, ($isOpen ? Path::OPEN : Path::CLOSED));
             } catch (\InvalidArgumentException $e) {
-                $this->throwInvalidValue($str, $e);
+                throw $this->invalidValueException($str, $e);
             }
         } else {
-            $this->throwInvalidValue($str);
+            throw $this->invalidValueException($str);
         }
     }
 
@@ -57,7 +57,7 @@ class PathType extends CompoundGeometricType
             try {
                 $val = Path::fromPoints($val);
             } catch (\InvalidArgumentException $e) {
-                $this->throwInvalidValue($val, $e);
+                throw $this->invalidValueException($val, $e);
             }
         }
 

@@ -42,7 +42,7 @@ class LineType extends CompoundGeometricType
             try {
                 return Line::fromEquationCoeffs($m[1], $m[2], $m[3]);
             } catch (\InvalidArgumentException $e) {
-                $this->throwInvalidValue($str, $e);
+                throw $this->invalidValueException($str, $e);
             }
         }
 
@@ -52,7 +52,7 @@ class LineType extends CompoundGeometricType
             $lineSeg = $this->lineSegType->parseValue($str);
             return Line::fromPoints($lineSeg->getStart(), $lineSeg->getEnd());
         } catch (\InvalidArgumentException $e) {
-            $this->throwInvalidValue($str, $e);
+            throw $this->invalidValueException($str, $e);
         }
     }
 
@@ -67,7 +67,7 @@ class LineType extends CompoundGeometricType
                 $this->pointType->serializeValue($p2)
             );
         } else {
-            $this->throwInvalidValue($val);
+            throw $this->invalidValueException($val);
         }
     }
 }

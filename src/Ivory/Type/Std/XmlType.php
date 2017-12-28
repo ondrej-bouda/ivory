@@ -36,7 +36,7 @@ class XmlType extends BaseType
                 strtr($xml->toString(), ["'" => "''"])
             );
         } catch (\InvalidArgumentException $e) {
-            $this->throwInvalidValue($val);
+            throw $this->invalidValueException($val);
         }
     }
 }

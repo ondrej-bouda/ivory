@@ -22,7 +22,7 @@ abstract class BitStringType extends BaseType implements ITotallyOrderedType
         } elseif ($val instanceof BitString) {
             return "B'" . $val->toString() . "'";
         } else {
-            $this->throwInvalidValue($val);
+            throw $this->invalidValueException($val);
         }
     }
 

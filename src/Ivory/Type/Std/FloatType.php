@@ -26,7 +26,7 @@ class FloatType extends BaseType implements ITotallyOrderedType
         } elseif (strcasecmp($str, '-Infinity') == 0) {
             return -INF;
         } else {
-            $this->throwInvalidValue($str);
+            throw $this->invalidValueException($str);
         }
     }
 

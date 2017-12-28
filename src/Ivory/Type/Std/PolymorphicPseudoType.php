@@ -23,7 +23,7 @@ class PolymorphicPseudoType extends BaseType implements ITotallyOrderedType
         if ($val === null) {
             return 'NULL';
         } else {
-            $this->throwInvalidValue($val);
+            throw $this->invalidValueException($val);
         }
     }
 

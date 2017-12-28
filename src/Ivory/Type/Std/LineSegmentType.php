@@ -31,10 +31,10 @@ class LineSegmentType extends CompoundGeometricType
                 $end = $this->pointType->parseValue($m[5]);
                 return LineSegment::fromEndpoints($start, $end);
             } catch (\InvalidArgumentException $e) {
-                $this->throwInvalidValue($str, $e);
+                throw $this->invalidValueException($str, $e);
             }
         } else {
-            $this->throwInvalidValue($str);
+            throw $this->invalidValueException($str);
         }
     }
 
@@ -48,7 +48,7 @@ class LineSegmentType extends CompoundGeometricType
                 $this->pointType->serializeValue($val->getEnd())
             );
         } else {
-            $this->throwInvalidValue($val);
+            throw $this->invalidValueException($val);
         }
     }
 }

@@ -40,12 +40,12 @@ class TimeTzType extends BaseType implements ITotallyOrderedType
                 try {
                     $val = TimeTz::fromString($val);
                 } catch (\InvalidArgumentException $e) {
-                    $this->throwInvalidValue($val, $e);
+                    throw $this->invalidValueException($val, $e);
                 } catch (\OutOfRangeException $e) {
-                    $this->throwInvalidValue($val, $e);
+                    throw $this->invalidValueException($val, $e);
                 }
             } else {
-                $this->throwInvalidValue($val);
+                throw $this->invalidValueException($val);
             }
         }
 

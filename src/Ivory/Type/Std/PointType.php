@@ -23,7 +23,7 @@ class PointType extends BaseType implements ITotallyOrderedType
         if (preg_match($coordsRe, $str, $m) && is_numeric($m[2]) && is_numeric($m[3])) {
             return Point::fromCoords($m[2], $m[3]);
         } else {
-            $this->throwInvalidValue($str);
+            throw $this->invalidValueException($str);
         }
     }
 
@@ -36,7 +36,7 @@ class PointType extends BaseType implements ITotallyOrderedType
         if (is_array($val)) {
             $val = Point::fromCoords($val);
         } elseif (!$val instanceof Point) {
-            $this->throwInvalidValue($val);
+            throw $this->invalidValueException($val);
         }
 
         return sprintf('point(%s,%s)', $val->getX(), $val->getY());

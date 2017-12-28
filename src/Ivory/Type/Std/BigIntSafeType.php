@@ -44,7 +44,7 @@ class BigIntSafeType extends BaseType implements IDiscreteType
             if (preg_match('~^\s*-?[0-9]+\s*$~', $val)) {
                 return (string)$val;
             } else {
-                $this->throwInvalidValue($val);
+                throw $this->invalidValueException($val);
             }
         }
     }

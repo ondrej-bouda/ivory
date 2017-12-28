@@ -36,7 +36,7 @@ class VoidType extends BaseType implements ITotallyOrderedType
         } elseif ($val === self::void()) {
             return "''::{$this->getSchemaName()}.{$this->getName()}";
         } else {
-            $this->throwInvalidValue($val);
+            throw $this->invalidValueException($val);
         }
     }
 

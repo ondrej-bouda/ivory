@@ -26,7 +26,7 @@ class JsonBType extends JsonType
             $json = Json::fromEncoded($str);
             return ($json->getValue() === null ? Json::null() : $json->getValue());
         } catch (\InvalidArgumentException $e) {
-            $this->throwInvalidValue($str, $e);
+            throw $this->invalidValueException($str, $e);
         }
     }
 }

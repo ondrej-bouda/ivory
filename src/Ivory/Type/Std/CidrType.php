@@ -21,7 +21,7 @@ class CidrType extends BaseType
         try {
             return NetAddress::fromCidrString($str);
         } catch (\InvalidArgumentException $e) {
-            $this->throwInvalidValue($str, $e);
+            throw $this->invalidValueException($str, $e);
         }
     }
 

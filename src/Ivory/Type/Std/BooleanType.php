@@ -35,7 +35,7 @@ class BooleanType extends BaseType implements ITotallyOrderedType
                 return false;
 
             default:
-                $this->throwInvalidValue($str);
+                throw $this->invalidValueException($str);
         }
     }
 

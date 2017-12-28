@@ -14,9 +14,9 @@ abstract class BaseType implements IType
         $this->setName($schemaName, $name);
     }
 
-    protected function throwInvalidValue($val, ?\Exception $cause = null): void
+    protected function invalidValueException($val, ?\Exception $cause = null): \InvalidArgumentException
     {
         $message = "Value '$val' is not valid for type {$this->schemaName}.{$this->name}";
-        throw new \InvalidArgumentException($message, 0, $cause);
+        return new \InvalidArgumentException($message, 0, $cause);
     }
 }
