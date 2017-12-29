@@ -17,6 +17,8 @@ use Ivory\Data\Map\ArrayTupleMap;
 
 /**
  * Standard implementations of IRelation operations which are defined solely in terms of other operations.
+ *
+ * Note the trait may only be used by a class implementing {@link IRelation}.
  */
 trait RelationMacros
 {
@@ -26,7 +28,9 @@ trait RelationMacros
 
     public function col($offsetOrNameOrEvaluator): IColumn
     {
-        return $this->_colImpl($offsetOrNameOrEvaluator, $this->columns, $this->colNameMap, $this);
+        $thisRel = $this;
+        assert($thisRel instanceof IRelation);
+        return $this->_colImpl($offsetOrNameOrEvaluator, $this->columns, $this->colNameMap, $thisRel);
     }
 
 
@@ -151,7 +155,9 @@ trait RelationMacros
             $key = $tuple->value($lastKeyCol);
             $rel = $m->maybe($key);
             if ($rel === null) {
-                $rel = new CherryPickedRelation($this, []);
+                $thisRel = $this;
+                assert($thisRel instanceof IRelation);
+                $rel = new CherryPickedRelation($thisRel, []);
                 $m->put($key, $rel);
             }
             $rel->cherryPick($tupleOffset);
@@ -211,7 +217,9 @@ trait RelationMacros
 
     public function getIterator()
     {
-        return new RelationSeekableIterator($this);
+        $thisRel = $this;
+        assert($thisRel instanceof IRelation);
+        return new RelationSeekableIterator($thisRel);
     }
 
     //endregion
