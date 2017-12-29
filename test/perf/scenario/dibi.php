@@ -31,6 +31,7 @@ class DibiPerformanceTest implements IPerformanceTest
 
     public function userAuthentication(string $email, string $password): int
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         $user = $this->conn->fetch('SELECT * FROM usr WHERE lower(email) = lower(%s)', $email);
         if (!$user) {
             exit('Error authenticating the user');
@@ -42,6 +43,7 @@ class DibiPerformanceTest implements IPerformanceTest
             exit('User inactive');
         }
 
+        /** @noinspection PhpUnhandledExceptionInspection */
         $this->conn->query('UPDATE usr SET last_login = CURRENT_TIMESTAMP WHERE id = %i', $user['id']);
         if ($user['last_login']) {
             echo 'Welcome back since ' . $user['last_login']->format('n/j/Y H:i:s') . "\n";
@@ -55,6 +57,7 @@ class DibiPerformanceTest implements IPerformanceTest
 
     public function starredItems(int $userId)
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         $res = $this->conn->query(
             'SELECT item.id, item.name, item.description
              FROM usr_starred_item
@@ -71,6 +74,7 @@ class DibiPerformanceTest implements IPerformanceTest
         }
         unset($res);
         if ($items) {
+            /** @noinspection PhpUnhandledExceptionInspection */
             $res = $this->conn->query(
                 "SELECT item_id, category_id, name AS category_name
                  FROM item_category
@@ -102,6 +106,7 @@ class DibiPerformanceTest implements IPerformanceTest
 
     public function categoryItems(int $categoryId)
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         $res = $this->conn->query(
             'SELECT item.id, item.name, item.description, item.introduction_date,
                     COALESCE(
