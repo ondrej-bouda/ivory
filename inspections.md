@@ -13,5 +13,5 @@ Expected PhpStorm inspection results
 `Ivory test` inspection on _Project Test Files_
 -----------------------------------------------
 * Undefined:
-  * Undefined field: 121 warnings
+  * Undefined field: 127 warnings
 
