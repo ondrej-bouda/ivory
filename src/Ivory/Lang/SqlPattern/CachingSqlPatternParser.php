@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Lang\SqlPattern;
 
 use Ivory\Cache\ICacheControl;
+use Psr\Cache\CacheException;
 
 class CachingSqlPatternParser implements ISqlPatternParser
 {
@@ -20,12 +21,22 @@ class CachingSqlPatternParser implements ISqlPatternParser
     public function parse(string $sqlPatternString): SqlPattern
     {
         $cacheKey = $this->computeCacheKey($sqlPatternString);
-        $pattern = $this->cacheControl->getCached($cacheKey);
-        if ($pattern === null) {
-            $pattern = $this->parser->parse($sqlPatternString);
-            $this->cacheControl->cachePermanently($cacheKey, $pattern);
+        try {
+            $pattern = $this->cacheControl->getCached($cacheKey);
+            if ($pattern === null) {
+                $pattern = $this->parser->parse($sqlPatternString);
+                $this->cacheControl->cachePermanently($cacheKey, $pattern);
+            }
+            return $pattern;
+        } catch (CacheException $e) {
+            trigger_error(
+                'Error working with cache for SQL pattern. ' .
+                'Parsing the SQL pattern with a non-caching parser, the performance is degraded. ' .
+                'Exception message: ' . $e->getMessage(),
+                E_USER_WARNING
+            );
+            return $this->parser->parse($sqlPatternString);
         }
-        return $pattern;
     }
 
     private function computeCacheKey(string $sqlPattern): string
