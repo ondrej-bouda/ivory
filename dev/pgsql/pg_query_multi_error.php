@@ -3,7 +3,6 @@
  * Test of processing an error of a multiple queries sent in a single pg_query() call.
  * Besides, test catching notices from successful commands.
  */
-
 namespace Ivory\Dev\Pgsql;
 
 $conn = pg_connect('dbname=ivory_scratch user=ivory password=ivory', PGSQL_CONNECT_FORCE_NEW);

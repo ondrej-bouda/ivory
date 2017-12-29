@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Data\Set;
 
 class CustomSetTest extends \PHPUnit\Framework\TestCase

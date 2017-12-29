@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Relation\Alg;
 
 class CallbackValueComparator extends CallbackAlg implements IValueComparator

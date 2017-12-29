@@ -7,7 +7,6 @@
  * - implicit BEGIN is issued after each explicit COMMIT or ROLLBACK
  * - implicit COMMIT is issued after the batch unless there is an explicit BEGIN in this or any of the previous batches with no following explicit COMMIT or ROLLBACK
  */
-
 namespace Ivory\Dev\Pgsql;
 
 $conn = pg_connect('dbname=ivory_scratch user=ivory password=ivory', PGSQL_CONNECT_FORCE_NEW);

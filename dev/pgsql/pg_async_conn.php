@@ -14,7 +14,6 @@
  *
  * Anyway, the sample code shows asynchronous connecting to the database at least.
  */
-
 namespace Ivory\Dev\Pgsql;
 
 $connStr = 'dbname=ivory_scratch user=ivory password=ivory';

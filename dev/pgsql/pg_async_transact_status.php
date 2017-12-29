@@ -2,7 +2,6 @@
 /**
  * Test of getting transaction status immediately after starting to connect asynchronously.
  */
-
 namespace Ivory\Dev\Pgsql;
 
 $connStr = 'dbname=ivory_scratch user=ivory password=ivory';

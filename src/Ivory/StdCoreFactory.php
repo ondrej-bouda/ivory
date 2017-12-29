@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory;
 
 use Ivory\Cache\CacheControl;

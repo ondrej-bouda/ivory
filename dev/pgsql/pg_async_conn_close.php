@@ -2,7 +2,6 @@
 /**
  * Test of asynchronous connection closed immediately after starting connecting.
  */
-
 namespace Ivory\Dev\Pgsql;
 
 $connStr = 'dbname=ivory_scratch user=ivory password=ivory';
