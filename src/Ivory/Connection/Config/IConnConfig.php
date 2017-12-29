@@ -1,7 +1,7 @@
 <?php
+declare(strict_types=1);
 namespace Ivory\Connection\Config;
 
-use Ivory\Connection\TxConfig;
 use Ivory\Value\Quantity;
 
 /**

@@ -1,18 +1,18 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Query;
 
 use Ivory\Connection\Config\ConfigParam;
 use Ivory\Connection\IConnection;
 use Ivory\Connection\ITxHandle;
 use Ivory\Exception\UndefinedTypeException;
+use Ivory\IvoryTestCase;
 use Ivory\Type\ITypeDictionary;
 use Ivory\Value\Box;
 use Ivory\Value\Decimal;
 use Ivory\Value\Time;
 
-class SqlRelationDefinitionTest extends \Ivory\IvoryTestCase
+class SqlRelationDefinitionTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;

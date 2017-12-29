@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Query;
 
 use Ivory\Connection\IConnection;
+use Ivory\IvoryTestCase;
 use Ivory\Relation\ITuple;
 
-class LimitedRelationDefinitionTest extends \Ivory\IvoryTestCase
+class LimitedRelationDefinitionTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;

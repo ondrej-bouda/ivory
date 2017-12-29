@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Relation;
 
 use Ivory\Connection\Config\ConfigParam;
@@ -8,6 +7,7 @@ use Ivory\Connection\IConnection;
 use Ivory\Data\Set\CustomSet;
 use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\UndefinedColumnException;
+use Ivory\IvoryTestCase;
 use Ivory\Value\Composite;
 use Ivory\Value\Box;
 use Ivory\Value\Date;
@@ -22,7 +22,7 @@ use Ivory\Value\TimestampTz;
 use Ivory\Value\TimeTz;
 use Ivory\Value\TxIdSnapshot;
 
-class RelationTest extends \Ivory\IvoryTestCase
+class RelationTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;
@@ -262,7 +262,7 @@ class RelationTest extends \Ivory\IvoryTestCase
         foreach ($rel as $tuple) {
             $albums = [];
             foreach ($tuple->albums as $album) {
-                /** @var Composite $album */
+                assert($album instanceof Composite);
                 $albums[] = $album->toMap();
             }
             $results[$tuple->artist_name] = $albums;
@@ -283,9 +283,11 @@ class RelationTest extends \Ivory\IvoryTestCase
             $results
         );
 
+        $album = $rel->value('albums', 2)[1];
+        assert($album instanceof Composite);
         $this->assertEquals(
             ['id' => 4, 'name' => 'Live One', 'year' => 2005, 'released' => Date::fromISOString('2005-01-01')],
-            $rel->value('albums', 2)[1]->toMap()
+            $album->toMap()
         );
         $this->assertSame('Live One', $rel->value('albums', 2)[1][1]);
         $this->assertSame('Live One', $rel->value('albums', 2)[1]['name']);
@@ -689,6 +691,7 @@ class RelationTest extends \Ivory\IvoryTestCase
         $this->assertSame([1, 2, 3], $tuple->toList());
 
         try {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $map = $tuple->toMap();
             $this->fail(AmbiguousException::class . ' was expected');
         }
@@ -698,6 +701,7 @@ class RelationTest extends \Ivory\IvoryTestCase
         $this->assertSame(1, $tuple->a);
 
         try {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $val = $tuple->b;
             $this->fail(AmbiguousException::class . ' was expected');
         } catch (AmbiguousException $e) {

@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Connection;
 
-class TransactionControlTest extends \Ivory\IvoryTestCase
+use Ivory\IvoryTestCase;
+
+class TransactionControlTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;
@@ -124,6 +125,30 @@ class TransactionControlTest extends \Ivory\IvoryTestCase
             $this->assertSame(TxConfig::ISOLATION_SERIALIZABLE, $actualConfig->getIsolationLevel());
             $this->assertTrue($actualConfig->isReadOnly());
             $this->assertFalse($actualConfig->isDeferrable());
+        } finally {
+            if ($tx !== null) {
+                $tx->rollbackIfOpen();
+            }
+            $conn1->disconnect();
+        }
+    }
+
+    public function testPrepareTransaction()
+    {
+        $conn1 = $this->createNewIvoryConnection('conn1');
+        $tx = null;
+        try {
+            $tx = $conn1->startTransaction();
+            $txName1 = $tx->prepareTransaction();
+            $this->assertTrue(strlen($txName1) >= 8);
+            $conn1->rollbackPreparedTransaction($txName1);
+
+            $tx = $conn1->startTransaction();
+            $txName2 = $tx->prepareTransaction();
+            $this->assertTrue(strlen($txName2) >= 8);
+            $conn1->rollbackPreparedTransaction($txName2);
+
+            $this->assertNotSame($txName1, $txName2);
         } finally {
             if ($tx !== null) {
                 $tx->rollbackIfOpen();

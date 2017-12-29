@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Value;
 
 use Ivory\Exception\UndefinedOperationException;
@@ -54,6 +53,10 @@ class QuantityTest extends \PHPUnit\Framework\TestCase
         $q = Quantity::fromValue(-123.0, '');
         $this->assertSame(-123.0, $q->getValue());
         $this->assertSame(null, $q->getUnit());
+
+        $q = Quantity::fromValue('5', 'apple');
+        $this->assertSame(5, $q->getValue());
+        $this->assertSame('apple', $q->getUnit());
 
         try {
             Quantity::fromValue('5 apples', 'unit');

@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
 use Ivory\Value\Circle;
@@ -30,10 +29,10 @@ class CircleType extends CompoundGeometricType
                 $center = $this->pointType->parseValue($m[4]);
                 return Circle::fromCoords($center, $m[5]);
             } catch (\InvalidArgumentException $e) {
-                $this->throwInvalidValue($str, $e);
+                throw $this->invalidValueException($str, $e);
             }
         } else {
-            $this->throwInvalidValue($str);
+            throw $this->invalidValueException($str);
         }
     }
 
@@ -47,7 +46,7 @@ class CircleType extends CompoundGeometricType
                 $val->getRadius()
             );
         } else {
-            $this->throwInvalidValue($val);
+            throw $this->invalidValueException($val);
         }
     }
 }

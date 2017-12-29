@@ -1,9 +1,7 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Relation;
 
-use Ivory\Exception\NotImplementedException;
 use Ivory\Relation\Alg\CallbackValueComparator;
 use Ivory\Relation\Alg\CallbackValueHasher;
 use Ivory\Relation\Alg\ITupleEvaluator;
@@ -67,7 +65,7 @@ class Column implements \IteratorAggregate, IColumn
                 return (is_int($value) || is_string($value) ? $value : serialize($value));
             });
         } elseif ($hasher === 1) {
-            $hasher = new CallbackValueHasher(function ($value) {
+            $hasher = new CallbackValueHasher(function (/** @noinspection PhpUnusedParameterInspection */ $value) {
                 return 1;
             });
         } elseif (!$hasher instanceof IValueHasher) {

@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Relation;
 
+use Ivory\IvoryTestCase;
 use Ivory\Relation\Alg\IValueFilter;
 
-class FilteredColumnTest extends \Ivory\IvoryTestCase
+class FilteredColumnTest extends IvoryTestCase
 {
     /** @var IColumn */
     private $baseCol;
@@ -25,7 +25,7 @@ class FilteredColumnTest extends \Ivory\IvoryTestCase
     public function testCount()
     {
         $this->assertSame(3, $this->baseCol->count());
-        $this->assertSame(3, $this->baseCol->filter(function ($n) { return true; })->count());
+        $this->assertSame(3, $this->baseCol->filter(function () { return true; })->count());
         $this->assertSame(2, $this->baseCol->filter(function ($n) { return ($n % 2 == 1); })->count());
         $this->assertSame(2, $this->baseCol->filter(function ($n) { return $n % 2; })->count());
         $this->assertSame(1, $this->baseCol->filter(function ($n) { return ($n > 4); })->count());

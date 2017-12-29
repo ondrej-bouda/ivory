@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
 use Ivory\Type\BaseType;
@@ -23,7 +22,7 @@ abstract class JsonType extends BaseType
             try {
                 $val = Json::fromValue($val);
             } catch (\InvalidArgumentException $e) {
-                $this->throwInvalidValue($val, $e);
+                throw $this->invalidValueException($val, $e);
             }
         }
 

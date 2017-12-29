@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Showcase;
 
 use Ivory\Connection\IConnection;
+use Ivory\IvoryTestCase;
 use Ivory\Query\SqlRelationDefinition;
 use Ivory\Type\IType;
 use Ivory\Type\IValueSerializer;
@@ -21,7 +21,7 @@ use Ivory\Value\XmlDocument;
 /**
  * This test presents the type system support.
  */
-class TypeSystemTest extends \Ivory\IvoryTestCase
+class TypeSystemTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;

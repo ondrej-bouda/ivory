@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Value;
 
 class PolygonTest extends \PHPUnit\Framework\TestCase

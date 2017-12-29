@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Ivory\Connection;
 
 use Ivory\Type\ITypeDictionary;

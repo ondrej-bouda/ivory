@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Ivory;
 
 use Ivory\INamedDbObject;
@@ -135,10 +134,10 @@ VAL;
             $result .= ')';
             $isFirstTuple = false;
         }
-        $result .= <<<SQL
+        $result .= <<<VAL
 
 ) t (
-SQL;
+VAL;
         $identSerializer = $this->getIdentifierSerializer();
         foreach ($columns as $i => list($name, $serializer)) {
             if ($i > 0) {

@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
 use Ivory\Value\Json;
@@ -20,7 +19,7 @@ class JsonExactType extends JsonType
         try {
             return Json::fromEncoded($str);
         } catch (\InvalidArgumentException $e) {
-            $this->throwInvalidValue($str, $e);
+            throw $this->invalidValueException($str, $e);
         }
     }
 }

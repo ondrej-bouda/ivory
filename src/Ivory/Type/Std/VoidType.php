@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
 use Ivory\Exception\IncomparableException;
@@ -36,7 +35,7 @@ class VoidType extends BaseType implements ITotallyOrderedType
         } elseif ($val === self::void()) {
             return "''::{$this->getSchemaName()}.{$this->getName()}";
         } else {
-            $this->throwInvalidValue($val);
+            throw $this->invalidValueException($val);
         }
     }
 
@@ -46,7 +45,7 @@ class VoidType extends BaseType implements ITotallyOrderedType
             return null;
         }
         if ($a === self::void() && $b === self::void()) {
-            return true;
+            return 0;
         }
         throw new IncomparableException('Invalid values to compare as ' . VoidType::class);
     }

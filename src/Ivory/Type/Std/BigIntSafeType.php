@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
+use Ivory\Type\BaseType;
 use Ivory\Type\IDiscreteType;
 
 /**
@@ -13,7 +13,7 @@ use Ivory\Type\IDiscreteType;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html#DATATYPE-INT
  */
-class BigIntSafeType extends \Ivory\Type\BaseType implements IDiscreteType
+class BigIntSafeType extends BaseType implements IDiscreteType
 {
     public static function createForRange($min, $max, string $schemaName, string $typeName): IDiscreteType
     {
@@ -43,7 +43,7 @@ class BigIntSafeType extends \Ivory\Type\BaseType implements IDiscreteType
             if (preg_match('~^\s*-?[0-9]+\s*$~', $val)) {
                 return (string)$val;
             } else {
-                $this->throwInvalidValue($val);
+                throw $this->invalidValueException($val);
             }
         }
     }

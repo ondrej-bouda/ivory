@@ -1,7 +1,8 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Connection;
+
+use Ivory\Exception\UnsupportedException;
 
 class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
 {
@@ -167,7 +168,7 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
         try {
             ConnectionParameters::fromUri('pgsql://localhost');
             $this->fail('\Ivory\UnsupportedException expected');
-        } catch (\Ivory\Exception\UnsupportedException $e) {
+        } catch (UnsupportedException $e) {
         }
     }
 

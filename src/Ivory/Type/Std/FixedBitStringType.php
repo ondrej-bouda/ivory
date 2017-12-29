@@ -1,7 +1,8 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
+
+use Ivory\Value\FixedBitString;
 
 /**
  * Fixed-length bit string.
@@ -14,6 +15,6 @@ class FixedBitStringType extends BitStringType
 {
     public function parseValue(string $str)
     {
-        return \Ivory\Value\FixedBitString::fromString($str);
+        return FixedBitString::fromString($str);
     }
 }

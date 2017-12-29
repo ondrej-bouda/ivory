@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Value;
 
 use Ivory\Exception\ImmutableException;
@@ -384,6 +383,8 @@ abstract class BitString implements IEqualable, \ArrayAccess
     /**
      * Setting a bit is not implemented - the bit string is immutable.
      *
+     * @param mixed $offset
+     * @param mixed $value
      * @throws ImmutableException
      */
     public function offsetSet($offset, $value)
@@ -394,6 +395,7 @@ abstract class BitString implements IEqualable, \ArrayAccess
     /**
      * Unsetting a bit is not implemented - the bit string is immutable.
      *
+     * @param mixed $offset
      * @throws ImmutableException
      */
     public function offsetUnset($offset)

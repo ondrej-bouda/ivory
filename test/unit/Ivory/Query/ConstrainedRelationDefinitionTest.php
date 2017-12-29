@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Query;
 
 use Ivory\Connection\IConnection;
 use Ivory\Ivory;
+use Ivory\IvoryTestCase;
 use Ivory\Lang\Sql\ISqlPredicate;
 
-class ConstrainedRelationDefinitionTest extends \Ivory\IvoryTestCase
+class ConstrainedRelationDefinitionTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;

@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
 use Ivory\Type\BaseType;
@@ -21,7 +20,7 @@ class MacAddrType extends BaseType
         try {
             return MacAddr::fromString($str);
         } catch (\InvalidArgumentException $e) {
-            $this->throwInvalidValue($str, $e);
+            throw $this->invalidValueException($str, $e);
         }
     }
 

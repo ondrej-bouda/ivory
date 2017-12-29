@@ -2,7 +2,6 @@
 /**
  * Test of PostgreSQL COPY FROM/TO facility.
  */
-
 namespace Ivory\Dev\Pgsql;
 
 $conn = pg_connect('dbname=ivory_scratch user=ivory password=ivory', PGSQL_CONNECT_FORCE_NEW);

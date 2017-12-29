@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Value;
 
 class TimeTest extends \PHPUnit\Framework\TestCase
@@ -198,7 +197,7 @@ class TimeTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame('15:45:03 \\u 123400', self::t(15, 45, 3.1234)->format('H:i:s \\\\\\u u'));
 
-        $this->assertSame('1.1.1970', self::t(8, 45, 3, 0)->format('j.n.Y'));
+        $this->assertSame('1.1.1970', self::t(8, 45, 3)->format('j.n.Y'));
     }
 
     public function testToUnixTimestamp()

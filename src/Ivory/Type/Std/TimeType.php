@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
 use Ivory\Type\BaseType;
@@ -40,12 +39,12 @@ class TimeType extends BaseType implements ITotallyOrderedType
                 try {
                     $val = Time::fromString($val);
                 } catch (\InvalidArgumentException $e) {
-                    $this->throwInvalidValue($val, $e);
+                    throw $this->invalidValueException($val, $e);
                 } catch (\OutOfRangeException $e) {
-                    $this->throwInvalidValue($val, $e);
+                    throw $this->invalidValueException($val, $e);
                 }
             } else {
-                $this->throwInvalidValue($val);
+                throw $this->invalidValueException($val);
             }
         }
 

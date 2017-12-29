@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Utils;
 
 /**
@@ -41,5 +40,6 @@ trait Singleton
 
     final private function __clone() { }
 
+    /** @noinspection PhpUnusedPrivateMethodInspection */
     final private function __wakeup() { }
 }

@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
 use Ivory\Connection\Config\ConfigParam;
@@ -48,7 +47,7 @@ class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedTy
         try {
             return Money::fromString($str, $decSep);
         } catch (\InvalidArgumentException $e) {
-            $this->throwInvalidValue($str, $e);
+            throw $this->invalidValueException($str, $e);
         }
     }
 
@@ -67,7 +66,7 @@ class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedTy
         } elseif (is_string($val)) {
             $str = Money::fromString($val, '.')->getAmount()->toString();
         } else {
-            $this->throwInvalidValue($val);
+            throw $this->invalidValueException($val);
         }
 
         return $str . '::money';

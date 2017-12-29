@@ -1,12 +1,8 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
-use Ivory\Value\Line;
-use Ivory\Value\LineSegment;
 use Ivory\Value\Path;
-use Ivory\Value\Polygon;
 
 /**
  * Path on a plane.
@@ -43,10 +39,10 @@ class PathType extends CompoundGeometricType
                 }
                 return Path::fromPoints($points, ($isOpen ? Path::OPEN : Path::CLOSED));
             } catch (\InvalidArgumentException $e) {
-                $this->throwInvalidValue($str, $e);
+                throw $this->invalidValueException($str, $e);
             }
         } else {
-            $this->throwInvalidValue($str);
+            throw $this->invalidValueException($str);
         }
     }
 
@@ -60,7 +56,7 @@ class PathType extends CompoundGeometricType
             try {
                 $val = Path::fromPoints($val);
             } catch (\InvalidArgumentException $e) {
-                $this->throwInvalidValue($val, $e);
+                throw $this->invalidValueException($val, $e);
             }
         }
 
@@ -70,9 +66,9 @@ class PathType extends CompoundGeometricType
         }
 
         return sprintf("path '%s%s%s'",
-            ($val->isOpen ? '[' : '('),
+            ($val->isOpen() ? '[' : '('),
             implode(',', $points),
-            ($val->isOpen ? ']' : ')')
+            ($val->isOpen() ? ']' : ')')
         );
     }
 }

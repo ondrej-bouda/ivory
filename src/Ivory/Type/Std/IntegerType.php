@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
+use Ivory\Type\BaseType;
 use Ivory\Type\IDiscreteType;
 
 /**
@@ -12,7 +12,7 @@ use Ivory\Type\IDiscreteType;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html#DATATYPE-INT
  */
-class IntegerType extends \Ivory\Type\BaseType implements IDiscreteType
+class IntegerType extends BaseType implements IDiscreteType
 {
     public function parseValue(string $str)
     {

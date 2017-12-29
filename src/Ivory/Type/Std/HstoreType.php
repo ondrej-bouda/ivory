@@ -1,7 +1,8 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
+
+use Ivory\Type\BaseType;
 
 /**
  * String hash table.
@@ -13,7 +14,7 @@ namespace Ivory\Type\Std;
  *
  * @see https://www.postgresql.org/docs/9.6/static/hstore.html
  */
-class HstoreType extends \Ivory\Type\BaseType
+class HstoreType extends BaseType
 {
     public function parseValue(string $str)
     {

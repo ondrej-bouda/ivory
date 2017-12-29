@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Data\Set;
 
 use Ivory\Relation\Alg\CallbackValueHasher;

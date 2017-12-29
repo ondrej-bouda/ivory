@@ -1,11 +1,10 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Utils;
 
 class StringUtilsTest extends \PHPUnit\Framework\TestCase
 {
-    public function testBasic()
+    public function testPregReplaceCallbackWithOffset()
     {
         $str = 'foo bar   baAz aaa  aaa';
         $re = '~ [[:alnum:]]+ ([aA]) [[:alnum:]]+ ~x';
@@ -23,5 +22,16 @@ class StringUtilsTest extends \PHPUnit\Framework\TestCase
         $repl = StringUtils::pregReplaceCallbackWithOffset($re, $tester, $str, 3, $count);
         $this->assertSame('foo XXX   XXXX XXX  aaa', $repl);
         $this->assertSame(3, $count);
+    }
+
+    public function testRandomHexString()
+    {
+        for ($i = 0; $i <= 33; $i++) {
+            $s = StringUtils::randomHexString($i);
+            $this->assertEquals($i, strlen($s), "Error generating string of length $i");
+        }
+
+        $this->expectException(\DomainException::class);
+        StringUtils::randomHexString(-1);
     }
 }

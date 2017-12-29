@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Connection;
 
 use Ivory\Ivory;
@@ -12,6 +11,7 @@ use Ivory\Type\TrackingTypeDictionary;
 use Ivory\Type\TypeDictionary;
 use Ivory\Type\TypeProviderList;
 use Ivory\Type\TypeRegister;
+use Psr\Cache\CacheException;
 
 class TypeControl implements ITypeControl
 {
@@ -57,13 +57,31 @@ class TypeControl implements ITypeControl
             if ($this->typeDictionary instanceof TrackingTypeDictionary) {
                 $this->typeDictionary->disposeUnusedTypes();
             }
-            $this->connection->cachePermanently(ITypeControl::TYPE_DICTIONARY_CACHE_KEY, $this->typeDictionary);
+            try {
+                $this->connection->cachePermanently(ITypeControl::TYPE_DICTIONARY_CACHE_KEY, $this->typeDictionary);
+            } catch (CacheException $e) {
+                trigger_error(
+                    'Error caching the type dictionary, the performance will be degraded. Exception message: ' .
+                    $e->getMessage(),
+                    E_USER_WARNING
+                );
+            }
         }
     }
 
     private function loadTypeDictionaryFromCache(): ?ITypeDictionary
     {
-        $dict = $this->connection->getCached(ITypeControl::TYPE_DICTIONARY_CACHE_KEY);
+        try {
+            $dict = $this->connection->getCached(ITypeControl::TYPE_DICTIONARY_CACHE_KEY);
+        } catch (CacheException $e) {
+            trigger_error(
+                'Error retrieving the type dictionary from cache, the performance is degraded. Exception message: ' .
+                $e->getMessage(),
+                E_USER_WARNING
+            );
+            return null;
+        }
+
         if ($dict instanceof ITypeDictionary) {
             if ($dict instanceof TrackingTypeDictionary) {
                 // type usage watching is no more necessary - all types retrieved from cache are considered as being used

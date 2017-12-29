@@ -1,10 +1,7 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
-use Ivory\Value\Line;
-use Ivory\Value\LineSegment;
 use Ivory\Value\Polygon;
 
 /**
@@ -41,10 +38,10 @@ class PolygonType extends CompoundGeometricType
                 }
                 return Polygon::fromPoints($points);
             } catch (\InvalidArgumentException $e) {
-                $this->throwInvalidValue($str, $e);
+                throw $this->invalidValueException($str, $e);
             }
         } else {
-            $this->throwInvalidValue($str);
+            throw $this->invalidValueException($str);
         }
     }
 
@@ -58,7 +55,7 @@ class PolygonType extends CompoundGeometricType
             try {
                 $val = Polygon::fromPoints($val);
             } catch (\InvalidArgumentException $e) {
-                $this->throwInvalidValue($val, $e);
+                throw $this->invalidValueException($val, $e);
             }
         }
 

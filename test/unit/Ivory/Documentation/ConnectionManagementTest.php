@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Documentation;
 
 use Ivory\Ivory;
+use Ivory\IvoryTestCase;
 
-class ConnectionManagementTest extends \Ivory\IvoryTestCase
+class ConnectionManagementTest extends IvoryTestCase
 {
     public function testConnectionSetup()
     {

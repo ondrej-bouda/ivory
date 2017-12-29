@@ -1,12 +1,13 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory;
 
-class IvoryTester extends \PHPUnit\DbUnit\DefaultTester
+use PHPUnit\DbUnit;
+
+class IvoryTester extends DbUnit\DefaultTester
 {
     protected function getSetUpOperation()
     {
-        return \PHPUnit\DbUnit\Operation\Factory::CLEAN_INSERT(true); // cascading is necessary for truncating tables referred to by foreign keys
+        return DbUnit\Operation\Factory::CLEAN_INSERT(true); // cascading is necessary for truncating tables referred to by foreign keys
     }
 }

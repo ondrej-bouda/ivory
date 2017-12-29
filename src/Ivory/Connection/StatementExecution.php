@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Connection;
 
 use Ivory\Exception\InvalidStateException;
@@ -205,9 +204,10 @@ class StatementExecution implements IStatementExecution
         if ($resultHandler === false) {
             throw new ConnectionException('No results received from the database.');
         }
-        /* For erroneous queries, one must call pg_get_result() once again to update the structures at the client side.
+        /**
+         * For erroneous queries, one must call pg_get_result() once again to update the structures at the client side.
          * Even worse, a loop might actually be needed according to
-         * http://www.postgresql.org/message-id/flat/gtitqq$26l3$1@news.hub.org#gtitqq$26l3$1@news.hub.org,
+         * {@link http://www.postgresql.org/message-id/flat/gtitqq$26l3$1@news.hub.org#gtitqq$26l3$1@news.hub.org},
          * which does not sound logical, though, and hopefully was just meant as a generic way to processing results of
          * multiple statements sent in a single pg_send_query() call. Anyway, looping seems to be the safest solution.
          */

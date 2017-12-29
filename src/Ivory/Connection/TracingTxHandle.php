@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Connection;
 
 /**
@@ -14,9 +13,12 @@ class TracingTxHandle extends TxHandle
 {
     private $backtrace;
 
-    public function __construct(IStatementExecution $stmtExec, IObservableTransactionControl $observableTxCtl)
-    {
-        parent::__construct($stmtExec, $observableTxCtl);
+    public function __construct(
+        IStatementExecution $stmtExec,
+        IObservableTransactionControl $observableTxCtl,
+        ISessionControl $sessionCtl
+    ) {
+        parent::__construct($stmtExec, $observableTxCtl, $sessionCtl);
 
         $this->backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
     }

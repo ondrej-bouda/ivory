@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Relation;
 
 use Ivory\Exception\AmbiguousException;
@@ -67,12 +66,14 @@ class TupleTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(5, $this->ambiguousColsTuple[2]);
 
         try {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $val = $this->simpleTuple[4];
             $this->fail(UndefinedColumnException::class . ' was expected');
         } catch (UndefinedColumnException $e) {
         }
 
         try {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $val = $this->simpleTuple[-1];
             $this->fail(UndefinedColumnException::class . ' was expected');
         } catch (UndefinedColumnException $e) {
@@ -105,12 +106,14 @@ class TupleTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(1, $this->ambiguousColsTuple->a);
 
         try {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $val = $this->ambiguousColsTuple->b;
             $this->fail(AmbiguousException::class . ' was expected');
         } catch (AmbiguousException $e) {
         }
 
         try {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $val = $this->simpleTuple->d;
             $this->fail(UndefinedColumnException::class . ' was expected');
         } catch (UndefinedColumnException $e) {
@@ -151,24 +154,28 @@ class TupleTest extends \PHPUnit\Framework\TestCase
         ));
 
         try {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $val = $this->simpleTuple->value(-1);
             $this->fail(UndefinedColumnException::class . ' was expected');
         } catch (UndefinedColumnException $e) {
         }
 
         try {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $val = $this->simpleTuple->value(4);
             $this->fail(UndefinedColumnException::class . ' was expected');
         } catch (UndefinedColumnException $e) {
         }
 
         try {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $val = $this->anonymousColsTuple->value('c');
             $this->fail(UndefinedColumnException::class . ' was expected');
         } catch (UndefinedColumnException $e) {
         }
 
         try {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $val = $this->ambiguousColsTuple->value('b');
             $this->fail(AmbiguousException::class . ' was expected');
         } catch (AmbiguousException $e) {

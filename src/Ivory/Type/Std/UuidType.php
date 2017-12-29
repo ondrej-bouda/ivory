@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
 use Ivory\Type\BaseType;
@@ -31,7 +30,7 @@ class UuidType extends BaseType implements ITotallyOrderedType
         }
 
         if (!preg_match('~^(\{)?(?:[[:xdigit:]]{4}-?){7}[[:xdigit:]]{4}(?(1)\})$~i', $val)) {
-            $this->throwInvalidValue($val);
+            throw $this->invalidValueException($val);
         }
         return "'" . strtr($val, ["'" => "''"]) . "'";
     }

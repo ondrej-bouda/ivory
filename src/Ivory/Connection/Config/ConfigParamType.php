@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Connection\Config;
 
 use Ivory\Exception\UnsupportedException;
@@ -16,7 +15,7 @@ class ConfigParamType
     const BOOL = 1;
     const STRING = 2;
     const INTEGER = 3;
-    const INTEGER_WITH_UNIT = 4;
+    const INTEGER_WITH_UNIT = 4; // NOTE: PostgreSQL only seems to allow integers with unit, not floats
     const REAL = 5;
     const ENUM = 6;
 

@@ -1,5 +1,8 @@
 <?php
+declare(strict_types=1);
 namespace Ivory\Cache;
+
+use Psr\Cache\CacheException;
 
 /**
  * Caching functionality for Ivory.
@@ -27,6 +30,7 @@ interface ICacheControl
      * @param string $cacheKey key to cache the object under; relevant for later identification when retrieving
      * @param mixed $object the object to cache
      * @return bool whether the object has been cached successfully
+     * @throws CacheException
      */
     function cachePermanently(string $cacheKey, $object): bool;
 
@@ -35,6 +39,7 @@ interface ICacheControl
      *
      * @param string $cacheKey key to get the cached object for
      * @return mixed the cached object, or <tt>null</tt> if no such item is cached or no caching mechanism is set up
+     * @throws CacheException
      */
     function getCached(string $cacheKey);
 
@@ -43,6 +48,7 @@ interface ICacheControl
      *
      * @param string|null $cacheKey key of object to flush
      * @return bool whether the operation has been successful
+     * @throws CacheException
      */
     function flushCache(string $cacheKey): bool;
 }

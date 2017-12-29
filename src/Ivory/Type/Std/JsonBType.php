@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
 use Ivory\Value\Json;
@@ -26,7 +25,7 @@ class JsonBType extends JsonType
             $json = Json::fromEncoded($str);
             return ($json->getValue() === null ? Json::null() : $json->getValue());
         } catch (\InvalidArgumentException $e) {
-            $this->throwInvalidValue($str, $e);
+            throw $this->invalidValueException($str, $e);
         }
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Ivory\Relation;
 
 use Ivory\Data\Set\ISet;
@@ -16,7 +17,7 @@ use Ivory\Data\Map\IValueMap;
  * A client-side relation.
  *
  * A relation is essentially a `Countable` `Traversable` list of {@link ITuple}s, each conforming to the same scheme -
- * the relation columns. Note the relation is intentionally not `ArrayAccess`ible - use the {@link IRelation::tuple()}
+ * the relation columns. Note that the relation does not implement `ArrayAccess` - use the {@link IRelation::tuple()}
  * method to get to specific rows.
  */
 interface IRelation extends \Traversable, \Countable
@@ -184,7 +185,10 @@ interface IRelation extends \Traversable, \Countable
      * the preceding columns specify the mapping. Specification of each column is the same as for {@link col()}.
      *
      * E.g., if this was a relation of three columns, `id`, `firstname`, and `lastname`, then
-     * `$this->assoc('id', function (ITuple $t) { return $t['firstname'] . ' ' . $t['lastname']; })`
+     * ```
+     * <?php
+     * $this->assoc('id', function (ITuple $t) { return $t['firstname'] . ' ' . $t['lastname']; });
+     * ```
      * would return an {@link IValueMap} with person IDs as keys and their full names as values.
      *
      * Note that the last level of association (i.e., mapping according to the last but one argument) leads to
@@ -194,7 +198,8 @@ interface IRelation extends \Traversable, \Countable
      *
      * @param int|string|ITupleEvaluator|\Closure $col1 the first column specifying the association
      * @param int|string|ITupleEvaluator|\Closure $col2 the first column specifying the association
-     * @param (int|string|ITupleEvaluator|\Closure)[] ...$moreCols additional columns specifying the association
+     * @param array ...$moreCols optional additional columns specifying further dimensions of the association, each of
+     *                             type <tt>(int|string|ITupleEvaluator|\Closure)</tt>
      * @return IValueMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns
@@ -221,8 +226,8 @@ interface IRelation extends \Traversable, \Countable
      *
      * @param int|string|ITupleEvaluator|\Closure $mappingCol
      *                                  the first column specifying the mapping
-     * @param (int|string|ITupleEvaluator|\Closure)[] ...$moreMappingCols
-     *                                  optional additional columns specifying the mapping
+     * @param array ...$moreMappingCols optional additional columns specifying further dimensions of the mapping, each
+     *                                    of type <tt>(int|string|ITupleEvaluator|\Closure)</tt>
      * @return ITupleMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns
@@ -238,10 +243,10 @@ interface IRelation extends \Traversable, \Countable
      * The relation gets enclosed by one or more {@link IRelationMap} boxes, each for one dimension of mapping. The
      * innermost box maps the individual {@link IRelation}s.
      *
-     * @param (int|string|ITupleEvaluator|\Closure)[] $mappingCol
+     * @param int|string|ITupleEvaluator|\Closure $mappingCol
      *                                  the first column specifying the mapping
-     * @param (int|string|ITupleEvaluator|\Closure)[] ...$moreMappingCols
-     *                                  optional additional columns specifying further dimensions of the mapping
+     * @param array ...$moreMappingCols optional additional columns specifying further dimensions of the mapping, each
+     *                                    of type <tt>(int|string|ITupleEvaluator|\Closure)</tt>
      * @return IRelationMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns

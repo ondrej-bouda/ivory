@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Ivory\Relation\Alg;
 
 use Ivory\Relation\ITuple;

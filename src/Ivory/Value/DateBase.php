@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Value;
 
 use Ivory\Utils\EqualableWithPhpOperators;
@@ -58,16 +57,13 @@ abstract class DateBase implements IEqualable
 
     /**
      * @internal Only for the purpose of Ivory itself.
+     * @param int $inf
+     * @param \DateTimeImmutable|null $dt
      */
     final protected function __construct(int $inf, ?\DateTimeImmutable $dt = null)
     {
         $this->inf = $inf;
         $this->dt = $dt;
-
-        // there was a bug in some PHP versions that \DateTime objects comparison did not take fractional seconds into account
-        if (PHP_VERSION_ID < 50619 || (PHP_VERSION_ID >= 70000 && PHP_VERSION_ID < 70004)) {
-            $this->frac = ($dt !== null ? $dt->format('u') : null);
-        }
     }
 
     /**

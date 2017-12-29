@@ -13,7 +13,7 @@ class IvoryPerformanceTest implements IPerformanceTest
     const SYNCHRONOUS = 1;
     const NO_CACHE = 2;
     const FILE_CACHE = 4;
-    
+
     const FILE_CACHE_DIR = __DIR__ . '/out';
 
     private $async;
@@ -61,8 +61,7 @@ class IvoryPerformanceTest implements IPerformanceTest
                 'SELECT * FROM usr WHERE lower(email) = lower(%s)',
                 $email
             );
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             exit('Error authenticating the user');
         }
 
@@ -76,8 +75,7 @@ class IvoryPerformanceTest implements IPerformanceTest
         $this->conn->command('UPDATE usr SET last_login = CURRENT_TIMESTAMP WHERE id = %int', $user->id);
         if ($user->last_login) {
             echo 'Welcome back since ' . $user->last_login->format('n/j/Y H:i:s') . "\n";
-        }
-        else {
+        } else {
             echo "Welcome!\n";
         }
 

@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type;
 
 use Ivory\Connection\IConnection;
 use Ivory\Exception\UndefinedTypeException;
+use Ivory\IvoryTestCase;
 use Ivory\Value\Decimal;
 use Ivory\Value\Timestamp;
 use Ivory\Value\TimestampTz;
@@ -12,7 +12,7 @@ use Ivory\Value\TimestampTz;
 /**
  * This test presents the type system support.
  */
-class TypeRegisterTest extends \Ivory\IvoryTestCase
+class TypeRegisterTest extends IvoryTestCase
 {
     /** @var IConnection */
     private $conn;

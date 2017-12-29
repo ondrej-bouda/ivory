@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Type\Std;
 
 use Ivory\Value\Box;
@@ -31,10 +30,10 @@ class BoxType extends CompoundGeometricType
                 $oppositeCorner = $this->pointType->parseValue($m[3]);
                 return Box::fromOppositeCorners($corner, $oppositeCorner);
             } catch (\InvalidArgumentException $e) {
-                $this->throwInvalidValue($str, $e);
+                throw $this->invalidValueException($str, $e);
             }
         } else {
-            $this->throwInvalidValue($str);
+            throw $this->invalidValueException($str);
         }
     }
 
@@ -48,7 +47,7 @@ class BoxType extends CompoundGeometricType
                 $this->pointType->serializeValue($val->getLowerLeft())
             );
         } else {
-            $this->throwInvalidValue($val);
+            throw $this->invalidValueException($val);
         }
     }
 }

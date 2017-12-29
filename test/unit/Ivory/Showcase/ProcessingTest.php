@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Showcase;
 
 use Ivory\Data\Map\IRelationMap;
+use Ivory\IvoryTestCase;
 use Ivory\Query\SqlRelationDefinition;
 use Ivory\Relation\IRelation;
 use Ivory\Relation\ITuple;
@@ -26,7 +26,7 @@ use Ivory\Relation\ITuple;
  * - `scheduled_timerange`, and
  * - `actual_timerange` (this might be `NULL` meaning the lesson has been cancelled).
  */
-class ProcessingTest extends \Ivory\IvoryTestCase
+class ProcessingTest extends IvoryTestCase
 {
     /** @var IRelation */
     private $teachers;
@@ -57,7 +57,6 @@ class ProcessingTest extends \Ivory\IvoryTestCase
             ->rename(['id', 'firstname', 'lastname', 'abbr']);
 
         $this->rel = $conn->query(
-            /** @lang PostgreSQL */
             "WITH lesson (id, topic, scheduled_timerange, actual_timerange) AS (
                VALUES
                  (1, '1+1',  tsrange('2015-09-01 08:00', '2015-09-01 08:45'), tsrange('2015-09-01 08:00', '2015-09-01 08:45')),

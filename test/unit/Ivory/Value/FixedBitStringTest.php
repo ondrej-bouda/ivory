@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Value;
 
 use Ivory\Exception\ImmutableException;
@@ -141,16 +140,6 @@ class FixedBitStringTest extends \PHPUnit\Framework\TestCase
                 FixedBitString::fromString('110011000000000000000000000000000000000000000000000000000000000000000')->toInt()
             );
         }
-    }
-
-    public function testFromNumber()
-    {
-        $this->markTestIncomplete(); // TODO once the interface is specified
-    }
-
-    public function testToNumber()
-    {
-        $this->markTestIncomplete(); // TODO once the interface is specified
     }
 
     public function testGetLength()

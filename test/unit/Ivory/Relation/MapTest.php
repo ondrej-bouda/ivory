@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Relation;
 
 use Ivory\Data\Map\ITupleMap;
 use Ivory\Exception\UndefinedColumnException;
+use Ivory\IvoryTestCase;
 
-class MapTest extends \Ivory\IvoryTestCase
+class MapTest extends IvoryTestCase
 {
     /** @var IRelation relation with all tuples */
     private $fullRel;
@@ -81,11 +81,14 @@ class MapTest extends \Ivory\IvoryTestCase
     {
         $map = $this->artistYearRel->map('artist', 'year');
 
-        $this->assertSame('Black Album', $map['Metallica'][1991]->album);
-        $this->assertSame('S & M', $map['Metallica'][1999]->value('album'));
+        $album = $map['Metallica'][1999];
+        assert($album instanceof ITuple);
+        $this->assertSame('S & M', $album->value('album'));
+
         $this->assertSame('S & M', $map->get('Metallica')[1999]->value('album'));
         $this->assertSame('S & M', $map->get('Metallica')->get(1999)->value('album'));
         $this->assertSame('S & M', $map->get('Metallica', 1999)->value('album'));
+        $this->assertSame('Black Album', $map['Metallica'][1991]->album);
 
         try {
             $map->get('wheee');

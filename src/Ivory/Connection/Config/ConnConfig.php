@@ -1,12 +1,10 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Connection\Config;
 
 use Ivory\Connection\ConnectionControl;
 use Ivory\Connection\IObservableTransactionControl;
 use Ivory\Connection\IStatementExecution;
-use Ivory\Connection\TxConfig;
 use Ivory\Exception\UnsupportedException;
 use Ivory\Result\IQueryResult;
 use Ivory\Value\Quantity;

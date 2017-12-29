@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
-
 namespace Ivory\Relation;
 
-class ArrayRelationTest extends \Ivory\IvoryTestCase
+use Ivory\IvoryTestCase;
+
+class ArrayRelationTest extends IvoryTestCase
 {
     public function testAutodetect()
     {
