@@ -15,4 +15,5 @@ Some decisions are commented directly in source code, denoted by phrase "Ivory d
 * Similar reasons hold for using a special Timestamp class instead of the built-in DateTime class.
 * As for the own class for representing date/time intervals: the PHP built-in DateInterval is out of question as it is unable to represent mixed intervals (e.g., '-1 year -2 mons +3 days -04:05:06') - which Postgres might give on output. And, by the way, PHP's DateInterval only represents the duration, without any reasonable operations on them.
 * Ivory is for PHP >= 7.1. Those who will be stuck on a PHP 7.0 (or even PHP 5) hosting will probably not change the database layer in their project, while new projects will be started right on PHP 7.1.
+* Coding issue: naturally, strict types declaration does not make sense in pure interface source files. However, PhpStorm inspection "Missing strict type declaration" reports such interfaces. It is better to use the inspection at the cost of a little nonsense in interface files.
 
