@@ -10,6 +10,6 @@ Expected PhpStorm inspection results
 
 `Ivory test` inspection on _Project Test Files_
 -----------------------------------------------
-* SQL:
-  * Unresolved reference: 4 warnings
+* Undefined:
+  * Undefined field: 121 warnings
 

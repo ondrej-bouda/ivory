@@ -161,6 +161,9 @@ interface ITxHandle
      * {@link ITransactionControl::rollbackPreparedTransaction()}, respectively. To list existing prepared transactions,
      * {@link ITransactionControl::listPreparedTransactions()} may be helpful.
      *
+     * After this operation, the transaction is closed and the handle gets stale and, as such, it cannot be used
+     * anymore.
+     *
      * @see http://www.postgresql.org/docs/9.4/static/sql-prepare-transaction.html
      *
      * @param string|null $name name for the prepared transaction; must be server-wide unique;

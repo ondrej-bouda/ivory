@@ -7,6 +7,7 @@ use Ivory\Result\IQueryResult;
 use Ivory\Type\IValueSerializer;
 use Ivory\Type\Ivory\IdentifierSerializer;
 use Ivory\Type\Std\StringType;
+use Ivory\Utils\StringUtils;
 
 /**
  * {@inheritdoc}
@@ -17,6 +18,10 @@ use Ivory\Type\Std\StringType;
  */
 class TxHandle implements ITxHandle
 {
+    private const PREPARED_TX_RANDOM_NAME_PREFIX = 'IvoryTx';
+    /** Total length (including prefix) of random names generated for prepared transactions without an explicit name. */
+    private const PREPARED_TX_RANDOM_NAME_LEN = 16;
+
     private $open = true;
     private $stmtExec;
     private $txCtl;
@@ -166,9 +171,8 @@ class TxHandle implements ITxHandle
         $this->assertOpen();
 
         if ($name === null) {
-            $len = 16;
-            $bytes = random_bytes(ceil($len / 2));
-            $name = substr(bin2hex($bytes), 0, $len);
+            $name = self::PREPARED_TX_RANDOM_NAME_PREFIX;
+            $name .= StringUtils::randomHexString(self::PREPARED_TX_RANDOM_NAME_LEN - strlen($name));
         }
 
         $str = $this->ensureStringSerializer()->serializeValue($name);

@@ -132,4 +132,28 @@ class TransactionControlTest extends IvoryTestCase
             $conn1->disconnect();
         }
     }
+
+    public function testPrepareTransaction()
+    {
+        $conn1 = $this->createNewIvoryConnection('conn1');
+        $tx = null;
+        try {
+            $tx = $conn1->startTransaction();
+            $txName1 = $tx->prepareTransaction();
+            $this->assertTrue(strlen($txName1) >= 8);
+            $conn1->rollbackPreparedTransaction($txName1);
+
+            $tx = $conn1->startTransaction();
+            $txName2 = $tx->prepareTransaction();
+            $this->assertTrue(strlen($txName2) >= 8);
+            $conn1->rollbackPreparedTransaction($txName2);
+
+            $this->assertNotSame($txName1, $txName2);
+        } finally {
+            if ($tx !== null) {
+                $tx->rollbackIfOpen();
+            }
+            $conn1->disconnect();
+        }
+    }
 }

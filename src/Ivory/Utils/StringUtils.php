@@ -80,4 +80,22 @@ class StringUtils
                 return $num . 'th';
         }
     }
+
+    /**
+     * @param int $len
+     * @return string a pseudo-random string of hexadecimal digits
+     */
+    public static function randomHexString(int $len): string
+    {
+        if ($len < 0) {
+            throw new \DomainException('$len is negative');
+        }
+
+        $result = '';
+        for ($i = 0; $i < $len; $i += strlen($s)) {
+            $s = dechex(mt_rand());
+            $result .= substr($s, 0, $len - $i);
+        }
+        return $result;
+    }
 }
