@@ -9,7 +9,7 @@ use Ivory\Utils\IEqualable;
  *
  * The objects are immutable.
  */
-class Point implements IEqualable
+final class Point implements IEqualable
 {
     private $x;
     private $y;

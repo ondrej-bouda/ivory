@@ -7,7 +7,7 @@ namespace Ivory\Connection;
  * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-client.html#GUC-DATESTYLE `DateStyle`} configuration
  * setting.
  */
-class DateStyle
+final class DateStyle
 {
     const FORMAT_ISO = 'ISO';
     const FORMAT_POSTGRES = 'Postgres';

@@ -7,7 +7,7 @@ namespace Ivory\Value;
  *
  * The objects are immutable.
  */
-class Box
+final class Box
 {
     /** @var Point */
     private $upperRight;

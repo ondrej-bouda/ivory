@@ -8,7 +8,7 @@ namespace Ivory\Lang\Sql;
  * @see SqlState
  * @see http://www.postgresql.org/docs/10/static/errcodes-appendix.html
  */
-class SqlStateClass
+final class SqlStateClass
 {
     const SUCCESSFUL_COMPLETION = '00';
     const WARNING = '01';
