@@ -28,6 +28,7 @@ interface IConnection extends
     ITransactionControl,
     IIPCControl,
     IStatementExecution,
+    ICopyControl,
     ICacheControl
 {
     /**

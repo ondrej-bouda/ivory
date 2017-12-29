@@ -9,6 +9,7 @@ use Ivory\Ivory;
 use Ivory\Relation\IColumn;
 use Ivory\Relation\ITuple;
 use Ivory\Result\ICommandResult;
+use Ivory\Result\ICopyInResult;
 use Ivory\Result\IQueryResult;
 use Ivory\Result\IResult;
 use Ivory\Type\ITypeDictionary;
@@ -24,6 +25,7 @@ class Connection implements IConnection
     private $connCtl;
     private $typeCtl;
     private $stmtExec;
+    private $copyCtl;
     private $txCtl;
     private $ipcCtl;
     private $cacheCtl;
@@ -44,6 +46,7 @@ class Connection implements IConnection
         $this->connCtl = new ConnectionControl($this, $params); // TODO: extract all usages of ConnectionControl::requireConnection() - consider introducing an interface specifying the method, named like PGSQLDriver or ConnectionManager or ConnectionPool
         $this->typeCtl = new TypeControl($this, $this->connCtl);
         $this->stmtExec = new StatementExecution($this->connCtl, $this->typeCtl);
+        $this->copyCtl = new CopyControl();
         $this->txCtl = new TransactionControl($this->connCtl, $this->stmtExec, $this);
         $this->ipcCtl = new IPCControl($this->connCtl, $this->stmtExec);
         $this->config = new ConnConfig($this->connCtl, $this->stmtExec, $this->txCtl);
@@ -189,6 +192,40 @@ class Connection implements IConnection
     public function getStatementExceptionFactory(): StatementExceptionFactory
     {
         return $this->stmtExec->getStatementExceptionFactory();
+    }
+
+    //endregion
+
+    //region Copy Control
+
+    public function copyFromFile(string $file, string $table, ?array $columns = null, array $options = []): ICommandResult
+    {
+        return $this->copyCtl->copyFromFile($file, $table, $columns, $options);
+    }
+
+    public function copyFromProgram(string $program, string $table, ?array $columns = null, array $options = []): ICommandResult
+    {
+        return $this->copyCtl->copyFromProgram($program, $table, $columns, $options);
+    }
+
+    public function copyFromInput(string $table, ?array $columns = null, array $options = []): ICopyInResult
+    {
+        return $this->copyCtl->copyFromInput($table, $columns, $options);
+    }
+
+    public function copyToFile(string $file, $tableOrRelationDefinition, ?array $columns = null, array $options = []): ICommandResult
+    {
+        return $this->copyCtl->copyToFile($file, $tableOrRelationDefinition, $columns, $options);
+    }
+
+    public function copyToProgram(string $program, $tableOrRelationDefinition, ?array $columns = null, array $options = []): ICommandResult
+    {
+        return $this->copyCtl->copyToProgram($program, $tableOrRelationDefinition, $columns, $options);
+    }
+
+    public function copyToArray(string $table, array $options = []): array
+    {
+        return $this->copyCtl->copyToArray($table, $options);
     }
 
     //endregion
