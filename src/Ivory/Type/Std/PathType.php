@@ -66,9 +66,9 @@ class PathType extends CompoundGeometricType
         }
 
         return sprintf("path '%s%s%s'",
-            ($val->isOpen ? '[' : '('),
+            ($val->isOpen() ? '[' : '('),
             implode(',', $points),
-            ($val->isOpen ? ']' : ')')
+            ($val->isOpen() ? ']' : ')')
         );
     }
 }
