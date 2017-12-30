@@ -109,10 +109,10 @@ class StdCoreFactory implements ICoreFactory
 
     public function createSqlPatternParser(?ICacheControl $cacheControl = null): ISqlPatternParser
     {
-        if ($cacheControl === null) {
-            return new SqlPatternParser();
-        } else {
+        if ($cacheControl !== null && $cacheControl->isCacheEnabled()) {
             return new CachingSqlPatternParser($cacheControl);
+        } else {
+            return new SqlPatternParser();
         }
     }
 
