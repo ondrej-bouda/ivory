@@ -23,12 +23,11 @@ class TracingTxHandle extends TxHandle
         $this->backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
     }
 
-    public function __destruct()
+    protected function makeReleasedOpenHandleWarning(): string
     {
-        parent::__destruct();
-
-        if ($this->isOpen()) {
-            error_log('The open transaction handle has been created in ' . print_r($this->backtrace, true));
-        }
+        return
+            parent::makeReleasedOpenHandleWarning() .
+            ' The handle has been created in ' .
+            print_r($this->backtrace, true);
     }
 }

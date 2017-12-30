@@ -42,11 +42,13 @@ class TxHandle implements ITxHandle
     public function __destruct()
     {
         if ($this->open) {
-            trigger_error(
-                'An open transaction handle has been released from memory. The transaction has probably stayed open.',
-                E_USER_WARNING
-            );
+            trigger_error($this->makeReleasedOpenHandleWarning(), E_USER_WARNING);
         }
+    }
+
+    protected function makeReleasedOpenHandleWarning(): string
+    {
+        return 'An open transaction handle has been released from memory. Has the transaction been closed properly?';
     }
 
     private function ensureIdentSerializer(): IValueSerializer
