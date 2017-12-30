@@ -43,6 +43,10 @@ class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedTy
 
     public function parseValue(string $str)
     {
+        /* FIXME: Is it really necessary to parse money value that strictly? What about just parsing up to two segments
+                  of digits, interpreting the second one as the fractional part, if present? The decimal separator is
+                  only used for parsing, so all the hassle with retrieving it from the configuration might be saved.
+         */
         $decSep = $this->decSepRetriever->getValue();
         try {
             return Money::fromString($str, $decSep);

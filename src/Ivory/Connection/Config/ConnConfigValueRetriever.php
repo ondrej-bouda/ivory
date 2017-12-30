@@ -2,6 +2,12 @@
 declare(strict_types=1);
 namespace Ivory\Connection\Config;
 
+/**
+ * Serves for reading configuration values, and keeping the current values cached to prevent repetitive querying.
+ *
+ * If an {@link IObservableConnConfig} is used to retrieve the values from, the cache is kept in sync automatically upon
+ * changes of the configuration value.
+ */
 class ConnConfigValueRetriever implements IConfigObserver
 {
     private $connConfig;

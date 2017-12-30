@@ -2,6 +2,11 @@
 declare(strict_types=1);
 namespace Ivory\Connection;
 
+/**
+ * Encapsulation of the `LISTEN`/`NOTIFY` inter-process communication primitives.
+ *
+ * @todo extend to support object payload - consider serializing the payload, even if its a string
+ */
 interface IIPCControl
 {
     /**
