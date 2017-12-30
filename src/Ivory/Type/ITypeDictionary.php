@@ -52,7 +52,7 @@ interface ITypeDictionary
      */
     function getValueSerializer(string $name): ?IValueSerializer;
 
-    function setUndefinedTypeHandler(?ITypeDictionaryUndefinedHandler $undefinedTypeHandler);
+    function setUndefinedTypeHandler(?ITypeDictionaryUndefinedHandler $undefinedTypeHandler): void;
 
     /**
      * @param string[] $schemaList

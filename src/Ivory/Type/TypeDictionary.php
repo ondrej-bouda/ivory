@@ -194,7 +194,7 @@ class TypeDictionary implements ITypeDictionary
         return $this->undefinedTypeHandler;
     }
 
-    public function setUndefinedTypeHandler(?ITypeDictionaryUndefinedHandler $undefinedTypeHandler)
+    public function setUndefinedTypeHandler(?ITypeDictionaryUndefinedHandler $undefinedTypeHandler): void
     {
         $this->undefinedTypeHandler = $undefinedTypeHandler;
     }

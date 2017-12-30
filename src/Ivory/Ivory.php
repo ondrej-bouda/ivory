@@ -2,8 +2,8 @@
 declare(strict_types=1);
 namespace Ivory;
 
-use Ivory\Connection\ConnectionParameters;
 use Ivory\Cache\ICacheControl;
+use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
 use Ivory\Exception\ConnectionException;
 use Ivory\Exception\StatementExceptionFactory;
@@ -54,13 +54,13 @@ final class Ivory
      *
      * @param ICoreFactory $coreFactory
      */
-    public static function setCoreFactory(ICoreFactory $coreFactory)
+    public static function setCoreFactory(ICoreFactory $coreFactory): void
     {
         self::$coreFactory = $coreFactory;
     }
 
     /**
-     * @return TypeRegister the global type register, used for getting types not defined locally for a connection
+     * Returns the global type register, used for getting types not defined locally for a connection.
      */
     public static function getTypeRegister(): TypeRegister
     {
@@ -80,10 +80,11 @@ final class Ivory
     }
 
     /**
-     * @return StatementExceptionFactory the global statement exception factory, used for emitting the
-     *                                     {@link \Ivory\Exception\StatementException}s upon statement errors;
-     *                                   like the type register, an overriding factory is also defined locally on each
-     *                                     connection - this factory only applies if the local one does not
+     * Returns the global statement exception factory.
+     *
+     * An exception factory is used for emitting {@link \Ivory\Exception\StatementException}s upon statement errors.
+     * Like the type register, an overriding exception factory is also defined locally on each connection - this factory
+     * only applies if the local one does not.
      */
     public static function getStatementExceptionFactory(): StatementExceptionFactory
     {
