@@ -32,7 +32,7 @@ class CacheControl implements ICacheControl
         $this->cacheItemPool = $cacheItemPool;
     }
 
-    private function composeCacheKey(string $objectKey): string
+    protected function composeCacheKey(string $objectKey): string
     {
         // object key before connection key - the connection key might contain anything out of control of Ivory
         $key = $this->prefix . self::safeCacheKey($objectKey) . $this->postfix;
@@ -53,7 +53,7 @@ class CacheControl implements ICacheControl
      * @param string $key
      * @return string
      */
-    private static function safeCacheKey(string $key): string
+    protected static function safeCacheKey(string $key): string
     {
         if (preg_match('~^[A-Za-z0-9_.]+$~', $key)) {
             return $key;
