@@ -7,6 +7,7 @@ namespace Ivory\Type;
  *
  * Type registers serve as the way to define the type system behaviour. Their purpose is to collect:
  * - types and type loaders,
+ * - value serializers,
  * - range canonical functions and their providers,
  * - abbreviations of qualified type names, and
  * - rules for recognizing types from values.
@@ -293,9 +294,18 @@ class TypeRegister implements ITypeProvider
         $this->valueSerializers[$name] = $valueSerializer;
     }
 
-    public function unregisterValueSerializer(string $name): void
+    /**
+     * Unregisters a previously registered value serializer.
+     *
+     * @param string $name name of value serializer to unregister
+     * @return bool whether the serializer has actually been unregistered (<tt>false</tt> if it was not registered and
+     *                thus this was a no-op)
+     */
+    public function unregisterValueSerializer(string $name): bool
     {
+        $existed = isset($this->valueSerializers[$name]);
         unset($this->valueSerializers[$name]);
+        return $existed;
     }
 
     /**
@@ -480,7 +490,7 @@ class TypeRegister implements ITypeProvider
         return null;
     }
 
-    public function getTypeRecognitionRules(): array
+    public function getTypeRecognitionRules(): array // TODO: rename to getTypeInferenceRules
     {
         return $this->typeRecognitionRules;
     }
