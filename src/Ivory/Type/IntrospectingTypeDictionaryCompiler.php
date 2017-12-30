@@ -19,34 +19,40 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
     {
         $enumLabels = $this->retrieveEnumLabels();
 
-        $query = "WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypdelim, rngcfnspname, rngcfname) AS (
-                    SELECT t.oid, nsp.nspname, t.typname,
-                           (CASE WHEN arrelemtype.oid IS NOT NULL THEN 'A' ELSE t.typtype END), -- marking array types as of typtype 'A'
-                           (CASE WHEN arrelemtype.oid IS NOT NULL THEN arrelemtype.oid
-                                 WHEN t.typtype = 'd' THEN t.typbasetype
-                                 WHEN t.typtype = 'r' THEN rngsubtype
-                            END),
-                           arrelemtype.typdelim,
-                           rngcfnsp.nspname AS rngcfnspname, rngcf.proname AS rngcfname
-                    FROM pg_catalog.pg_type t
-                         JOIN pg_catalog.pg_namespace nsp ON nsp.oid = t.typnamespace
-                         LEFT JOIN pg_catalog.pg_range rng ON rng.rngtypid = t.oid
-                         LEFT JOIN pg_catalog.pg_proc rngcf ON rngcf.oid = rng.rngcanonical
-                         LEFT JOIN pg_catalog.pg_namespace rngcfnsp ON rngcfnsp.oid = rngcf.pronamespace
-                         LEFT JOIN pg_catalog.pg_type arrelemtype ON arrelemtype.typarray = t.oid
-                  ),
-                  typetree (oid, depth) AS (
-                    SELECT oid, 0 FROM typeinfo WHERE parenttype IS NULL
-                    UNION ALL
-                    SELECT ti.oid, tt.depth + 1
-                    FROM typeinfo ti
-                         JOIN typetree tt ON tt.oid = ti.parenttype
-                  )
-                  SELECT ti.*
-                  FROM typeinfo ti
-                       JOIN typetree tt USING (oid)
-                  ORDER BY tt.depth";
-        /* NOTE: The query orders the types so that, when processing them one by one, there are no forward references.
+        $query = <<<SQL
+WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypdelim, rngcfnspname, rngcfname) AS (
+    SELECT
+        t.oid,
+        nsp.nspname,
+        t.typname,
+        (CASE WHEN arrelemtype.oid IS NOT NULL THEN 'A' ELSE t.typtype END), -- marking array types as of typtype 'A'
+        (CASE WHEN arrelemtype.oid IS NOT NULL THEN arrelemtype.oid
+              WHEN t.typtype = 'd' THEN t.typbasetype
+              WHEN t.typtype = 'r' THEN rngsubtype
+         END),
+        arrelemtype.typdelim,
+        rngcfnsp.nspname AS rngcfnspname,
+        rngcf.proname AS rngcfname
+    FROM pg_catalog.pg_type t
+         JOIN pg_catalog.pg_namespace nsp ON nsp.oid = t.typnamespace
+         LEFT JOIN pg_catalog.pg_range rng ON rng.rngtypid = t.oid
+         LEFT JOIN pg_catalog.pg_proc rngcf ON rngcf.oid = rng.rngcanonical
+         LEFT JOIN pg_catalog.pg_namespace rngcfnsp ON rngcfnsp.oid = rngcf.pronamespace
+         LEFT JOIN pg_catalog.pg_type arrelemtype ON arrelemtype.typarray = t.oid
+),
+typetree (oid, depth) AS (
+    SELECT oid, 0 FROM typeinfo WHERE parenttype IS NULL
+    UNION ALL
+    SELECT ti.oid, tt.depth + 1
+    FROM typeinfo ti
+         JOIN typetree tt ON tt.oid = ti.parenttype
+)
+SELECT ti.*
+FROM typeinfo ti
+     JOIN typetree tt USING (oid)
+ORDER BY tt.depth
+SQL;
+        /* NOTE: The query sorts the types so that, when processing them one by one, there are no forward references.
                  This is achieved by constituting the types dependency tree, and ordering the types by the depth in the
                  tree. For such method to be correct, we should prove the dependency graph among types actually forms
                  a tree, or more precisely, a forest. See the following points:
@@ -161,9 +167,11 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
 
     private function retrieveEnumLabels(): array
     {
-        $query = 'SELECT enumtypid, enumlabel
-                  FROM pg_catalog.pg_enum
-                  ORDER BY enumtypid, enumsortorder';
+        $query = <<<'SQL'
+SELECT enumtypid, enumlabel
+FROM pg_catalog.pg_enum
+ORDER BY enumtypid, enumsortorder
+SQL;
         $errorDesc = 'Error fetching enum labels';
         $labels = [];
         foreach ($this->query($query, $errorDesc) as $row) {
@@ -178,11 +186,13 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
 
     private function fetchCompositeAttributes(ITypeDictionary $dict): void
     {
-        $query = 'SELECT pg_type.oid, attname, atttypid
-                  FROM pg_catalog.pg_attribute
-                       JOIN pg_catalog.pg_type ON typrelid = attrelid
-                  WHERE attnum > 0 AND NOT attisdropped
-                  ORDER BY attrelid, attnum';
+        $query = <<<'SQL'
+SELECT pg_type.oid, attname, atttypid
+FROM pg_catalog.pg_attribute
+     JOIN pg_catalog.pg_type ON typrelid = attrelid
+WHERE attnum > 0 AND NOT attisdropped
+ORDER BY attrelid, attnum
+SQL;
         $errorDesc = 'Error fetching composite type attributes';
         foreach ($this->query($query, $errorDesc) as $row) {
             /** @var CompositeType $compType */
