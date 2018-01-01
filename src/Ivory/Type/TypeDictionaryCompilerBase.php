@@ -38,7 +38,7 @@ abstract class TypeDictionaryCompilerBase implements ITypeDictionaryCompiler
             $dict->defineValueSerializer($name, $type);
         }
 
-        $dict->addTypeRecognitionRuleSet($typeProvider->getTypeRecognitionRules());
+        $dict->addTypeInferenceRuleSet($typeProvider->getTypeInferenceRules());
 
         foreach ($this->yieldTypes($typeProvider, $dict) as $oid => $type) {
             $dict->defineType($type, $oid);

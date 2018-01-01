@@ -47,7 +47,7 @@ class TypeRegister implements ITypeProvider
     /** @var string[][] type name abbreviation => pair: schema name, type name */
     private $typeAbbreviations = [];
     /** @var string[][] PHP data type => pair: schema name, type name */
-    private $typeRecognitionRules = [];
+    private $typeInferenceRules = [];
 
     /**
      * Registers a type.
@@ -335,9 +335,9 @@ class TypeRegister implements ITypeProvider
     }
 
     /**
-     * Adds a new rule for recognizing type from a PHP value.
+     * Adds a new rule for inferring type from a PHP value.
      *
-     * The rule tells to use the type object registered for `$schemaName.$typeName` type whenever a value of the
+     * The rule specifies to use the type object registered for `$schemaName.$typeName` type whenever a value of the
      * specified data type is given. The data type may be given by the string containing either:
      * - `'bool'`, `'int'`, `'float'`, `'string'`, or `'null'`, specifying to use the type object for values of the
      *   corresponding scalar types; or
@@ -351,50 +351,49 @@ class TypeRegister implements ITypeProvider
      * 2. otherwise, supertypes of the PHP value are consecutively tried and the first match is used:
      *    - `float` is, for this purpose, considered as a supertype of `int`;
      *    - parent classes of an object are unrolled consecutively from the closest parent to the top-level superclass;
-     *    - if parent classes do not make a match, then all interfaces the class of the PHP value implements, are tried
+     *    - if parent classes do not make a match, then all interfaces the class of the PHP value implements are tried
      *      in the alphabetical ordered (note this also includes interfaces extended by the ones actually implemented by
-     *      the class of the PHP value.
+     *      the class of the PHP value).
      *
-     * Arrays are recognized automatically - their type is recognized according to the first non-array, non-null element
-     * found in the array. Recall that PHP arrays may hold elements of various types while PostgreSQL limits arrays to
-     * be of just a single type. The type is recognized by taking the first non-null element in the array. If it is an
-     * array, the recognition procedure recursively continues on it. The whole array value is then treated by the array
-     * type object with its element type set to the recognized type. If the type is not recognized (empty array or array
-     * only containing null values), the rule specified for `array` is used, if defined.
+     * Arrays are recognized automatically. Their type is inferred from to the first non-array, non-null element found
+     * in the array. If it is an array, the recognition procedure recursively continues on it. The whole array value is
+     * then treated by the array type object with its element type set to the inferred type (recall that PHP arrays may
+     * hold elements of various types while PostgreSQL limits arrays to be of just a single type). If the type is not
+     * inferred (empty or `null`-only array), the rule specified for `array` is used, if defined.
      *
-     * Any previously defined rule for the same data type (`$dataType`) is dropped in favor of the new one.
+     * Any previously defined rule for the same data type (`$phpType`) is dropped in favor of the new one.
      *
      * Note the rules are case sensitive.
      *
-     * @internal Ivory design note: Alternatively, the data types recognition might be defined by the registered type
-     * objects. That would not work for two reasons: multiple type objects might collide about the recognized type
+     * @internal Ivory design note: Alternatively, the data types inference might be defined by the registered type
+     * objects. That would not work for two reasons: multiple type objects might collide about the inferred type
      * and, more importantly, the same type object class is registered for multiple types (e.g., IntegerType) and
      * Ivory could not decide which type object instance to actually use.
      * @internal Ivory design note: Regarding the alphabetical order of interfaces matched against the rules: a more
      * sophisticated preference system might be used. We prefer simplicity, though, over perfection (in the perfect
-     * system, the fact which parent declared implementing which interfaces, should be considered, complicated with
+     * system, the fact which parent declared implementing which interfaces should be considered, complicated with
      * parent interfaces...).
      *
-     * @param string $dataType either one of <tt>boolean</tt>, <tt>integer</tt>, <tt>double</tt>, <tt>string</tt>, and
-     *                           <tt>null</tt>, or a fully-qualified name of a PHP class or interface
-     * @param string $schemaName name of schema the recognized type is defined in
-     * @param string $typeName name of the recognized type
+     * @param string $phpType either one of <tt>'bool'</tt>, <tt>'int'</tt>, <tt>'float'</tt>, <tt>'string'</tt> or
+     *                          <tt>'null'</tt>, or a fully-qualified name of a PHP class or interface
+     * @param string $schemaName name of schema the inferred type is defined in
+     * @param string $typeName name of the inferred type
      */
-    public function addTypeRecognitionRule(string $dataType, string $schemaName, string $typeName): void
+    public function addTypeInferenceRule(string $phpType, string $schemaName, string $typeName): void
     {
-        $this->typeRecognitionRules[$dataType] = [$schemaName, $typeName];
+        $this->typeInferenceRules[$phpType] = [$schemaName, $typeName];
     }
 
     /**
-     * Removes rule for the given PHP data type
+     * Removes an inference rule for the given PHP data type.
      *
      * If no such rule has been added, nothing is done.
      *
-     * @param string $dataType
+     * @param string $phpType
      */
-    public function removeTypeRecognitionRule(string $dataType): void
+    public function removeTypeInferenceRule(string $phpType): void
     {
-        unset($this->typeRecognitionRules[$dataType]);
+        unset($this->typeInferenceRules[$phpType]);
     }
 
 
@@ -490,9 +489,9 @@ class TypeRegister implements ITypeProvider
         return null;
     }
 
-    public function getTypeRecognitionRules(): array // TODO: rename to getTypeInferenceRules
+    public function getTypeInferenceRules(): array
     {
-        return $this->typeRecognitionRules;
+        return $this->typeInferenceRules;
     }
 
     public function getValueSerializers(): array

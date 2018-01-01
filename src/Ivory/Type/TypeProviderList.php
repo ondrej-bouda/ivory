@@ -53,11 +53,11 @@ class TypeProviderList implements ITypeProvider
         return null;
     }
 
-    public function getTypeRecognitionRules(): array
+    public function getTypeInferenceRules(): array
     {
         $result = [];
         foreach ($this->typeProviders as $typeProvider) {
-            $result += $typeProvider->getTypeRecognitionRules();
+            $result += $typeProvider->getTypeInferenceRules();
         }
         return $result;
     }

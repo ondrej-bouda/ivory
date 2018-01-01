@@ -9,7 +9,7 @@ use Ivory\Exception\UndefinedTypeException;
  * Dictionary of all the specific types and other type-related objects and definitions prepared for being used.
  *
  * A type dictionary is the interface of the type system to other Ivory subsystems. All the definitions and rules are
- * compiled in the dictionary, so that just the dictionary is needed for serializing, parsing and recognizing types.
+ * compiled in the dictionary, so that just the dictionary is needed for serializing, parsing and inferring types.
  */
 interface ITypeDictionary
 {

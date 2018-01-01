@@ -29,11 +29,11 @@ interface ITypeProvider
     ): ?IRangeCanonicalFunc;
 
     /**
-     * Returns the list of all rules for recognizing types from PHP values.
+     * Returns the list of all rules for inferring types from PHP values.
      *
-     * @return string[][] map: data type => pair: schema name, type name
+     * @return string[][] map: PHP data type => pair: schema name, type name
      */
-    function getTypeRecognitionRules(): array;
+    function getTypeInferenceRules(): array;
 
     /**
      * @return IValueSerializer[] map: name => value serializer

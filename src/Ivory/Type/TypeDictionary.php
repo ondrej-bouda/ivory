@@ -16,7 +16,7 @@ class TypeDictionary implements ITypeDictionary
     /** @var IValueSerializer[] map: serializer name => value serializer */
     protected $valueSerializers = [];
     /** @var string[][][] list: map: PHP data type name => pair (schema name, type name) */
-    protected $typeRecognitionRuleSets = [];
+    protected $typeInferenceRuleSets = [];
     /** @var string[] names of schemas to search for a type only given by name without schema */
     private $typeSearchPath = [];
     /** @var ITypeDictionaryUndefinedHandler|null */
@@ -35,7 +35,7 @@ class TypeDictionary implements ITypeDictionary
             'qualNameTypeMap',
             'typeAliases',
             'valueSerializers',
-            'typeRecognitionRuleSets',
+            'typeInferenceRuleSets',
             // typeSearchPath and undefinedTypeHandler are expected to be set again after unserializing.
             // searchedNameCache is needless to serialize - it must be recomputed anyway when the type search path is set.
         ];
@@ -94,9 +94,9 @@ class TypeDictionary implements ITypeDictionary
 
     public function requireTypeByValue($value): IType
     {
-        foreach ($this->typeRecognitionRuleSets as $ruleSet) {
+        foreach ($this->typeInferenceRuleSets as $ruleSet) {
             if ($ruleSet) {
-                $rule = $this->recognizeType($value, $ruleSet);
+                $rule = $this->inferType($value, $ruleSet);
                 if ($rule) {
                     return $this->requireTypeByName($rule[1], $rule[0]);
                 }
@@ -107,7 +107,7 @@ class TypeDictionary implements ITypeDictionary
         throw new UndefinedTypeException("There is no type defined for converting value of type \"$typeName\"");
     }
 
-    private function recognizeType($value, $ruleSet): ?array
+    private function inferType($value, $ruleSet): ?array
     {
         static $gettypeMap = [
             'boolean' => 'bool',
@@ -127,15 +127,15 @@ class TypeDictionary implements ITypeDictionary
                 return null;
             }
         } elseif (is_object($value)) {
-            return $this->recognizeObjectType($value, $ruleSet);
+            return $this->inferObjectType($value, $ruleSet);
         } elseif (is_array($value)) {
-            return $this->recognizeArrayType($value, $ruleSet);
+            return $this->inferArrayType($value, $ruleSet);
         } else {
             throw new \InvalidArgumentException('$value');
         }
     }
 
-    private function recognizeObjectType($value, $ruleSet): ?array
+    private function inferObjectType($value, $ruleSet): ?array
     {
         $valueClass = new \ReflectionClass($value);
         $class = $valueClass;
@@ -155,12 +155,12 @@ class TypeDictionary implements ITypeDictionary
         return null;
     }
 
-    private function recognizeArrayType($value, $ruleSet): ?array
+    private function inferArrayType($value, $ruleSet): ?array
     {
         $element = $this->findFirstSignificantElement($value);
 
         if ($element !== null) {
-            $elmtType = $this->recognizeType($element, $ruleSet);
+            $elmtType = $this->inferType($element, $ruleSet);
             if ($elmtType !== null) {
                 return [$elmtType[0], $elmtType[1] . '[]'];
             } else {
@@ -329,9 +329,9 @@ class TypeDictionary implements ITypeDictionary
     /**
      * @param string[][] $ruleSet map: PHP data type name => pair: (schema name, type name)
      */
-    public function addTypeRecognitionRuleSet(array $ruleSet): void
+    public function addTypeInferenceRuleSet(array $ruleSet): void
     {
-        $this->typeRecognitionRuleSets[] = $ruleSet;
+        $this->typeInferenceRuleSets[] = $ruleSet;
     }
 
     private function recomputeNameCache(): void

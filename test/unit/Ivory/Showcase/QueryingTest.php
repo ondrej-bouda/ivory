@@ -50,17 +50,17 @@ class QueryingTest extends IvoryTestCase
 
         // Moreover, the types need not be specified explicitly. There are rules for inferring the type from the actual
         // value.
-        $relDef = SqlRelationDefinition::fromPattern('SELECT %, %, %', "Automatic type recognition", 3.14, false);
+        $relDef = SqlRelationDefinition::fromPattern('SELECT %, %, %', "Automatic type inference", 3.14, false);
         $sql = $relDef->toSql($this->typeDict);
-        $this->assertSame("SELECT 'Automatic type recognition', 3.14, FALSE", $sql);
+        $this->assertSame("SELECT 'Automatic type inference', 3.14, FALSE", $sql);
 
         // All the standard PostgreSQL types are already set up in Ivory by default. Besides, there are special value
         // serializers for specific usage, e.g., LIKE operands.
         $this->assertTrue($this->conn->querySingleValue("SELECT 'foobar' LIKE %_like_", 'oo'));
 
-        // As usual, both the types of placeholders and the rules for recognizing types from values are configurable.
+        // As usual, both the types of placeholders and the rules for infering types from values are configurable.
         $this->conn->getTypeRegister()->registerTypeAbbreviation('js', 'pg_catalog', 'json');
-        $this->conn->getTypeRegister()->addTypeRecognitionRule(\stdClass::class, 'pg_catalog', 'json');
+        $this->conn->getTypeRegister()->addTypeInferenceRule(\stdClass::class, 'pg_catalog', 'json');
         $this->conn->flushTypeDictionary(); // the type dictionary was changed while in use - explicit flush necessary
 
         $relDef = SqlRelationDefinition::fromPattern('SELECT %js, %', Json::null(), (object)['a' => 42]);
