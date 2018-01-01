@@ -60,7 +60,7 @@ class QueryingTest extends IvoryTestCase
 
         // As usual, both the types of placeholders and the rules for infering types from values are configurable.
         $this->conn->getTypeRegister()->registerTypeAbbreviation('js', 'pg_catalog', 'json');
-        $this->conn->getTypeRegister()->addTypeInferenceRule(\stdClass::class, 'pg_catalog', 'json');
+        $this->conn->getTypeRegister()->registerTypeInferenceRule(\stdClass::class, 'pg_catalog', 'json');
         $this->conn->flushTypeDictionary(); // the type dictionary was changed while in use - explicit flush necessary
 
         $relDef = SqlRelationDefinition::fromPattern('SELECT %js, %', Json::null(), (object)['a' => 42]);

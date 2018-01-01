@@ -359,7 +359,7 @@ class TypeRegister implements ITypeProvider
     }
 
     /**
-     * Adds a new rule for inferring type from a PHP value.
+     * Registers a new rule for inferring type from a PHP value.
      *
      * The rule specifies to use the type object registered for `$schemaName.$typeName` type whenever a value of the
      * specified data type is given. The data type may be given by the string containing either:
@@ -403,31 +403,31 @@ class TypeRegister implements ITypeProvider
      * @param string $schemaName name of schema the inferred type is defined in
      * @param string $typeName name of the inferred type
      */
-    public function addTypeInferenceRule(string $phpType, string $schemaName, string $typeName): void
+    public function registerTypeInferenceRule(string $phpType, string $schemaName, string $typeName): void
     {
         $this->typeInferenceRules[$phpType] = [$schemaName, $typeName];
     }
 
     /**
-     * Adds multiple type inference rules.
+     * Registers multiple type inference rules.
      *
      * See {@link addTypeInferenceRule()} for details on type inference rules.
      *
      * @param array $ruleMap map: PHP type => pair: (schema name, type name)
      */
-    public function addTypeInferenceRules(array $ruleMap): void
+    public function registerTypeInferenceRules(array $ruleMap): void
     {
         $this->typeInferenceRules = array_merge($this->typeInferenceRules, $ruleMap);
     }
 
     /**
-     * Removes an inference rule for the given PHP data type.
+     * Unregisters a previously registered inference rule for the given PHP data type.
      *
      * If no such rule has been added, nothing is done.
      *
      * @param string $phpType
      */
-    public function removeTypeInferenceRule(string $phpType): void
+    public function unregisterTypeInferenceRule(string $phpType): void
     {
         unset($this->typeInferenceRules[$phpType]);
     }

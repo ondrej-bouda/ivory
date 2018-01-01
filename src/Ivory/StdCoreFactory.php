@@ -67,7 +67,7 @@ class StdCoreFactory implements ICoreFactory
         ]);
 
         // standard type inference rules
-        $reg->addTypeInferenceRules([
+        $reg->registerTypeInferenceRules([
             'int' => ['pg_catalog', 'int8'],
             'string' => ['pg_catalog', 'text'],
             'bool' => ['pg_catalog', 'bool'],
