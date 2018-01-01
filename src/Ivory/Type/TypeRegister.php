@@ -295,6 +295,18 @@ class TypeRegister implements ITypeProvider
     }
 
     /**
+     * Registers multiple value serializers.
+     *
+     * See {@link registerValueSerializer()} for details on value serializers.
+     *
+     * @param IValueSerializer[] $serializerMap map: serializer name => serializer
+     */
+    public function registerValueSerializers(array $serializerMap): void
+    {
+        $this->valueSerializers = array_merge($this->valueSerializers, $serializerMap);
+    }
+
+    /**
      * Unregisters a previously registered value serializer.
      *
      * @param string $name name of value serializer to unregister
@@ -320,6 +332,18 @@ class TypeRegister implements ITypeProvider
     public function registerTypeAbbreviation(string $abbreviation, string $schemaName, string $typeName): void
     {
         $this->typeAbbreviations[$abbreviation] = [$schemaName, $typeName];
+    }
+
+    /**
+     * Registers multiple type abbreviations.
+     *
+     * See {@link registerTypeAbbreviation()} for details on type abbreviations.
+     *
+     * @param array $abbreviationMap map: PHP type => pair: (schema name, type name)
+     */
+    public function registerTypeAbbreviations(array $abbreviationMap): void
+    {
+        $this->typeAbbreviations = array_merge($this->typeAbbreviations, $abbreviationMap);
     }
 
     /**
@@ -382,6 +406,18 @@ class TypeRegister implements ITypeProvider
     public function addTypeInferenceRule(string $phpType, string $schemaName, string $typeName): void
     {
         $this->typeInferenceRules[$phpType] = [$schemaName, $typeName];
+    }
+
+    /**
+     * Adds multiple type inference rules.
+     *
+     * See {@link addTypeInferenceRule()} for details on type inference rules.
+     *
+     * @param array $ruleMap map: PHP type => pair: (schema name, type name)
+     */
+    public function addTypeInferenceRules(array $ruleMap): void
+    {
+        $this->typeInferenceRules = array_merge($this->typeInferenceRules, $ruleMap);
     }
 
     /**
