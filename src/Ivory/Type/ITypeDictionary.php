@@ -52,9 +52,20 @@ interface ITypeDictionary
      */
     function getValueSerializer(string $name): ?IValueSerializer;
 
+    /**
+     * Defines the handler consulted when a data type is required but not found.
+     *
+     * @param ITypeDictionaryUndefinedHandler|null $undefinedTypeHandler
+     */
     function setUndefinedTypeHandler(?ITypeDictionaryUndefinedHandler $undefinedTypeHandler): void;
 
     /**
+     * Sets the search path for looking up data types by their unqualified names.
+     *
+     * The mechanism is equivalent to the PostgreSQL `search_path` facility: a list of schema names is given. Then, an
+     * unqualified type name is consecutively searched in schemas from the list. It is used mainly for serializing SQL
+     * pattern arguments.
+     *
      * @param string[] $schemaList
      */
     function setTypeSearchPath(array $schemaList): void;

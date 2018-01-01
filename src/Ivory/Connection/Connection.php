@@ -15,7 +15,6 @@ use Ivory\Type\ITypeDictionary;
 use Ivory\Type\TypeRegister;
 use Ivory\Utils\NotSerializable;
 
-// TODO: consider renaming to Database or Session or... - to reflect it is mere a facade, the single entry point
 class Connection implements IConnection
 {
     use NotSerializable; // TODO: implement connection serialization instead of giving up
@@ -34,7 +33,7 @@ class Connection implements IConnection
     /**
      * @param string $name name for the connection
      * @param ConnectionParameters|array|string $params either a connection parameters object, or an associative array
-     *                                                    of parameters for {@link ConnectionParameters::__construct()},
+     *                                                    of parameters for {@link ConnectionParameters::fromArray()},
      *                                                    or a URL for {@link ConnectionParameters::fromUrl()},
      *                                                    or a PostgreSQL connection string (see {@link pg_connect()})
      */

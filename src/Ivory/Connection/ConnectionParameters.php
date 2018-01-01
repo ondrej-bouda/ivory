@@ -145,7 +145,7 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
      * optional. To contain special characters, the value may be enclosed in single quotes, using backslash as the
      * escape character.
      *
-     * For details about the connection parameter keywords and values, see {@link __construct()}.
+     * For details about the connection parameter keywords and values, see {@link fromArray()}.
      *
      * @param string $connStr a PostgreSQL connection string
      * @return ConnectionParameters

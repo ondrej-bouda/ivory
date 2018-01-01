@@ -50,7 +50,7 @@ use Ivory\Exception\NoDataException;
  *   pairs of brackets are accepted, although these are treated the same as a mere one bracket pair, consistently with
  *   what PostgreSQL does.) Note, however, that only empty pairs of brackets are recognized as part of the type
  *   specification. An array placeholder immediately followed by a subscript works as expected: `SELECT %bigint[][2]`
- *   selects the item under index 2 from the provided array.
+ *   selects the item at index 2 from the provided array.
  * * Names of available types, as well as the rules inferring the type automatically (when the type is not specified),
  *   are defined by the {@link Ivory\Type\TypeDictionary} used by the connection for which the pattern will be
  *   serialized to an SQL string. The standard Ivory deployment registers all types defined in the connected-to database
@@ -70,19 +70,19 @@ use Ivory\Exception\NoDataException;
  *   (which would be registered with the `TypeDictionary` as an alias).
  *
  * In specific situations, multiple same-named placeholders may be used with different type specifications, e.g.,
- * `SELECT id FROM %ident:tbl UNION SELECT object_id FROM log WHERE table = %s:tbl`. This is perfectly legal - a single
- * value for the `tbl` parameter will be encoded as an identifier for the first placeholder and as a string literal for
+ * `SELECT id FROM %ident:tbl UNION SELECT object_id FROM log WHERE table = %s:tbl`. This is perfectly legal - the value
+ * of the `tbl` parameter will be encoded both as an identifier for the first placeholder and as a string literal for
  * the second placeholder.
  *
  * To use a literal `%` in the SQL string, type `%%`.
  *
  * The percent signs are searched in the whole string, regardless of the surrounding content. Namely, a percent sign
  * inside string constants written in the SQL string literally *will* be interpreted as a placeholder and replaced with
- * a provided value.
+ * the provided value.
  *
- * Also beware of stating non-schema-qualified types followed with a dot and a named. This is typical when qualifying
+ * Also beware of stating non-schema-qualified types followed by a dot and a name. This is typical when qualifying
  * column names with the relation name, e.g., `person.name`. To parametrize the table name, use `%{ident}.name` to
- * prevent Ivory to search for a type `name` in schema `ident`.
+ * prevent Ivory to search for type `name` in schema `ident`.
  *
  * Note that even {@link IRelationDefinition} and {@link ICommand} objects may be used as parameter values to form a
  * more complex definition, e.g., a

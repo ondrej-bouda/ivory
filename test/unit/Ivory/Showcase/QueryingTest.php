@@ -56,7 +56,7 @@ class QueryingTest extends IvoryTestCase
 
         // All the standard PostgreSQL types are already set up in Ivory by default. Besides, there are special value
         // serializers for specific usage, e.g., LIKE operands.
-        $this->assertTrue($this->conn->querySingleValue("SELECT 'foobar' LIKE %_like_", 'oo'));
+        $this->assertTrue($this->conn->querySingleValue("SELECT 'foobar' LIKE %_like_", 'oo')); // yields LIKE '%oo%'
 
         // As usual, both the types of placeholders and the rules for infering types from values are configurable.
         $this->conn->getTypeRegister()->registerTypeAbbreviation('js', 'pg_catalog', 'json');
