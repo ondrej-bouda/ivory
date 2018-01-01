@@ -45,7 +45,7 @@ class StdCoreFactory implements ICoreFactory
 
         // standard value serializers
         $reg->registerValueSerializers([
-            'sql', new SqlSerializer(),
+            'sql' => new SqlSerializer(),
             'ident' => new IdentifierSerializer(),
             'qident' => new QuotedIdentifierSerializer(),
             'rel' => new RelationSerializer(),
