@@ -86,7 +86,7 @@ class ArrayType implements ITotallyOrderedType
         throw new ParseException($msg, $offset, 0, $cause);
     }
 
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
         // OPT: The parser processes any string which is legal for the PostgreSQL input. Considering it would only be
         //      used for processing output from PostgreSQL, more limited syntax might be accepted, which would be
@@ -95,41 +95,41 @@ class ArrayType implements ITotallyOrderedType
 
         $strOffset = 0;
 
-        while (isset($str[$strOffset]) && ctype_space($str[$strOffset])) {
+        while (isset($extRepr[$strOffset]) && ctype_space($extRepr[$strOffset])) {
             $strOffset++;
         }
 
-        if ($str[$strOffset] == '[') { // explicit bounds specification
-            $decorSepPos = strpos($str, '=');
-            $decoration = substr($str, 0, $decorSepPos);
+        if ($extRepr[$strOffset] == '[') { // explicit bounds specification
+            $decorSepPos = strpos($extRepr, '=');
+            $decoration = substr($extRepr, 0, $decorSepPos);
 
             preg_match_all('~\[(\d+):\d+\]~', $decoration, $m);
             if ($decorSepPos === false || !$m) {
-                $this->throwParseException($str, 'Invalid array bounds decoration');
+                $this->throwParseException($extRepr, 'Invalid array bounds decoration');
             }
             $strOffset = $decorSepPos + 1;
-            while (isset($str[$strOffset]) && ctype_space($str[$strOffset])) {
+            while (isset($extRepr[$strOffset]) && ctype_space($extRepr[$strOffset])) {
                 $strOffset++;
             }
             $lowerBounds = $m[1];
             unset($m);
         } else {
-            if (trim($str) == '{}') {
+            if (trim($extRepr) == '{}') {
                 return [];
             }
             $dims = 0;
-            $len = strlen($str);
+            $len = strlen($extRepr);
             for ($i = $strOffset; $i < $len; $i++) {
-                if (ctype_space($str[$i])) {
+                if (ctype_space($extRepr[$i])) {
                     continue;
-                } elseif ($str[$i] == '{') {
+                } elseif ($extRepr[$i] == '{') {
                     $dims++;
                 } else {
                     break;
                 }
             }
             if ($dims == 0) {
-                $this->throwParseException($str, "Expected '{'", 0);
+                $this->throwParseException($extRepr, "Expected '{'", 0);
             }
             $lowerBounds = array_fill(0, $dims, 1);
         }
@@ -150,9 +150,9 @@ class ArrayType implements ITotallyOrderedType
                           (?:[^"{}\s\\\\' . $d . ']|\\\\.)+   # ending again with non-special, non-whitespace characters
                        )?
                       ~x';
-        preg_match_all($elemRegex, $str, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE, $strOffset);
+        preg_match_all($elemRegex, $extRepr, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE, $strOffset);
         if (!$matches) {
-            $this->throwParseException($str, 'Invalid array syntax');
+            $this->throwParseException($extRepr, 'Invalid array syntax');
         }
 
         $strOffset++;
@@ -162,7 +162,7 @@ class ArrayType implements ITotallyOrderedType
 
         foreach ($matches[0] as list($elem, $elemOffset)) {
             for (; $strOffset < $elemOffset; $strOffset++) {
-                $c = $str[$strOffset];
+                $c = $extRepr[$strOffset];
                 if (ctype_space($c)) {
                     continue;
                 }
@@ -180,7 +180,7 @@ class ArrayType implements ITotallyOrderedType
                         $keys[$dim]++;
                         break;
                     default:
-                        $this->throwParseException($str, "Unexpected array decoration character '$c'", $strOffset);
+                        $this->throwParseException($extRepr, "Unexpected array decoration character '$c'", $strOffset);
                 }
             }
 
@@ -194,7 +194,7 @@ class ArrayType implements ITotallyOrderedType
                     $refs[$dim][$k] = $this->elemType->parseValue($unEsc);
                 }
             } catch (ParseException $e) {
-                $this->throwParseException($str, 'Error parsing the element value', $strOffset, $e);
+                $this->throwParseException($extRepr, 'Error parsing the element value', $strOffset, $e);
             }
             $strOffset += strlen($elem);
         }

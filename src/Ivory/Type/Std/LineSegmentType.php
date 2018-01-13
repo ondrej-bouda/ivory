@@ -10,11 +10,10 @@ use Ivory\Value\LineSegment;
  * Represented as a {@link \Ivory\Value\LineSegment} object.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-geometric.html
- * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
 class LineSegmentType extends CompoundGeometricType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
         $re = '~^ \s*
                 ((\()|(\[))? \s*                    # optional opening parenthesis or bracket
@@ -24,16 +23,16 @@ class LineSegmentType extends CompoundGeometricType
                 (?(2)\)|(?(3)\])) \s*               # pairing closing parenthesis or bracket
                 $~x';
 
-        if (preg_match($re, $str, $m)) {
+        if (preg_match($re, $extRepr, $m)) {
             try {
                 $start = $this->pointType->parseValue($m[4]);
                 $end = $this->pointType->parseValue($m[5]);
                 return LineSegment::fromEndpoints($start, $end);
             } catch (\InvalidArgumentException $e) {
-                throw $this->invalidValueException($str, $e);
+                throw $this->invalidValueException($extRepr, $e);
             }
         } else {
-            throw $this->invalidValueException($str);
+            throw $this->invalidValueException($extRepr);
         }
     }
 

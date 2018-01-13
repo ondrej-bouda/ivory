@@ -196,11 +196,11 @@ SQL
                 return 'time';
             }
 
-            public function parseValue(string $str)
+            public function parseValue(string $extRepr)
             {
-                $dt = \DateTime::createFromFormat('H:i:s.u', $str);
+                $dt = \DateTime::createFromFormat('H:i:s.u', $extRepr);
                 if ($dt === false) {
-                    $dt = \DateTime::createFromFormat('H:i:s', $str);
+                    $dt = \DateTime::createFromFormat('H:i:s', $extRepr);
                 }
 
                 if ($dt !== false) {
@@ -243,9 +243,9 @@ SQL
         // Prefer standard \DateTime over the custom Date class:
         $myDateType = new class('pg_catalog', 'date') extends DateType
         {
-            public function parseValue(string $str)
+            public function parseValue(string $extRepr)
             {
-                $date = parent::parseValue($str);
+                $date = parent::parseValue($extRepr);
                 return $date->toDateTime();
             }
 

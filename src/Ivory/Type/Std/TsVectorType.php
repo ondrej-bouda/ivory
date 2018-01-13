@@ -16,9 +16,9 @@ class TsVectorType extends BaseType
 {
     const DEFAULT_WEIGHT = 'D';
 
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        preg_match_all('~\'((?:[^\']+|\'\')+)\'(?::([\d\w,]+))?~', $str, $matches, PREG_SET_ORDER);
+        preg_match_all('~\'((?:[^\']+|\'\')+)\'(?::([\d\w,]+))?~', $extRepr, $matches, PREG_SET_ORDER);
         $lexemes = [];
         foreach ($matches as $m) {
             $lex = strtr($m[1], ["''" => "'"]);

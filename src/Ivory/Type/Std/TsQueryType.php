@@ -14,9 +14,9 @@ use Ivory\Value\TextSearchQuery;
  */
 class TsQueryType extends BaseType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        return TextSearchQuery::fromString($str);
+        return TextSearchQuery::fromString($extRepr);
     }
 
     public function serializeValue($val): string

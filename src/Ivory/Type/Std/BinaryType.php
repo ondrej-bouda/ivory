@@ -14,15 +14,15 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class BinaryType extends BaseType implements ITotallyOrderedType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
         /* Depending on the PostgreSQL bytea_output configuration parameter, data may be encoded either in the "hex" or
          * "escape" format, which may be recognized by the '\x' prefix.
          */
-        if (substr($str, 0, 2) == '\\x') {
-            return hex2bin(substr($str, 2));
+        if (substr($extRepr, 0, 2) == '\\x') {
+            return hex2bin(substr($extRepr, 2));
         } else {
-            return pg_unescape_bytea($str);
+            return pg_unescape_bytea($extRepr);
         }
     }
 

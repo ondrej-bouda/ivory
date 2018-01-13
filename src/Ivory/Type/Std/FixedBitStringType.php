@@ -13,8 +13,8 @@ use Ivory\Value\FixedBitString;
  */
 class FixedBitStringType extends BitStringType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        return FixedBitString::fromString($str);
+        return FixedBitString::fromString($extRepr);
     }
 }

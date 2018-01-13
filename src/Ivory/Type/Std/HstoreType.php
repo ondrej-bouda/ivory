@@ -16,7 +16,7 @@ use Ivory\Type\BaseType;
  */
 class HstoreType extends BaseType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
         $re = '~
                 \s*
@@ -30,7 +30,7 @@ class HstoreType extends BaseType
                ~iux';
         $result = [];
         $offset = 0;
-        while (preg_match($re, $str, $m, PREG_OFFSET_CAPTURE, $offset)) {
+        while (preg_match($re, $extRepr, $m, PREG_OFFSET_CAPTURE, $offset)) {
             if ($m[0][1] != $offset) {
                 throw new \InvalidArgumentException('Invalid syntax of hstore value');
             }
@@ -40,22 +40,22 @@ class HstoreType extends BaseType
             $result[$k] = $v;
 
             $offset += strlen($m[0][0]);
-            if ($offset == strlen($str)) {
+            if ($offset == strlen($extRepr)) {
                 break;
             }
-            if ($str[$offset] != ',') {
+            if ($extRepr[$offset] != ',') {
                 throw new \InvalidArgumentException('Invalid syntax of hstore value');
             }
 
             $offset++;
         }
-        if (strlen($str) > $offset) {
+        if (strlen($extRepr) > $offset) {
             $pregError = preg_last_error();
             switch ($pregError) {
                 case PREG_NO_ERROR:
                     throw new \InvalidArgumentException('Invalid syntax of hstore value');
                 case PREG_JIT_STACKLIMIT_ERROR:
-                    return $this->parseLongValue($str);
+                    return $this->parseLongValue($extRepr);
                 default:
                     throw new \RuntimeException("PCRE error $pregError when matching at offset $offset");
             }

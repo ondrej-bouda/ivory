@@ -10,11 +10,10 @@ use Ivory\Value\Path;
  * Represented as a {@link \Ivory\Value\Path} object.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-geometric.html
- * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
 class PathType extends CompoundGeometricType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
         $re = '~^ \s*
                 (?:(\()|(\[))? \s*                  # optional opening parenthesis or bracket
@@ -28,7 +27,7 @@ class PathType extends CompoundGeometricType
                 (?(1)\)|(?(2)\])) \s*               # pairing closing parenthesis or bracket
                 $~x';
 
-        if (preg_match($re, $str, $m)) {
+        if (preg_match($re, $extRepr, $m)) {
             $isOpen = isset($m[2]);
             $points = [];
             $pointListStr = $m[3];
@@ -39,10 +38,10 @@ class PathType extends CompoundGeometricType
                 }
                 return Path::fromPoints($points, ($isOpen ? Path::OPEN : Path::CLOSED));
             } catch (\InvalidArgumentException $e) {
-                throw $this->invalidValueException($str, $e);
+                throw $this->invalidValueException($extRepr, $e);
             }
         } else {
-            throw $this->invalidValueException($str);
+            throw $this->invalidValueException($extRepr);
         }
     }
 

@@ -105,21 +105,21 @@ class DateType extends ConnectionDependentBaseType implements IDiscreteType
         $this->modeRetriever = null;
     }
 
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        if ($str == 'infinity') {
+        if ($extRepr == 'infinity') {
             return Date::infinity();
-        } elseif ($str == '-infinity') {
+        } elseif ($extRepr == '-infinity') {
             return Date::minusInfinity();
         }
 
-        $parts = explode(' BC', $str);
+        $parts = explode(' BC', $extRepr);
 
         switch ($this->modeRetriever->getValue()) {
             case self::MODE_ISO: // e.g., 1997-12-17
             case self::MODE_PG_YMD: // e.g., 1997-12-17
                 if (!isset($parts[1])) {
-                    return Date::fromISOString($str); // optimization of the major case
+                    return Date::fromISOString($extRepr); // optimization of the major case
                 }
                 list($y, $m, $d) = explode('-', $parts[0]);
                 break;
@@ -155,7 +155,7 @@ class DateType extends ConnectionDependentBaseType implements IDiscreteType
         try {
             return Date::fromISOString($isoStr);
         } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException('Invalid date: ' . $str, 0, $e);
+            throw new \InvalidArgumentException('Invalid date: ' . $extRepr, 0, $e);
         }
     }
 

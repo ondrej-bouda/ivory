@@ -14,18 +14,18 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class FloatType extends BaseType implements ITotallyOrderedType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        if (is_numeric($str)) {
-            return (float)$str;
-        } elseif (strcasecmp($str, 'NaN') == 0) {
+        if (is_numeric($extRepr)) {
+            return (float)$extRepr;
+        } elseif (strcasecmp($extRepr, 'NaN') == 0) {
             return NAN;
-        } elseif (strcasecmp($str, 'Infinity') == 0) {
+        } elseif (strcasecmp($extRepr, 'Infinity') == 0) {
             return INF;
-        } elseif (strcasecmp($str, '-Infinity') == 0) {
+        } elseif (strcasecmp($extRepr, '-Infinity') == 0) {
             return -INF;
         } else {
-            throw $this->invalidValueException($str);
+            throw $this->invalidValueException($extRepr);
         }
     }
 

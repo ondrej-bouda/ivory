@@ -14,9 +14,9 @@ use Ivory\Type\IDiscreteType;
  */
 class IntegerType extends BaseType implements IDiscreteType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        return (int)$str;
+        return (int)$extRepr;
     }
 
     public function serializeValue($val): string

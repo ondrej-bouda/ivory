@@ -19,9 +19,9 @@ class TimeTzType extends BaseType implements ITotallyOrderedType
     use TotallyOrderedByPhpOperators;
 
 
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        return TimeTz::fromString($str);
+        return TimeTz::fromString($extRepr);
     }
 
     public function serializeValue($val): string

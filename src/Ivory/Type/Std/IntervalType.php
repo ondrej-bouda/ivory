@@ -19,9 +19,9 @@ class IntervalType extends BaseType implements ITotallyOrderedType
     use TotallyOrderedByPhpOperators;
 
 
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        return TimeInterval::fromString($str);
+        return TimeInterval::fromString($extRepr);
     }
 
     public function serializeValue($val): string

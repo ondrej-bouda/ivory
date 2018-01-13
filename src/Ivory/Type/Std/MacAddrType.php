@@ -11,16 +11,16 @@ use Ivory\Value\MacAddr;
  * Represented as a {@link \Ivory\Value\MacAddr} object.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-net-types.html
- * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
+ * @todo #21 implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
 class MacAddrType extends BaseType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
         try {
-            return MacAddr::fromString($str);
+            return MacAddr::fromString($extRepr);
         } catch (\InvalidArgumentException $e) {
-            throw $this->invalidValueException($str, $e);
+            throw $this->invalidValueException($extRepr, $e);
         }
     }
 

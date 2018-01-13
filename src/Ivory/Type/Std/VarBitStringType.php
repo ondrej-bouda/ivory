@@ -13,8 +13,8 @@ use Ivory\Value\VarBitString;
  */
 class VarBitStringType extends BitStringType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        return VarBitString::fromString($str);
+        return VarBitString::fromString($extRepr);
     }
 }

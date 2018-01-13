@@ -10,11 +10,10 @@ use Ivory\Value\Polygon;
  * Represented as a {@link \Ivory\Value\Polygon} object.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-geometric.html
- * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
 class PolygonType extends CompoundGeometricType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
         $re = '~^ \s*
                 (\()? \s*                           # optional opening parenthesis
@@ -28,7 +27,7 @@ class PolygonType extends CompoundGeometricType
                 (?(1)\)) \s*                        # pairing closing parenthesis
                 $~x';
 
-        if (preg_match($re, $str, $m)) {
+        if (preg_match($re, $extRepr, $m)) {
             $points = [];
             $pointListStr = $m[2];
             $fragments = explode(',', $pointListStr);
@@ -38,10 +37,10 @@ class PolygonType extends CompoundGeometricType
                 }
                 return Polygon::fromPoints($points);
             } catch (\InvalidArgumentException $e) {
-                throw $this->invalidValueException($str, $e);
+                throw $this->invalidValueException($extRepr, $e);
             }
         } else {
-            throw $this->invalidValueException($str);
+            throw $this->invalidValueException($extRepr);
         }
     }
 

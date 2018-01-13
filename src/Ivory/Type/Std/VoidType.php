@@ -23,7 +23,7 @@ class VoidType extends BaseType implements ITotallyOrderedType
         return $inst;
     }
 
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
         return self::void();
     }

@@ -16,13 +16,13 @@ use Ivory\Value\Point;
  */
 class PointType extends BaseType implements ITotallyOrderedType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
         $coordsRe = '~^ \s* (\()? \s* ([0-9.e+-]+) \s* , \s* ([0-9.e+-]+) \s* (?(1)\)) \s* $~ix';
-        if (preg_match($coordsRe, $str, $m) && is_numeric($m[2]) && is_numeric($m[3])) {
+        if (preg_match($coordsRe, $extRepr, $m) && is_numeric($m[2]) && is_numeric($m[3])) {
             return Point::fromCoords($m[2], $m[3]);
         } else {
-            throw $this->invalidValueException($str);
+            throw $this->invalidValueException($extRepr);
         }
     }
 

@@ -13,13 +13,12 @@ use Ivory\Value\XmlDocument;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-xml.html
  * @see http://www.postgresql.org/docs/9.4/static/functions-xml.html
- * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
 class XmlType extends BaseType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        return XmlContent::fromValue($str);
+        return XmlContent::fromValue($extRepr);
     }
 
     public function serializeValue($val): string

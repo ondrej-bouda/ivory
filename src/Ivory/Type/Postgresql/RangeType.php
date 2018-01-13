@@ -41,9 +41,9 @@ class RangeType implements ITotallyOrderedType
         return $this->canonicalFunc;
     }
 
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        if (preg_match('~^\s*empty\s*$~i', $str)) {
+        if (preg_match('~^\s*empty\s*$~i', $extRepr)) {
             return Range::createEmpty($this->subtype);
         }
 
@@ -60,7 +60,7 @@ class RangeType implements ITotallyOrderedType
                    (?P<close> [])] )
                    \s*$
                   ~x';
-        if (!preg_match($regex, $str, $m)) {
+        if (!preg_match($regex, $extRepr, $m)) {
             throw new \InvalidArgumentException("Invalid value for range {$this->getSchemaName()}.{$this->getName()}");
         }
 

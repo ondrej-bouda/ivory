@@ -11,7 +11,6 @@ use Ivory\Value\LineSegment;
  * Represented as a {@link \Ivory\Value\Line} object.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-geometric.html
- * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
 class LineType extends CompoundGeometricType
 {
@@ -27,7 +26,7 @@ class LineType extends CompoundGeometricType
     }
 
 
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
         // the { A, B, C } variant
         $re = '~^ \s*
@@ -37,21 +36,21 @@ class LineType extends CompoundGeometricType
                 ([0-9.e+-]+) \s*
                 \} \s*
                 $~x';
-        if (preg_match($re, $str, $m)) {
+        if (preg_match($re, $extRepr, $m)) {
             try {
                 return Line::fromEquationCoeffs($m[1], $m[2], $m[3]);
             } catch (\InvalidArgumentException $e) {
-                throw $this->invalidValueException($str, $e);
+                throw $this->invalidValueException($extRepr, $e);
             }
         }
 
         // given by two distinct points
         try {
             /** @var LineSegment $lineSeg */
-            $lineSeg = $this->lineSegType->parseValue($str);
+            $lineSeg = $this->lineSegType->parseValue($extRepr);
             return Line::fromPoints($lineSeg->getStart(), $lineSeg->getEnd());
         } catch (\InvalidArgumentException $e) {
-            throw $this->invalidValueException($str, $e);
+            throw $this->invalidValueException($extRepr, $e);
         }
     }
 

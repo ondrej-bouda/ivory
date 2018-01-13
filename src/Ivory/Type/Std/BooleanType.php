@@ -14,9 +14,9 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class BooleanType extends BaseType implements ITotallyOrderedType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        switch (strtoupper($str)) {
+        switch (strtoupper($extRepr)) {
             case 'T':
             case 'TRUE':
             case 'Y':
@@ -34,7 +34,7 @@ class BooleanType extends BaseType implements ITotallyOrderedType
                 return false;
 
             default:
-                throw $this->invalidValueException($str);
+                throw $this->invalidValueException($extRepr);
         }
     }
 

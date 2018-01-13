@@ -69,11 +69,11 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
         $this->localMeanTimeZoneRetriever = null;
     }
 
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        if ($str == 'infinity') {
+        if ($extRepr == 'infinity') {
             return TimestampTz::infinity();
-        } elseif ($str == '-infinity') {
+        } elseif ($extRepr == '-infinity') {
             return TimestampTz::minusInfinity();
         }
 
@@ -86,15 +86,15 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
                     E_USER_WARNING
                 );
             case DateStyle::FORMAT_ISO:
-                preg_match('~^(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+(?:\.\d+)?)([-+][^ ]+)( BC)?$~', $str, $matches);
+                preg_match('~^(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+(?:\.\d+)?)([-+][^ ]+)( BC)?$~', $extRepr, $matches);
                 list(, $y, $m, $d, $h, $i, $s, $z) = $matches;
                 break;
             case DateStyle::FORMAT_GERMAN:
-                preg_match('~^(\d+)\.(\d+)\.(\d+) (\d+):(\d+):(\d+(?:\.\d+)?) ([^ ]+)( BC)?$~', $str, $matches);
+                preg_match('~^(\d+)\.(\d+)\.(\d+) (\d+):(\d+):(\d+(?:\.\d+)?) ([^ ]+)( BC)?$~', $extRepr, $matches);
                 list(, $d, $m, $y, $h, $i, $s, $z) = $matches;
                 break;
             case DateStyle::FORMAT_SQL:
-                preg_match('~^(\d+)/(\d+)/(\d+) (\d+):(\d+):(\d+(?:\.\d+)?) ([^ ]+)( BC)?$~', $str, $matches);
+                preg_match('~^(\d+)/(\d+)/(\d+) (\d+):(\d+):(\d+(?:\.\d+)?) ([^ ]+)( BC)?$~', $extRepr, $matches);
                 if ($dateStyle->getOrder() == DateStyle::ORDER_DMY) {
                     list(, $d, $m, $y, $h, $i, $s, $z) = $matches;
                 } else {
@@ -102,7 +102,7 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
                 }
                 break;
             case DateStyle::FORMAT_POSTGRES:
-                preg_match('~^\w{3} (\d+|\w{3}) (\d+|\w{3}) (\d+):(\d+):(\d+(?:\.\d+)?) (\d+) ([^ ]+)( BC)?$~', $str, $matches);
+                preg_match('~^\w{3} (\d+|\w{3}) (\d+|\w{3}) (\d+):(\d+):(\d+(?:\.\d+)?) (\d+) ([^ ]+)( BC)?$~', $extRepr, $matches);
                 if ($dateStyle->getOrder() == DateStyle::ORDER_DMY) {
                     list(, $d, $ms, $h, $i, $s, $y, $z) = $matches;
                 } else {

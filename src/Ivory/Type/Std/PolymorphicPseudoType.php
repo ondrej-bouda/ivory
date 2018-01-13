@@ -12,7 +12,7 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class PolymorphicPseudoType extends BaseType implements ITotallyOrderedType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
         throw new InternalException('A non-null value to be parsed for a polymorphic pseudo-type');
     }

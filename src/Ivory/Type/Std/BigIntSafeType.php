@@ -24,12 +24,12 @@ class BigIntSafeType extends BaseType implements IDiscreteType
         }
     }
 
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        if ($str >= PHP_INT_MIN && $str <= PHP_INT_MAX) { // correctness: int does not overflow, but rather gets converted to a float
-            return (int)$str;
+        if ($extRepr >= PHP_INT_MIN && $extRepr <= PHP_INT_MAX) { // correctness: int does not overflow, but rather gets converted to a float
+            return (int)$extRepr;
         } else {
-            return $str;
+            return $extRepr;
         }
     }
 

@@ -41,7 +41,7 @@ class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedTy
         $this->decSepRetriever = null;
     }
 
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
         /* FIXME: Is it really necessary to parse money value that strictly? What about just parsing up to two segments
                   of digits, interpreting the second one as the fractional part, if present? The decimal separator is
@@ -49,9 +49,9 @@ class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedTy
          */
         $decSep = $this->decSepRetriever->getValue();
         try {
-            return Money::fromString($str, $decSep);
+            return Money::fromString($extRepr, $decSep);
         } catch (\InvalidArgumentException $e) {
-            throw $this->invalidValueException($str, $e);
+            throw $this->invalidValueException($extRepr, $e);
         }
     }
 

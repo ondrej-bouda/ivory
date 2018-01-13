@@ -10,11 +10,10 @@ use Ivory\Value\Circle;
  * Represented as a {@link \Ivory\Value\Circle} object.
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-geometric.html
- * @todo implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
 class CircleType extends CompoundGeometricType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
         $re = '~^ \s*
                 ((\()|(<))? \s*                     # optional opening parenthesis or angle bracket
@@ -24,15 +23,15 @@ class CircleType extends CompoundGeometricType
                 (?(1)\)|(?(2)>)) \s*                # pairing closing parenthesis or angle bracket
                 $~ix';
 
-        if (preg_match($re, $str, $m) && is_numeric($m[5])) {
+        if (preg_match($re, $extRepr, $m) && is_numeric($m[5])) {
             try {
                 $center = $this->pointType->parseValue($m[4]);
                 return Circle::fromCoords($center, $m[5]);
             } catch (\InvalidArgumentException $e) {
-                throw $this->invalidValueException($str, $e);
+                throw $this->invalidValueException($extRepr, $e);
             }
         } else {
-            throw $this->invalidValueException($str);
+            throw $this->invalidValueException($extRepr);
         }
     }
 

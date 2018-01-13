@@ -74,17 +74,17 @@ abstract class CompositeType implements ITotallyOrderedType
         return ($this->attNameMap[$attName] ?? null);
     }
 
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        if ($str == '()' && !$this->attributes) {
+        if ($extRepr == '()' && !$this->attributes) {
             return Composite::fromList($this, []);
         }
 
-        $strLen = strlen($str);
-        if ($str[0] != '(') {
+        $strLen = strlen($extRepr);
+        if ($extRepr[0] != '(') {
             throw new ParseException('Composite value not enclosed in parentheses', 0);
         }
-        if ($str[$strLen - 1] != ')') {
+        if ($extRepr[$strLen - 1] != ')') {
             throw new ParseException('Composite value not enclosed in parentheses', $strLen - 1);
         }
         $strOffset = 1;
@@ -95,29 +95,29 @@ abstract class CompositeType implements ITotallyOrderedType
                       |                             # or an unquoted string of characters which do not confuse the
                       (?:[^"()\\\\,]|\\\\.)+        # parser or are backslash-escaped
 		             ~x';
-        preg_match_all($attRegex, $str, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE, $strOffset);
+        preg_match_all($attRegex, $extRepr, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE, $strOffset);
         $atts = [];
         foreach ($matches[0] as list($att, $attOffset)) {
             for (; $strOffset < $attOffset; $strOffset++) {
-                if ($str[$strOffset] == ',') {
+                if ($extRepr[$strOffset] == ',') {
                     $atts[] = null;
                 } else {
-                    throw new ParseException("Expecting ',' instead of '{$str[$strOffset]}'", $strOffset);
+                    throw new ParseException("Expecting ',' instead of '{$extRepr[$strOffset]}'", $strOffset);
                 }
             }
             $cont = ($att[0] == '"' ? substr($att, 1, -1) : $att);
             $atts[] = preg_replace(['~\\\\(.)~', '~""~'], ['$1', '"'], $cont);
             $strOffset += strlen($att);
-            if (!($str[$strOffset] == ',' || ($str[$strOffset] == ')' && $strOffset == $strLen - 1))) {
-                throw new ParseException("Expecting ',' instead of '{$str[$strOffset]}'", $strOffset);
+            if (!($extRepr[$strOffset] == ',' || ($extRepr[$strOffset] == ')' && $strOffset == $strLen - 1))) {
+                throw new ParseException("Expecting ',' instead of '{$extRepr[$strOffset]}'", $strOffset);
             }
             $strOffset++;
         }
         for (; $strOffset < $strLen; $strOffset++) {
-            if ($str[$strOffset] == ',' || ($str[$strOffset] == ')' && $strOffset == $strLen - 1)) {
+            if ($extRepr[$strOffset] == ',' || ($extRepr[$strOffset] == ')' && $strOffset == $strLen - 1)) {
                 $atts[] = null;
             } else {
-                throw new ParseException("Expecting ',' instead of '{$str[$strOffset]}'", $strOffset);
+                throw new ParseException("Expecting ',' instead of '{$extRepr[$strOffset]}'", $strOffset);
             }
         }
 

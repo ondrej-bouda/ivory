@@ -15,13 +15,13 @@ use Ivory\Value\Decimal;
  */
 class DecimalType extends BaseType implements ITotallyOrderedType
 {
-    public function parseValue(string $str)
+    public function parseValue(string $extRepr)
     {
-        if (strcasecmp($str, 'NaN') == 0) {
+        if (strcasecmp($extRepr, 'NaN') == 0) {
             return Decimal::NaN();
         }
 
-        return Decimal::fromNumber($str);
+        return Decimal::fromNumber($extRepr);
     }
 
     public function serializeValue($val): string
