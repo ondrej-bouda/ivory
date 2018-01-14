@@ -2,17 +2,13 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-use Ivory\Type\IRangeCanonicalFunc;
 use Ivory\Type\ITotallyOrderedType;
-use Ivory\Type\Std\ConventionalRangeCanonicalFunc;
 use Ivory\Type\Std\IntegerType;
 
 class RangeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ITotallyOrderedType */
     private $intType;
-    /** @var IRangeCanonicalFunc */
-    private $intCanonFunc;
     /** @var Range */
     private $empty;
     /** @var Range */
@@ -25,18 +21,16 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->intType = new IntegerType('pg_catalog', 'int4');
-        $this->intCanonFunc = new ConventionalRangeCanonicalFunc($this->intType);
 
         $this->empty = Range::createEmpty($this->intType);
-        $this->finite = Range::createFromBounds($this->intType, $this->intCanonFunc, 1, 4);
-        $this->infinite = Range::createFromBounds($this->intType, $this->intCanonFunc, null, 4);
+        $this->finite = Range::createFromBounds($this->intType, 1, 4);
+        $this->infinite = Range::createFromBounds($this->intType, null, 4);
     }
 
     private function intRng($lower, $upper)
     {
         return Range::createFromBounds(
             $this->intType,
-            $this->intCanonFunc,
             $lower,
             $upper
         );
@@ -57,43 +51,55 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     public function testCreateFromBounds()
     {
         $this->assertTrue(
-            Range::createFromBounds($this->intType, $this->intCanonFunc, 1, 4)
+            Range::createFromBounds($this->intType, 1, 4)
+                ->equals($this->intRng(1, 4))
+        );
+
+        $this->assertSame('[]', Range::createFromBounds($this->intType, 1, 3, '[]')->getBoundsSpec());
+        $this->assertSame('(]', Range::createFromBounds($this->intType, null, 3, '[]')->getBoundsSpec());
+        $this->assertSame('[)', Range::createFromBounds($this->intType, 1, null, '[)')->getBoundsSpec());
+        $this->assertSame('()', Range::createFromBounds($this->intType, 1, 3, '()')->getBoundsSpec());
+        $this->assertSame('()', Range::createFromBounds($this->intType, null, null, '[]')->getBoundsSpec());
+
+        $this->assertSame('[]', Range::createFromBounds($this->intType, 1, 3, true, true)->getBoundsSpec());
+        $this->assertSame('(]', Range::createFromBounds($this->intType, null, 3, true, true)->getBoundsSpec());
+        $this->assertSame('[)', Range::createFromBounds($this->intType, 1, null, true, false)->getBoundsSpec());
+        $this->assertSame('()', Range::createFromBounds($this->intType, 1, 3, false, false)->getBoundsSpec());
+        $this->assertSame('()', Range::createFromBounds($this->intType, null, null, true, true)->getBoundsSpec());
+
+        $this->assertTrue(Range::createFromBounds($this->intType, 1, 1)->isEmpty());
+        $this->assertTrue(Range::createFromBounds($this->intType, 1, 2, '()')->isEmpty());
+        $this->assertTrue(Range::createFromBounds($this->intType, 5, 3)->isEmpty());
+
+        $this->assertFalse(Range::createFromBounds($this->intType, 3, 3, '[]')->isEmpty());
+    }
+
+    public function testEquals()
+    {
+        $this->assertTrue(
+            Range::createFromBounds($this->intType, 1, 4)
                 ->equals($this->intRng(1, 4))
         );
 
         $this->assertTrue(
-            Range::createFromBounds($this->intType, $this->intCanonFunc, 1, 3, '[]')
+            Range::createFromBounds($this->intType, 1, 3, '[]')
                 ->equals($this->intRng(1, 4))
         );
 
         $this->assertTrue(
-            Range::createFromBounds($this->intType, $this->intCanonFunc, 0, 3, '(]')
+            Range::createFromBounds($this->intType, 0, 3, '(]')
                 ->equals($this->intRng(1, 4))
         );
 
         $this->assertTrue(
-            Range::createFromBounds($this->intType, $this->intCanonFunc, 0, 4, '()')
+            Range::createFromBounds($this->intType, 0, 4, '()')
                 ->equals($this->intRng(1, 4))
         );
 
         $this->assertFalse(
-            Range::createFromBounds($this->intType, null, 1, 3, '[]')
-                ->equals($this->intRng(1, 4))
+            Range::createFromBounds($this->intType, 1, 3, '[]')
+                ->equals($this->intRng(1, 3))
         );
-
-        $this->assertSame('[]', Range::createFromBounds($this->intType, null, 1, 3, '[]')->getBoundsSpec());
-        $this->assertSame('(]', Range::createFromBounds($this->intType, null, null, 3, '[]')->getBoundsSpec());
-        $this->assertSame('[)', Range::createFromBounds($this->intType, null, 1, null, '[)')->getBoundsSpec());
-        $this->assertSame('()', Range::createFromBounds($this->intType, null, null, null, '[]')->getBoundsSpec());
-
-        $this->assertTrue(Range::createFromBounds($this->intType, $this->intCanonFunc, 1, 1)->isEmpty());
-        $this->assertTrue(Range::createFromBounds($this->intType, null, 1, 1)->isEmpty());
-
-        $this->assertTrue(Range::createFromBounds($this->intType, $this->intCanonFunc, 1, 2, '()')->isEmpty());
-        $this->assertFalse(Range::createFromBounds($this->intType, null, 1, 2, '()')->isEmpty());
-
-        $this->assertTrue(Range::createFromBounds($this->intType, $this->intCanonFunc, 5, 3)->isEmpty());
-        $this->assertFalse(Range::createFromBounds($this->intType, $this->intCanonFunc, 3, 3, '[]')->isEmpty());
     }
 
     public function testBounds()

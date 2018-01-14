@@ -5,7 +5,6 @@ namespace Ivory\Value;
 use Ivory\Exception\ImmutableException;
 use Ivory\Exception\UnsupportedException;
 use Ivory\Type\IDiscreteType;
-use Ivory\Type\IRangeCanonicalFunc;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Utils\IEqualable;
 
@@ -23,11 +22,10 @@ use Ivory\Utils\IEqualable;
  *   towards infinity, respectively.
  * - A range might even cover just a single point. {@link Range::isSinglePoint()} may be used for checking out.
  *
- * Ranges of some types may have a canonical function, the purpose of which is to convert semantically equivalent ranges
- * on {@link \Ivory\Type\IDiscreteType discrete types} to syntactically equivalent ranges. E.g., one such function might
- * convert the range `[1,3]` to `[1,4)`. Like in PostgreSQL, such canonicalization is performed automatically upon
- * constructing a range. If other than canonical representation of a range is desired, e.g., for presenting the range
- * using both bounds inclusive, method {@link Range::toBounds()} may be useful.
+ * In PostgreSQL, ranges on discrete subtypes may have a canonical function defined on them, the purpose of which is to
+ * convert semantically equivalent ranges to syntactically equivalent ones (e.g., one such function might convert the
+ * range `[1,3]` to `[1,4)`). Such a feature is *not* implemented on the PHP side. The ranges constructed in PHP are not
+ * normalized in any way, they may only be converted manually using the {@link Range::toBounds()} method.
  *
  * A range is `IEqualable` to another range. Two ranges are equal only if they are above the same subtype and if the
  * effective range equals.
@@ -46,8 +44,6 @@ class Range implements IEqualable, \ArrayAccess
 {
     /** @var ITotallyOrderedType */
     private $subtype;
-    /** @var IRangeCanonicalFunc */
-    private $canonicalFunc;
     /** @var bool */
     private $empty;
     /** @var mixed */
@@ -71,17 +67,16 @@ class Range implements IEqualable, \ArrayAccess
      * - or by passing two boolean values as the `$boundsOrLowerInc` and `$upperInc` telling whichever bound is
      *   inclusive.
      *
-     * If the lower bound is greater than the upper bound, or if both bounds are equal but any of them is exclusive, an
-     * empty range gets created, forgetting the given upper and lower bound (just as PostgreSQL does). For creating an
-     * empty range explicitly, see {@link createEmpty()}.
+     * When the constructed range is effectively empty, an empty range gets created, forgetting the given lower and
+     * upper bound (just as PostgreSQL does). That happens in one of the following cases:
+     * * the lower bound is greater than the upper bound, or
+     * * both bounds are equal but any of them is exclusive, or
+     * * the subtype is {@link IDiscreteType discrete}, the upper bound is just one step after the lower bound and both
+     *   the bounds are exclusive.
+     *
+     * For creating an empty range explicitly, see {@link createEmpty()}.
      *
      * @param ITotallyOrderedType $subtype the range subtype
-     * @param IRangeCanonicalFunc|null $canonicalFunc
-     *                          if given, the range will be created in the canonical form according to this function;
-     *                          skip with <tt>null</tt> to create the range as is;
-     *                          NOTE: while one could expect the canonical function usage at the range *type* level,
-     *                            passing it to this factory method makes it clear that if no canonical function is
-     *                            given, the range will not get canonicalized
      * @param mixed $lower the range lower bound, or <tt>null</tt> if unbounded
      * @param mixed $upper the range upper bound, or <tt>null</tt> if unbounded
      * @param bool|string $boundsOrLowerInc
@@ -100,7 +95,6 @@ class Range implements IEqualable, \ArrayAccess
      */
     public static function createFromBounds(
         ITotallyOrderedType $subtype,
-        ?IRangeCanonicalFunc $canonicalFunc,
         $lower,
         $upper,
         $boundsOrLowerInc = '[)',
@@ -116,6 +110,12 @@ class Range implements IEqualable, \ArrayAccess
                 if (!$loInc || !$upInc) {
                     return self::createEmpty($subtype);
                 }
+            } elseif (!$loInc && !$upInc && $subtype instanceof IDiscreteType) {
+                $up = $subtype->step(-1, $upper);
+                $isEmpty = ($lower instanceof IEqualable ? $lower->equals($up) : ($lower == $up));
+                if ($isEmpty) {
+                    return self::createEmpty($subtype);
+                }
             }
         } else {
             if ($lower === null) {
@@ -126,33 +126,7 @@ class Range implements IEqualable, \ArrayAccess
             }
         }
 
-        if ($canonicalFunc !== null) {
-            list($lower, $loInc, $upper, $upInc) = $canonicalFunc->canonicalize($lower, $loInc, $upper, $upInc);
-
-            /* Check everything once again:
-             * - to find out whether the range became empty after canonicalization, and
-             * - as a defensive measure against poorly written canonical functions.
-             */
-            if ($lower !== null && $upper !== null) {
-                $comp = $subtype->compareValues($lower, $upper);
-                if ($comp > 0) {
-                    return self::createEmpty($subtype);
-                } elseif ($comp == 0) {
-                    if (!$loInc || !$upInc) {
-                        return self::createEmpty($subtype);
-                    }
-                }
-            } else {
-                if ($lower === null) {
-                    $loInc = false;
-                }
-                if ($upper === null) {
-                    $upInc = false;
-                }
-            }
-        }
-
-        return new Range($subtype, $canonicalFunc, false, $lower, $upper, $loInc, $upInc);
+        return new Range($subtype, false, $lower, $upper, $loInc, $upInc);
     }
 
     /**
@@ -163,7 +137,7 @@ class Range implements IEqualable, \ArrayAccess
      */
     public static function createEmpty(ITotallyOrderedType $subtype): Range
     {
-        return new Range($subtype, null, true, null, null, null, null);
+        return new Range($subtype, true, null, null, null, null);
     }
 
     private static function processBoundSpec($boundsOrLowerInc = '[)', ?bool $upperInc = null)
@@ -194,7 +168,6 @@ class Range implements IEqualable, \ArrayAccess
 
     private function __construct(
         ITotallyOrderedType $subtype,
-        ?IRangeCanonicalFunc $canonicalFunc,
         bool $empty,
         $lower,
         $upper,
@@ -202,7 +175,6 @@ class Range implements IEqualable, \ArrayAccess
         ?bool $upperInc
     ) {
         $this->subtype = $subtype;
-        $this->canonicalFunc = $canonicalFunc;
         $this->empty = $empty;
         $this->lower = $lower;
         $this->upper = $upper;
@@ -219,9 +191,6 @@ class Range implements IEqualable, \ArrayAccess
         return $this->subtype;
     }
 
-    /**
-     * @return bool whether the range is empty
-     */
     final public function isEmpty(): bool
     {
         return $this->empty;
@@ -592,7 +561,7 @@ class Range implements IEqualable, \ArrayAccess
             }
         }
 
-        return self::createFromBounds($this->subtype, $this->canonicalFunc, $lo, $up, $loInc, $upInc);
+        return self::createFromBounds($this->subtype, $lo, $up, $loInc, $upInc);
     }
 
     /**
@@ -673,37 +642,48 @@ class Range implements IEqualable, \ArrayAccess
             return false;
         }
 
+        $objLower = $object->lower;
+        $objUpper = $object->upper;
+
         if ($this->lowerInc != $object->lowerInc) {
-            return false;
+            if ($object->subtype instanceof IDiscreteType) {
+                $objLower = $object->subtype->step(($object->lowerInc ? -1 : 1), $objLower);
+            } else {
+                return false;
+            }
         }
         if ($this->upperInc != $object->upperInc) {
-            return false;
+            if ($object->subtype instanceof IDiscreteType) {
+                $objUpper = $object->subtype->step(($object->upperInc ? 1 : -1), $objUpper);
+            } else {
+                return false;
+            }
         }
 
         if ($this->lower === null) {
-            if ($object->lower !== null) {
+            if ($objLower !== null) {
                 return false;
             }
         } elseif ($this->lower instanceof IEqualable) {
-            if (!$this->lower->equals($object->lower)) {
+            if (!$this->lower->equals($objLower)) {
                 return false;
             }
         } else {
-            if ($this->lower != $object->lower) {
+            if ($this->lower != $objLower) {
                 return false;
             }
         }
 
         if ($this->upper === null) {
-            if ($object->upper !== null) {
+            if ($objUpper !== null) {
                 return false;
             }
         } elseif ($this->upper instanceof IEqualable) {
-            if (!$this->upper->equals($object->upper)) {
+            if (!$this->upper->equals($objUpper)) {
                 return false;
             }
         } else {
-            if ($this->upper != $object->upper) {
+            if ($this->upper != $objUpper) {
                 return false;
             }
         }

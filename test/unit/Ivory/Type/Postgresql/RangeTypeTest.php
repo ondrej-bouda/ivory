@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
-use Ivory\Type\Std\ConventionalRangeCanonicalFunc;
 use Ivory\Type\Std\IntegerType;
 use Ivory\Value\Range;
 
@@ -16,8 +15,7 @@ class RangeTypeTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $int = new IntegerType('pg_catalog', 'int4');
-        $canonFunc = new ConventionalRangeCanonicalFunc($int);
-        $this->intRangeType = new RangeType('pg_catalog', 'int4range', $int, $canonFunc);
+        $this->intRangeType = new RangeType('pg_catalog', 'int4range', $int);
     }
 
     private function intEmpty()
@@ -29,27 +27,42 @@ class RangeTypeTest extends \PHPUnit\Framework\TestCase
     {
         return Range::createFromBounds(
             $this->intRangeType->getSubtype(),
-            $this->intRangeType->getCanonicalFunc(),
             $lower,
             $upper
         );
     }
 
-    public function testParseSimple()
+    public function testParseValue()
     {
-        $this->assertTrue($this->intRangeType->parseValue('[1,4)')->equals($this->intRng(1, 4)));
-        $this->assertTrue($this->intRangeType->parseValue('[1,3]')->equals($this->intRng(1, 4)));
-        $this->assertTrue($this->intRangeType->parseValue('(0,4)')->equals($this->intRng(1, 4)));
-        $this->assertTrue($this->intRangeType->parseValue('(0,3]')->equals($this->intRng(1, 4)));
-        $this->assertTrue($this->intRangeType->parseValue('[1,1]')->equals($this->intRng(1, 2)));
-        $this->assertTrue($this->intRangeType->parseValue('[1,1)')->isEmpty());
-        $this->assertTrue($this->intRangeType->parseValue('[,4)')->equals($this->intRng(null, 4)));
-        $this->assertTrue($this->intRangeType->parseValue('[1,)')->equals($this->intRng(1, null)));
-        $this->assertTrue($this->intRangeType->parseValue('[,)')->equals($this->intRng(null, null)));
-        $this->assertTrue($this->intRangeType->parseValue('[5,4)')->isEmpty());
+        $rng1 = $this->intRangeType->parseValue('[1,4)');
+        $this->assertSame(1, $rng1->getLower());
+        $this->assertSame(4, $rng1->getUpper());
+        $this->assertSame('[)', $rng1->getBoundsSpec());
+
+        $rng2 = $this->intRangeType->parseValue('[1,3]');
+        $this->assertSame('[]', $rng2->getBoundsSpec());
+
+        $rng3 = $this->intRangeType->parseValue('(0,4)');
+        $this->assertSame('()', $rng3->getBoundsSpec());
+
+        $rng4 = $this->intRangeType->parseValue('[1,1)');
+        $this->assertTrue($rng4->isEmpty());
+
+        $rng5 = $this->intRangeType->parseValue('[,4)');
+        $this->assertSame(null, $rng5->getLower());
+        $this->assertSame(4, $rng5->getUpper());
+        $this->assertSame('()', $rng5->getBoundsSpec());
+
+        $rng6 = $this->intRangeType->parseValue('[,)');
+        $this->assertSame(null, $rng6->getLower());
+        $this->assertSame(null, $rng6->getUpper());
+        $this->assertSame('()', $rng6->getBoundsSpec());
+
+        $rng7 = $this->intRangeType->parseValue('[5,4)');
+        $this->assertTrue($rng7->isEmpty());
     }
 
-    public function testSerializeSimple()
+    public function testSerializeValue()
     {
         $this->assertSame('NULL', $this->intRangeType->serializeValue(null));
 

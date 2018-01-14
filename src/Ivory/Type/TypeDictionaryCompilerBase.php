@@ -116,13 +116,9 @@ abstract class TypeDictionaryCompilerBase implements ITypeDictionaryCompiler
         return new EnumType($schemaName, $typeName, $labels);
     }
 
-    protected function createRangeType(
-        string $schemaName,
-        string $typeName,
-        ITotallyOrderedType $subtype,
-        ?IRangeCanonicalFunc $canonicalFunc = null
-    ): IType {
-        return new RangeType($schemaName, $typeName, $subtype, $canonicalFunc);
+    protected function createRangeType(string $schemaName, string $typeName, ITotallyOrderedType $subtype): IType
+    {
+        return new RangeType($schemaName, $typeName, $subtype);
     }
 
     protected function createArrayType(IType $elemType, string $delimiter): IType

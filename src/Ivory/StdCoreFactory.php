@@ -23,7 +23,6 @@ use Ivory\Type\Ivory\LikeExpressionSerializer;
 use Ivory\Type\Ivory\QuotedIdentifierSerializer;
 use Ivory\Type\Ivory\RelationSerializer;
 use Ivory\Type\Ivory\SqlSerializer;
-use Ivory\Type\Std\StdRangeCanonicalFuncProvider;
 use Ivory\Type\Std\StdTypeLoader;
 use Ivory\Type\TypeRegister;
 
@@ -40,7 +39,6 @@ class StdCoreFactory implements ICoreFactory
     {
         $reg = new TypeRegister();
         $reg->registerTypeLoader(new StdTypeLoader());
-        $reg->registerRangeCanonicalFuncProvider(new StdRangeCanonicalFuncProvider());
         $reg->registerTypeAbbreviations(Lang\Sql\Types::getReservedTypes());
 
         // standard value serializers

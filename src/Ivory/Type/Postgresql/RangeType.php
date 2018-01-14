@@ -4,7 +4,6 @@ namespace Ivory\Type\Postgresql;
 
 use Ivory\Exception\IncomparableException;
 use Ivory\NamedDbObject;
-use Ivory\Type\IRangeCanonicalFunc;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Range;
 
@@ -18,27 +17,16 @@ class RangeType implements ITotallyOrderedType
     use NamedDbObject;
 
     private $subtype;
-    private $canonicalFunc;
 
-    public function __construct(
-        string $schemaName,
-        string $name,
-        ITotallyOrderedType $subtype,
-        ?IRangeCanonicalFunc $canonicalFunc = null
-    ) {
+    public function __construct(string $schemaName, string $name, ITotallyOrderedType $subtype)
+    {
         $this->setName($schemaName, $name);
         $this->subtype = $subtype;
-        $this->canonicalFunc = $canonicalFunc;
     }
 
     public function getSubtype(): ITotallyOrderedType
     {
         return $this->subtype;
-    }
-
-    public function getCanonicalFunc(): ?IRangeCanonicalFunc
-    {
-        return $this->canonicalFunc;
     }
 
     public function parseValue(string $extRepr)
@@ -69,7 +57,7 @@ class RangeType implements ITotallyOrderedType
         $lower = $this->parseBoundStr($m['lower']);
         $upper = $this->parseBoundStr($m['upper']);
 
-        return Range::createFromBounds($this->subtype, $this->canonicalFunc, $lower, $upper, $lowerInc, $upperInc);
+        return Range::createFromBounds($this->subtype, $lower, $upper, $lowerInc, $upperInc);
     }
 
     private function parseBoundStr(string $str)
@@ -93,7 +81,7 @@ class RangeType implements ITotallyOrderedType
 
         if (!$val instanceof Range) {
             if (is_array($val) && isset($val[0], $val[1]) && count($val) == 2) {
-                $val = Range::createFromBounds($this->subtype, $this->canonicalFunc, $val[0], $val[1], true, true);
+                $val = Range::createFromBounds($this->subtype, $val[0], $val[1], true, true);
             } else {
                 $message = "Value '$val' is not valid for type {$this->getSchemaName()}.{$this->getName()}";
                 throw new \InvalidArgumentException($message);

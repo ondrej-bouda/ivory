@@ -37,22 +37,6 @@ class TypeProviderList implements ITypeProvider
         return null;
     }
 
-    public function provideRangeCanonicalFunc(
-        string $schemaName,
-        string $funcName,
-        ITotallyOrderedType $subtype
-    ): ?IRangeCanonicalFunc
-    {
-        foreach ($this->typeProviders as $typeProvider) {
-            $func = $typeProvider->provideRangeCanonicalFunc($schemaName, $funcName, $subtype);
-            if ($func !== null) {
-                return $func;
-            }
-        }
-
-        return null;
-    }
-
     public function getTypeInferenceRules(): array
     {
         $result = [];

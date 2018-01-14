@@ -20,7 +20,7 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
         $enumLabels = $this->retrieveEnumLabels();
 
         $query = <<<SQL
-WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypdelim, rngcfnspname, rngcfname) AS (
+WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypdelim) AS (
     SELECT
         t.oid,
         nsp.nspname,
@@ -30,15 +30,12 @@ WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypd
               WHEN t.typtype = 'd' THEN t.typbasetype
               WHEN t.typtype = 'r' THEN rngsubtype
          END),
-        arrelemtype.typdelim,
-        rngcfnsp.nspname AS rngcfnspname,
-        rngcf.proname AS rngcfname
-    FROM pg_catalog.pg_type t
-         JOIN pg_catalog.pg_namespace nsp ON nsp.oid = t.typnamespace
-         LEFT JOIN pg_catalog.pg_range rng ON rng.rngtypid = t.oid
-         LEFT JOIN pg_catalog.pg_proc rngcf ON rngcf.oid = rng.rngcanonical
-         LEFT JOIN pg_catalog.pg_namespace rngcfnsp ON rngcfnsp.oid = rngcf.pronamespace
-         LEFT JOIN pg_catalog.pg_type arrelemtype ON arrelemtype.typarray = t.oid
+        arrelemtype.typdelim
+    FROM
+        pg_catalog.pg_type t
+        JOIN pg_catalog.pg_namespace nsp ON nsp.oid = t.typnamespace
+        LEFT JOIN pg_catalog.pg_range rng ON rng.rngtypid = t.oid
+        LEFT JOIN pg_catalog.pg_type arrelemtype ON arrelemtype.typarray = t.oid
 ),
 typetree (oid, depth) AS (
     SELECT oid, 0 FROM typeinfo WHERE parenttype IS NULL
@@ -137,21 +134,7 @@ SQL;
                             trigger_error($msg, E_USER_WARNING);
                             continue 2;
                         }
-                        if ($row['rngcfname'] !== null) {
-                            $canonFunc = $typeProvider->provideRangeCanonicalFunc(
-                                $row['rngcfnspname'], $row['rngcfname'], $subtype
-                            );
-                            if ($canonFunc === null) {
-                                $msg = "Range $typeName has a canonical function $row[rngcfnspname].$row[rngcfname], " .
-                                    "but there is no implementation of this function registered. Using the range " .
-                                    "without any canonical function - the range will be treated as a continuous " .
-                                    "range. That might lead to unexpected results, though.";
-                                trigger_error($msg, E_USER_WARNING);
-                            }
-                        } else {
-                            $canonFunc = null;
-                        }
-                        $type = $this->createRangeType($schemaName, $typeName, $subtype, $canonFunc);
+                        $type = $this->createRangeType($schemaName, $typeName, $subtype);
                         break;
 
                     default:

@@ -14,21 +14,6 @@ interface ITypeProvider
     function provideType(string $schemaName, string $typeName): ?IType;
 
     /**
-     * Provides the implementation of the range canonical function.
-     *
-     * @param string $schemaName name of the PostgreSQL schema to get the function from
-     * @param string $funcName name of the PostgreSQL canonical function to get the implementation for
-     * @param ITotallyOrderedType $subtype the range subtype the canonical function should operate on
-     * @return IRangeCanonicalFunc|null implementation of the requested canonical function, or <tt>null</tt> if no
-     *                                    corresponding implementation is registered
-     */
-    function provideRangeCanonicalFunc(
-        string $schemaName,
-        string $funcName,
-        ITotallyOrderedType $subtype
-    ): ?IRangeCanonicalFunc;
-
-    /**
      * Returns the list of all rules for inferring types from PHP values.
      *
      * @return string[][] map: PHP data type => pair: schema name, type name
