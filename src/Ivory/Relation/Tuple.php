@@ -155,12 +155,12 @@ class Tuple implements ITuple
 
     //region IEqualable
 
-    public function equals($object): ?bool
+    public function equals($other): bool
     {
-        if (!$object instanceof ITuple) {
+        if (!$other instanceof ITuple) {
             return false;
         }
-        return ValueUtils::equals($this->data, $object->toList());
+        return ValueUtils::equals($this->data, $other->toList());
     }
 
     //endregion

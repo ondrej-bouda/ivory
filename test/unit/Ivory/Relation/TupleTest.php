@@ -205,11 +205,11 @@ class TupleTest__Equalable implements IEqualable
         $this->num = $num;
     }
 
-    public function equals($object): ?bool
+    public function equals($other): bool
     {
-        if (!$object instanceof TupleTest__Equalable) {
+        if (!$other instanceof TupleTest__Equalable) {
             return false;
         }
-        return (($this->num % 2) == ($object->num % 2));
+        return (($this->num % 2) == ($other->num % 2));
     }
 }

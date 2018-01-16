@@ -75,24 +75,15 @@ final class Point implements IEqualable
         return "({$this->x},{$this->y})";
     }
 
-    /**
-     * @param object $object
-     * @return bool|null <tt>true</tt> if <tt>$this</tt> and the other <tt>$object</tt> are equal to each other,
-     *                   <tt>false</tt> if they are not equal,
-     *                   <tt>null</tt> iff <tt>$object</tt> is <tt>null</tt>
-     */
-    public function equals($object): ?bool
+    public function equals($other): bool
     {
-        if ($object === null) {
-            return null;
-        }
-        if (!$object instanceof Point) {
+        if (!$other instanceof Point) {
             return false;
         }
         return (
-            $this->getX() == $object->getX()
+            $this->getX() == $other->getX()
             &&
-            $this->getY() == $object->getY()
+            $this->getY() == $other->getY()
         );
     }
 }

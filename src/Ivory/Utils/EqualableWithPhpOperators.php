@@ -7,12 +7,12 @@ namespace Ivory\Utils;
  */
 trait EqualableWithPhpOperators
 {
-    final public function equals($object): ?bool
+    final public function equals($other): bool
     {
-        if ($object === null) {
-            return null;
-        } else {
-            return ($this == $object);
-        }
+        return (
+            $other !== null &&
+            get_class($this) == get_class($other) &&
+            $this == $other
+        );
     }
 }

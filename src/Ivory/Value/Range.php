@@ -623,38 +623,35 @@ class Range implements IEqualable, \ArrayAccess
 
     //region IEqualable
 
-    public function equals($object): ?bool
+    public function equals($other): bool
     {
-        if ($object === null) {
-            return null;
-        }
-        if (!$object instanceof Range) {
+        if (!$other instanceof Range) {
             return false;
         }
-        if ($this->subtype !== $object->subtype) {
+        if ($this->subtype !== $other->subtype) {
             return false;
         }
 
         if ($this->empty) {
-            return $object->empty;
+            return $other->empty;
         }
-        if ($object->empty) {
+        if ($other->empty) {
             return false;
         }
 
-        $objLower = $object->lower;
-        $objUpper = $object->upper;
+        $objLower = $other->lower;
+        $objUpper = $other->upper;
 
-        if ($this->lowerInc != $object->lowerInc) {
-            if ($object->subtype instanceof IDiscreteType) {
-                $objLower = $object->subtype->step(($object->lowerInc ? -1 : 1), $objLower);
+        if ($this->lowerInc != $other->lowerInc) {
+            if ($other->subtype instanceof IDiscreteType) {
+                $objLower = $other->subtype->step(($other->lowerInc ? -1 : 1), $objLower);
             } else {
                 return false;
             }
         }
-        if ($this->upperInc != $object->upperInc) {
-            if ($object->subtype instanceof IDiscreteType) {
-                $objUpper = $object->subtype->step(($object->upperInc ? 1 : -1), $objUpper);
+        if ($this->upperInc != $other->upperInc) {
+            if ($other->subtype instanceof IDiscreteType) {
+                $objUpper = $other->subtype->step(($other->upperInc ? 1 : -1), $objUpper);
             } else {
                 return false;
             }

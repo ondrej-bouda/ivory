@@ -82,14 +82,15 @@ abstract class BitString implements IEqualable, \ArrayAccess
 
     /**
      * @param BitString|null $other
-     * @return bool|null whether this and the other bit string are of the same type, have the same bits and same length
+     * @return bool whether this and the other bit string are of the same type, have the same bits and same length
      */
-    public function equals($other): ?bool
+    public function equals($other): bool
     {
-        if ($other === null) {
-            return null;
-        }
-        return (get_class($this) == get_class($other) && $this->bits == $other->bits);
+        return (
+            $other !== null &&
+            get_class($this) == get_class($other) &&
+            $this->bits == $other->bits
+        );
     }
 
     /**

@@ -82,10 +82,10 @@ class Composite implements IEqualable, \ArrayAccess, \IteratorAggregate
         return $this->type;
     }
 
-    public function equals($other): ?bool
+    public function equals($other): bool
     {
         if ($other === null) {
-            return null;
+            return false;
         }
         if (get_class($this) != get_class($other)) {
             return false;

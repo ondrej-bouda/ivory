@@ -256,13 +256,12 @@ class Decimal implements IEqualable
      * though.
      *
      * @param string|int|float|Decimal|object $number number to compare this number with
-     * @return bool|null whether this number numerically equals to <tt>$number</tt>;
-     *                   <tt>null</tt> for <tt>null</tt> input
+     * @return bool whether this number numerically equals to <tt>$number</tt>
      */
-    public function equals($number): ?bool
+    public function equals($number): bool
     {
         if ($number === null) {
-            return null;
+            return false;
         }
         return ($this->compareTo($number) == 0);
     }
@@ -318,7 +317,7 @@ class Decimal implements IEqualable
      */
     public function isZero(): bool
     {
-        return ($this->equals(self::zero()));
+        return $this->equals(self::zero());
     }
 
     /**

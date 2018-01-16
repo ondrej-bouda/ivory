@@ -157,13 +157,13 @@ class Quantity implements IEqualable
     /**
      * @param Quantity|string $quantity quantity to compare this quantity with;
      *                                  if Quantity is not given, {@link Quantity::fromString()} is used to parse it
-     * @return bool|null whether the two quantities are comparable and of equal value (after converting to the same unit
-     *                     if convertible)
+     * @return bool whether the two quantities are comparable and of equal value (after converting to the same unit if
+     *                convertible)
      */
-    public function equals($quantity): ?bool
+    public function equals($quantity): bool
     {
         if ($quantity === null) {
-            return null;
+            return false;
         }
         if (!$quantity instanceof Quantity) {
             $quantity = self::fromString($quantity);

@@ -4,7 +4,7 @@ namespace Ivory\Utils;
 
 class ValueUtils
 {
-    public static function equals($a, $b): ?bool
+    public static function equals($a, $b): bool
     {
         if ($a === null) {
             return ($b === null);

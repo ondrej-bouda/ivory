@@ -60,13 +60,13 @@ class VarBitString extends BitString
         $this->maxLength = $maxLength;
     }
 
-    public function equals($other): ?bool
+    public function equals($other): bool
     {
         $parRes = parent::equals($other);
         if (!$parRes) {
             return $parRes;
         }
-        /** @var VarBitString $other */
+        assert($other instanceof VarBitString);
         return ($this->maxLength == $other->maxLength);
     }
 

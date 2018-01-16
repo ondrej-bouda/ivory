@@ -8,7 +8,7 @@ use Ivory\Relation\Alg\ITupleEvaluator;
 use Ivory\Relation\Alg\IValueComparator;
 use Ivory\Relation\Alg\IValueHasher;
 use Ivory\Type\IType;
-use Ivory\Utils\IEqualable;
+use Ivory\Utils\ValueUtils;
 
 class Column implements \IteratorAggregate, IColumn
 {
@@ -78,11 +78,7 @@ class Column implements \IteratorAggregate, IColumn
 
         if ($comparator === null) {
             $comparator = new CallbackValueComparator(function ($a, $b) {
-                if (is_object($a) && is_object($b) && $a instanceof IEqualable) {
-                    return $a->equals($b);
-                } else {
-                    return ($a == $b);
-                }
+                return ValueUtils::equals($a, $b);
             });
         } elseif (!$comparator instanceof IValueComparator) {
             $comparator = new CallbackValueComparator($comparator);

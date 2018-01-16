@@ -337,12 +337,12 @@ class NetAddress implements IEqualable
      *
      * @param NetAddress|string $address a {@link NetAddress} or anything {@link NetAddress::fromString()} accepts as
      *                                     its first argument
-     * @return bool|null
+     * @return bool
      */
-    public function equals($address): ?bool
+    public function equals($address): bool
     {
         if ($address === null) {
-            return null;
+            return false;
         }
         if (!$address instanceof NetAddress) {
             $address = NetAddress::fromString($address);
