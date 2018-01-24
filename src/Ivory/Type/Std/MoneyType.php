@@ -84,13 +84,6 @@ class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedTy
         if (!$a instanceof Money) {
             throw new IncomparableException('$a is not of class ' . Money::class);
         }
-        if (!$b instanceof Money) {
-            throw new IncomparableException('$b is not of class ' . Money::class);
-        }
-        if (!$a->getUnit() != $b->getUnit()) {
-            throw new IncomparableException('$a and $b of not the same monetary unit');
-        }
-
-        return $a->getAmount()->compareTo($b->getAmount());
+        return $a->compareTo($b);
     }
 }

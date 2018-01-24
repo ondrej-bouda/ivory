@@ -3,8 +3,9 @@ declare(strict_types=1);
 namespace Ivory\Value;
 
 use Ivory\Exception\IncomparableException;
+use Ivory\Utils\IComparable;
 
-class EnumItem
+class EnumItem implements IComparable
 {
     private $typeSchema;
     private $typeName;
@@ -71,5 +72,4 @@ class EnumItem
         }
         return ($this->ordinal - $other->ordinal);
     }
-
 }

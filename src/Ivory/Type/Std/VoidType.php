@@ -12,7 +12,7 @@ use Ivory\Type\ITotallyOrderedType;
  * There are just two possible values accepted or returned by this type object: `null` and {@link VoidType::void()},
  * which is an empty singleton object.
  */
-class VoidType extends BaseType implements ITotallyOrderedType
+class VoidType extends BaseType
 {
     public static function void()
     {
@@ -37,16 +37,5 @@ class VoidType extends BaseType implements ITotallyOrderedType
         } else {
             throw $this->invalidValueException($val);
         }
-    }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-        if ($a === self::void() && $b === self::void()) {
-            return 0;
-        }
-        throw new IncomparableException('Invalid values to compare as ' . VoidType::class);
     }
 }

@@ -2,8 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-use Ivory\Utils\EqualableWithPhpOperators;
-use Ivory\Utils\IEqualable;
+use Ivory\Utils\ComparableWithPhpOperators;
+use Ivory\Utils\IComparable;
 
 /**
  * Representation of a time interval.
@@ -24,9 +24,9 @@ use Ivory\Utils\IEqualable;
  *
  * The objects are immutable, i.e., once constructed, their value cannot be changed.
  */
-class TimeInterval implements IEqualable
+class TimeInterval implements IComparable
 {
-    use EqualableWithPhpOperators;
+    use ComparableWithPhpOperators;
 
     const MILLENNIUM = 'millennium';
     const CENTURY = 'century';

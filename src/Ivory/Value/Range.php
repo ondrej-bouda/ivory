@@ -3,9 +3,11 @@ declare(strict_types=1);
 namespace Ivory\Value;
 
 use Ivory\Exception\ImmutableException;
+use Ivory\Exception\IncomparableException;
 use Ivory\Exception\UnsupportedException;
 use Ivory\Type\IDiscreteType;
 use Ivory\Type\ITotallyOrderedType;
+use Ivory\Utils\IComparable;
 use Ivory\Utils\IEqualable;
 
 /**
@@ -40,7 +42,7 @@ use Ivory\Utils\IEqualable;
  *
  * @see http://www.postgresql.org/docs/9.4/static/rangetypes.html
  */
-class Range implements IEqualable, \ArrayAccess
+class Range implements IComparable, \ArrayAccess
 {
     /** @var ITotallyOrderedType */
     private $subtype;
@@ -621,7 +623,7 @@ class Range implements IEqualable, \ArrayAccess
 
     //endregion
 
-    //region IEqualable
+    //region IComparable
 
     public function equals($other): bool
     {
@@ -686,6 +688,60 @@ class Range implements IEqualable, \ArrayAccess
         }
 
         return true;
+    }
+
+    public function compareTo($other): int
+    {
+        if ($other === null) {
+            throw new \InvalidArgumentException('comparing with null');
+        }
+        if (!$other instanceof Range) {
+            throw new IncomparableException('$other is not a ' . Range::class);
+        }
+        if ($this->subtype !== $other->subtype) {
+            throw new IncomparableException('comparing ranges of incompatible subtypes');
+        }
+
+        if ($this->isEmpty() && $other->isEmpty()) {
+            return 0;
+        } elseif ($this->isEmpty()) {
+            return -1;
+        } elseif ($other->isEmpty()) {
+            return 1;
+        }
+
+        $cmp = $this->compareBounds(-1, $this->getLower(), $this->isLowerInc(), $other->getLower(), $other->isLowerInc());
+        if ($cmp != 0) {
+            return $cmp;
+        } else {
+            return $this->compareBounds(1, $this->getUpper(), $this->isUpperInc(), $other->getUpper(), $other->isUpperInc());
+        }
+    }
+
+    private function compareBounds(int $sgn, $aVal, bool $aIsInc, $bVal, bool $bIsInc): int
+    {
+        if ($aVal === null && $bVal === null) {
+            return 0;
+        } elseif ($aVal === null) {
+            return 1 * $sgn;
+        } elseif ($bVal === null) {
+            return -1 * $sgn;
+        }
+
+        $cmp = $this->subtype->compareValues($aVal, $bVal);
+        if ($cmp != 0) {
+            return $cmp;
+        }
+
+        if ($aIsInc && $bIsInc) {
+            return 0;
+        } elseif ($aIsInc) {
+            return 1 * $sgn;
+        } elseif ($bIsInc) {
+            return -1 * $sgn;
+        } else {
+            return 0;
+        }
     }
 
     //endregion

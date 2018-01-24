@@ -107,60 +107,9 @@ class RangeType implements ITotallyOrderedType
         if ($a === null || $b === null) {
             return null;
         }
-
         if (!$a instanceof Range) {
             throw new IncomparableException('$a is not a ' . Range::class);
         }
-        if (!$b instanceof Range) {
-            throw new IncomparableException('$b is not a ' . Range::class);
-        }
-        if ($a->getSubtype() !== $this->subtype) {
-            throw new IncomparableException('$a of an incompatible subtype');
-        }
-        if ($b->getSubtype() !== $this->subtype) {
-            throw new IncomparableException('$b of an incompatible subtype');
-        }
-
-        // empty ranges are sorted before all else in PostgreSQL
-        if ($a->isEmpty() && $b->isEmpty()) {
-            return 0;
-        } elseif ($a->isEmpty()) {
-            return -1;
-        } elseif ($b->isEmpty()) {
-            return 1;
-        } else {
-            $cmp = $this->compareBounds(-1, $a->getLower(), $a->isLowerInc(), $b->getLower(), $b->isLowerInc());
-            if ($cmp != 0) {
-                return $cmp;
-            } else {
-                return $this->compareBounds(1, $a->getUpper(), $a->isUpperInc(), $b->getUpper(), $b->isUpperInc());
-            }
-        }
-    }
-
-    private function compareBounds(int $sgn, $aVal, ?bool $aIsInc, $bVal, ?bool $bIsInc): int
-    {
-        if ($aVal === null && $bVal === null) {
-            return 0;
-        } elseif ($aVal === null) {
-            return 1 * $sgn;
-        } elseif ($bVal === null) {
-            return -1 * $sgn;
-        }
-
-        $cmp = $this->subtype->compareValues($aVal, $bVal);
-        if ($cmp != 0) {
-            return $cmp;
-        }
-
-        if ($aIsInc && $bIsInc) {
-            return 0;
-        } elseif ($aIsInc) {
-            return 1 * $sgn;
-        } elseif ($bIsInc) {
-            return -1 * $sgn;
-        } else {
-            return 0;
-        }
+        return $a->compareTo($b);
     }
 }

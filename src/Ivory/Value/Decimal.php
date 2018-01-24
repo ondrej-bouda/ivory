@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Value;
 
 use Ivory\Exception\UndefinedOperationException;
-use Ivory\Utils\IEqualable;
+use Ivory\Utils\IComparable;
 use Ivory\Utils\System;
 
 /**
@@ -31,7 +31,7 @@ use Ivory\Utils\System;
  * @see http://www.postgresql.org/docs/current/static/datatype-numeric.html PostgreSQL Numeric Types
  * @see http://www.postgresql.org/docs/current/static/functions-math.html PostgreSQL Mathematical Functions and Operators
  */
-class Decimal implements IEqualable
+class Decimal implements IComparable
 {
     /** Maximal number of decimal digits considered by PostgreSQL. */
     const SCALE_LIMIT = 16383;

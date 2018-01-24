@@ -10,7 +10,7 @@ use Ivory\Type\ITotallyOrderedType;
 /**
  * A polymorphic type, which basically cannot be retrieved in a `SELECT` result, except for `NULL` values.
  */
-class PolymorphicPseudoType extends BaseType implements ITotallyOrderedType
+class PolymorphicPseudoType extends BaseType
 {
     public function parseValue(string $extRepr)
     {
@@ -24,13 +24,5 @@ class PolymorphicPseudoType extends BaseType implements ITotallyOrderedType
         } else {
             throw $this->invalidValueException($val);
         }
-    }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-        throw new IncomparableException('Non-null values to be compared according to ' . PolymorphicPseudoType::class);
     }
 }

@@ -32,6 +32,15 @@ class DateTest extends \PHPUnit\Framework\TestCase
         $this->assertLessThan(self::d(2016, 2, 27), Date::minusInfinity());
     }
 
+    public function testComparable()
+    {
+        $this->assertEquals(0, self::d(2015, 1, 30)->compareTo(self::d(2015, 1, 30)));
+        $this->assertLessThan(0, self::d(2015, 1, 30)->compareTo(self::d(2015, 1, 31)));
+        $this->assertLessThan(0, self::d(2014, 1, 30)->compareTo(self::d(2015, 1, 30)));
+        $this->assertGreaterThan(0, self::d(2015, 1, 31)->compareTo(self::d(2015, 1, 30)));
+        $this->assertGreaterThan(0, self::d(2015, 1, 30)->compareTo(self::d(2014, 1, 30)));
+    }
+
     public function testFromISOString()
     {
         $this->assertEquals(self::d(2016, 2, 27), Date::fromISOString('2016-02-27'));

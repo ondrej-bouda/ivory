@@ -5,6 +5,7 @@ namespace Ivory\Type\Std;
 use Ivory\Exception\IncomparableException;
 use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
+use Ivory\Utils\ValueUtils;
 use Ivory\Value\Point;
 
 /**
@@ -59,14 +60,6 @@ class PointType extends BaseType implements ITotallyOrderedType
             throw new IncomparableException('$b is not a ' . Point::class);
         }
 
-        $ac = $a->toCoords();
-        $bc = $b->toCoords();
-
-        $xComp = FloatType::compareFloats($ac[0], $bc[0]);
-        if ($xComp !== 0) {
-            return $xComp;
-        } else {
-            return FloatType::compareFloats($ac[1], $bc[1]);
-        }
+        return $a->compareTo($b);
     }
 }

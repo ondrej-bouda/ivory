@@ -33,9 +33,6 @@ abstract class BitStringType extends BaseType implements ITotallyOrderedType
         if (!$a instanceof BitString) {
             throw new IncomparableException('$a is not a ' . BitString::class);
         }
-        if (!$b instanceof BitString) {
-            throw new IncomparableException('$b is not a ' . BitString::class);
-        }
-        return strcmp($a->toString(), $b->toString());
+        return $a->compareTo($b);
     }
 }

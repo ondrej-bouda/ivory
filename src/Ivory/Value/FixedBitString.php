@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
+use Ivory\Exception\IncomparableException;
+
 /**
  * Fixed-length bit string - a string of 1's and 0's.
  *
@@ -94,5 +96,17 @@ class FixedBitString extends BitString
     public function toInt(): int
     {
         return bindec(substr($this->bits, -(PHP_INT_SIZE * 8 - 1)));
+    }
+
+    public function compareTo($other): int
+    {
+        $cmp = parent::compareTo($other);
+
+        assert($other instanceof FixedBitString);
+        if ($this->len != $other->len) {
+            throw new IncomparableException();
+        }
+
+        return $cmp;
     }
 }

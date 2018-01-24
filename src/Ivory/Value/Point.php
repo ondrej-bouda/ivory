@@ -2,14 +2,16 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-use Ivory\Utils\IEqualable;
+use Ivory\Exception\IncomparableException;
+use Ivory\Utils\IComparable;
+use Ivory\Utils\ValueUtils;
 
 /**
  * Representation of a point on a plane.
  *
  * The objects are immutable.
  */
-final class Point implements IEqualable
+final class Point implements IComparable
 {
     private $x;
     private $y;
@@ -85,5 +87,25 @@ final class Point implements IEqualable
             &&
             $this->getY() == $other->getY()
         );
+    }
+
+    public function compareTo($other): int
+    {
+        if ($other === null) {
+            throw new \InvalidArgumentException('comparing with null');
+        }
+        if (!$other instanceof Point) {
+            throw new IncomparableException();
+        }
+
+        [$thisX, $thisY] = $this->toCoords();
+        [$otherX, $otherY] = $other->toCoords();
+
+        $xCmp = ValueUtils::compareFloats($thisX, $otherX);
+        if ($xCmp != 0) {
+            return $xCmp;
+        } else {
+            return ValueUtils::compareFloats($thisY, $otherY);
+        }
     }
 }

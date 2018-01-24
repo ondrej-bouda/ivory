@@ -4,6 +4,7 @@ namespace Ivory\Type\Std;
 
 use Ivory\Type\BaseType;
 use Ivory\Type\IDiscreteType;
+use Ivory\Utils\ValueUtils;
 
 /**
  * Signed eight-byte integer.
@@ -53,11 +54,8 @@ class BigIntSafeType extends BaseType implements IDiscreteType
         if ($a === null || $b === null) {
             return null;
         }
-        if ($a > PHP_INT_MAX || $b > PHP_INT_MAX || $a < PHP_INT_MIN || $b < PHP_INT_MIN) {
-            return bccomp($a, $b, 0);
-        } else {
-            return (int)$a - (int)$b;
-        }
+
+        return ValueUtils::compareBigIntegers($a, $b);
     }
 
     public function step(int $delta, $value)

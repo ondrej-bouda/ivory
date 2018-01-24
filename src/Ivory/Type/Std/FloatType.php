@@ -4,6 +4,7 @@ namespace Ivory\Type\Std;
 
 use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
+use Ivory\Utils\ValueUtils;
 
 /**
  * Inexact, variable-precision numeric type.
@@ -46,21 +47,10 @@ class FloatType extends BaseType implements ITotallyOrderedType
 
     public function compareValues($a, $b): ?int
     {
-        return self::compareFloats($a, $b);
-    }
-
-    public static function compareFloats($a, $b): ?int
-    {
         if ($a === null || $b === null) {
             return null;
         }
 
-        if ($a === NAN) {
-            return ($b === NAN ? 0 : 1);
-        } elseif ($b === NAN) {
-            return -1;
-        }
-
-        return (float)$a <=> (float)$b;
+        return ValueUtils::compareFloats($a, $b);
     }
 }

@@ -9,7 +9,7 @@ namespace Ivory\Value;
  *
  * The supported range is from `00:00:00` to `24:00:00`. Fractional seconds may be used.
  *
- * Besides being {@link IEqualable}, the {@link Time} objects may safely be compared using the `<`, `==`, and `>`
+ * Besides being {@link IComparable}, the {@link Time} objects may safely be compared using the `<`, `==`, and `>`
  * operators with the expected results.
  *
  * The objects are immutable, i.e., operations always produce a new object.
