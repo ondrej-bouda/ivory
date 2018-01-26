@@ -2,8 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Type\BaseType;
+use Ivory\NamedDbObject;
 use Ivory\Type\ITotallyOrderedType;
+use Ivory\Type\Ivory\StringSerializer;
 
 /**
  * Character string.
@@ -12,20 +13,18 @@ use Ivory\Type\ITotallyOrderedType;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-character.html
  */
-class StringType extends BaseType implements ITotallyOrderedType
+class StringType extends StringSerializer implements ITotallyOrderedType
 {
+    use NamedDbObject;
+
+    public function __construct(string $schemaName, string $name)
+    {
+        $this->setName($schemaName, $name);
+    }
+
     public function parseValue(string $extRepr)
     {
         return $extRepr;
-    }
-
-    public function serializeValue($val): string
-    {
-        if ($val === null) {
-            return 'NULL';
-        } else {
-            return "'" . strtr((string)$val, ["'" => "''"]) . "'";
-        }
     }
 
     public function compareValues($a, $b): ?int

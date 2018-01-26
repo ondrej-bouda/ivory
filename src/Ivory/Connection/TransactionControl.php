@@ -5,8 +5,8 @@ namespace Ivory\Connection;
 use Ivory\Connection\Config\ConfigParam;
 use Ivory\Exception\InvalidStateException;
 use Ivory\Ivory;
+use Ivory\Lang\Sql\Types;
 use Ivory\Result\IQueryResult;
-use Ivory\Type\Std\StringType;
 
 class TransactionControl implements IObservableTransactionControl
 {
@@ -74,7 +74,7 @@ class TransactionControl implements IObservableTransactionControl
             throw new InvalidStateException('Cannot commit a prepared transaction while inside another transaction.');
         }
 
-        $this->stmtExec->rawCommand("COMMIT PREPARED {$this->quoteString($name)}");
+        $this->stmtExec->rawCommand('COMMIT PREPARED ' . Types::serializeString($name));
         $this->notifyPreparedTransactionCommit($name);
     }
 
@@ -84,22 +84,13 @@ class TransactionControl implements IObservableTransactionControl
             throw new InvalidStateException('Cannot rollback a prepared transaction while inside another transaction.');
         }
 
-        $this->stmtExec->rawCommand("ROLLBACK PREPARED {$this->quoteString($name)}");
+        $this->stmtExec->rawCommand('ROLLBACK PREPARED ' . Types::serializeString($name));
         $this->notifyPreparedTransactionRollback($name);
     }
 
     public function listPreparedTransactions(): IQueryResult
     {
         return $this->stmtExec->rawQuery('SELECT * FROM pg_catalog.pg_prepared_xacts');
-    }
-
-    private function quoteString(string $str): string
-    {
-        static $stringSerializer = null;
-        if ($stringSerializer === null) {
-            $stringSerializer = new StringType('pg_catalog', 'text');
-        }
-        return $stringSerializer->serializeValue($str);
     }
 
 
