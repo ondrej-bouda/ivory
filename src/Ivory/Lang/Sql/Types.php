@@ -64,7 +64,7 @@ class Types
         ];
     }
 
-    public static function serializeString(string $str): string
+    public static function serializeString($str): string
     {
         static $stringSerializer = null;
         if ($stringSerializer === null) {

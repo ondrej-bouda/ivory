@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
+use Ivory\Lang\Sql\Types;
 use Ivory\Type\BaseType;
 use Ivory\Value\XmlContent;
 use Ivory\Value\XmlDocument;
@@ -29,9 +30,9 @@ class XmlType extends BaseType
 
         try {
             $xml = XmlContent::fromValue($val);
-            return sprintf("XMLPARSE(%s '%s')",
+            return sprintf("XMLPARSE(%s %s)",
                 ($xml instanceof XmlDocument ? 'DOCUMENT' : 'CONTENT'),
-                strtr($xml->toString(), ["'" => "''"])
+                Types::serializeString($xml->toString())
             );
         } catch (\InvalidArgumentException $e) {
             throw $this->invalidValueException($val);

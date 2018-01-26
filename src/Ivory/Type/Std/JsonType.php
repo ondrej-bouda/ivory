@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
+use Ivory\Lang\Sql\Types;
 use Ivory\Type\BaseType;
 use Ivory\Value\Json;
 
@@ -26,7 +27,11 @@ abstract class JsonType extends BaseType
             }
         }
 
-        $encoded = $val->getEncoded();
-        return $this->getQualifiedName() . " '" . strtr($encoded, ["'" => "''"]) . "'";
+        return sprintf(
+            '%s.%s %s',
+            Types::serializeIdent($this->getSchemaName()),
+            Types::serializeIdent($this->getName()),
+            Types::serializeString($val->getEncoded())
+        );
     }
 }

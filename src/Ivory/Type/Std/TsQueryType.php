@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
+use Ivory\Lang\Sql\Types;
 use Ivory\Type\BaseType;
 use Ivory\Value\TextSearchQuery;
 
@@ -29,6 +30,6 @@ class TsQueryType extends BaseType
             $val = TextSearchQuery::fromString($val);
         }
 
-        return "'" . strtr($val->toString(), ["'" => "''"]) . "'";
+        return Types::serializeString($val->toString());
     }
 }

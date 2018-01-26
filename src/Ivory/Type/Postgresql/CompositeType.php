@@ -5,6 +5,7 @@ namespace Ivory\Type\Postgresql;
 use Ivory\Exception\IncomparableException;
 use Ivory\Exception\ParseException;
 use Ivory\Exception\UnsupportedException;
+use Ivory\Lang\Sql\Types;
 use Ivory\Type\IType;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Composite;
@@ -174,7 +175,7 @@ abstract class CompositeType implements ITotallyOrderedType
 
         $items = [];
         foreach ($values as $v) {
-            $items[] = ($v === null ? 'NULL' : "'" . strtr((string)$v, ["'" => "''"]) . "'");
+            $items[] = Types::serializeString($v);
         }
         return self::serializeItems($items);
     }

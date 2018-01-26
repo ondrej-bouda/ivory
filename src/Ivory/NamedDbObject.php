@@ -32,12 +32,4 @@ trait NamedDbObject
     {
         return $this->name;
     }
-
-    /**
-     * @return string schema-qualified name of this object
-     */
-    final public function getQualifiedName(): string
-    {
-        return $this->getSchemaName() . '.' . $this->getName();
-    }
 }

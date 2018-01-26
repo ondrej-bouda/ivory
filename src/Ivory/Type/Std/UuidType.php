@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
+use Ivory\Lang\Sql\Types;
 use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
 
@@ -32,7 +33,8 @@ class UuidType extends BaseType implements ITotallyOrderedType
         if (!preg_match('~^(\{)?(?:[[:xdigit:]]{4}-?){7}[[:xdigit:]]{4}(?(1)\})$~i', $val)) {
             throw $this->invalidValueException($val);
         }
-        return "'" . strtr($val, ["'" => "''"]) . "'";
+
+        return Types::serializeString($val);
     }
 
     public function compareValues($a, $b): ?int

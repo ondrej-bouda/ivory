@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
+use Ivory\Lang\Sql\Types;
 use Ivory\Type\BaseType;
 use Ivory\Value\TextSearchVector;
 
@@ -65,6 +66,6 @@ class TsVectorType extends BaseType
             $tokens[] = $tok;
         }
 
-        return "'" . strtr(implode(' ', $tokens), ["'" => "''"]) . "'";
+        return Types::serializeString(implode(' ', $tokens));
     }
 }
