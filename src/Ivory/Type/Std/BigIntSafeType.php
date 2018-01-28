@@ -4,7 +4,7 @@ namespace Ivory\Type\Std;
 
 use Ivory\Type\BaseType;
 use Ivory\Type\IDiscreteType;
-use Ivory\Utils\ValueUtils;
+use Ivory\Value\Alg\ComparisonUtils;
 
 /**
  * Signed eight-byte integer.
@@ -55,7 +55,7 @@ class BigIntSafeType extends BaseType implements IDiscreteType
             return null;
         }
 
-        return ValueUtils::compareBigIntegers($a, $b);
+        return ComparisonUtils::compareBigIntegers($a, $b);
     }
 
     public function step(int $delta, $value)

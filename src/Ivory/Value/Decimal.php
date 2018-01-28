@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Value;
 
 use Ivory\Exception\UndefinedOperationException;
-use Ivory\Utils\IComparable;
+use Ivory\Value\Alg\IComparable;
 use Ivory\Utils\System;
 
 /**

@@ -7,8 +7,8 @@ use Ivory\Exception\IncomparableException;
 use Ivory\Exception\UnsupportedException;
 use Ivory\Type\IDiscreteType;
 use Ivory\Type\ITotallyOrderedType;
-use Ivory\Utils\IComparable;
-use Ivory\Utils\IEqualable;
+use Ivory\Value\Alg\IComparable;
+use Ivory\Value\Alg\IEqualable;
 
 /**
  * A range of values.
@@ -29,8 +29,7 @@ use Ivory\Utils\IEqualable;
  * range `[1,3]` to `[1,4)`). Such a feature is *not* implemented on the PHP side. The ranges constructed in PHP are not
  * normalized in any way, they may only be converted manually using the {@link Range::toBounds()} method.
  *
- * A range is `IEqualable` to another range. Two ranges are equal only if they are above the same subtype and if the
- * effective range equals.
+ * A range is `IComparable` with another range provided both have the same subtype.
  *
  * Alternatively to the {@link Range::getLower()} and {@link Range::getUpper()} methods, `ArrayAccess` is implemented.
  * Indexes `0` and `1` may be used to get the lower and upper bound, respectively. Either of them returns `null` if the

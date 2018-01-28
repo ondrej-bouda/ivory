@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Ivory\Utils;
+namespace Ivory\Value\Alg;
 
 use Ivory\Exception\IncomparableException;
 

@@ -5,7 +5,6 @@ namespace Ivory\Type\Std;
 use Ivory\Exception\IncomparableException;
 use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
-use Ivory\Utils\ValueUtils;
 use Ivory\Value\Point;
 
 /**

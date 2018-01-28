@@ -4,7 +4,7 @@ namespace Ivory\Type\Std;
 
 use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
-use Ivory\Utils\ValueUtils;
+use Ivory\Value\Alg\ComparisonUtils;
 
 /**
  * Inexact, variable-precision numeric type.
@@ -51,6 +51,6 @@ class FloatType extends BaseType implements ITotallyOrderedType
             return null;
         }
 
-        return ValueUtils::compareFloats($a, $b);
+        return ComparisonUtils::compareFloats($a, $b);
     }
 }

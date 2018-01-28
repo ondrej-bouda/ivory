@@ -3,8 +3,8 @@ declare(strict_types=1);
 namespace Ivory\Value;
 
 use Ivory\Exception\IncomparableException;
-use Ivory\Utils\EqualableWithCompareTo;
-use Ivory\Utils\IComparable;
+use Ivory\Value\Alg\EqualableWithCompareTo;
+use Ivory\Value\Alg\IComparable;
 
 /**
  * A money amount.

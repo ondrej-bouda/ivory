@@ -4,7 +4,7 @@ namespace Ivory\Relation;
 
 use Ivory\Connection\IConnection;
 use Ivory\IvoryTestCase;
-use Ivory\Relation\Alg\ITupleFilter;
+use Ivory\Value\Alg\ITupleFilter;
 
 class FilteredRelationTest extends IvoryTestCase
 {

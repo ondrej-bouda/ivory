@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Ivory\Utils;
+namespace Ivory\Value\Alg;
 
 /**
  * Implements the {@link IEqualable::equals()} using the {@link IComparable::compareTo()} method.

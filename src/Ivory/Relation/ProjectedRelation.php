@@ -5,7 +5,7 @@ namespace Ivory\Relation;
 use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\InternalException;
 use Ivory\Exception\UndefinedColumnException;
-use Ivory\Relation\Alg\ITupleEvaluator;
+use Ivory\Value\Alg\ITupleEvaluator;
 
 class ProjectedRelation extends ProjectedRelationBase
 {

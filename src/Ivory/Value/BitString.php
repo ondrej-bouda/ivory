@@ -5,7 +5,7 @@ namespace Ivory\Value;
 use Ivory\Exception\ImmutableException;
 use Ivory\Exception\IncomparableException;
 use Ivory\Exception\UndefinedOperationException;
-use Ivory\Utils\IComparable;
+use Ivory\Value\Alg\IComparable;
 
 /**
  * A common super type for bit string types - strings of 1's and 0's.

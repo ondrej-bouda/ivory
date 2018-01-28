@@ -5,8 +5,8 @@ namespace Ivory\Relation;
 use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\ImmutableException;
 use Ivory\Exception\UndefinedColumnException;
-use Ivory\Relation\Alg\ITupleEvaluator;
-use Ivory\Utils\ValueUtils;
+use Ivory\Value\Alg\ITupleEvaluator;
+use Ivory\Value\Alg\ComparisonUtils;
 
 /**
  * {@inheritdoc}
@@ -160,7 +160,7 @@ class Tuple implements ITuple
         if (!$other instanceof ITuple) {
             return false;
         }
-        return ValueUtils::equals($this->data, $other->toList());
+        return ComparisonUtils::equals($this->data, $other->toList());
     }
 
     //endregion

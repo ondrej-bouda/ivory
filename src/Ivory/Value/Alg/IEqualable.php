@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Ivory\Utils;
+namespace Ivory\Value\Alg;
 
 /**
  * Defines logical equality on objects of the implementing class.

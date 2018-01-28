@@ -2,8 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-use Ivory\Utils\ComparableWithPhpOperators;
-use Ivory\Utils\IComparable;
+use Ivory\Value\Alg\ComparableWithPhpOperators;
+use Ivory\Value\Alg\IComparable;
 
 /**
  * Common base for date and date/time representations.

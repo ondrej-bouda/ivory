@@ -2,13 +2,13 @@
 declare(strict_types=1);
 namespace Ivory\Relation;
 
-use Ivory\Relation\Alg\CallbackValueEqualizer;
-use Ivory\Relation\Alg\CallbackValueHasher;
-use Ivory\Relation\Alg\ITupleEvaluator;
-use Ivory\Relation\Alg\IValueEqualizer;
-use Ivory\Relation\Alg\IValueHasher;
+use Ivory\Value\Alg\CallbackValueEqualizer;
+use Ivory\Value\Alg\CallbackValueHasher;
+use Ivory\Value\Alg\ITupleEvaluator;
+use Ivory\Value\Alg\IValueEqualizer;
+use Ivory\Value\Alg\IValueHasher;
 use Ivory\Type\IType;
-use Ivory\Utils\ValueUtils;
+use Ivory\Value\Alg\ComparisonUtils;
 
 class Column implements \IteratorAggregate, IColumn
 {
@@ -78,7 +78,7 @@ class Column implements \IteratorAggregate, IColumn
 
         if ($comparator === null) {
             $comparator = new CallbackValueEqualizer(function ($a, $b) {
-                return ValueUtils::equals($a, $b);
+                return ComparisonUtils::equals($a, $b);
             });
         } elseif (!$comparator instanceof IValueEqualizer) {
             $comparator = new CallbackValueEqualizer($comparator);

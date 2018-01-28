@@ -8,7 +8,7 @@ use Ivory\Exception\ParseException;
 use Ivory\Exception\UnsupportedException;
 use Ivory\Type\IType;
 use Ivory\Type\ITotallyOrderedType;
-use Ivory\Utils\ValueUtils;
+use Ivory\Value\Alg\ComparisonUtils;
 
 /**
  * Array type object.
@@ -388,7 +388,7 @@ class ArrayType implements ITotallyOrderedType
         }
 
         if (is_array($a) && is_array($b)) {
-            return ValueUtils::compareArrays($a, $b);
+            return ComparisonUtils::compareArrays($a, $b);
         }
         else {
             throw new IncomparableException();

@@ -3,8 +3,8 @@ declare(strict_types=1);
 namespace Ivory\Value;
 
 use Ivory\Exception\IncomparableException;
-use Ivory\Utils\IComparable;
-use Ivory\Utils\ValueUtils;
+use Ivory\Value\Alg\IComparable;
+use Ivory\Value\Alg\ComparisonUtils;
 
 /**
  * Representation of a point on a plane.
@@ -101,11 +101,11 @@ final class Point implements IComparable
         [$thisX, $thisY] = $this->toCoords();
         [$otherX, $otherY] = $other->toCoords();
 
-        $xCmp = ValueUtils::compareFloats($thisX, $otherX);
+        $xCmp = ComparisonUtils::compareFloats($thisX, $otherX);
         if ($xCmp != 0) {
             return $xCmp;
         } else {
-            return ValueUtils::compareFloats($thisY, $otherY);
+            return ComparisonUtils::compareFloats($thisY, $otherY);
         }
     }
 }

@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Relation;
 
 use Ivory\IvoryTestCase;
-use Ivory\Relation\Alg\IValueFilter;
+use Ivory\Value\Alg\IValueFilter;
 
 class FilteredColumnTest extends IvoryTestCase
 {

@@ -2,9 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Relation;
 
-use Ivory\Relation\Alg\IValueEqualizer;
-use Ivory\Relation\Alg\IValueFilter;
-use Ivory\Relation\Alg\IValueHasher;
+use Ivory\Value\Alg\IValueEqualizer;
+use Ivory\Value\Alg\IValueFilter;
+use Ivory\Value\Alg\IValueHasher;
 use Ivory\Type\IType;
 
 /**

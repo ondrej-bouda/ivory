@@ -2,8 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Relation;
 
-use Ivory\Relation\Alg\CallbackValueFilter;
-use Ivory\Relation\Alg\IValueFilter;
+use Ivory\Value\Alg\CallbackValueFilter;
+use Ivory\Value\Alg\IValueFilter;
 use Ivory\Type\IType;
 
 class FilteredColumn implements \IteratorAggregate, IColumn, ICachingDataProcessor

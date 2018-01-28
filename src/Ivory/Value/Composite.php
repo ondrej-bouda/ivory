@@ -7,8 +7,8 @@ use Ivory\Exception\IncomparableException;
 use Ivory\Exception\UnsupportedException;
 use Ivory\Type\Postgresql\CompositeType;
 use Ivory\Type\Postgresql\NamedCompositeType;
-use Ivory\Utils\IComparable;
-use Ivory\Utils\ValueUtils;
+use Ivory\Value\Alg\IComparable;
+use Ivory\Value\Alg\ComparisonUtils;
 
 /**
  * A value of a composite type.
@@ -196,7 +196,7 @@ class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
             return false;
         }
 
-        return ValueUtils::equals($this->values, $other->values);
+        return ComparisonUtils::equals($this->values, $other->values);
     }
 
     public function compareTo($other): int
@@ -214,7 +214,7 @@ class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
         $otherValues = $other->values;
         foreach ($this->values as $i => $av) {
             $bv = $otherValues[$i];
-            $cmp = ValueUtils::compareValues($av, $bv);
+            $cmp = ComparisonUtils::compareValues($av, $bv);
             if ($cmp != 0) {
                 return $cmp;
             }
