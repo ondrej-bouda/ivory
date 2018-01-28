@@ -5,7 +5,7 @@ namespace Ivory\Relation;
 use Ivory\Data\Set\ISet;
 use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\UndefinedColumnException;
-use Ivory\Relation\Alg\ITupleComparator;
+use Ivory\Relation\Alg\ITupleEqualizer;
 use Ivory\Relation\Alg\ITupleEvaluator;
 use Ivory\Relation\Alg\ITupleFilter;
 use Ivory\Relation\Alg\ITupleHasher;
@@ -291,8 +291,8 @@ interface IRelation extends \Traversable, \Countable
      *                                  The integer <tt>1</tt> may specially be used for a constant hasher, which
      *                                    effectively skips hashing and leads to only using <tt>$comparator</tt>.
      *                                  If not given, the default hasher provided by the implementing class is used.
-     * @param ITupleComparator|\Closure $comparator Tells whether two tuples are equivalent or not.
-     *                                  An {@link ITupleComparator} gets called its {@link ITupleComparator::equal()}
+     * @param ITupleEqualizer|\Closure $comparator Tells whether two tuples are equivalent or not.
+     *                                  An {@link ITupleEqualizer} gets called its {@link ITupleEqualizer::equal()}
      *                                    method.
      *                                  A <tt>Closure</tt> is given two {@link ITuple} arguments and is expected to
      *                                    return <tt>true</tt> if it considers the tuples equivalent, or <tt>false</tt>

@@ -4,7 +4,7 @@ namespace Ivory\Relation\Alg;
 
 use Ivory\Relation\ITuple;
 
-interface ITupleComparator
+interface ITupleEqualizer
 {
     /**
      * @param ITuple $first

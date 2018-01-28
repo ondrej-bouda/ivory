@@ -4,7 +4,7 @@ namespace Ivory\Relation\Alg;
 
 use Ivory\Relation\ITuple;
 
-class CallbackTupleComparator extends CallbackAlg implements ITupleComparator
+class CallbackTupleEqualizer extends CallbackAlg implements ITupleEqualizer
 {
     public function equal(ITuple $first, ITuple $second): bool
     {

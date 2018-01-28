@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Relation;
 
-use Ivory\Relation\Alg\IValueComparator;
+use Ivory\Relation\Alg\IValueEqualizer;
 use Ivory\Relation\Alg\IValueFilter;
 use Ivory\Relation\Alg\IValueHasher;
 use Ivory\Type\IType;
@@ -71,8 +71,8 @@ interface IColumn extends \Traversable, \Countable
      *                                  the integer <tt>1</tt> may specially be used for a constant hasher, which
      *                                    effectively skips hashing and leads to only using <tt>$comparator</tt>;
      *                                  if not given, the default hasher provided by the implementing class is used
-     * @param IValueComparator|\Closure $comparator tells whether two values are equivalent or not;
-     *                                  an {@link IValueComparator} gets called its {@link IValueComparator::equal()}
+     * @param IValueEqualizer|\Closure $comparator tells whether two values are equivalent or not;
+     *                                  an {@link IValueEqualizer} gets called its {@link IValueEqualizer::equal()}
      *                                    method;
      *                                  a <tt>Closure</tt> is given two values as its arguments and is expected to
      *                                    return <tt>true</tt> if it considers the values equivalent, or <tt>false</tt>
