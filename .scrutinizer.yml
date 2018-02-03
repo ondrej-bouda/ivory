@@ -32,9 +32,12 @@ coding_style:
                 closure_definition: true
             other:
                 after_type_cast: false
-#
-#build:
-#    tests:
-#        override:
-#            - phpcs-run <code-sniffer-config-file.xml>
-#
+
+build:
+	nodes:
+		analysis:
+            project_setup:
+                override: true
+			tests:
+				override:
+				 	- php-scrutinizer-run --enable-security-analysis
