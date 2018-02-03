@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
-use Ivory\Exception\IncomparableException;
 use Ivory\NamedDbObject;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Range;
@@ -32,7 +31,7 @@ class RangeType implements ITotallyOrderedType
     public function parseValue(string $extRepr)
     {
         if (preg_match('~^\s*empty\s*$~i', $extRepr)) {
-            return Range::createEmpty($this->subtype);
+            return Range::empty();
         }
 
         $regex = '~
@@ -57,7 +56,7 @@ class RangeType implements ITotallyOrderedType
         $lower = $this->parseBoundStr($m['lower']);
         $upper = $this->parseBoundStr($m['upper']);
 
-        return Range::createFromBounds($this->subtype, $lower, $upper, $lowerInc, $upperInc);
+        return Range::fromBounds($lower, $upper, $lowerInc, $upperInc);
     }
 
     private function parseBoundStr(string $str)
@@ -81,7 +80,7 @@ class RangeType implements ITotallyOrderedType
 
         if (!$val instanceof Range) {
             if (is_array($val) && isset($val[0], $val[1]) && count($val) == 2) {
-                $val = Range::createFromBounds($this->subtype, $val[0], $val[1], true, true);
+                $val = Range::fromBounds($val[0], $val[1], true, true);
             } else {
                 $message = "Value '$val' is not valid for type {$this->getSchemaName()}.{$this->getName()}";
                 throw new \InvalidArgumentException($message);
@@ -100,67 +99,5 @@ class RangeType implements ITotallyOrderedType
             $this->subtype->serializeValue($val->getUpper()),
             ($boundsSpec == '[)' || ($boundsSpec == '()' && $val->getLower() === null) ? '' : ",'$boundsSpec'")
         );
-    }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-
-        if (!$a instanceof Range) {
-            throw new IncomparableException('$a is not a ' . Range::class);
-        }
-        if (!$b instanceof Range) {
-            throw new IncomparableException('$b is not a ' . Range::class);
-        }
-        if ($a->getSubtype() !== $this->subtype) {
-            throw new IncomparableException('$a of an incompatible subtype');
-        }
-        if ($b->getSubtype() !== $this->subtype) {
-            throw new IncomparableException('$b of an incompatible subtype');
-        }
-
-        // empty ranges are sorted before all else in PostgreSQL
-        if ($a->isEmpty() && $b->isEmpty()) {
-            return 0;
-        } elseif ($a->isEmpty()) {
-            return -1;
-        } elseif ($b->isEmpty()) {
-            return 1;
-        } else {
-            $cmp = $this->compareBounds(-1, $a->getLower(), $a->isLowerInc(), $b->getLower(), $b->isLowerInc());
-            if ($cmp != 0) {
-                return $cmp;
-            } else {
-                return $this->compareBounds(1, $a->getUpper(), $a->isUpperInc(), $b->getUpper(), $b->isUpperInc());
-            }
-        }
-    }
-
-    private function compareBounds(int $sgn, $aVal, ?bool $aIsInc, $bVal, ?bool $bIsInc): int
-    {
-        if ($aVal === null && $bVal === null) {
-            return 0;
-        } elseif ($aVal === null) {
-            return 1 * $sgn;
-        } elseif ($bVal === null) {
-            return -1 * $sgn;
-        }
-
-        $cmp = $this->subtype->compareValues($aVal, $bVal);
-        if ($cmp != 0) {
-            return $cmp;
-        }
-
-        if ($aIsInc && $bIsInc) {
-            return 0;
-        } elseif ($aIsInc) {
-            return 1 * $sgn;
-        } elseif ($bIsInc) {
-            return -1 * $sgn;
-        } else {
-            return 0;
-        }
     }
 }

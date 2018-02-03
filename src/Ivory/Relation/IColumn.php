@@ -2,9 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Relation;
 
-use Ivory\Relation\Alg\IValueComparator;
-use Ivory\Relation\Alg\IValueFilter;
-use Ivory\Relation\Alg\IValueHasher;
+use Ivory\Value\Alg\IValueEqualizer;
+use Ivory\Value\Alg\IValueFilter;
+use Ivory\Value\Alg\IValueHasher;
 use Ivory\Type\IType;
 
 /**
@@ -57,30 +57,30 @@ interface IColumn extends \Traversable, \Countable
      * The first of the group of equivalent values is always passed to the result, the others are dropped.
      *
      * Each value is hashed, first, using `$hasher`. In case of collision, i.e., if the value hashes to the same hash as
-     * any of the previous values, `$comparator` is used for deciding the equivalence precisely.
+     * any of the previous values, `$equalizer` is used for deciding the equivalence precisely.
      *
-     * Note the `$hasher` and `$comparator` must be consistent, i.e., values equal according to the comparator must be
+     * Note the `$hasher` and `$equalizer` must be consistent, i.e., values equal according to the equalizer must be
      * hashed to the same key.
      *
-     * {@internal The implementing method should document behaviour of the default value hasher and comparator.}
+     * {@internal The implementing method should document behaviour of the default value hasher and equalizer.}
      *
      * @param IValueHasher|\Closure|int $hasher hashes a value;
      *                                  an {@link IValueHasher} gets called its {@link IValueHasher::hash()} method;
      *                                  a <tt>Closure</tt> is given a value as its only argument and is expected to
      *                                    return the value hash as a <tt>string</tt> or <tt>int</tt>;
      *                                  the integer <tt>1</tt> may specially be used for a constant hasher, which
-     *                                    effectively skips hashing and leads to only using <tt>$comparator</tt>;
+     *                                    effectively skips hashing and leads to only using <tt>$equalizer</tt>;
      *                                  if not given, the default hasher provided by the implementing class is used
-     * @param IValueComparator|\Closure $comparator tells whether two values are equivalent or not;
-     *                                  an {@link IValueComparator} gets called its {@link IValueComparator::equal()}
+     * @param IValueEqualizer|\Closure $equalizer tells whether two values are equivalent or not;
+     *                                  an {@link IValueEqualizer} gets called its {@link IValueEqualizer::equal()}
      *                                    method;
      *                                  a <tt>Closure</tt> is given two values as its arguments and is expected to
      *                                    return <tt>true</tt> if it considers the values equivalent, or <tt>false</tt>
      *                                    otherwise;
-     *                                  if not given, the default comparator provided by the implementing class is used
+     *                                  if not given, the default equalizer provided by the implementing class is used
      * @return IColumn
      */
-    function uniq($hasher = null, $comparator = null): IColumn;
+    function uniq($hasher = null, $equalizer = null): IColumn;
 
     /**
      * @return array list of values of this column, in their original order

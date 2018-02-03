@@ -2,13 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-use Ivory\Type\ITotallyOrderedType;
-use Ivory\Type\Std\IntegerType;
-
 class RangeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ITotallyOrderedType */
-    private $intType;
     /** @var Range */
     private $empty;
     /** @var Range */
@@ -20,20 +15,14 @@ class RangeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->intType = new IntegerType('pg_catalog', 'int4');
-
-        $this->empty = Range::createEmpty($this->intType);
-        $this->finite = Range::createFromBounds($this->intType, 1, 4);
-        $this->infinite = Range::createFromBounds($this->intType, null, 4);
+        $this->empty = Range::empty();
+        $this->finite = Range::fromBounds(1, 4);
+        $this->infinite = Range::fromBounds(null, 4);
     }
 
-    private function intRng($lower, $upper)
+    private function intRng($lower, $upper): Range
     {
-        return Range::createFromBounds(
-            $this->intType,
-            $lower,
-            $upper
-        );
+        return Range::fromBounds($lower, $upper);
     }
 
     public function testEmpty()
@@ -48,56 +37,56 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->empty->toBounds('[]'));
     }
 
-    public function testCreateFromBounds()
+    public function testFromBounds()
     {
         $this->assertTrue(
-            Range::createFromBounds($this->intType, 1, 4)
+            Range::fromBounds(1, 4)
                 ->equals($this->intRng(1, 4))
         );
 
-        $this->assertSame('[]', Range::createFromBounds($this->intType, 1, 3, '[]')->getBoundsSpec());
-        $this->assertSame('(]', Range::createFromBounds($this->intType, null, 3, '[]')->getBoundsSpec());
-        $this->assertSame('[)', Range::createFromBounds($this->intType, 1, null, '[)')->getBoundsSpec());
-        $this->assertSame('()', Range::createFromBounds($this->intType, 1, 3, '()')->getBoundsSpec());
-        $this->assertSame('()', Range::createFromBounds($this->intType, null, null, '[]')->getBoundsSpec());
+        $this->assertSame('[]', Range::fromBounds(1, 3, '[]')->getBoundsSpec());
+        $this->assertSame('(]', Range::fromBounds(null, 3, '[]')->getBoundsSpec());
+        $this->assertSame('[)', Range::fromBounds(1, null, '[)')->getBoundsSpec());
+        $this->assertSame('()', Range::fromBounds(1, 3, '()')->getBoundsSpec());
+        $this->assertSame('()', Range::fromBounds(null, null, '[]')->getBoundsSpec());
 
-        $this->assertSame('[]', Range::createFromBounds($this->intType, 1, 3, true, true)->getBoundsSpec());
-        $this->assertSame('(]', Range::createFromBounds($this->intType, null, 3, true, true)->getBoundsSpec());
-        $this->assertSame('[)', Range::createFromBounds($this->intType, 1, null, true, false)->getBoundsSpec());
-        $this->assertSame('()', Range::createFromBounds($this->intType, 1, 3, false, false)->getBoundsSpec());
-        $this->assertSame('()', Range::createFromBounds($this->intType, null, null, true, true)->getBoundsSpec());
+        $this->assertSame('[]', Range::fromBounds(1, 3, true, true)->getBoundsSpec());
+        $this->assertSame('(]', Range::fromBounds(null, 3, true, true)->getBoundsSpec());
+        $this->assertSame('[)', Range::fromBounds(1, null, true, false)->getBoundsSpec());
+        $this->assertSame('()', Range::fromBounds(1, 3, false, false)->getBoundsSpec());
+        $this->assertSame('()', Range::fromBounds(null, null, true, true)->getBoundsSpec());
 
-        $this->assertTrue(Range::createFromBounds($this->intType, 1, 1)->isEmpty());
-        $this->assertTrue(Range::createFromBounds($this->intType, 1, 2, '()')->isEmpty());
-        $this->assertTrue(Range::createFromBounds($this->intType, 5, 3)->isEmpty());
+        $this->assertTrue(Range::fromBounds(1, 1)->isEmpty());
+        $this->assertTrue(Range::fromBounds(1, 2, '()')->isEmpty());
+        $this->assertTrue(Range::fromBounds(5, 3)->isEmpty());
 
-        $this->assertFalse(Range::createFromBounds($this->intType, 3, 3, '[]')->isEmpty());
+        $this->assertFalse(Range::fromBounds(3, 3, '[]')->isEmpty());
     }
 
     public function testEquals()
     {
         $this->assertTrue(
-            Range::createFromBounds($this->intType, 1, 4)
+            Range::fromBounds(1, 4)
                 ->equals($this->intRng(1, 4))
         );
 
         $this->assertTrue(
-            Range::createFromBounds($this->intType, 1, 3, '[]')
+            Range::fromBounds(1, 3, '[]')
                 ->equals($this->intRng(1, 4))
         );
 
         $this->assertTrue(
-            Range::createFromBounds($this->intType, 0, 3, '(]')
+            Range::fromBounds(0, 3, '(]')
                 ->equals($this->intRng(1, 4))
         );
 
         $this->assertTrue(
-            Range::createFromBounds($this->intType, 0, 4, '()')
+            Range::fromBounds(0, 4, '()')
                 ->equals($this->intRng(1, 4))
         );
 
         $this->assertFalse(
-            Range::createFromBounds($this->intType, 1, 3, '[]')
+            Range::fromBounds(1, 3, '[]')
                 ->equals($this->intRng(1, 3))
         );
     }
@@ -394,5 +383,18 @@ class RangeTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse($this->intRng(null, 4)->strictlyRightOf($this->intRng(null, 9)));
         $this->assertFalse($this->intRng(null, null)->strictlyRightOf($this->intRng(3, 9)));
+    }
+
+    public function testDateRange()
+    {
+        $this->assertTrue(
+            Range::fromBounds(Date::fromParts(2018, 1, 15), Date::fromParts(2018, 1, 16), '()')
+                ->isEmpty()
+        );
+
+        $this->assertEquals(
+            [Date::fromParts(2018, 1, 14), Date::fromParts(2018, 2, 2)],
+            Range::fromBounds(Date::fromParts(2018, 1, 15), Date::fromParts(2018, 2, 3))->toBounds('(]')
+        );
     }
 }

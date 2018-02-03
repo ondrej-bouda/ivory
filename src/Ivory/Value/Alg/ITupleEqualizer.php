@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
-namespace Ivory\Relation\Alg;
+namespace Ivory\Value\Alg;
 
 use Ivory\Relation\ITuple;
 
-interface ITupleComparator
+interface ITupleEqualizer
 {
     /**
      * @param ITuple $first

@@ -2,6 +2,10 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
+use Ivory\Exception\IncomparableException;
+use Ivory\Value\Alg\EqualableWithCompareTo;
+use Ivory\Value\Alg\IComparable;
+
 /**
  * A money amount.
  *
@@ -13,8 +17,10 @@ namespace Ivory\Value;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datatype-money.html
  */
-class Money
+class Money implements IComparable
 {
+    use EqualableWithCompareTo;
+
     private $amount;
     private $unit;
 
@@ -75,9 +81,6 @@ class Money
         $this->unit = $unit;
     }
 
-    /**
-     * @return Decimal
-     */
     public function getAmount(): Decimal
     {
         return $this->amount;
@@ -94,5 +97,21 @@ class Money
     public function __toString()
     {
         return "{$this->amount} " . ($this->unit === null ? '(no unit)' : $this->unit);
+    }
+
+    public function compareTo($other): int
+    {
+        if ($other === null) {
+            throw new \InvalidArgumentException('comparing with null');
+        }
+
+        if (!$other instanceof Money) {
+            throw new IncomparableException('$other is not of class ' . Money::class);
+        }
+        if ($this->getUnit() != $other->getUnit()) {
+            throw new IncomparableException('Different monetary unit');
+        }
+
+        return $this->getAmount()->compareTo($other->getAmount());
     }
 }

@@ -26,6 +26,15 @@ class TimestampTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEquals(self::dt(2015, 1, 30, 12, 34, 56), self::dt(2015, 1, 30, 12, 34, 56.000001));
     }
 
+    public function testComparable()
+    {
+        $this->assertEquals(0, self::dt(2015, 1, 30, 12, 34, 56)->compareTo(self::dt(2015, 1, 30, 12, 34, 56)));
+        $this->assertLessThan(0, self::dt(2015, 1, 30, 12, 34, 55)->compareTo(self::dt(2015, 1, 30, 12, 34, 56)));
+        $this->assertLessThan(0, self::dt(2014, 1, 30, 12, 34, 56)->compareTo(self::dt(2015, 1, 30, 12, 34, 56)));
+        $this->assertGreaterThan(0, self::dt(2015, 1, 30, 12, 34, 56)->compareTo(self::dt(2015, 1, 30, 12, 34, 55)));
+        $this->assertGreaterThan(0, self::dt(2015, 1, 30, 12, 34, 56)->compareTo(self::dt(2014, 1, 30, 12, 34, 56)));
+    }
+
     public function testNow()
     {
         // there is a little chance of hitting the following code exactly at time with no microseconds

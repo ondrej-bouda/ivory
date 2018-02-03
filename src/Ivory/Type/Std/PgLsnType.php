@@ -4,7 +4,6 @@ namespace Ivory\Type\Std;
 
 use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
-use Ivory\Type\TotallyOrderedByPhpOperators;
 use Ivory\Value\PgLogSequenceNumber;
 
 /**
@@ -16,8 +15,6 @@ use Ivory\Value\PgLogSequenceNumber;
  */
 class PgLsnType extends BaseType implements ITotallyOrderedType
 {
-    use TotallyOrderedByPhpOperators;
-
     public function parseValue(string $extRepr)
     {
         return PgLogSequenceNumber::fromString($extRepr);

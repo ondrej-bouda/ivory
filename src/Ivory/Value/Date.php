@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
+use Ivory\Value\Alg\IDiscreteStepper;
+
 /**
  * Representation of a date according to the
  * {@link https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar proleptic} Gregorian calendar.
@@ -20,7 +22,7 @@ namespace Ivory\Value;
  *
  * @see http://www.postgresql.org/docs/9.4/static/datetime-units-history.html
  */
-class Date extends DateBase
+class Date extends DateBase implements IDiscreteStepper
 {
     /**
      * @return Date date representing the current day
@@ -233,5 +235,14 @@ class Date extends DateBase
             $z = (int)$this->dt->format('Y');
             return [($z > 0 ? $z : $z - 1), (int)$this->dt->format('n'), (int)$this->dt->format('j')];
         }
+    }
+
+    public function step(int $delta, $value)
+    {
+        if (!$value instanceof Date) {
+            throw new \InvalidArgumentException('$value');
+        }
+
+        return $value->addDay($delta);
     }
 }

@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Exception\IncomparableException;
 use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\BitString;
@@ -23,19 +22,5 @@ abstract class BitStringType extends BaseType implements ITotallyOrderedType
         } else {
             throw $this->invalidValueException($val);
         }
-    }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-        if (!$a instanceof BitString) {
-            throw new IncomparableException('$a is not a ' . BitString::class);
-        }
-        if (!$b instanceof BitString) {
-            throw new IncomparableException('$b is not a ' . BitString::class);
-        }
-        return strcmp($a->toString(), $b->toString());
     }
 }

@@ -2,13 +2,13 @@
 declare(strict_types=1);
 namespace Ivory\Relation;
 
-use Ivory\Relation\Alg\CallbackValueComparator;
-use Ivory\Relation\Alg\CallbackValueHasher;
-use Ivory\Relation\Alg\ITupleEvaluator;
-use Ivory\Relation\Alg\IValueComparator;
-use Ivory\Relation\Alg\IValueHasher;
+use Ivory\Value\Alg\CallbackValueEqualizer;
+use Ivory\Value\Alg\CallbackValueHasher;
+use Ivory\Value\Alg\ITupleEvaluator;
+use Ivory\Value\Alg\IValueEqualizer;
+use Ivory\Value\Alg\IValueHasher;
 use Ivory\Type\IType;
-use Ivory\Utils\ValueUtils;
+use Ivory\Value\Alg\ComparisonUtils;
 
 class Column implements \IteratorAggregate, IColumn
 {
@@ -58,7 +58,7 @@ class Column implements \IteratorAggregate, IColumn
         return new FilteredColumn($this, $decider);
     }
 
-    public function uniq($hasher = null, $comparator = null): IColumn
+    public function uniq($hasher = null, $equalizer = null): IColumn
     {
         if ($hasher === null) {
             $hasher = new CallbackValueHasher(function ($value) {
@@ -76,23 +76,23 @@ class Column implements \IteratorAggregate, IColumn
             }
         }
 
-        if ($comparator === null) {
-            $comparator = new CallbackValueComparator(function ($a, $b) {
-                return ValueUtils::equals($a, $b);
+        if ($equalizer === null) {
+            $equalizer = new CallbackValueEqualizer(function ($a, $b) {
+                return ComparisonUtils::equals($a, $b);
             });
-        } elseif (!$comparator instanceof IValueComparator) {
-            $comparator = new CallbackValueComparator($comparator);
+        } elseif (!$equalizer instanceof IValueEqualizer) {
+            $equalizer = new CallbackValueEqualizer($equalizer);
         }
 
         $hashTable = [];
-        return new FilteredColumn($this, function ($value) use ($hasher, $comparator, &$hashTable) {
+        return new FilteredColumn($this, function ($value) use ($hasher, $equalizer, &$hashTable) {
             $h = $hasher->hash($value);
             if (!isset($hashTable[$h])) {
                 $hashTable[$h] = [$value];
                 return true;
             } else {
                 foreach ($hashTable[$h] as $v) {
-                    if ($comparator->equal($value, $v)) {
+                    if ($equalizer->equal($value, $v)) {
                         return false;
                     }
                 }

@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Value;
 
 use Ivory\Exception\NotImplementedException;
-use Ivory\Utils\IEqualable;
+use Ivory\Value\Alg\IEqualable;
 
 /**
  * Representation of an IPv4 or IPv6 host or network address.

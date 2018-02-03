@@ -3,8 +3,9 @@ declare(strict_types=1);
 namespace Ivory\Value;
 
 use Ivory\Exception\ImmutableException;
+use Ivory\Exception\IncomparableException;
 use Ivory\Exception\UndefinedOperationException;
-use Ivory\Utils\IEqualable;
+use Ivory\Value\Alg\IComparable;
 
 /**
  * A common super type for bit string types - strings of 1's and 0's.
@@ -22,7 +23,7 @@ use Ivory\Utils\IEqualable;
  *
  * @todo optimize the internal representation (unpack('c*', $value) might be handy for constructing from string)
  */
-abstract class BitString implements IEqualable, \ArrayAccess
+abstract class BitString implements IComparable, \ArrayAccess
 {
     protected $bits;
     protected $len;
@@ -91,6 +92,18 @@ abstract class BitString implements IEqualable, \ArrayAccess
             get_class($this) == get_class($other) &&
             $this->bits == $other->bits
         );
+    }
+
+    public function compareTo($other): int
+    {
+        if ($other === null) {
+            throw new \InvalidArgumentException('comparing with null');
+        }
+        if (get_class($this) != get_class($other)) {
+            throw new IncomparableException();
+        }
+
+        return strcmp($this->bits, $other->bits);
     }
 
     /**

@@ -2,9 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Relation;
 
-use Ivory\Relation\Alg\CallbackTupleFilter;
-use Ivory\Relation\Alg\ITupleFilter;
-use Ivory\Relation\Alg\TupleFilterIterator;
+use Ivory\Value\Alg\CallbackTupleFilter;
+use Ivory\Value\Alg\ITupleFilter;
+use Ivory\Value\Alg\TupleFilterIterator;
 
 class FilteredRelation extends StreamlinedRelation implements ICachingDataProcessor
 {

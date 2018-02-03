@@ -3,11 +3,12 @@ declare(strict_types=1);
 namespace Ivory\Value;
 
 use Ivory\Exception\ImmutableException;
+use Ivory\Exception\IncomparableException;
 use Ivory\Exception\UnsupportedException;
 use Ivory\Type\Postgresql\CompositeType;
 use Ivory\Type\Postgresql\NamedCompositeType;
-use Ivory\Utils\IEqualable;
-use Ivory\Utils\ValueUtils;
+use Ivory\Value\Alg\IComparable;
+use Ivory\Value\Alg\ComparisonUtils;
 
 /**
  * A value of a composite type.
@@ -27,7 +28,7 @@ use Ivory\Utils\ValueUtils;
  *
  * @see http://www.postgresql.org/docs/9.4/static/rowtypes.html
  */
-class Composite implements IEqualable, \ArrayAccess, \IteratorAggregate
+class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
 {
     /** @var CompositeType type of the composite */
     private $type;
@@ -80,21 +81,6 @@ class Composite implements IEqualable, \ArrayAccess, \IteratorAggregate
     final public function getType(): CompositeType
     {
         return $this->type;
-    }
-
-    public function equals($other): bool
-    {
-        if ($other === null) {
-            return false;
-        }
-        if (get_class($this) != get_class($other)) {
-            return false;
-        }
-        if ($this->type !== $other->type) {
-            return false;
-        }
-
-        return ValueUtils::equals($this->values, $other->values);
     }
 
     /**
@@ -192,6 +178,48 @@ class Composite implements IEqualable, \ArrayAccess, \IteratorAggregate
     {
         $arr = ($this->type->getAttributes() ? $this->toMap() : $this->values);
         return new \ArrayIterator($arr);
+    }
+
+    //endregion
+
+    //region IComparable
+
+    public function equals($other): bool
+    {
+        if ($other === null) {
+            return false;
+        }
+        if (get_class($this) != get_class($other)) {
+            return false;
+        }
+        if ($this->type !== $other->type) {
+            return false;
+        }
+
+        return ComparisonUtils::equals($this->values, $other->values);
+    }
+
+    public function compareTo($other): int
+    {
+        if ($other === null) {
+            throw new \InvalidArgumentException();
+        }
+        if (!$other instanceof Composite) {
+            throw new IncomparableException('$other is not a ' . Composite::class);
+        }
+        if ($this->getType() !== $other->getType()) {
+            throw new IncomparableException('Different composite types');
+        }
+
+        $otherValues = $other->values;
+        foreach ($this->values as $i => $av) {
+            $bv = $otherValues[$i];
+            $cmp = ComparisonUtils::compareValues($av, $bv);
+            if ($cmp != 0) {
+                return $cmp;
+            }
+        }
+        return 0;
     }
 
     //endregion

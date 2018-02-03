@@ -4,8 +4,8 @@ namespace Ivory\Relation;
 
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Exception\AmbiguousException;
-use Ivory\Relation\Alg\ITupleEvaluator;
-use Ivory\Utils\IEqualable;
+use Ivory\Value\Alg\ITupleEvaluator;
+use Ivory\Value\Alg\IEqualable;
 
 /**
  * Represents one relation row.

@@ -113,7 +113,7 @@ class QueryResult extends Result implements IQueryResult
         return new RenamedRelation($this, $renamePairs);
     }
 
-    public function uniq($hasher = null, $comparator = null): IRelation
+    public function uniq($hasher = null, $equalizer = null): IRelation
     {
         throw new NotImplementedException();
     }

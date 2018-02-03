@@ -48,12 +48,4 @@ class BooleanType extends BaseType implements ITotallyOrderedType
             return 'FALSE';
         }
     }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-        return (bool)$a <=> (bool)$b;
-    }
 }

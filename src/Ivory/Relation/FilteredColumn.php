@@ -2,8 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Relation;
 
-use Ivory\Relation\Alg\CallbackValueFilter;
-use Ivory\Relation\Alg\IValueFilter;
+use Ivory\Value\Alg\CallbackValueFilter;
+use Ivory\Value\Alg\IValueFilter;
 use Ivory\Type\IType;
 
 class FilteredColumn implements \IteratorAggregate, IColumn, ICachingDataProcessor
@@ -71,9 +71,9 @@ class FilteredColumn implements \IteratorAggregate, IColumn, ICachingDataProcess
         return new FilteredColumn($this, $decider);
     }
 
-    public function uniq($hasher = null, $comparator = null): IColumn
+    public function uniq($hasher = null, $equalizer = null): IColumn
     {
-        return new FilteredColumn($this->baseCol->uniq($hasher, $comparator), $this->decider);
+        return new FilteredColumn($this->baseCol->uniq($hasher, $equalizer), $this->decider);
     }
 
     public function toArray(): array

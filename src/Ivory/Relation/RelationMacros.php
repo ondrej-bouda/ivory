@@ -12,7 +12,7 @@ use Ivory\Data\Set\DictionarySet;
 use Ivory\Data\Set\ISet;
 use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\UndefinedColumnException;
-use Ivory\Relation\Alg\ITupleEvaluator;
+use Ivory\Value\Alg\ITupleEvaluator;
 use Ivory\Data\Map\ArrayTupleMap;
 
 /**

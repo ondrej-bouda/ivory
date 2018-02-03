@@ -2,12 +2,10 @@
 declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
-use Ivory\Exception\IncomparableException;
 use Ivory\Exception\ParseException;
-use Ivory\Exception\UnsupportedException;
 use Ivory\Lang\Sql\Types;
-use Ivory\Type\IType;
 use Ivory\Type\ITotallyOrderedType;
+use Ivory\Type\IType;
 use Ivory\Value\Composite;
 
 /**
@@ -187,50 +185,5 @@ abstract class CompositeType implements ITotallyOrderedType
             $res = 'ROW' . $res;
         }
         return $res;
-    }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-
-        if (!$a instanceof Composite) {
-            throw new IncomparableException('$a is not a ' . Composite::class);
-        }
-        if (!$b instanceof Composite) {
-            throw new IncomparableException('$b is not a ' . Composite::class);
-        }
-        if ($a->getType() !== $b->getType()) {
-            throw new IncomparableException('Different composite types');
-        }
-        $t = $a->getType();
-        if ($t->attributes) {
-            foreach ($t->attributes as $att => $type) {
-                if ($type instanceof ITotallyOrderedType) {
-                    $xComp = $type->compareValues($a[$att], $b[$att]);
-                    if ($xComp != 0) {
-                        return $xComp;
-                    }
-                } else {
-                    throw new UnsupportedException("The composite {$this->getSchemaName()}.{$this->getName()} attribute $att type $type is not totally ordered.");
-                }
-            }
-            return 0;
-        } else {
-            $al = $a->toList();
-            $bl = $b->toList();
-            if (count($al) != count($bl)) {
-                throw new IncomparableException('Unequal number of composite components');
-            }
-            foreach ($al as $i => $av) {
-                $bv = $bl[$i];
-                $xComp = strcmp((string)$av, (string)$bv);
-                if ($xComp != 0) {
-                    return $xComp;
-                }
-            }
-            return 0;
-        }
     }
 }

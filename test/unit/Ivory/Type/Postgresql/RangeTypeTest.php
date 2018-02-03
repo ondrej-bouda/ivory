@@ -18,20 +18,6 @@ class RangeTypeTest extends \PHPUnit\Framework\TestCase
         $this->intRangeType = new RangeType('pg_catalog', 'int4range', $int);
     }
 
-    private function intEmpty()
-    {
-        return Range::createEmpty($this->intRangeType->getSubtype());
-    }
-
-    private function intRng($lower, $upper)
-    {
-        return Range::createFromBounds(
-            $this->intRangeType->getSubtype(),
-            $lower,
-            $upper
-        );
-    }
-
     public function testParseValue()
     {
         $rng1 = $this->intRangeType->parseValue('[1,4)');
@@ -64,16 +50,35 @@ class RangeTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testSerializeValue()
     {
-        $this->assertSame('NULL', $this->intRangeType->serializeValue(null));
+        $this->assertSame(
+            'NULL',
+            $this->intRangeType->serializeValue(null)
+        );
 
-        $this->assertSame("'empty'::pg_catalog.int4range", $this->intRangeType->serializeValue($this->intEmpty()));
-        $this->assertSame("'empty'::pg_catalog.int4range", $this->intRangeType->serializeValue([1, 0]));
+        $this->assertSame(
+            "'empty'::pg_catalog.int4range",
+            $this->intRangeType->serializeValue(Range::empty())
+        );
+        $this->assertSame(
+            "'empty'::pg_catalog.int4range",
+            $this->intRangeType->serializeValue([1, 0])
+        );
 
-        $this->assertSame("pg_catalog.int4range(1,4)", $this->intRangeType->serializeValue($this->intRng(1, 4)));
-        $this->assertSame("pg_catalog.int4range(1,NULL)", $this->intRangeType->serializeValue($this->intRng(1, null)));
-        $this->assertSame("pg_catalog.int4range(NULL,4)", $this->intRangeType->serializeValue($this->intRng(null, 4)));
-        $this->assertSame("pg_catalog.int4range(NULL,NULL)",
-            $this->intRangeType->serializeValue($this->intRng(null, null))
+        $this->assertSame(
+            "pg_catalog.int4range(1,4)",
+            $this->intRangeType->serializeValue(Range::fromBounds(1, 4))
+        );
+        $this->assertSame(
+            "pg_catalog.int4range(1,NULL)",
+            $this->intRangeType->serializeValue(Range::fromBounds(1, null))
+        );
+        $this->assertSame(
+            "pg_catalog.int4range(NULL,4)",
+            $this->intRangeType->serializeValue(Range::fromBounds(null, 4))
+        );
+        $this->assertSame(
+            "pg_catalog.int4range(NULL,NULL)",
+            $this->intRangeType->serializeValue(Range::fromBounds(null, null))
         );
     }
 }

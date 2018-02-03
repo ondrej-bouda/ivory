@@ -36,17 +36,4 @@ class UuidType extends BaseType implements ITotallyOrderedType
 
         return Types::serializeString($val);
     }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-        if ($a == $b) {
-            return 0;
-        }
-        $aCan = preg_replace('~\D~', '', (string)$a);
-        $bCan = preg_replace('~\D~', '', (string)$b);
-        return strcmp($aCan, $bCan);
-    }
 }

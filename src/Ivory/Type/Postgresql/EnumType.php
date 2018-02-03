@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
-use Ivory\Exception\IncomparableException;
 use Ivory\Lang\Sql\Types;
 use Ivory\NamedDbObject;
 use Ivory\Type\ITotallyOrderedType;
@@ -56,16 +55,5 @@ class EnumType implements ITotallyOrderedType
             Types::serializeIdent($this->getSchemaName()),
             Types::serializeIdent($this->getName())
         );
-    }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-        if (!$a instanceof EnumItem || !$b instanceof EnumItem) {
-            throw new IncomparableException();
-        }
-        return $a->compareTo($b);
     }
 }

@@ -34,12 +34,4 @@ class BinaryType extends BaseType implements ITotallyOrderedType
             return "E'\\\\x" . bin2hex($val) . "'";
         }
     }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-        return strcmp((string)$a, (string)$b);
-    }
 }

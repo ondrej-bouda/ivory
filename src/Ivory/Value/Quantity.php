@@ -4,7 +4,7 @@ namespace Ivory\Value;
 
 use Ivory\Exception\UndefinedOperationException;
 use Ivory\Exception\UnsupportedException;
-use Ivory\Utils\IEqualable;
+use Ivory\Value\Alg\IEqualable;
 
 /**
  * A quantity with a unit.

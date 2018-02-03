@@ -5,10 +5,10 @@ namespace Ivory\Relation;
 use Ivory\Data\Set\ISet;
 use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\UndefinedColumnException;
-use Ivory\Relation\Alg\ITupleComparator;
-use Ivory\Relation\Alg\ITupleEvaluator;
-use Ivory\Relation\Alg\ITupleFilter;
-use Ivory\Relation\Alg\ITupleHasher;
+use Ivory\Value\Alg\ITupleEqualizer;
+use Ivory\Value\Alg\ITupleEvaluator;
+use Ivory\Value\Alg\ITupleFilter;
+use Ivory\Value\Alg\ITupleHasher;
 use Ivory\Data\Map\IRelationMap;
 use Ivory\Data\Map\ITupleMap;
 use Ivory\Data\Map\IValueMap;
@@ -277,30 +277,30 @@ interface IRelation extends \Traversable, \Countable
      * The first of the group of equivalent tuples is always passed to the result, the others are dropped.
      *
      * Each tuple is hashed, first, using `$hasher`. In case of collision, i.e., if the tuple hashes to the same value
-     * as any of the previous tuples, `$comparator` is used for deciding the equivalence precisely.
+     * as any of the previous tuples, `$equalizer` is used for deciding the equivalence precisely.
      *
-     * Note the `$hasher` and `$comparator` must be consistent, i.e., tuples equal according to the comparator must be
+     * Note the `$hasher` and `$equalizer` must be consistent, i.e., tuples equal according to the equalizer must be
      * hashed to the same key.
      *
-     * {@internal The implementing method should document behaviour of the default tuple hasher and comparator.}
+     * {@internal The implementing method should document behaviour of the default tuple hasher and equalizer.}
      *
      * @param ITupleHasher|\Closure|int $hasher hashes a tuple;
      *                                  An {@link ITupleHasher} gets called its {@link ITupleHasher::hash()} method.
      *                                  A <tt>Closure</tt> is given one {@link ITuple} argument and is expected to
      *                                    return the tuple hash as a <tt>string</tt> or <tt>int</tt>.
      *                                  The integer <tt>1</tt> may specially be used for a constant hasher, which
-     *                                    effectively skips hashing and leads to only using <tt>$comparator</tt>.
+     *                                    effectively skips hashing and leads to only using <tt>$equalizer</tt>.
      *                                  If not given, the default hasher provided by the implementing class is used.
-     * @param ITupleComparator|\Closure $comparator Tells whether two tuples are equivalent or not.
-     *                                  An {@link ITupleComparator} gets called its {@link ITupleComparator::equal()}
+     * @param ITupleEqualizer|\Closure $equalizer Tells whether two tuples are equivalent or not.
+     *                                  An {@link ITupleEqualizer} gets called its {@link ITupleEqualizer::equal()}
      *                                    method.
      *                                  A <tt>Closure</tt> is given two {@link ITuple} arguments and is expected to
      *                                    return <tt>true</tt> if it considers the tuples equivalent, or <tt>false</tt>
      *                                    otherwise.
-     *                                  If not given, the default comparator provided by the implementing class is used.
+     *                                  If not given, the default equalizer provided by the implementing class is used.
      * @return IRelation
      */
-    function uniq($hasher = null, $comparator = null): IRelation; // TODO: test & implement
+    function uniq($hasher = null, $equalizer = null): IRelation; // TODO: test & implement
 
     /**
      * @return array[] list of associative arrays, each representing one tuple of this relation (in the original order);

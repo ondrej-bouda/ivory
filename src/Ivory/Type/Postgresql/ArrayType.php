@@ -4,9 +4,8 @@ namespace Ivory\Type\Postgresql;
 
 use Ivory\Exception\InternalException;
 use Ivory\Exception\ParseException;
-use Ivory\Exception\UnsupportedException;
-use Ivory\Type\IType;
 use Ivory\Type\ITotallyOrderedType;
+use Ivory\Type\IType;
 
 /**
  * Array type object.
@@ -372,88 +371,5 @@ class ArrayType implements ITotallyOrderedType
         $out .= '}';
 
         return $out;
-    }
-
-    public function compareValues($a, $b): ?int
-    {
-        if (!$this->elemType instanceof ITotallyOrderedType) {
-            $elemTypeName = $this->elemType->getSchemaName() . '.' . $this->elemType->getName();
-            throw new UnsupportedException("The array element type $elemTypeName is not totally ordered.");
-        }
-
-        if ($a === null || $b === null) {
-            return null;
-        }
-
-        return $this->compareValuesImpl($a, $b);
-    }
-
-    private function compareValuesImpl($a, $b): int
-    {
-        reset($b);
-        foreach ($a as $av) {
-            if (key($b) === null) {
-                return 1;
-            }
-            $bv = current($b);
-            next($b);
-            if ($av === null) {
-                if ($bv !== null) {
-                    return -1;
-                }
-            } elseif ($bv === null) {
-                return 1;
-            } elseif (is_array($av)) {
-                if (is_array($bv)) {
-                    $comp = $this->compareValuesImpl($av, $bv);
-                    if ($comp) {
-                        return $comp;
-                    }
-                } else {
-                    return 1;
-                }
-            } elseif (is_array($bv)) {
-                return -1;
-            } else {
-                /** @var ITotallyOrderedType $et */
-                $et = $this->elemType;
-                $comp = $et->compareValues($av, $bv);
-                if ($comp) {
-                    return $comp;
-                }
-            }
-        }
-        if (key($b) !== null) {
-            return -1;
-        }
-
-        // ties broken by the subscripts of the first item
-        $aFst = $a;
-        $bFst = $b;
-        do {
-            reset($aFst);
-            reset($bFst);
-            $ak = key($aFst);
-            $bk = key($bFst);
-            if ($ak === null && $bk === null) {
-                return 0;
-            } elseif ($ak === null) {
-                return -1;
-            } elseif ($bk === null) {
-                return 1;
-            } elseif (!is_numeric($ak) || !is_numeric($bk)) {
-                return 0;
-            } else {
-                $d = $ak - $bk;
-                if ($d) {
-                    return $d;
-                } else {
-                    $aFst = current($aFst);
-                    $bFst = current($bFst);
-                }
-            }
-        } while (is_array($aFst) && is_array($bFst));
-
-        return 0;
     }
 }

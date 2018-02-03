@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace Ivory\Relation\Alg;
+namespace Ivory\Value\Alg;
 
-interface IValueComparator
+interface IValueEqualizer
 {
     /**
      * @param mixed $first

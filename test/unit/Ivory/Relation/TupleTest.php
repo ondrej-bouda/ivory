@@ -5,8 +5,8 @@ namespace Ivory\Relation;
 use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\ImmutableException;
 use Ivory\Exception\UndefinedColumnException;
-use Ivory\Relation\Alg\ITupleEvaluator;
-use Ivory\Utils\IEqualable;
+use Ivory\Value\Alg\ITupleEvaluator;
+use Ivory\Value\Alg\IEqualable;
 
 class TupleTest extends \PHPUnit\Framework\TestCase
 {

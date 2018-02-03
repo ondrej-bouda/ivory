@@ -40,15 +40,4 @@ class DecimalType extends BaseType implements ITotallyOrderedType
             return $val->toString();
         }
     }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-        if (!$a instanceof Decimal) {
-            $a = Decimal::fromNumber($a);
-        }
-        return $a->compareTo($b);
-    }
 }

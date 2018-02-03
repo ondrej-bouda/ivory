@@ -2,8 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Data\Set;
 
-use Ivory\Relation\Alg\CallbackValueHasher;
-use Ivory\Relation\Alg\IValueHasher;
+use Ivory\Value\Alg\CallbackValueHasher;
+use Ivory\Value\Alg\IValueHasher;
 
 /**
  * {@inheritdoc}

@@ -9,6 +9,7 @@ use Ivory\Exception\ConnectionException;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Lang\SqlPattern\ISqlPatternParser;
 use Ivory\Type\TypeRegister;
+use Ivory\Value\Alg\IValueComparator;
 use Psr\Cache\CacheItemPoolInterface;
 
 final class Ivory
@@ -31,6 +32,8 @@ final class Ivory
     private static $defaultCacheImpl = null;
     /** @var ICacheControl|null */
     private static $globalCacheControl = null;
+    /** @var IValueComparator */
+    private static $defaultValueComparator = null;
 
 
     private function __construct()
@@ -262,5 +265,16 @@ final class Ivory
         } else {
             throw new \RuntimeException('Undefined connection');
         }
+    }
+
+    /**
+     * @return IValueComparator value comparator to use as the default one
+     */
+    public static function getDefaultValueComparator(): IValueComparator
+    {
+        if (self::$defaultValueComparator === null) {
+            self::$defaultValueComparator = self::getCoreFactory()->createDefaultValueComparator();
+        }
+        return self::$defaultValueComparator;
     }
 }

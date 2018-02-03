@@ -4,7 +4,6 @@ namespace Ivory\Type\Std;
 
 use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
-use Ivory\Type\TotallyOrderedByPhpOperators;
 use Ivory\Value\TimeInterval;
 
 /**
@@ -16,9 +15,6 @@ use Ivory\Value\TimeInterval;
  */
 class IntervalType extends BaseType implements ITotallyOrderedType
 {
-    use TotallyOrderedByPhpOperators;
-
-
     public function parseValue(string $extRepr)
     {
         return TimeInterval::fromString($extRepr);
