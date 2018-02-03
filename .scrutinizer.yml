@@ -34,10 +34,10 @@ coding_style:
                 after_type_cast: false
 
 build:
-	nodes:
-		analysis:
+    nodes:
+        analysis:
             project_setup:
                 override: true
-			tests:
-				override:
-				 	- php-scrutinizer-run --enable-security-analysis
+            tests:
+                override:
+                    - php-scrutinizer-run --enable-security-analysis
