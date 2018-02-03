@@ -8,7 +8,6 @@ use Ivory\Connection\DateStyle;
 use Ivory\Connection\IConnection;
 use Ivory\Type\ConnectionDependentBaseType;
 use Ivory\Type\ITotallyOrderedType;
-use Ivory\Type\TotallyOrderedByPhpOperators;
 use Ivory\Value\Timestamp;
 
 /**
@@ -41,9 +40,6 @@ use Ivory\Value\Timestamp;
  */
 class TimestampType extends ConnectionDependentBaseType implements ITotallyOrderedType
 {
-    use TotallyOrderedByPhpOperators;
-
-
     /** @var ConnConfigValueRetriever */
     private $dateStyleRetriever;
 

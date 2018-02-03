@@ -2,10 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Exception\IncomparableException;
 use Ivory\Exception\InternalException;
 use Ivory\Type\BaseType;
-use Ivory\Type\ITotallyOrderedType;
 
 /**
  * A polymorphic type, which basically cannot be retrieved in a `SELECT` result, except for `NULL` values.

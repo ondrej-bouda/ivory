@@ -5,7 +5,6 @@ namespace Ivory\Type\Std;
 use Ivory\Connection\Config\ConfigParam;
 use Ivory\Connection\Config\ConnConfigValueRetriever;
 use Ivory\Connection\IConnection;
-use Ivory\Exception\IncomparableException;
 use Ivory\Type\ConnectionDependentBaseType;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Decimal;
@@ -74,16 +73,5 @@ class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedTy
         }
 
         return $str . '::money';
-    }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-        if (!$a instanceof Money) {
-            throw new IncomparableException('$a is not of class ' . Money::class);
-        }
-        return $a->compareTo($b);
     }
 }

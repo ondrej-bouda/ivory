@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Exception\IncomparableException;
 use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Point;
@@ -39,26 +38,5 @@ class PointType extends BaseType implements ITotallyOrderedType
         }
 
         return sprintf('point(%s,%s)', $val->getX(), $val->getY());
-    }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-
-        if (is_array($a)) {
-            $a = Point::fromCoords($a);
-        } elseif (!$a instanceof Point) {
-            throw new IncomparableException('$a is not a ' . Point::class);
-        }
-
-        if (is_array($b)) {
-            $b = Point::fromCoords($b);
-        } elseif (!$b instanceof Point) {
-            throw new IncomparableException('$b is not a ' . Point::class);
-        }
-
-        return $a->compareTo($b);
     }
 }

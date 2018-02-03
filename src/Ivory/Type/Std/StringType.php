@@ -26,13 +26,4 @@ class StringType extends StringSerializer implements ITotallyOrderedType
     {
         return $extRepr;
     }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-        // FIXME: compare according to a collation, or at least the client encoding, or at least using UTF-8
-        return strcmp((string)$a, (string)$b);
-    }
 }

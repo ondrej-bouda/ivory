@@ -4,7 +4,6 @@ namespace Ivory\Type\Std;
 
 use Ivory\Type\BaseType;
 use Ivory\Type\ITotallyOrderedType;
-use Ivory\Type\TotallyOrderedByPhpOperators;
 use Ivory\Value\Time;
 
 /**
@@ -16,9 +15,6 @@ use Ivory\Value\Time;
  */
 class TimeType extends BaseType implements ITotallyOrderedType
 {
-    use TotallyOrderedByPhpOperators;
-
-
     public function parseValue(string $extRepr)
     {
         return Time::fromString($extRepr);

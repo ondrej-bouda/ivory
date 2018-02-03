@@ -152,14 +152,4 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
             throw new \LogicException('A non-finite timezone-aware timestamp not recognized');
         }
     }
-
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null || !$a instanceof TimestampTz || !$b instanceof TimestampTz) {
-            return null;
-        }
-
-        return ($a->toUnixTimestamp() - $b->toUnixTimestamp());
-    }
 }

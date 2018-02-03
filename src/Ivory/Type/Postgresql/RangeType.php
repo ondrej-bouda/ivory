@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
-use Ivory\Exception\IncomparableException;
 use Ivory\NamedDbObject;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Range;
@@ -32,7 +31,7 @@ class RangeType implements ITotallyOrderedType
     public function parseValue(string $extRepr)
     {
         if (preg_match('~^\s*empty\s*$~i', $extRepr)) {
-            return Range::createEmpty($this->subtype);
+            return Range::createEmpty();
         }
 
         $regex = '~
@@ -57,7 +56,7 @@ class RangeType implements ITotallyOrderedType
         $lower = $this->parseBoundStr($m['lower']);
         $upper = $this->parseBoundStr($m['upper']);
 
-        return Range::createFromBounds($this->subtype, $lower, $upper, $lowerInc, $upperInc);
+        return Range::createFromBounds($lower, $upper, $lowerInc, $upperInc);
     }
 
     private function parseBoundStr(string $str)
@@ -81,7 +80,7 @@ class RangeType implements ITotallyOrderedType
 
         if (!$val instanceof Range) {
             if (is_array($val) && isset($val[0], $val[1]) && count($val) == 2) {
-                $val = Range::createFromBounds($this->subtype, $val[0], $val[1], true, true);
+                $val = Range::createFromBounds($val[0], $val[1], true, true);
             } else {
                 $message = "Value '$val' is not valid for type {$this->getSchemaName()}.{$this->getName()}";
                 throw new \InvalidArgumentException($message);
@@ -100,16 +99,5 @@ class RangeType implements ITotallyOrderedType
             $this->subtype->serializeValue($val->getUpper()),
             ($boundsSpec == '[)' || ($boundsSpec == '()' && $val->getLower() === null) ? '' : ",'$boundsSpec'")
         );
-    }
-
-    public function compareValues($a, $b): ?int
-    {
-        if ($a === null || $b === null) {
-            return null;
-        }
-        if (!$a instanceof Range) {
-            throw new IncomparableException('$a is not a ' . Range::class);
-        }
-        return $a->compareTo($b);
     }
 }

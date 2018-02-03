@@ -7,8 +7,7 @@ use Ivory\Connection\Config\ConnConfigValueRetriever;
 use Ivory\Connection\DateStyle;
 use Ivory\Connection\IConnection;
 use Ivory\Type\ConnectionDependentBaseType;
-use Ivory\Type\IDiscreteType;
-use Ivory\Type\TotallyOrderedByPhpOperators;
+use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Date;
 
 /**
@@ -39,10 +38,8 @@ use Ivory\Value\Date;
  * @see http://www.postgresql.org/docs/9.4/static/datetime-units-history.html
  * @see http://www.postgresql.org/docs/9.4/static/runtime-config-client.html#GUC-DATESTYLE
  */
-class DateType extends ConnectionDependentBaseType implements IDiscreteType
+class DateType extends ConnectionDependentBaseType implements ITotallyOrderedType
 {
-    use TotallyOrderedByPhpOperators;
-
     const MODE_ISO = 1;
     const MODE_SQL_DMY = 2;
     const MODE_SQL_MDY = 3;
@@ -184,17 +181,5 @@ class DateType extends ConnectionDependentBaseType implements IDiscreteType
         } else {
             throw new \LogicException('A non-finite date not recognized');
         }
-    }
-
-    public function step(int $delta, $value)
-    {
-        if ($value === null) {
-            return null;
-        }
-        if (!$value instanceof Date) {
-            throw new \InvalidArgumentException('$value');
-        }
-
-        return $value->addDay($delta);
     }
 }

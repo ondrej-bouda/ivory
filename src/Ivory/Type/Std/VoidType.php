@@ -2,9 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Exception\IncomparableException;
 use Ivory\Type\BaseType;
-use Ivory\Type\ITotallyOrderedType;
 
 /**
  * Representation of the PostgreSQL void type, i.e., nothing.

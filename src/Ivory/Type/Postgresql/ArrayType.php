@@ -2,13 +2,10 @@
 declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
-use Ivory\Exception\IncomparableException;
 use Ivory\Exception\InternalException;
 use Ivory\Exception\ParseException;
-use Ivory\Exception\UnsupportedException;
-use Ivory\Type\IType;
 use Ivory\Type\ITotallyOrderedType;
-use Ivory\Value\Alg\ComparisonUtils;
+use Ivory\Type\IType;
 
 /**
  * Array type object.
@@ -374,24 +371,5 @@ class ArrayType implements ITotallyOrderedType
         $out .= '}';
 
         return $out;
-    }
-
-    public function compareValues($a, $b): ?int
-    {
-        if (!$this->elemType instanceof ITotallyOrderedType) {
-            $elemTypeName = $this->elemType->getSchemaName() . '.' . $this->elemType->getName();
-            throw new UnsupportedException("The array element type $elemTypeName is not totally ordered.");
-        }
-
-        if ($a === null || $b === null) {
-            return null;
-        }
-
-        if (is_array($a) && is_array($b)) {
-            return ComparisonUtils::compareArrays($a, $b);
-        }
-        else {
-            throw new IncomparableException();
-        }
     }
 }

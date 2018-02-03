@@ -6,10 +6,11 @@ use Ivory\Exception\ImmutableException;
 use Ivory\Exception\IncomparableException;
 use Ivory\Exception\UnsupportedException;
 use Ivory\Ivory;
-use Ivory\Type\IDiscreteType;
-use Ivory\Type\ITotallyOrderedType;
+use Ivory\Type\Std\BigIntSafeType;
+use Ivory\Value\Alg\BigIntSafeStepper;
 use Ivory\Value\Alg\IComparable;
-use Ivory\Value\Alg\IEqualable;
+use Ivory\Value\Alg\IDiscreteStepper;
+use Ivory\Value\Alg\IntegerStepper;
 use Ivory\Value\Alg\IValueComparator;
 
 /**
@@ -48,8 +49,6 @@ use Ivory\Value\Alg\IValueComparator;
  */
 class Range implements IComparable, \ArrayAccess
 {
-    /** @var ITotallyOrderedType */
-    private $subtype;
     /** @var bool */
     private $empty;
     /** @var mixed */
@@ -62,6 +61,8 @@ class Range implements IComparable, \ArrayAccess
     private $upperInc;
     /** @var IValueComparator */
     private $comparator;
+    /** @var IDiscreteStepper */
+    private $discreteStepper;
 
 
     //region construction
@@ -79,12 +80,11 @@ class Range implements IComparable, \ArrayAccess
      * upper bound (just as PostgreSQL does). That happens in one of the following cases:
      * * the lower bound is greater than the upper bound, or
      * * both bounds are equal but any of them is exclusive, or
-     * * the subtype is {@link IDiscreteType discrete}, the upper bound is just one step after the lower bound and both
-     *   the bounds are exclusive.
+     * * the subtype is discrete, the upper bound is just one step after the lower bound and both the bounds are
+     *   exclusive.
      *
      * For creating an empty range explicitly, see {@link createEmpty()}.
      *
-     * @param ITotallyOrderedType $subtype the range subtype
      * @param mixed $lower the range lower bound, or <tt>null</tt> if unbounded
      * @param mixed $upper the range upper bound, or <tt>null</tt> if unbounded
      * @param bool|string $boundsOrLowerInc
@@ -100,36 +100,48 @@ class Range implements IComparable, \ArrayAccess
      * @param bool|null $upperInc whether the upper bound is inclusive;
      *                            only relevant if <tt>$boundsOrLowerInc</tt> is also boolean
      * @param IValueComparator|null $customComparator
-     *                          comparator to use for the values;
-     *                          skip with <tt>null</tt> to use {@link Ivory::getDefaultValueComparator() the default
-     *                            value comparator}
+     *                          a custom comparator to use for the values;
+     *                          skip with <tt>null</tt> to use
+     *                            {@link Ivory::getDefaultValueComparator() the default value comparator}
+     * @param IDiscreteStepper|null $customDiscreteStepper
+     *                          a custom discrete stepper, used for converting from/to inclusive/exclusive bounds;
+     *                          if not given, it is inferred from the lower or upper bound value, whichever is non-null:
+     *                            <ul>
+     *                            <li>if the value object implements {@link IDiscreteStepper}, it is used directly;
+     *                            <li>if the value is an integer, an {@link IntegerStepper} is used;
+     *                            <li>if an integer string (which is a case of a {@link BigIntSafeType}),
+     *                                a {@link BigIntSafeStepper} is used;
+     *                            <li>otherwise, no discrete stepper is used (especially, if both bounds are
+     *                                <tt>null</tt>, no discrete stepper is actually useful)
+     *                            </ul>
      * @return Range
      */
     public static function createFromBounds(
-        ITotallyOrderedType $subtype,
         $lower,
         $upper,
         $boundsOrLowerInc = '[)',
         ?bool $upperInc = null,
-        ?IValueComparator $customComparator = null
+        ?IValueComparator $customComparator = null,
+        ?IDiscreteStepper $customDiscreteStepper = null
     ): Range {
         list($loInc, $upInc) = self::processBoundSpec($boundsOrLowerInc, $upperInc);
 
         $comparator = ($customComparator ?? Ivory::getDefaultValueComparator());
+        $discreteStepper = ($customDiscreteStepper ?? self::inferDiscreteStepper($lower ?? $upper));
 
         if ($lower !== null && $upper !== null) {
             $comp = $comparator->compareValues($lower, $upper);
             if ($comp > 0) {
-                return self::createEmpty($subtype);
+                return self::createEmpty();
             } elseif ($comp == 0) {
                 if (!$loInc || !$upInc) {
-                    return self::createEmpty($subtype);
+                    return self::createEmpty();
                 }
-            } elseif (!$loInc && !$upInc && $subtype instanceof IDiscreteType) {
-                $up = $subtype->step(-1, $upper);
-                $isEmpty = ($lower instanceof IEqualable ? $lower->equals($up) : ($lower == $up));
+            } elseif (!$loInc && !$upInc && $discreteStepper !== null) {
+                $upperPred = $discreteStepper->step(-1, $upper);
+                $isEmpty = ($comparator->compareValues($lower, $upperPred) == 0);
                 if ($isEmpty) {
-                    return self::createEmpty($subtype);
+                    return self::createEmpty();
                 }
             }
         } else {
@@ -141,19 +153,39 @@ class Range implements IComparable, \ArrayAccess
             }
         }
 
-        return new Range($subtype, false, $lower, $upper, $loInc, $upInc, $comparator);
+        return new Range(false, $lower, $upper, $loInc, $upInc, $comparator, $discreteStepper);
+    }
+
+    private static function inferDiscreteStepper($value): ?IDiscreteStepper
+    {
+        if (is_int($value)) {
+            static $intStepper = null;
+            if ($intStepper === null) {
+                $intStepper = new IntegerStepper();
+            }
+            return $intStepper;
+        } elseif ($value instanceof IDiscreteStepper) {
+            return $value;
+        } elseif (is_string($value) && BigIntSafeType::isIntegerString($value)) {
+            static $bigIntSafeStepper = null;
+            if ($bigIntSafeStepper === null) {
+                $bigIntSafeStepper = new BigIntSafeStepper();
+            }
+            return $bigIntSafeStepper;
+        } else {
+            return null;
+        }
     }
 
     /**
      * Creates a new empty range.
      *
-     * @param ITotallyOrderedType $subtype the range subtype
      * @return Range
      */
-    public static function createEmpty(ITotallyOrderedType $subtype): Range
+    public static function createEmpty(): Range
     {
         $comparator = Ivory::getDefaultValueComparator(); // we must provide one, although for empty range it is useless
-        return new Range($subtype, true, null, null, null, null, $comparator);
+        return new Range(true, null, null, null, null, $comparator, null);
     }
 
     private static function processBoundSpec($boundsOrLowerInc = '[)', ?bool $upperInc = null)
@@ -183,21 +215,21 @@ class Range implements IComparable, \ArrayAccess
 
 
     private function __construct(
-        ITotallyOrderedType $subtype,
         bool $empty,
         $lower,
         $upper,
         ?bool $lowerInc,
         ?bool $upperInc,
-        IValueComparator $comparator
+        IValueComparator $comparator,
+        ?IDiscreteStepper $discreteStepper
     ) {
-        $this->subtype = $subtype;
         $this->empty = $empty;
         $this->lower = $lower;
         $this->upper = $upper;
         $this->lowerInc = $lowerInc;
         $this->upperInc = $upperInc;
         $this->comparator = $comparator;
+        $this->discreteStepper = $discreteStepper;
     }
 
     //endregion
@@ -272,9 +304,9 @@ class Range implements IComparable, \ArrayAccess
         if ($this->lowerInc && $this->upperInc) { // optimization
             return false;
         }
-        if ($this->subtype instanceof IDiscreteType) {
-            $lo = ($this->lowerInc ? $this->lower : $this->subtype->step(1, $this->lower));
-            $up = ($this->upperInc ? $this->upper : $this->subtype->step(-1, $this->upper));
+        if ($this->discreteStepper !== null) {
+            $lo = ($this->lowerInc ? $this->lower : $this->discreteStepper->step(1, $this->lower));
+            $up = ($this->upperInc ? $this->upper : $this->discreteStepper->step(-1, $this->upper));
             return ($this->comparator->compareValues($lo, $up) == 0);
         } else {
             return false;
@@ -284,7 +316,7 @@ class Range implements IComparable, \ArrayAccess
     /**
      * Returns the range bounds according to the requested bound specification.
      *
-     * **Only defined on ranges of {@link IDiscreteType discrete} subtypes.**
+     * **Only defined on ranges of {@link IDiscreteStepper discrete} subtypes.**
      *
      * E.g., on an integer range `(null,3)`, if bounds `[]` are requested, a pair of `null` and `2` is returned.
      *
@@ -298,7 +330,8 @@ class Range implements IComparable, \ArrayAccess
      * @param bool $upperInc whether the upper bound is inclusive;
      *                       only relevant if <tt>$boundsOrLowerInc</tt> is also boolean
      * @return array|null pair of the lower and upper bound, or <tt>null</tt> if the range is empty
-     * @throws UnsupportedException if the range subtype is not an {@link IDiscreteType}
+     * @throws UnsupportedException if the range subtype is not discrete and no custom discrete stepper has been
+     *                                provided
      */
     public function toBounds($boundsOrLowerInc, ?bool $upperInc = null): ?array
     {
@@ -306,8 +339,15 @@ class Range implements IComparable, \ArrayAccess
             return null;
         }
 
-        if (!$this->subtype instanceof IDiscreteType) {
-            throw new UnsupportedException('Range subtype is not ' . IDiscreteType::class . ', cannot convert bounds');
+        if ($this->lower === null && $this->upper === null) {
+            return [null, null]; // no matter of the actually requested bounds, the result is (-inf,inf)
+        }
+
+        if ($this->discreteStepper === null) {
+            throw new UnsupportedException(
+                'Cannot convert the range bounds - the subtype was not recognized as a ' . IDiscreteStepper::class .
+                ', and no custom discrete stepper has been provided.'
+            );
         }
 
         list($loInc, $upInc) = self::processBoundSpec($boundsOrLowerInc, $upperInc);
@@ -318,7 +358,7 @@ class Range implements IComparable, \ArrayAccess
             $lo = $this->lower;
             $step = (int)$loInc - (int)$this->lowerInc;
             if ($step) {
-                $lo = $this->subtype->step($step, $lo);
+                $lo = $this->discreteStepper->step($step, $lo);
             }
         }
 
@@ -328,7 +368,7 @@ class Range implements IComparable, \ArrayAccess
             $up = $this->upper;
             $step = (int)$this->upperInc - (int)$upInc;
             if ($step) {
-                $up = $this->subtype->step($step, $up);
+                $up = $this->discreteStepper->step($step, $up);
             }
         }
 
@@ -574,7 +614,7 @@ class Range implements IComparable, \ArrayAccess
             }
         }
 
-        return self::createFromBounds($this->subtype, $lo, $up, $loInc, $upInc, $this->comparator);
+        return self::createFromBounds($lo, $up, $loInc, $upInc, $this->comparator, $this->discreteStepper);
     }
 
     /**
@@ -649,25 +689,24 @@ class Range implements IComparable, \ArrayAccess
             return false;
         }
 
-        if ($this->subtype !== $other->subtype) {
-            return false;
-        }
-
         $objLower = $other->lower;
         $objUpper = $other->upper;
 
         if ($this->lowerInc != $other->lowerInc) {
-            if ($other->subtype instanceof IDiscreteType) {
-                $objLower = $other->subtype->step(($other->lowerInc ? -1 : 1), $objLower);
-            } else {
-                return false;
+            if ($this->discreteStepper === null) {
+                return false; // no chance of converting to equivalent lower bounds
+            }
+
+            if ($objLower !== null) {
+                $objLower = $this->discreteStepper->step(($other->lowerInc ? -1 : 1), $objLower);
             }
         }
         if ($this->upperInc != $other->upperInc) {
-            if ($other->subtype instanceof IDiscreteType) {
-                $objUpper = $other->subtype->step(($other->upperInc ? 1 : -1), $objUpper);
-            } else {
-                return false;
+            if ($this->discreteStepper === null) {
+                return false; // no chance of converting to equivalent upper bounds
+            }
+            if ($objUpper !== null) {
+                $objUpper = $this->discreteStepper->step(($other->upperInc ? 1 : -1), $objUpper);
             }
         }
 
@@ -675,12 +714,8 @@ class Range implements IComparable, \ArrayAccess
             if ($objLower !== null) {
                 return false;
             }
-        } elseif ($this->lower instanceof IEqualable) {
-            if (!$this->lower->equals($objLower)) {
-                return false;
-            }
         } else {
-            if ($this->lower != $objLower) {
+            if ($this->comparator->compareValues($this->lower, $objLower) != 0) {
                 return false;
             }
         }
@@ -689,12 +724,8 @@ class Range implements IComparable, \ArrayAccess
             if ($objUpper !== null) {
                 return false;
             }
-        } elseif ($this->upper instanceof IEqualable) {
-            if (!$this->upper->equals($objUpper)) {
-                return false;
-            }
         } else {
-            if ($this->upper != $objUpper) {
+            if ($this->comparator->compareValues($this->upper, $objUpper) != 0) {
                 return false;
             }
         }
@@ -717,10 +748,6 @@ class Range implements IComparable, \ArrayAccess
             return -1;
         } elseif ($other->isEmpty()) {
             return 1;
-        }
-
-        if ($this->subtype !== $other->subtype) {
-            throw new IncomparableException('comparing ranges of incompatible subtypes');
         }
 
         $cmp = $this->compareBounds(-1, $this->getLower(), $this->isLowerInc(), $other->getLower(), $other->isLowerInc());
