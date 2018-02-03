@@ -83,7 +83,7 @@ class Range implements IComparable, \ArrayAccess
      * * the subtype is discrete, the upper bound is just one step after the lower bound and both the bounds are
      *   exclusive.
      *
-     * For creating an empty range explicitly, see {@link createEmpty()}.
+     * For creating an empty range explicitly, see {@link Range::empty()}.
      *
      * @param mixed $lower the range lower bound, or <tt>null</tt> if unbounded
      * @param mixed $upper the range upper bound, or <tt>null</tt> if unbounded
@@ -116,7 +116,7 @@ class Range implements IComparable, \ArrayAccess
      *                            </ul>
      * @return Range
      */
-    public static function createFromBounds(
+    public static function fromBounds(
         $lower,
         $upper,
         $boundsOrLowerInc = '[)',
@@ -132,16 +132,16 @@ class Range implements IComparable, \ArrayAccess
         if ($lower !== null && $upper !== null) {
             $comp = $comparator->compareValues($lower, $upper);
             if ($comp > 0) {
-                return self::createEmpty();
+                return self::empty();
             } elseif ($comp == 0) {
                 if (!$loInc || !$upInc) {
-                    return self::createEmpty();
+                    return self::empty();
                 }
             } elseif (!$loInc && !$upInc && $discreteStepper !== null) {
                 $upperPred = $discreteStepper->step(-1, $upper);
                 $isEmpty = ($comparator->compareValues($lower, $upperPred) == 0);
                 if ($isEmpty) {
-                    return self::createEmpty();
+                    return self::empty();
                 }
             }
         } else {
@@ -182,7 +182,7 @@ class Range implements IComparable, \ArrayAccess
      *
      * @return Range
      */
-    public static function createEmpty(): Range
+    public static function empty(): Range
     {
         $comparator = Ivory::getDefaultValueComparator(); // we must provide one, although for empty range it is useless
         return new Range(true, null, null, null, null, $comparator, null);
@@ -276,7 +276,7 @@ class Range implements IComparable, \ArrayAccess
     }
 
     /**
-     * @return string|null the bounds inclusive/exclusive specification, as accepted by {@link createFromBounds()}, or
+     * @return string|null the bounds inclusive/exclusive specification, as accepted by {@link fromBounds()}, or
      *                     <tt>null</tt> if the range is empty
      */
     final public function getBoundsSpec(): ?string
@@ -614,7 +614,7 @@ class Range implements IComparable, \ArrayAccess
             }
         }
 
-        return self::createFromBounds($lo, $up, $loInc, $upInc, $this->comparator, $this->discreteStepper);
+        return self::fromBounds($lo, $up, $loInc, $upInc, $this->comparator, $this->discreteStepper);
     }
 
     /**

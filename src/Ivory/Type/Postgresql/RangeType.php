@@ -31,7 +31,7 @@ class RangeType implements ITotallyOrderedType
     public function parseValue(string $extRepr)
     {
         if (preg_match('~^\s*empty\s*$~i', $extRepr)) {
-            return Range::createEmpty();
+            return Range::empty();
         }
 
         $regex = '~
@@ -56,7 +56,7 @@ class RangeType implements ITotallyOrderedType
         $lower = $this->parseBoundStr($m['lower']);
         $upper = $this->parseBoundStr($m['upper']);
 
-        return Range::createFromBounds($lower, $upper, $lowerInc, $upperInc);
+        return Range::fromBounds($lower, $upper, $lowerInc, $upperInc);
     }
 
     private function parseBoundStr(string $str)
@@ -80,7 +80,7 @@ class RangeType implements ITotallyOrderedType
 
         if (!$val instanceof Range) {
             if (is_array($val) && isset($val[0], $val[1]) && count($val) == 2) {
-                $val = Range::createFromBounds($val[0], $val[1], true, true);
+                $val = Range::fromBounds($val[0], $val[1], true, true);
             } else {
                 $message = "Value '$val' is not valid for type {$this->getSchemaName()}.{$this->getName()}";
                 throw new \InvalidArgumentException($message);
