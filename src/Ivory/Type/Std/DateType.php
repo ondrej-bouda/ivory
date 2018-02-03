@@ -163,7 +163,15 @@ class DateType extends ConnectionDependentBaseType implements ITotallyOrderedTyp
         }
 
         if (!$val instanceof Date) {
-            $val = (is_numeric($val) ? Date::fromUnixTimestamp($val) : Date::fromISOString($val));
+            if (is_numeric($val)) {
+                $val = Date::fromUnixTimestamp($val);
+            } elseif (is_string($val)) {
+                $val = Date::fromISOString($val);
+            } elseif ($val instanceof \DateTimeInterface) {
+                $val = Date::fromDateTime($val);
+            } else {
+                throw new \InvalidArgumentException('Unsupported type of value to serialize to a date');
+            }
         }
 
         if ($val->isFinite()) {
