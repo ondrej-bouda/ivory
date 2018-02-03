@@ -5,10 +5,10 @@ namespace Ivory\Showcase;
 use Ivory\Connection\IConnection;
 use Ivory\IvoryTestCase;
 use Ivory\Query\SqlRelationDefinition;
+use Ivory\Type\BaseType;
 use Ivory\Type\IType;
 use Ivory\Type\IValueSerializer;
 use Ivory\Type\Postgresql\ArrayType;
-use Ivory\Type\Std\DateType;
 use Ivory\Type\Std\StringType;
 use Ivory\Value\Composite;
 use Ivory\Value\Date;
@@ -241,21 +241,23 @@ SQL
         $this->assertInstanceOf(Date::class, $dateVal);
 
         // Prefer standard \DateTime over the custom Date class:
-        $myDateType = new class('pg_catalog', 'date') extends DateType
+        $myDateType = new class('pg_catalog', 'date') extends BaseType
         {
             public function parseValue(string $extRepr)
             {
-                $date = parent::parseValue($extRepr);
-                return $date->toDateTime();
+                return \DateTime::createFromFormat('!Y-m-d', $extRepr);
             }
 
             public function serializeValue($val): string
             {
-                if ($val instanceof \DateTime) {
-                    return parent::serializeValue(Date::fromDateTime($val));
-                } else {
-                    return parent::serializeValue($val);
+                if ($val === null) {
+                    return 'NULL';
                 }
+                if (!$val instanceof \DateTime) {
+                    throw new \InvalidArgumentException();
+                }
+
+                return $val->format("'Y-m-d'");
             }
         };
         $this->conn->getTypeRegister()->registerType($myDateType);

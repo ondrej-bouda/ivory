@@ -4,6 +4,7 @@ namespace Ivory\Type;
 
 use Ivory\Exception\InternalException;
 use Ivory\Type\Ivory\UndefinedType;
+use Ivory\Type\Ivory\UnorderedRangeType;
 use Ivory\Type\Postgresql\CompositeType;
 
 class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
@@ -123,18 +124,13 @@ SQL;
 
                     case 'r':
                         $subtype = $dict->requireTypeByOid((int)$row['parenttype']);
-                        if (!$subtype instanceof ITotallyOrderedType) {
-                            if ($subtype instanceof UndefinedType) {
-                                $type = new UndefinedType($schemaName, $typeName);
-                                break;
-                            }
-
-                            $sc = get_class($subtype);
-                            $msg = "Cannot create range type $schemaName.$typeName: the subtype $sc is not totally ordered";
-                            trigger_error($msg, E_USER_WARNING);
-                            continue 2;
+                        if ($subtype instanceof ITotallyOrderedType) {
+                            $type = $this->createRangeType($schemaName, $typeName, $subtype);
+                        } elseif ($subtype instanceof UndefinedType) {
+                            $type = new UndefinedType($schemaName, $typeName);
+                        } else {
+                            $type = new UnorderedRangeType($schemaName, $typeName);
                         }
-                        $type = $this->createRangeType($schemaName, $typeName, $subtype);
                         break;
 
                     default:
