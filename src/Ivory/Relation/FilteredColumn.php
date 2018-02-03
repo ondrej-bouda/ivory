@@ -71,9 +71,9 @@ class FilteredColumn implements \IteratorAggregate, IColumn, ICachingDataProcess
         return new FilteredColumn($this, $decider);
     }
 
-    public function uniq($hasher = null, $comparator = null): IColumn
+    public function uniq($hasher = null, $equalizer = null): IColumn
     {
-        return new FilteredColumn($this->baseCol->uniq($hasher, $comparator), $this->decider);
+        return new FilteredColumn($this->baseCol->uniq($hasher, $equalizer), $this->decider);
     }
 
     public function toArray(): array

@@ -58,7 +58,7 @@ class Column implements \IteratorAggregate, IColumn
         return new FilteredColumn($this, $decider);
     }
 
-    public function uniq($hasher = null, $comparator = null): IColumn
+    public function uniq($hasher = null, $equalizer = null): IColumn
     {
         if ($hasher === null) {
             $hasher = new CallbackValueHasher(function ($value) {
@@ -76,23 +76,23 @@ class Column implements \IteratorAggregate, IColumn
             }
         }
 
-        if ($comparator === null) {
-            $comparator = new CallbackValueEqualizer(function ($a, $b) {
+        if ($equalizer === null) {
+            $equalizer = new CallbackValueEqualizer(function ($a, $b) {
                 return ComparisonUtils::equals($a, $b);
             });
-        } elseif (!$comparator instanceof IValueEqualizer) {
-            $comparator = new CallbackValueEqualizer($comparator);
+        } elseif (!$equalizer instanceof IValueEqualizer) {
+            $equalizer = new CallbackValueEqualizer($equalizer);
         }
 
         $hashTable = [];
-        return new FilteredColumn($this, function ($value) use ($hasher, $comparator, &$hashTable) {
+        return new FilteredColumn($this, function ($value) use ($hasher, $equalizer, &$hashTable) {
             $h = $hasher->hash($value);
             if (!isset($hashTable[$h])) {
                 $hashTable[$h] = [$value];
                 return true;
             } else {
                 foreach ($hashTable[$h] as $v) {
-                    if ($comparator->equal($value, $v)) {
+                    if ($equalizer->equal($value, $v)) {
                         return false;
                     }
                 }
