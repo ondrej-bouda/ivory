@@ -5,17 +5,21 @@ namespace Ivory\Value;
 use Ivory\Exception\ImmutableException;
 use Ivory\Exception\IncomparableException;
 use Ivory\Exception\UnsupportedException;
+use Ivory\Ivory;
 use Ivory\Type\IDiscreteType;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Alg\IComparable;
 use Ivory\Value\Alg\IEqualable;
+use Ivory\Value\Alg\IValueComparator;
 
 /**
  * A range of values.
  *
  * The class resembles the range values manipulated by PostgreSQL. Just a brief summary:
- * - The range is defined above a type of values, called "subtype" (see {@link Range::getSubtype()}).
- * - The subtype must have a total order.
+ * - The range is defined above a type of values, called "subtype".
+ * - The subtype must have a total order. For this implementation, it means the lower and the upper bounds must be
+ *   comparable using the {@link Ivory::getDefaultValueComparator() default value comparator}, or using a custom
+ *   {@link IValueComparator} supplied besides the bounds.
  * - A range may be empty, meaning it contains nothing. See {@link Range::isEmpty()} for distinguishing it.
  * - A non-empty range has the lower and the upper bounds, either of which may either be inclusive or exclusive. See
  *   {@link Range::getLower()} and {@link Range::getUpper()} for getting the boundaries. Also see
@@ -29,7 +33,8 @@ use Ivory\Value\Alg\IEqualable;
  * range `[1,3]` to `[1,4)`). Such a feature is *not* implemented on the PHP side. The ranges constructed in PHP are not
  * normalized in any way, they may only be converted manually using the {@link Range::toBounds()} method.
  *
- * A range is `IComparable` with another range provided both have the same subtype.
+ * A range is `IComparable` with another range provided both have the same subtype. Besides, an empty range may safely
+ * be compared to any other range.
  *
  * Alternatively to the {@link Range::getLower()} and {@link Range::getUpper()} methods, `ArrayAccess` is implemented.
  * Indexes `0` and `1` may be used to get the lower and upper bound, respectively. Either of them returns `null` if the
@@ -55,6 +60,8 @@ class Range implements IComparable, \ArrayAccess
     private $lowerInc;
     /** @var bool */
     private $upperInc;
+    /** @var IValueComparator */
+    private $comparator;
 
 
     //region construction
@@ -92,6 +99,10 @@ class Range implements IComparable, \ArrayAccess
      *                            as such
      * @param bool|null $upperInc whether the upper bound is inclusive;
      *                            only relevant if <tt>$boundsOrLowerInc</tt> is also boolean
+     * @param IValueComparator|null $customComparator
+     *                          comparator to use for the values;
+     *                          skip with <tt>null</tt> to use {@link Ivory::getDefaultValueComparator() the default
+     *                            value comparator}
      * @return Range
      */
     public static function createFromBounds(
@@ -99,12 +110,15 @@ class Range implements IComparable, \ArrayAccess
         $lower,
         $upper,
         $boundsOrLowerInc = '[)',
-        ?bool $upperInc = null
+        ?bool $upperInc = null,
+        ?IValueComparator $customComparator = null
     ): Range {
         list($loInc, $upInc) = self::processBoundSpec($boundsOrLowerInc, $upperInc);
 
+        $comparator = ($customComparator ?? Ivory::getDefaultValueComparator());
+
         if ($lower !== null && $upper !== null) {
-            $comp = $subtype->compareValues($lower, $upper);
+            $comp = $comparator->compareValues($lower, $upper);
             if ($comp > 0) {
                 return self::createEmpty($subtype);
             } elseif ($comp == 0) {
@@ -127,7 +141,7 @@ class Range implements IComparable, \ArrayAccess
             }
         }
 
-        return new Range($subtype, false, $lower, $upper, $loInc, $upInc);
+        return new Range($subtype, false, $lower, $upper, $loInc, $upInc, $comparator);
     }
 
     /**
@@ -138,7 +152,8 @@ class Range implements IComparable, \ArrayAccess
      */
     public static function createEmpty(ITotallyOrderedType $subtype): Range
     {
-        return new Range($subtype, true, null, null, null, null);
+        $comparator = Ivory::getDefaultValueComparator(); // we must provide one, although for empty range it is useless
+        return new Range($subtype, true, null, null, null, null, $comparator);
     }
 
     private static function processBoundSpec($boundsOrLowerInc = '[)', ?bool $upperInc = null)
@@ -173,7 +188,8 @@ class Range implements IComparable, \ArrayAccess
         $lower,
         $upper,
         ?bool $lowerInc,
-        ?bool $upperInc
+        ?bool $upperInc,
+        IValueComparator $comparator
     ) {
         $this->subtype = $subtype;
         $this->empty = $empty;
@@ -181,16 +197,12 @@ class Range implements IComparable, \ArrayAccess
         $this->upper = $upper;
         $this->lowerInc = $lowerInc;
         $this->upperInc = $upperInc;
+        $this->comparator = $comparator;
     }
 
     //endregion
 
     //region getters
-
-    final public function getSubtype(): ITotallyOrderedType
-    {
-        return $this->subtype;
-    }
 
     final public function isEmpty(): bool
     {
@@ -253,7 +265,7 @@ class Range implements IComparable, \ArrayAccess
             return false;
         }
 
-        $cmp = $this->subtype->compareValues($this->lower, $this->upper);
+        $cmp = $this->comparator->compareValues($this->lower, $this->upper);
         if ($cmp == 0) {
             return ($this->lowerInc && $this->upperInc);
         }
@@ -263,7 +275,7 @@ class Range implements IComparable, \ArrayAccess
         if ($this->subtype instanceof IDiscreteType) {
             $lo = ($this->lowerInc ? $this->lower : $this->subtype->step(1, $this->lower));
             $up = ($this->upperInc ? $this->upper : $this->subtype->step(-1, $this->upper));
-            return ($this->subtype->compareValues($lo, $up) == 0);
+            return ($this->comparator->compareValues($lo, $up) == 0);
         } else {
             return false;
         }
@@ -290,12 +302,12 @@ class Range implements IComparable, \ArrayAccess
      */
     public function toBounds($boundsOrLowerInc, ?bool $upperInc = null): ?array
     {
-        if (!$this->subtype instanceof IDiscreteType) {
-            throw new UnsupportedException('Range subtype is not ' . IDiscreteType::class . ', cannot convert bounds');
-        }
-
         if ($this->empty) {
             return null;
+        }
+
+        if (!$this->subtype instanceof IDiscreteType) {
+            throw new UnsupportedException('Range subtype is not ' . IDiscreteType::class . ', cannot convert bounds');
         }
 
         list($loInc, $upInc) = self::processBoundSpec($boundsOrLowerInc, $upperInc);
@@ -357,14 +369,14 @@ class Range implements IComparable, \ArrayAccess
         }
 
         if ($this->lower !== null) {
-            $cmp = $this->subtype->compareValues($element, $this->lower);
+            $cmp = $this->comparator->compareValues($element, $this->lower);
             if ($cmp < 0 || ($cmp == 0 && !$this->lowerInc)) {
                 return false;
             }
         }
 
         if ($this->upper !== null) {
-            $cmp = $this->subtype->compareValues($element, $this->upper);
+            $cmp = $this->comparator->compareValues($element, $this->upper);
             if ($cmp > 0 || ($cmp == 0 && !$this->upperInc)) {
                 return false;
             }
@@ -391,7 +403,7 @@ class Range implements IComparable, \ArrayAccess
         if ($this->upper === null) {
             return false;
         }
-        $cmp = $this->subtype->compareValues($element, $this->upper);
+        $cmp = $this->comparator->compareValues($element, $this->upper);
         return ($cmp > 0 || ($cmp == 0 && !$this->upperInc));
     }
 
@@ -413,7 +425,7 @@ class Range implements IComparable, \ArrayAccess
         if ($this->lower === null) {
             return false;
         }
-        $cmp = $this->subtype->compareValues($element, $this->lower);
+        $cmp = $this->comparator->compareValues($element, $this->lower);
         return ($cmp < 0 || ($cmp == 0 && !$this->lowerInc));
     }
 
@@ -439,7 +451,7 @@ class Range implements IComparable, \ArrayAccess
             if ($other->lower === null) {
                 return false;
             } else {
-                $cmp = $this->subtype->compareValues($this->lower, $other->lower);
+                $cmp = $this->comparator->compareValues($this->lower, $other->lower);
                 if ($cmp > 0 || ($cmp == 0 && !$this->lowerInc && $other->lowerInc)) {
                     return false;
                 }
@@ -450,7 +462,7 @@ class Range implements IComparable, \ArrayAccess
             if ($other->upper === null) {
                 return false;
             } else {
-                $cmp = $this->subtype->compareValues($this->upper, $other->upper);
+                $cmp = $this->comparator->compareValues($this->upper, $other->upper);
                 if ($cmp < 0 || ($cmp == 0 && !$this->upperInc && $other->upperInc)) {
                     return false;
                 }
@@ -489,13 +501,13 @@ class Range implements IComparable, \ArrayAccess
         }
 
         if ($this->lower !== null && $other->upper !== null) {
-            $cmp = $this->subtype->compareValues($this->lower, $other->upper);
+            $cmp = $this->comparator->compareValues($this->lower, $other->upper);
             if ($cmp > 0 || ($cmp == 0 && (!$this->lowerInc || !$other->upperInc))) {
                 return false;
             }
         }
         if ($other->lower !== null && $this->upper !== null) {
-            $cmp = $this->subtype->compareValues($other->lower, $this->upper);
+            $cmp = $this->comparator->compareValues($other->lower, $this->upper);
             if ($cmp > 0 || ($cmp == 0 && (!$other->lowerInc || !$this->upperInc))) {
                 return false;
             }
@@ -529,7 +541,7 @@ class Range implements IComparable, \ArrayAccess
             $lo = $this->lower;
             $loInc = $this->lowerInc;
         } else {
-            $cmp = $this->subtype->compareValues($this->lower, $other->lower);
+            $cmp = $this->comparator->compareValues($this->lower, $other->lower);
             if ($cmp < 0) {
                 $lo = $other->lower;
                 $loInc = $other->lowerInc;
@@ -549,7 +561,7 @@ class Range implements IComparable, \ArrayAccess
             $up = $this->upper;
             $upInc = $this->upperInc;
         } else {
-            $cmp = $this->subtype->compareValues($this->upper, $other->upper);
+            $cmp = $this->comparator->compareValues($this->upper, $other->upper);
             if ($cmp < 0) {
                 $up = $this->upper;
                 $upInc = $this->upperInc;
@@ -562,7 +574,7 @@ class Range implements IComparable, \ArrayAccess
             }
         }
 
-        return self::createFromBounds($this->subtype, $lo, $up, $loInc, $upInc);
+        return self::createFromBounds($this->subtype, $lo, $up, $loInc, $upInc, $this->comparator);
     }
 
     /**
@@ -593,7 +605,7 @@ class Range implements IComparable, \ArrayAccess
         if ($this->upper === null || $other->lower === null) {
             return false;
         }
-        $cmp = $this->subtype->compareValues($this->upper, $other->lower);
+        $cmp = $this->comparator->compareValues($this->upper, $other->lower);
         return ($cmp < 0 || ($cmp == 0 && (!$this->upperInc || !$other->lowerInc)));
     }
 
@@ -616,7 +628,7 @@ class Range implements IComparable, \ArrayAccess
         if ($other->upper === null || $this->lower === null) {
             return false;
         }
-        $cmp = $this->subtype->compareValues($other->upper, $this->lower);
+        $cmp = $this->comparator->compareValues($other->upper, $this->lower);
         return ($cmp < 0 || ($cmp == 0 && (!$other->upperInc || !$this->lowerInc)));
     }
 
@@ -629,14 +641,15 @@ class Range implements IComparable, \ArrayAccess
         if (!$other instanceof Range) {
             return false;
         }
-        if ($this->subtype !== $other->subtype) {
-            return false;
-        }
 
         if ($this->empty) {
             return $other->empty;
         }
         if ($other->empty) {
+            return false;
+        }
+
+        if ($this->subtype !== $other->subtype) {
             return false;
         }
 
@@ -697,9 +710,6 @@ class Range implements IComparable, \ArrayAccess
         if (!$other instanceof Range) {
             throw new IncomparableException('$other is not a ' . Range::class);
         }
-        if ($this->subtype !== $other->subtype) {
-            throw new IncomparableException('comparing ranges of incompatible subtypes');
-        }
 
         if ($this->isEmpty() && $other->isEmpty()) {
             return 0;
@@ -707,6 +717,10 @@ class Range implements IComparable, \ArrayAccess
             return -1;
         } elseif ($other->isEmpty()) {
             return 1;
+        }
+
+        if ($this->subtype !== $other->subtype) {
+            throw new IncomparableException('comparing ranges of incompatible subtypes');
         }
 
         $cmp = $this->compareBounds(-1, $this->getLower(), $this->isLowerInc(), $other->getLower(), $other->isLowerInc());
@@ -727,7 +741,7 @@ class Range implements IComparable, \ArrayAccess
             return -1 * $sgn;
         }
 
-        $cmp = $this->subtype->compareValues($aVal, $bVal);
+        $cmp = $this->comparator->compareValues($aVal, $bVal);
         if ($cmp != 0) {
             return $cmp;
         }

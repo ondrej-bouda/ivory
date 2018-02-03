@@ -12,6 +12,7 @@ use Ivory\Connection\ITxHandle;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Lang\SqlPattern\ISqlPatternParser;
 use Ivory\Type\TypeRegister;
+use Ivory\Value\Alg\IValueComparator;
 
 /**
  * Specification for factory of objects used in the core of Ivory.
@@ -45,4 +46,11 @@ interface ICoreFactory
         IObservableTransactionControl $observableTxCtl,
         ISessionControl $sessionCtl
     ): ITxHandle;
+
+    /**
+     * Creates a value comparator to be used as the default one, e.g., for ranges.
+     *
+     * @return IValueComparator
+     */
+    function createDefaultValueComparator(): IValueComparator;
 }

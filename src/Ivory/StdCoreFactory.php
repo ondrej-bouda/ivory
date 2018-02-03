@@ -25,6 +25,8 @@ use Ivory\Type\Ivory\RelationSerializer;
 use Ivory\Type\Ivory\SqlSerializer;
 use Ivory\Type\Std\StdTypeLoader;
 use Ivory\Type\TypeRegister;
+use Ivory\Value\Alg\ComparisonUtils;
+use Ivory\Value\Alg\IValueComparator;
 
 /**
  * The standard factory for the core Ivory objects.
@@ -151,5 +153,16 @@ class StdCoreFactory implements ICoreFactory
         ISessionControl $sessionCtl
     ): ITxHandle {
         return new TxHandle($stmtExec, $observableTxCtl, $sessionCtl);
+    }
+
+    public function createDefaultValueComparator(): IValueComparator
+    {
+        return new class implements IValueComparator
+        {
+            public function compareValues($a, $b): int
+            {
+                return ComparisonUtils::compareValues($a, $b);
+            }
+        };
     }
 }
