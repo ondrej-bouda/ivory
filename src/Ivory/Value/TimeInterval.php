@@ -368,34 +368,31 @@ class TimeInterval implements IComparable
         $result = [];
         $yr = (int)($this->mon / 12);
         $mon = $this->mon % 12;
-        if ($yr) {
+        if ($yr != 0) {
             $result[self::YEAR] = $yr;
         }
-        if ($mon) {
+        if ($mon != 0) {
             $result[self::MONTH] = $mon;
         }
-        if ($this->day) {
+        if ($this->day != 0) {
             $result[self::DAY] = $this->day;
         }
         $hr = (int)($this->sec / (60 * 60));
         $sec = $this->sec - $hr * 60 * 60;
         $min = (int)($sec / 60);
         $sec -= $min * 60;
-        if ($hr) {
+        if ($hr != 0) {
             $result[self::HOUR] = $hr;
         }
-        if ($min) {
+        if ($min != 0) {
             $result[self::MINUTE] = $min;
         }
-        if ($sec || !$result) {
+        if ($sec != 0 || !$result) {
             $result[self::SECOND] = $sec;
         }
         return $result;
     }
 
-    /**
-     * @return string
-     */
     public function toIsoString(): string
     {
         $str = '';
