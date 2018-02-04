@@ -146,7 +146,7 @@ class Range implements IComparable
             }
         }
 
-        return new Range(false, $lower, $upper, $loInc, $upInc, $comparator, $discreteStepper);
+        return new static(false, $lower, $upper, $loInc, $upInc, $comparator, $discreteStepper);
     }
 
     private static function inferDiscreteStepper($value): ?IDiscreteStepper
@@ -178,7 +178,7 @@ class Range implements IComparable
     public static function empty(): Range
     {
         $comparator = Ivory::getDefaultValueComparator(); // we must provide one, although for empty range it is useless
-        return new Range(true, null, null, null, null, $comparator, null);
+        return new static(true, null, null, null, null, $comparator, null);
     }
 
     private static function processBoundSpec($boundsOrLowerInc = '[)', ?bool $upperInc = null)

@@ -277,4 +277,12 @@ final class Ivory
         }
         return self::$defaultValueComparator;
     }
+
+    /**
+     * Discards the default value comparator, cached by {@link getDefaultValueComparator()}.
+     */
+    public static function flushDefaultValueComparator(): void
+    {
+        self::$defaultValueComparator = null;
+    }
 }

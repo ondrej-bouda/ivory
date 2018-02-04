@@ -57,6 +57,11 @@ class RangeType implements ITotallyOrderedType
         $lower = $this->parseBoundStr($m['lower']);
         $upper = $this->parseBoundStr($m['upper']);
 
+        return $this->createParsedRange($lower, $upper, $lowerInc, $upperInc);
+    }
+
+    protected function createParsedRange($lower, $upper, bool $lowerInc, bool $upperInc): Range
+    {
         return Range::fromBounds($lower, $upper, $lowerInc, $upperInc);
     }
 

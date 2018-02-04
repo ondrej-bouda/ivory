@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace Ivory\Showcase;
+namespace Ivory\Documentation;
 
 use Ivory\IvoryTestCase;
 use Ivory\Value\Range;
