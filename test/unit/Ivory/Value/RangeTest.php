@@ -2,6 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
+use Ivory\Exception\UnsupportedException;
+use Ivory\Value\Alg\IDiscreteStepper;
+
 class RangeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Range */
@@ -385,8 +388,41 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->intRng(null, null)->strictlyRightOf($this->intRng(3, 9)));
     }
 
+    public function testIntRange()
+    {
+        $range = Range::fromBounds(5, 10); // range from 5 (inclusive) to 10 (exclusive)
+
+        $this->assertFalse($range->containsElement(4));
+        $this->assertTrue($range->containsElement(5));
+        $this->assertTrue($range->containsElement(7));
+        $this->assertTrue($range->containsElement(9));
+        $this->assertFalse($range->containsElement(10));
+
+        $this->assertSame([4, 9], $range->toBounds('(]'));
+    }
+
     public function testDateRange()
     {
+        $range = Range::fromBounds(
+            Date::fromParts(2018, 1, 15),
+            Date::fromParts(2018, 2, 1)
+        );
+
+        $this->assertTrue(
+            $range->containsElement(Date::fromParts(2018, 1, 31))
+        );
+        $this->assertTrue(
+            $range->containsRange(Range::fromBounds(Date::fromParts(2018, 1, 20), Date::fromParts(2018, 1, 31), '[]'))
+        );
+
+        $this->assertEquals(
+            [
+                Date::fromParts(2018, 1, 14),
+                Date::fromParts(2018, 1, 31)
+            ],
+            $range->toBounds('(]')
+        );
+
         $this->assertTrue(
             Range::fromBounds(Date::fromParts(2018, 1, 15), Date::fromParts(2018, 1, 16), '()')
                 ->isEmpty()
@@ -396,5 +432,42 @@ class RangeTest extends \PHPUnit\Framework\TestCase
             [Date::fromParts(2018, 1, 14), Date::fromParts(2018, 2, 2)],
             Range::fromBounds(Date::fromParts(2018, 1, 15), Date::fromParts(2018, 2, 3))->toBounds('(]')
         );
+    }
+
+    public function testFloatRange()
+    {
+        $range = Range::fromBounds(1.1, 4.2);
+
+        $this->assertFalse($range->containsElement(1.00000009));
+        $this->assertTrue($range->containsElement(1.1));
+        $this->assertTrue($range->containsElement(4));
+        $this->assertTrue($range->containsElement(4.19));
+        $this->assertFalse($range->containsElement(4.2));
+
+        try {
+            $range->toBounds('[]');
+            $this->fail(UnsupportedException::class . ' expected due to the subtype being continuous');
+        } catch (UnsupportedException $e) {
+        }
+    }
+
+    public function testCustomDiscreteStepper()
+    {
+        $decimalStepper = new class implements IDiscreteStepper
+        {
+            public function step(int $delta, $value)
+            {
+                if ($delta == 1) {
+                    return (floor($value * 10) + 1) / 10;
+                } elseif ($delta == -1) {
+                    return (ceil($value * 10) - 1) / 10;
+                } else {
+                    throw new \InvalidArgumentException();
+                }
+            }
+        };
+
+        $range = Range::fromBounds(1.1, 4.25, '[]', null, null, $decimalStepper);
+        $this->assertSame([1.0, 4.3], $range->toBounds('()'));
     }
 }

@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-use Ivory\Exception\ImmutableException;
 use Ivory\Exception\IncomparableException;
 use Ivory\Exception\UnsupportedException;
 use Ivory\Ivory;
@@ -32,22 +31,16 @@ use Ivory\Value\Alg\IValueComparator;
  * In PostgreSQL, ranges on discrete subtypes may have a canonical function defined on them, the purpose of which is to
  * convert semantically equivalent ranges to syntactically equivalent ones (e.g., one such function might convert the
  * range `[1,3]` to `[1,4)`). Such a feature is *not* implemented on the PHP side. The ranges constructed in PHP are not
- * normalized in any way, they may only be converted manually using the {@link Range::toBounds()} method.
+ * normalized to certain bounds, they may only be converted manually using the {@link Range::toBounds()} method.
  *
  * A range is `IComparable` with another range provided both have the same subtype. Besides, an empty range may safely
  * be compared to any other range.
  *
- * Alternatively to the {@link Range::getLower()} and {@link Range::getUpper()} methods, `ArrayAccess` is implemented.
- * Indexes `0` and `1` may be used to get the lower and upper bound, respectively. Either of them returns `null` if the
- * range is empty or unbounded in the given direction.
- *
- * Note the range value is immutable, i.e., once constructed, its values cannot be changed. Thus, `ArrayAccess` write
- * operations ({@link \ArrayAccess::offsetSet()} and {@link \ArrayAccess::offsetUnset()}) throw an
- * {@link \Ivory\Exception\ImmutableException}.
+ * Note the range value is immutable, i.e., once constructed, it cannot be changed.
  *
  * @see http://www.postgresql.org/docs/9.4/static/rangetypes.html
  */
-class Range implements IComparable, \ArrayAccess
+class Range implements IComparable
 {
     /** @var bool */
     private $empty;
@@ -782,37 +775,6 @@ class Range implements IComparable, \ArrayAccess
         } else {
             return 0;
         }
-    }
-
-    //endregion
-
-    //region ArrayAccess
-
-    public function offsetExists($offset)
-    {
-        return (!$this->empty && ($offset == 0 || $offset == 1));
-    }
-
-    public function offsetGet($offset)
-    {
-        if ($offset == 0) {
-            return ($this->empty ? null : $this->lower);
-        } elseif ($offset == 1) {
-            return ($this->empty ? null : $this->upper);
-        } else {
-            trigger_error("Undefined range offset: $offset", E_USER_WARNING);
-            return null;
-        }
-    }
-
-    public function offsetSet($offset, $value)
-    {
-        throw new ImmutableException();
-    }
-
-    public function offsetUnset($offset)
-    {
-        throw new ImmutableException();
     }
 
     //endregion
