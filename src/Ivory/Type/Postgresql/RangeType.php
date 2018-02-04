@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
+use Ivory\Lang\Sql\Types;
 use Ivory\NamedDbObject;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Range;
@@ -88,13 +89,18 @@ class RangeType implements ITotallyOrderedType
         }
 
         if ($val->isEmpty()) {
-            return sprintf("'empty'::%s.%s", $this->getSchemaName(), $this->getName());
+            return sprintf(
+                "'empty'::%s.%s",
+                Types::serializeIdent($this->getSchemaName()),
+                Types::serializeIdent($this->getName())
+            );
         }
 
         $boundsSpec = $val->getBoundsSpec();
         return sprintf(
             "%s.%s(%s,%s%s)",
-            $this->getSchemaName(), $this->getName(),
+            Types::serializeIdent($this->getSchemaName()),
+            Types::serializeIdent($this->getName()),
             $this->subtype->serializeValue($val->getLower()),
             $this->subtype->serializeValue($val->getUpper()),
             ($boundsSpec == '[)' || ($boundsSpec == '()' && $val->getLower() === null) ? '' : ",'$boundsSpec'")

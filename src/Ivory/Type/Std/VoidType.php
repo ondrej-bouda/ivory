@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
+use Ivory\Lang\Sql\Types;
 use Ivory\Type\BaseType;
 
 /**
@@ -31,7 +32,11 @@ class VoidType extends BaseType
         if ($val === null) {
             return 'NULL';
         } elseif ($val === self::void()) {
-            return "''::{$this->getSchemaName()}.{$this->getName()}";
+            return sprintf(
+                "''::%s.%s",
+                Types::serializeIdent($this->getSchemaName()),
+                Types::serializeIdent($this->getName())
+            );
         } else {
             throw $this->invalidValueException($val);
         }
