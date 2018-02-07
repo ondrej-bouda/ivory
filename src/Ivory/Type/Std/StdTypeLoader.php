@@ -5,7 +5,7 @@ namespace Ivory\Type\Std;
 use Ivory\Lang\Sql\Types;
 use Ivory\Type\IType;
 use Ivory\Type\ITypeLoader;
-use Ivory\Type\Postgresql\AdHocCompositeType;
+use Ivory\Type\Postgresql\RecordType;
 
 /**
  * Type loader for the standard PostgreSQL base types.
@@ -128,7 +128,7 @@ class StdTypeLoader implements ITypeLoader
                         return new VoidType($schemaName, $typeName);
 
                     case 'record':
-                        return new AdHocCompositeType($schemaName, $typeName);
+                        return new RecordType($schemaName, $typeName);
 
                     case 'any':
                     case 'anyelement':

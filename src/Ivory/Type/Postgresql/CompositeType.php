@@ -2,35 +2,20 @@
 declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
-use Ivory\Exception\ParseException;
-use Ivory\Lang\Sql\Types;
-use Ivory\Type\ITotallyOrderedType;
 use Ivory\Type\IType;
 use Ivory\Value\Composite;
 
 /**
  * A composite type is basically a tuple of values.
  *
- * It is optional for a `CompositeType` to have its attributes defined. If it has, it is called "typed", otherwise, we
- * call it "untyped".
- * - Typed composite types use the type objects for parsing and serializing the corresponding tuple values.
- * - Untyped composite types parse and serialize every tuple value to a string (or `null` if the value is `NULL`). Note
- *   that PostgreSQL does not differentiate between `ROW()` and `ROW(NULL)` in their external text representation.
- *   As an untyped composite type cannot tell the original expression, it prefers `ROW()`.
- *
- * @see http://www.postgresql.org/docs/9.4/static/rowtypes.html
+ * A composite type has several attributes, each given by its name, type, and position.
  */
-abstract class CompositeType implements ITotallyOrderedType
+class CompositeType extends RowTypeBase
 {
-    /** @var IType[] ordered map: attribute name => attribute type */
-    private $attributes = [];
+    /** @var IType[] list: attribute position within the composite type => attribute type */
+    private $attTypes = [];
     /** @var int[] map: attribute name => position of the attribute within the composite type */
     private $attNameMap = [];
-
-
-    public function __construct()
-    {
-    }
 
     /**
      * Defines a new attribute of this composite type.
@@ -46,144 +31,48 @@ abstract class CompositeType implements ITotallyOrderedType
             $msg = "No attribute name given when adding attribute to composite type $typeName";
             throw new \InvalidArgumentException($msg);
         }
-        if (isset($this->attributes[$attName])) {
+        if (isset($this->attNameMap[$attName])) {
             $typeName = "{$this->getSchemaName()}.{$this->getName()}";
             throw new \RuntimeException("Attribute '$attName' already defined on composite type $typeName");
         }
-        $this->attributes[$attName] = $attType;
+
+        $this->attTypes[] = $attType;
         $this->attNameMap[$attName] = count($this->attNameMap);
 
         return $this;
     }
 
-    /**
-     * @return IType[] ordered map: attribute name => attribute type
-     */
-    public function getAttributes(): array
+    protected function parseItem(int $pos, string $itemExtRepr)
     {
-        return $this->attributes;
+        return $this->attTypes[$pos]->parseValue($itemExtRepr);
     }
 
-    /**
-     * @param string $attName name of an attribute, previously defined by {@link addAttribute()}
-     * @return int|null zero-based position of the given attribute, or <tt>null</tt> if no such attribute is defined
-     */
-    public function getAttPos(string $attName): ?int
+    protected function makeParsedValue(array $items)
     {
-        return ($this->attNameMap[$attName] ?? null);
+        $valueMap = [];
+        foreach ($this->attNameMap as $name => $pos) {
+            $valueMap[$name] = ($items[$pos] ?? null);
+        }
+        return Composite::fromMap($valueMap);
     }
 
-    public function parseValue(string $extRepr)
+    protected function serializeBody(string &$result, $value): int
     {
-        if ($extRepr == '()' && !$this->attributes) {
-            return Composite::fromList($this, []);
+        if (is_array($value)) {
+            $value = Composite::fromMap($value);
+        } elseif (!$value instanceof Composite) {
+            throw $this->invalidValueException($value);
         }
 
-        $strLen = strlen($extRepr);
-        if ($extRepr[0] != '(') {
-            throw new ParseException('Composite value not enclosed in parentheses', 0);
-        }
-        if ($extRepr[$strLen - 1] != ')') {
-            throw new ParseException('Composite value not enclosed in parentheses', $strLen - 1);
-        }
-        $strOffset = 1;
-
-        $attRegex = '~
-		              "(?:[^"\\\\]|""|\\\\.)*"      # either a double-quoted string (backslashes used for escaping, or
-		                                            # double quotes doubled for a single double-quote character),
-                      |                             # or an unquoted string of characters which do not confuse the
-                      (?:[^"()\\\\,]|\\\\.)+        # parser or are backslash-escaped
-		             ~x';
-        preg_match_all($attRegex, $extRepr, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE, $strOffset);
-        $atts = [];
-        foreach ($matches[0] as list($att, $attOffset)) {
-            for (; $strOffset < $attOffset; $strOffset++) {
-                if ($extRepr[$strOffset] == ',') {
-                    $atts[] = null;
-                } else {
-                    throw new ParseException("Expecting ',' instead of '{$extRepr[$strOffset]}'", $strOffset);
-                }
+        $cnt = 0;
+        foreach ($this->attNameMap as $name => $pos) {
+            if ($cnt > 0) {
+                $result .= ',';
             }
-            $cont = ($att[0] == '"' ? substr($att, 1, -1) : $att);
-            $atts[] = preg_replace(['~\\\\(.)~', '~""~'], ['$1', '"'], $cont);
-            $strOffset += strlen($att);
-            if (!($extRepr[$strOffset] == ',' || ($extRepr[$strOffset] == ')' && $strOffset == $strLen - 1))) {
-                throw new ParseException("Expecting ',' instead of '{$extRepr[$strOffset]}'", $strOffset);
-            }
-            $strOffset++;
+            $type = $this->attTypes[$pos];
+            $result .= $type->serializeValue(($value->{$name} ?? null));
+            $cnt++;
         }
-        for (; $strOffset < $strLen; $strOffset++) {
-            if ($extRepr[$strOffset] == ',' || ($extRepr[$strOffset] == ')' && $strOffset == $strLen - 1)) {
-                $atts[] = null;
-            } else {
-                throw new ParseException("Expecting ',' instead of '{$extRepr[$strOffset]}'", $strOffset);
-            }
-        }
-
-        /** @var IType[] $types */
-        $types = array_values($this->attributes);
-        if ($types) {
-            if (count($atts) != count($types)) {
-                throw new \InvalidArgumentException(sprintf(
-                    'Invalid number of composite value attributes - expecting %d, parsed %d',
-                    count($types), count($atts)
-                ));
-            } else {
-                $values = [];
-                foreach ($atts as $i => $v) {
-                    $values[] = ($v !== null ? $types[$i]->parseValue($v) : null);
-                }
-            }
-        } else {
-            $values = $atts;
-        }
-
-        return Composite::fromList($this, $values);
-    }
-
-    public function serializeValue($val): string
-    {
-        if ($val === null) {
-            return 'NULL';
-        } elseif ($val instanceof Composite) {
-            /** @var IType[] $types */
-            $types = array_values($val->getType()->getAttributes());
-            if ($types) {
-                $itemList = $val->toList();
-                if (count($itemList) != count($types)) {
-                    throw new \InvalidArgumentException(sprintf(
-                        'Invalid number of composite value attributes - expecting %d, given %d',
-                        count($types), count($itemList)
-                    ));
-                }
-                $items = [];
-                foreach ($itemList as $i => $v) {
-                    $items[] = $types[$i]->serializeValue($v);
-                }
-                return self::serializeItems($items);
-            } else {
-                $values = $val->toList();
-            }
-        } elseif (is_array($val)) {
-            $values = $val;
-        } else {
-            $message = "Value '$val' is not valid for type {$this->getSchemaName()}.{$this->getName()}";
-            throw new \InvalidArgumentException($message);
-        }
-
-        $items = [];
-        foreach ($values as $v) {
-            $items[] = Types::serializeString($v);
-        }
-        return self::serializeItems($items);
-    }
-
-    private static function serializeItems(array $items): string
-    {
-        $res = '(' . implode(',', $items) . ')';
-        if (count($items) < 2) {
-            $res = 'ROW' . $res;
-        }
-        return $res;
+        return $cnt;
     }
 }

@@ -174,8 +174,8 @@ ORDER BY attrelid, attnum
 SQL;
         $errorDesc = 'Error fetching composite type attributes';
         foreach ($this->query($query, $errorDesc) as $row) {
-            /** @var CompositeType $compType */
             $compType = $dict->requireTypeByOid((int)$row['oid']);
+            assert($compType instanceof CompositeType);
             $attType = $dict->requireTypeByOid((int)$row['atttypid']);
             $compType->addAttribute($row['attname'], $attType);
         }

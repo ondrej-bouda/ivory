@@ -4,9 +4,9 @@ namespace Ivory\Type;
 
 use Ivory\Type\Ivory\UndefinedType;
 use Ivory\Type\Postgresql\ArrayType;
+use Ivory\Type\Postgresql\CompositeType;
 use Ivory\Type\Postgresql\DomainType;
 use Ivory\Type\Postgresql\EnumType;
-use Ivory\Type\Postgresql\NamedCompositeType;
 use Ivory\Type\Postgresql\RangeType;
 
 abstract class TypeDictionaryCompilerBase implements ITypeDictionaryCompiler
@@ -97,7 +97,7 @@ abstract class TypeDictionaryCompilerBase implements ITypeDictionaryCompiler
 
     protected function createCompositeType(string $schemaName, string $typeName): IType
     {
-        return new NamedCompositeType($schemaName, $typeName);
+        return new CompositeType($schemaName, $typeName);
     }
 
     protected function createDomainType(string $schemaName, string $typeName, IType $baseType): IType

@@ -289,8 +289,6 @@ class RelationTest extends IvoryTestCase
             ['id' => 4, 'name' => 'Live One', 'year' => 2005, 'released' => Date::fromISOString('2005-01-01')],
             $album->toMap()
         );
-        $this->assertSame('Live One', $rel->value('albums', 2)[1][1]);
-        $this->assertSame('Live One', $rel->value('albums', 2)[1]['name']);
         $this->assertSame('Live One', $rel->value('albums', 2)[1]->name);
     }
 
@@ -300,10 +298,8 @@ class RelationTest extends IvoryTestCase
             "WITH a (k,l,m) AS (VALUES (1, 'a', true))
              SELECT a FROM a"
         );
-        /** @var Composite $composite */
-        $composite = $rel->value();
         // there does not seem to be a way to get associative array, as well as the types of components
-        $this->assertSame(['1', 'a', 't'], $composite->toList());
+        $this->assertSame(['1', 'a', 't'], $rel->value());
     }
 
     public function testRangeResult()

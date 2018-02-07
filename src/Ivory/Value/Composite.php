@@ -2,115 +2,54 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-use Ivory\Exception\ImmutableException;
 use Ivory\Exception\IncomparableException;
-use Ivory\Exception\UnsupportedException;
-use Ivory\Type\Postgresql\CompositeType;
-use Ivory\Type\Postgresql\NamedCompositeType;
 use Ivory\Value\Alg\IComparable;
 use Ivory\Value\Alg\ComparisonUtils;
 
 /**
- * A value of a composite type.
+ * A composite value of several attributes.
  *
- * A composite value is a `Traversable`, readonly-`ArrayAccess`ible list of elementary values. E.g., `$val[0]` contains
- * the value of the first elementary value.
+ * The attribute values are accessible as dynamic properties. E.g., attribute "foo" is accessed using `$val->foo`.
+ * Besides, the composite value is `Traversable` - its attribute names and values are returned during traversal.
  *
- * If the composite type defines some attributes (using the {@link CompositeType::addAttribute()}, the attribute names
- * are returned as traversal keys; otherwise, the zero-based numeric indices are used for keys. Besides, the attribute
- * names may be used as the `ArrayAccess` keys, if non-numeric, and are also recognized as dynamic properties, exposing
- * the attribute values under their names. E.g., both `$val['foo']` and `$val->foo` refer to the value of attribute
- * named "foo".
+ * Note the composite value is immutable, i.e., once constructed, its values cannot be changed.
  *
- * Note the composite value is immutable, i.e., once constructed, its values cannot be changed. Thus, both `__set()` and
- * `ArrayAccess` write operations ({@link \ArrayAccess::offsetSet()} and {@link \ArrayAccess::offsetUnset()}) throw an
- * {@link \Ivory\Exception\ImmutableException}.
+ * @internal Ivory design note: Although Composite seems similar to Tuple and using the same class for both might look
+ * reasonable, there is a significant difference: in Composite, each attribute name is unique, whereas in Tuple,
+ * multiple columns might have a same name. Moreover, it is customary to access tuples with array indices, while
+ * composite attributes should only be accessed through attribute names. Hence, two different classes.
  *
  * @see http://www.postgresql.org/docs/9.4/static/rowtypes.html
  */
-class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
+class Composite implements IComparable, \IteratorAggregate
 {
-    /** @var CompositeType type of the composite */
-    private $type;
-    /** @var array list of attribute values */
+    /** @var array map: attribute name => value */
     private $values;
-
-    /**
-     * Creates a new composite value out of a list of attributes values.
-     *
-     * @param CompositeType $type the type of the value
-     * @param array $values list of values of corresponding attributes
-     * @return Composite
-     */
-    public static function fromList(CompositeType $type, array $values): Composite
-    {
-        return new Composite($type, $values);
-    }
 
     /**
      * Creates a new composite value out of a map of attribute names to the corresponding values.
      *
-     * Attributes not mentioned in the given map are set to `null`.
+     * Attributes not mentioned in the given map will be considered as `null`.
      *
-     * @param NamedCompositeType $type the type of the value; must be a named composite type
-     * @param array $map map: attribute name => value; unspecified attributes get a <tt>null</tt> value
+     * @param array $valueMap map: attribute name => value; unspecified attributes get a <tt>null</tt> value
      * @return Composite
      */
-    public static function fromMap(NamedCompositeType $type, array $map): Composite
+    public static function fromMap(array $valueMap): Composite
     {
-        $values = array_fill(0, count($type->getAttributes()), null);
-        foreach ($map as $k => $v) {
-            $pos = $type->getAttPos($k);
-            if ($pos !== null) {
-                $values[$pos] = $v;
-            } else {
-                $typeName = "{$type->getSchemaName()}.{$type->getName()}";
-                $msg = "Error creating a composite value of type $typeName: key '$k' is undefined";
-                throw new \InvalidArgumentException($msg);
-            }
-        }
-        return new Composite($type, $values);
+        return new Composite($valueMap);
     }
 
-    private function __construct(CompositeType $type, array $values)
+    private function __construct(array $valueMap)
     {
-        $this->type = $type;
-        $this->values = $values;
-    }
-
-    final public function getType(): CompositeType
-    {
-        return $this->type;
-    }
-
-    /**
-     * @return array list of the elementary values
-     */
-    public function toList(): array
-    {
-        return $this->values;
+        $this->values = $valueMap;
     }
 
     /**
      * @return array ordered map: attribute name => attribute value
-     * @throws UnsupportedException if called on a value of an ad hoc composite type, i.e., such that defines no
-     *                              attributes
      */
     public function toMap(): array
     {
-        $attNames = array_keys($this->type->getAttributes());
-        if (!$attNames) {
-            $msg = 'Ad hoc composite type value cannot be converted to map - no attributes are defined';
-            throw new UnsupportedException($msg);
-        }
-        $result = [];
-        foreach ($this->values as $i => $v) {
-            if (isset($attNames[$i])) {
-                $k = $attNames[$i];
-                $result[$k] = $v;
-            }
-        }
-        return $result;
+        return $this->values;
     }
 
     //region dynamic properties
@@ -121,63 +60,16 @@ class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
      */
     public function __get($name)
     {
-        $pos = $this->type->getAttPos($name);
-        if ($pos !== null) {
-            return $this->values[$pos];
-        } else {
-            return null;
-        }
+        return ($this->values[$name] ?? null);
     }
 
     /**
      * @param string $name attribute name
-     * @return bool whether the attribute is defined on this value
+     * @return bool whether the attribute is defined and non-null on this value
      */
     public function __isset($name)
     {
-        return ($this->type->getAttPos($name) !== null);
-    }
-
-    //endregion
-
-    //region \IArrayAccess
-
-    public function offsetExists($offset)
-    {
-        if (filter_var($offset, FILTER_VALIDATE_INT) !== false) {
-            return ($offset < count($this->values));
-        } else {
-            return ($this->type->getAttPos($offset) !== null);
-        }
-    }
-
-    public function offsetGet($offset)
-    {
-        if (filter_var($offset, FILTER_VALIDATE_INT) !== false) {
-            return $this->values[$offset];
-        } else {
-            return $this->values[$this->type->getAttPos($offset)];
-        }
-    }
-
-    public function offsetSet($offset, $value)
-    {
-        throw new ImmutableException();
-    }
-
-    public function offsetUnset($offset)
-    {
-        throw new ImmutableException();
-    }
-
-    //endregion
-
-    //region \IteratorAggregate
-
-    public function getIterator()
-    {
-        $arr = ($this->type->getAttributes() ? $this->toMap() : $this->values);
-        return new \ArrayIterator($arr);
+        return isset($this->values[$name]);
     }
 
     //endregion
@@ -186,17 +78,23 @@ class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
 
     public function equals($other): bool
     {
-        if ($other === null) {
-            return false;
-        }
-        if (get_class($this) != get_class($other)) {
-            return false;
-        }
-        if ($this->type !== $other->type) {
+        if (!$other instanceof Composite) {
             return false;
         }
 
-        return ComparisonUtils::equals($this->values, $other->values);
+        $otherValues = $other->values;
+
+        if (count($this->values) != count($otherValues)) {
+            return false;
+        }
+
+        foreach ($this->values as $name => $thisVal) {
+            if (!ComparisonUtils::equals($thisVal, ($otherValues[$name] ?? null))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function compareTo($other): int
@@ -207,19 +105,31 @@ class Composite implements IComparable, \ArrayAccess, \IteratorAggregate
         if (!$other instanceof Composite) {
             throw new IncomparableException('$other is not a ' . Composite::class);
         }
-        if ($this->getType() !== $other->getType()) {
-            throw new IncomparableException('Different composite types');
-        }
 
         $otherValues = $other->values;
-        foreach ($this->values as $i => $av) {
-            $bv = $otherValues[$i];
-            $cmp = ComparisonUtils::compareValues($av, $bv);
+
+        if (count($this->values) != count($otherValues)) {
+            throw new IncomparableException('$other contains different attributes');
+        }
+
+        foreach ($this->values as $name => $thisVal) {
+            $otherVal = ($otherValues[$name] ?? null);
+            $cmp = ComparisonUtils::compareValues($thisVal, $otherVal);
             if ($cmp != 0) {
                 return $cmp;
             }
         }
+
         return 0;
+    }
+
+    //endregion
+
+    //region IteratorAggregate
+
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->values);
     }
 
     //endregion

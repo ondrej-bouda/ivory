@@ -10,7 +10,6 @@ use Ivory\Type\IType;
 use Ivory\Type\IValueSerializer;
 use Ivory\Type\Postgresql\ArrayType;
 use Ivory\Type\Std\StringType;
-use Ivory\Value\Composite;
 use Ivory\Value\Date;
 use Ivory\Value\Json;
 use Ivory\Value\Polygon;
@@ -100,10 +99,7 @@ SQL
         $this->assertInstanceOf(Polygon::class, $polygon);
         $this->assertEquals(6, $polygon->getArea(), '', 1e-12);
 
-        /** @var Composite $row */
-        $row = $tuple->row;
-        $this->assertInstanceOf(Composite::class, $row);
-        $this->assertSame(['1', '2', 'foo'], $row->toList());
+        $this->assertSame(['1', '2', 'foo'], $tuple->row);
     }
 
     /**

@@ -9,89 +9,51 @@ use Ivory\Value\Composite;
 class CompositeTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CompositeType */
-    private $adHocComposite;
+    private $zeroType;
+    /** @var CompositeType */
+    private $intSingletonType;
+    /** @var CompositeType */
+    private $intTextPairType;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->adHocComposite = new AdHocCompositeType('pg_catalog', 'record');
+        $this->zeroType = new CompositeType(self::class, '0');
+
+        $this->intSingletonType = new CompositeType(self::class, '1');
+        $this->intSingletonType->addAttribute('a', new IntegerType('pg_catalog', 'int4'));
+
+        $this->intTextPairType = new CompositeType(self::class, '2');
+        $this->intTextPairType->addAttribute('a', new IntegerType('pg_catalog', 'int4'));
+        $this->intTextPairType->addAttribute('b', new StringType('pg_catalog', 'text'));
     }
 
-    public function testParseSimpleUntyped()
+    public function testParseSimple()
     {
-        $this->assertSame([], $this->adHocComposite->parseValue('()')->toList());
-        $this->assertSame(['1'], $this->adHocComposite->parseValue('(1)')->toList());
-        $this->assertSame(['ab'], $this->adHocComposite->parseValue('(ab)')->toList());
-        $this->assertSame(['1', 'ab'], $this->adHocComposite->parseValue('(1,ab)')->toList());
-        $this->assertSame([null, '1.2'], $this->adHocComposite->parseValue('(,1.2)')->toList());
+        $this->assertSame([], $this->zeroType->parseValue('()')->toMap());
+
+        $this->assertSame(['a' => 1], $this->intSingletonType->parseValue('(1)')->toMap());
+        $this->assertSame(['a' => null], $this->intSingletonType->parseValue('()')->toMap());
+
+        $this->assertSame(['a' => 1, 'b' => 'ab'], $this->intTextPairType->parseValue('(1,ab)')->toMap());
+        $this->assertSame(['a' => null, 'b' => ''], $this->intTextPairType->parseValue('(,"")')->toMap());
+        $this->assertSame(['a' => 0, 'b' => null], $this->intTextPairType->parseValue('(0,)')->toMap());
     }
 
-    public function testParseSpecialStrings()
+    public function testSerializeSimple()
     {
-        $this->assertSame([' '], $this->adHocComposite->parseValue('( )')->toList());
+        $this->assertSame('ROW(1)', $this->intSingletonType->serializeValue(Composite::fromMap(['a' => 1])));
+        $this->assertSame('ROW(NULL)', $this->intSingletonType->serializeValue(Composite::fromMap(['a' => null])));
 
-        $this->assertSame(
-            [null, 'NULL', '', '()', ',', '1\\2', 'p q', '"r"', "'", '"', ' , a \\ " ( ) \' '],
-            $this->adHocComposite->parseValue(<<<'STR'
-(,NULL,"","()",",","1\\2","p q","\"r\"",',"""", \, \a \\ \" \( \) ' )
-STR
-            )->toList()
-        );
+        $this->assertSame("(1,'ab')", $this->intTextPairType->serializeValue($this->intText(1, 'ab')));
+        $this->assertSame("(1,'2')", $this->intTextPairType->serializeValue($this->intText(1, 2)));
+        $this->assertSame("(NULL,'')", $this->intTextPairType->serializeValue($this->intText(null, '')));
+        $this->assertSame('(0,NULL)', $this->intTextPairType->serializeValue($this->intText(0, null)));
     }
 
-    public function testParseSimpleTyped()
+    private function intText($a, $b)
     {
-        $this->assertSame([], $this->adHocComposite->parseValue('()')->toList());
-
-        $this->adHocComposite->addAttribute('a', new IntegerType('pg_catalog', 'int4'));
-        $this->assertSame([1], $this->adHocComposite->parseValue('(1)')->toList());
-        $this->assertSame([null], $this->adHocComposite->parseValue('()')->toList());
-
-        $this->adHocComposite->addAttribute('b', new StringType('pg_catalog', 'text'));
-        $this->assertSame([1, 'ab'], $this->adHocComposite->parseValue('(1,ab)')->toList());
-        $this->assertSame([null, ''], $this->adHocComposite->parseValue('(,"")')->toList());
-        $this->assertSame([0, null], $this->adHocComposite->parseValue('(0,)')->toList());
-    }
-
-    public function testSerializeSimpleUntyped()
-    {
-        $this->assertSame('NULL', $this->adHocComposite->serializeValue(null));
-        $this->assertSame('ROW()', $this->adHocComposite->serializeValue($this->val([])));
-        $this->assertSame('ROW(NULL)', $this->adHocComposite->serializeValue($this->val([null])));
-        $this->assertSame("ROW('1')", $this->adHocComposite->serializeValue($this->val([1])));
-        $this->assertSame("ROW('ab')", $this->adHocComposite->serializeValue($this->val(['ab'])));
-        $this->assertSame("('1','ab')", $this->adHocComposite->serializeValue($this->val([1, 'ab'])));
-        $this->assertSame("(NULL,'1.2')", $this->adHocComposite->serializeValue($this->val([null, 1.2])));
-    }
-
-    public function testSerializeSpecialStrings()
-    {
-        $this->assertSame(
-            <<<'STR'
-(NULL,'NULL','','()',',','1\2','p q','"r"','''','"',' , \ " ''')
-STR
-            ,
-            $this->adHocComposite->serializeValue($this->val(
-                [null, 'NULL', '', '()', ',', '1\\2', 'p q', '"r"', "'", '"', ' , \\ " \'']
-            ))
-        );
-    }
-
-    public function testSerializeSimpleTyped()
-    {
-        $this->adHocComposite->addAttribute('a', new IntegerType('pg_catalog', 'int4'));
-        $this->assertSame('ROW(1)', $this->adHocComposite->serializeValue($this->val([1])));
-        $this->assertSame('ROW(NULL)', $this->adHocComposite->serializeValue($this->val([null])));
-
-        $this->adHocComposite->addAttribute('b', new StringType('pg_catalog', 'text'));
-        $this->assertSame("(1,'ab')", $this->adHocComposite->serializeValue($this->val([1, 'ab'])));
-        $this->assertSame("(NULL,'')", $this->adHocComposite->serializeValue($this->val([null, ''])));
-        $this->assertSame('(0,NULL)', $this->adHocComposite->serializeValue($this->val([0, null])));
-    }
-
-    private function val($values)
-    {
-        return Composite::fromList($this->adHocComposite, $values);
+        return Composite::fromMap(['a' => $a, 'b' => $b]);
     }
 }
