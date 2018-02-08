@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
+use Ivory\Lang\Sql\Types;
 use Ivory\Type\IType;
 use Ivory\Value\Composite;
 
@@ -54,6 +55,16 @@ class CompositeType extends RowTypeBase
             $valueMap[$name] = ($items[$pos] ?? null);
         }
         return Composite::fromMap($valueMap);
+    }
+
+    public function serializeValue($val): string
+    {
+        return
+            parent::serializeValue($val) .
+            '::' .
+            Types::serializeIdent($this->getSchemaName()) .
+            '.' .
+            Types::serializeIdent($this->getName());
     }
 
     protected function serializeBody(string &$result, $value): int

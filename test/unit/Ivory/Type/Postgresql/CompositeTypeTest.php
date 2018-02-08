@@ -19,12 +19,12 @@ class CompositeTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->zeroType = new CompositeType(self::class, '0');
+        $this->zeroType = new CompositeType('s', 't0');
 
-        $this->intSingletonType = new CompositeType(self::class, '1');
+        $this->intSingletonType = new CompositeType('s', 't1');
         $this->intSingletonType->addAttribute('a', new IntegerType('pg_catalog', 'int4'));
 
-        $this->intTextPairType = new CompositeType(self::class, '2');
+        $this->intTextPairType = new CompositeType('s', 't2');
         $this->intTextPairType->addAttribute('a', new IntegerType('pg_catalog', 'int4'));
         $this->intTextPairType->addAttribute('b', new StringType('pg_catalog', 'text'));
     }
@@ -43,13 +43,17 @@ class CompositeTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testSerializeSimple()
     {
-        $this->assertSame('ROW(1)', $this->intSingletonType->serializeValue(Composite::fromMap(['a' => 1])));
-        $this->assertSame('ROW(NULL)', $this->intSingletonType->serializeValue(Composite::fromMap(['a' => null])));
+        $this->assertSame('NULL::s.t1', $this->intSingletonType->serializeValue(null));
 
-        $this->assertSame("(1,'ab')", $this->intTextPairType->serializeValue($this->intText(1, 'ab')));
-        $this->assertSame("(1,'2')", $this->intTextPairType->serializeValue($this->intText(1, 2)));
-        $this->assertSame("(NULL,'')", $this->intTextPairType->serializeValue($this->intText(null, '')));
-        $this->assertSame('(0,NULL)', $this->intTextPairType->serializeValue($this->intText(0, null)));
+        $this->assertSame('ROW()::s.t0', $this->zeroType->serializeValue(Composite::fromMap([])));
+
+        $this->assertSame('ROW(1)::s.t1', $this->intSingletonType->serializeValue(Composite::fromMap(['a' => 1])));
+        $this->assertSame('ROW(NULL)::s.t1', $this->intSingletonType->serializeValue(Composite::fromMap(['a' => null])));
+
+        $this->assertSame("(1,'ab')::s.t2", $this->intTextPairType->serializeValue($this->intText(1, 'ab')));
+        $this->assertSame("(1,'2')::s.t2", $this->intTextPairType->serializeValue($this->intText(1, 2)));
+        $this->assertSame("(NULL,'')::s.t2", $this->intTextPairType->serializeValue($this->intText(null, '')));
+        $this->assertSame('(0,NULL)::s.t2', $this->intTextPairType->serializeValue($this->intText(0, null)));
     }
 
     private function intText($a, $b)
