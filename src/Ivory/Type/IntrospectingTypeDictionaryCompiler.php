@@ -87,8 +87,10 @@ SQL;
             /* OPT: This leads to a great flexibility - any type may be registered explicitly, bypassing the generic
              *      type constructors offered by Ivory. It may as well lead to a performance penalty, though.
              */
-            $type = $typeProvider->provideType($schemaName, $typeName);
-            if ($type === null) {
+            $providedType = $typeProvider->provideType($schemaName, $typeName);
+            if ($providedType !== null) {
+                $type = clone $providedType; // clone: do not touch the original object - it might be reused by others
+            } else {
                 switch ($row['typtype']) {
                     case 'A':
                         $elemType = $dict->requireTypeByOid((int)$row['parenttype']);
