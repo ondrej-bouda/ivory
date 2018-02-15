@@ -54,6 +54,11 @@ class CompositeType extends RowTypeBase
         foreach ($this->attNameMap as $name => $pos) {
             $valueMap[$name] = ($items[$pos] ?? null);
         }
+        return $this->constructCompositeValue($valueMap);
+    }
+
+    protected function constructCompositeValue(array $valueMap): Composite
+    {
         return Composite::fromMap($valueMap);
     }
 

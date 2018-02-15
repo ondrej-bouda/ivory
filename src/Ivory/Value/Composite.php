@@ -39,7 +39,7 @@ class Composite implements IComparable, \IteratorAggregate
         return new Composite($valueMap);
     }
 
-    private function __construct(array $valueMap)
+    protected function __construct(array $valueMap)
     {
         $this->values = $valueMap;
     }
