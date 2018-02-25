@@ -24,7 +24,7 @@ class StrictEnumTypeTest extends IvoryTestCase
         $this->tx = $this->conn->startTransaction();
 
         $this->conn->command(
-            "CREATE TYPE sms_protocol AS ENUM ('SMPP', 'REST', 'Jupiter')"
+            "CREATE TYPE chocolate_bar AS ENUM ('Mars', 'Snickers', 'Twix')"
         );
         $this->conn->command(
             "CREATE TYPE planet AS ENUM ('Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune')"
@@ -34,7 +34,7 @@ class StrictEnumTypeTest extends IvoryTestCase
         );
 
         $typeRegister = $this->conn->getTypeRegister();
-        $typeRegister->registerType(new StrictEnumType('public', 'sms_protocol', SmsProtocol::class));
+        $typeRegister->registerType(new StrictEnumType('public', 'chocolate_bar', ChocolateBar::class));
         $typeRegister->registerType(new StrictEnumType('public', 'planet', Planet::class));
     }
 
@@ -49,32 +49,33 @@ class StrictEnumTypeTest extends IvoryTestCase
         $conn = $this->getIvoryConnection();
         $tuple = $conn->querySingleTuple(
             "SELECT
-                 'SMPP'::sms_protocol AS sms_prot1,
-                 'Jupiter'::sms_protocol AS sms_prot2,
+                 'Mars'::chocolate_bar AS bar1,
+                 'Twix'::chocolate_bar AS bar2,
                  'Mars'::planet AS planet1,
                  'Mars'::planet AS planet2,
                  'Jupiter'::planet AS planet3,
                  planet_range('Jupiter', 'Neptune') AS planet_rng"
         );
 
-        assert($tuple->sms_prot1 instanceof SmsProtocol);
-        assert($tuple->sms_prot2 instanceof SmsProtocol);
+        assert($tuple->bar1 instanceof ChocolateBar);
+        assert($tuple->bar2 instanceof ChocolateBar);
         assert($tuple->planet1 instanceof Planet);
         assert($tuple->planet2 instanceof Planet);
         assert($tuple->planet3 instanceof Planet);
         assert($tuple->planet_rng instanceof Range);
 
-        $this->assertTrue($tuple->sms_prot1->equals(SmsProtocol::SMPP()));
+        $this->assertTrue($tuple->bar2 == ChocolateBar::Twix());
+        $this->assertTrue($tuple->bar2->equals(ChocolateBar::Twix()));
 
-        $this->assertTrue($tuple->planet1->equals($tuple->planet2));
-        $this->assertFalse($tuple->planet1->equals($tuple->planet3));
-        $this->assertFalse($tuple->sms_prot1->equals($tuple->planet1));
-        $this->assertFalse($tuple->sms_prot2->equals($tuple->planet3));
+        $this->assertTrue($tuple->planet1 == $tuple->planet2);
+        $this->assertTrue($tuple->planet1 != $tuple->planet3);
+        $this->assertTrue($tuple->bar1 != $tuple->planet1);
+        $this->assertTrue($tuple->bar2 != $tuple->planet3);
 
         $this->assertEquals(0, $tuple->planet1->compareTo($tuple->planet2));
         $this->assertLessThan(0, $tuple->planet1->compareTo($tuple->planet3));
         try {
-            $tuple->planet1->compareTo($tuple->sms_prot1);
+            $tuple->planet1->compareTo($tuple->bar1);
             $this->fail(IncomparableException::class . ' was expected');
         } catch (IncomparableException $e) {
         }
@@ -101,9 +102,33 @@ class StrictEnumTypeTest extends IvoryTestCase
         }
 
         try {
-            $conn->querySingleValue('SELECT %planet', SmsProtocol::Jupiter());
+            $conn->querySingleValue('SELECT %planet', ChocolateBar::Mars());
             $this->fail(\InvalidArgumentException::class . ' was expected');
         } catch (\InvalidArgumentException $e) {
+        }
+    }
+
+    public function testPlanetEquals()
+    {
+        $this->assertTrue($this->isGiantPlanet(Planet::Uranus()));
+        $this->assertFalse($this->isGiantPlanet(Planet::Earth()));
+    }
+
+    private function isGiantPlanet(Planet $p): bool
+    {
+        switch ($p) {
+            case Planet::Mercury():
+            case Planet::Venus():
+            case Planet::Earth():
+            case Planet::Mars():
+                return false;
+            case Planet::Jupiter():
+            case Planet::Saturn():
+            case Planet::Uranus():
+            case Planet::Neptune():
+                return true;
+            default:
+                throw new \UnexpectedValueException();
         }
     }
 }

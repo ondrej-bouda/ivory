@@ -21,7 +21,7 @@ class EnumTypeTest extends IvoryTestCase
         $this->tx = $conn->startTransaction();
 
         $conn->command(
-            "CREATE TYPE sms_protocol AS ENUM ('SMPP', 'REST', 'Jupiter')"
+            "CREATE TYPE chocolate_bar AS ENUM ('Mars', 'Snickers', 'Twix')"
         );
         $conn->command(
             "CREATE TYPE planet AS ENUM ('Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune')"
@@ -42,32 +42,32 @@ class EnumTypeTest extends IvoryTestCase
         $conn = $this->getIvoryConnection();
         $tuple = $conn->querySingleTuple(
             "SELECT
-                 'SMPP'::sms_protocol AS sms_prot1,
-                 'Jupiter'::sms_protocol AS sms_prot2,
+                 'Mars'::chocolate_bar AS bar1,
+                 'Twix'::chocolate_bar AS bar2,
                  'Mars'::planet AS planet1,
                  'Mars'::planet AS planet2,
                  'Jupiter'::planet AS planet3,
                  planet_range('Jupiter', 'Neptune') AS planet_rng"
         );
 
-        assert($tuple->sms_prot1 instanceof EnumItem);
-        assert($tuple->sms_prot2 instanceof EnumItem);
+        assert($tuple->bar1 instanceof EnumItem);
+        assert($tuple->bar2 instanceof EnumItem);
         assert($tuple->planet1 instanceof EnumItem);
         assert($tuple->planet2 instanceof EnumItem);
         assert($tuple->planet3 instanceof EnumItem);
         assert($tuple->planet_rng instanceof Range);
 
-        $this->assertSame('SMPP', $tuple->sms_prot1->getValue());
+        $this->assertSame('Twix', $tuple->bar2->getValue());
 
         $this->assertTrue($tuple->planet1->equals($tuple->planet2));
         $this->assertFalse($tuple->planet1->equals($tuple->planet3));
-        $this->assertFalse($tuple->sms_prot1->equals($tuple->planet1));
-        $this->assertFalse($tuple->sms_prot2->equals($tuple->planet3));
+        $this->assertFalse($tuple->bar1->equals($tuple->planet1));
+        $this->assertFalse($tuple->bar2->equals($tuple->planet3));
 
         $this->assertEquals(0, $tuple->planet1->compareTo($tuple->planet2));
         $this->assertLessThan(0, $tuple->planet1->compareTo($tuple->planet3));
         try {
-            $tuple->planet1->compareTo($tuple->sms_prot1);
+            $tuple->planet1->compareTo($tuple->bar1);
             $this->fail(IncomparableException::class . ' was expected');
         } catch (IncomparableException $e) {
         }
@@ -86,5 +86,11 @@ class EnumTypeTest extends IvoryTestCase
                 EnumItem::forType('public', 'planet', 'Uranus')
             )
         );
+
+        try {
+            $conn->querySingleValue('SELECT %planet', 'Pluto');
+            $this->fail('A warning was expected');
+        } catch (\PHPUnit\Framework\Error\Warning $e) {
+        }
     }
 }

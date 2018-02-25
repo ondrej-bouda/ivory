@@ -14,7 +14,7 @@ use Ivory\Value\Alg\IComparable;
  * <?php
  * class Planet extends StrictEnum
  * {
- *     protected static function getValues()
+ *     protected static function getValues(): array
  *     {
  *         return ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
  *     }
@@ -26,7 +26,24 @@ use Ivory\Value\Alg\IComparable;
  * <code>
  * <?php
  * $mars = Planet::Mars();
+ * assert($mars == Planet::Mars());
  * assert($mars->compareTo(Planet::Jupiter()) < 0);
+ * </code>
+ *
+ * Due to PHP `==` operator taking taking the class into consideration, enumeration objects may safely be compared
+ * including their type:
+ * <code>
+ * <?php
+ * class ChocolateBar extends StrictEnum
+ * {
+ *     protected static function getValues(): array
+ *     {
+ *         return ['Mars', 'Snickers', 'Twix'];
+ *     }
+ * }
+ *
+ * assert(ChocolateBar::Mars() == ChocolateBar::Mars());
+ * assert(Planet::Mars() != ChocolateBar::Mars());
  * </code>
  *
  * Note, in order to let the IDE recognize the items, declare them in the class PHPDoc block using the &#64;method
@@ -34,8 +51,8 @@ use Ivory\Value\Alg\IComparable;
  */
 abstract class StrictEnum implements IComparable
 {
-    private static $flipped = [];
-    private $value;
+    private static $valueMap = [];
+    private $offset;
 
     /**
      * Returns the list of enumeration values as defined in the corresponding PostgreSQL enumeration type (including
@@ -49,10 +66,10 @@ abstract class StrictEnum implements IComparable
 
     private static function getValueMap(): array
     {
-        if (!isset(self::$flipped[static::class])) {
-            self::$flipped[static::class] = array_flip(static::getValues());
+        if (!isset(self::$valueMap[static::class])) {
+            self::$valueMap[static::class] = array_flip(static::getValues());
         }
-        return self::$flipped[static::class];
+        return self::$valueMap[static::class];
     }
 
     public static function __callStatic(string $name, array $arguments)
@@ -62,25 +79,22 @@ abstract class StrictEnum implements IComparable
 
     final public function __construct(string $value)
     {
-        if (!isset(self::getValueMap()[$value])) {
+        $valueMap = self::getValueMap();
+        if (!isset($valueMap[$value])) {
             throw new \InvalidArgumentException("`$value` is not among the defined enumeration values");
         }
 
-        $this->value = $value;
+        $this->offset = $valueMap[$value];
     }
 
     final public function getValue(): string
     {
-        return $this->value;
+        return static::getValues()[$this->offset];
     }
 
     final public function equals($other): bool
     {
-        return (
-            $other instanceof StrictEnum &&
-            $other->value == $this->value &&
-            get_class($other) == static::class
-        );
+        return ($this == $other);
     }
 
     final public function compareTo($other): int
@@ -91,11 +105,19 @@ abstract class StrictEnum implements IComparable
         if (!$other instanceof StrictEnum || get_class($other) != static::class) {
             throw new IncomparableException();
         }
-        return self::getValueMap()[$this->value] - self::getValueMap()[$other->value];
+        return $this->offset - $other->offset;
     }
 
     final public function __toString()
     {
-        return $this->value;
+        return $this->getValue();
+    }
+
+    public function __debugInfo()
+    {
+        return [
+            'offset' => $this->offset,
+            'value' => $this->getValue(),
+        ];
     }
 }
