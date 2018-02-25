@@ -9,7 +9,7 @@ use Ivory\IvoryTestCase;
 use Ivory\Type\Postgresql\StrictEnumType;
 use Ivory\Value\Range;
 
-class CustomEnumTypeTest extends IvoryTestCase
+class StrictEnumTypeTest extends IvoryTestCase
 {
     /** @var Connection */
     private $conn;
