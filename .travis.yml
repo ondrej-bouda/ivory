@@ -4,15 +4,16 @@ php:
   - '7.1'
   - '7.2'
 
-addons:
-  postgresql: '9.4'
+env:
+  - POSTGRESQL_VERSION=9.4
+  - POSTGRESQL_VERSION=9.5
 
 before_install:
   - sudo apt-get update
   - sudo apt-get install language-pack-cs language-pack-ja
   - sudo /etc/init.d/postgresql stop
-  - sudo sed -e 's~#\?max_prepared_transactions = 0~max_prepared_transactions = 1~' --in-place /etc/postgresql/9.4/main/postgresql.conf
-  - sudo /etc/init.d/postgresql start 9.4
+  - sudo sed -e 's~#\?max_prepared_transactions = 0~max_prepared_transactions = 1~' --in-place /etc/postgresql/$POSTGRESQL_VERSION/main/postgresql.conf
+  - sudo /etc/init.d/postgresql start $POSTGRESQL_VERSION
   - composer self-update
 
 install:
