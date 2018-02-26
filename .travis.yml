@@ -7,6 +7,7 @@ php:
 env:
   - POSTGRESQL_VERSION=9.4
   - POSTGRESQL_VERSION=9.5
+  - POSTGRESQL_VERSION=9.6
 
 before_install:
   - sudo apt-get update
