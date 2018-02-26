@@ -31,19 +31,16 @@ class StrictEnumType implements ITotallyOrderedType
             return 'NULL';
         }
 
-        if ($val instanceof StrictEnum) {
-            if (is_a($val, $this->enumClass)) {
-                $enum = $val;
-            } else {
-                throw new \InvalidArgumentException('Serializing enumeration value for a different type');
-            }
-        } else {
-            $enum = new $this->enumClass($val);
+        if (!$val instanceof StrictEnum) {
+            throw new \InvalidArgumentException('Instance of ' . StrictEnum::class . ' is expected');
+        }
+        if (!is_a($val, $this->enumClass)) {
+            throw new \InvalidArgumentException('Serializing enumeration value for a different type');
         }
 
         return sprintf(
             '%s::%s.%s',
-            Types::serializeString($enum->getValue()),
+            Types::serializeString($val->getValue()),
             Types::serializeIdent($this->getSchemaName()),
             Types::serializeIdent($this->getName())
         );

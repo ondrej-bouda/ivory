@@ -91,12 +91,12 @@ class StrictEnumTypeTest extends IvoryTestCase
             $conn->querySingleValue(
                 'SELECT %planet < %planet',
                 Planet::Venus(),
-                'Uranus'
+                new Planet('Uranus')
             )
         );
 
         try {
-            $conn->querySingleValue('SELECT %planet', 'Pluto');
+            $conn->querySingleValue('SELECT %planet', 'Mars');
             $this->fail(\InvalidArgumentException::class . ' was expected');
         } catch (\InvalidArgumentException $e) {
         }
@@ -108,10 +108,21 @@ class StrictEnumTypeTest extends IvoryTestCase
         }
     }
 
-    public function testPlanetEquals()
+    public function testEquals()
     {
         $this->assertTrue($this->isGiantPlanet(Planet::Uranus()));
         $this->assertFalse($this->isGiantPlanet(Planet::Earth()));
+    }
+
+    public function testConstruction()
+    {
+        $this->assertTrue(Planet::Mars() == new Planet('Mars'));
+
+        try {
+            $p = new Planet('mars');
+            $this->fail(\InvalidArgumentException::class . ' expected');
+        } catch (\InvalidArgumentException $e) {
+        }
     }
 
     private function isGiantPlanet(Planet $p): bool
