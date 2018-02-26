@@ -460,7 +460,7 @@ class RelationTest extends IvoryTestCase
                             '1987-08-17 13:01:02.5 BC'::TIMESTAMP AS bc,
                             'infinity'::TIMESTAMP AS inf,
                             '-infinity'::TIMESTAMP AS minus_inf,
-                            '294276-12-31 24:00:00'::TIMESTAMP AS mx,
+                            '294276-12-31 23:59:59.999999'::TIMESTAMP AS mx,
                             '4713-01-01 00:00:00 BC'::TIMESTAMP AS mn"
                 );
                 $tuple = $rel->tuple();
@@ -471,7 +471,7 @@ class RelationTest extends IvoryTestCase
                 $this->assertEquals(Timestamp::fromParts(-1987, 8, 17, 13, 1, 2.5), $tuple->bc, $dateStyle);
                 $this->assertEquals(Timestamp::infinity(), $tuple->inf, $dateStyle);
                 $this->assertEquals(Timestamp::minusInfinity(), $tuple->minus_inf, $dateStyle);
-                $this->assertEquals(Timestamp::fromParts(294277, 1, 1, 0, 0, 0), $tuple->mx, $dateStyle);
+                $this->assertEquals(Timestamp::fromParts(294276, 12, 31, 23, 59, 59.999999), $tuple->mx, $dateStyle);
                 $this->assertEquals(Timestamp::fromParts(-4713, 1, 1, 0, 0, 0), $tuple->mn, $dateStyle);
             }
         } finally {
@@ -505,7 +505,7 @@ class RelationTest extends IvoryTestCase
                                 'infinity'::TIMESTAMPTZ AS inf,
                                 '-infinity'::TIMESTAMPTZ AS minus_inf,
                                 '1987-08-17 13:01:02.5 BC'::TIMESTAMPTZ AS bc,
-                                '294276-12-31 24:00:00'::TIMESTAMPTZ AS mx,
+                                '294276-12-31 23:59:59.999999'::TIMESTAMPTZ AS mx,
                                 '4713-01-01 00:00:00 BC'::TIMESTAMPTZ AS mn"
                     );
 
@@ -527,7 +527,7 @@ class RelationTest extends IvoryTestCase
                     $this->assertEquals(TimestampTz::minusInfinity(), $tuple->minus_inf, $msg);
                     $this->assertEquals(TimestampTz::fromParts(-1987, 8, 17, 13, 1, 2.5, $lmtOffset), $tuple->bc,
                         $msg);
-                    $this->assertEquals(TimestampTz::fromParts(294277, 1, 1, 0, 0, 0, $tzStd), $tuple->mx, $msg);
+                    $this->assertEquals(TimestampTz::fromParts(294276, 12, 31, 23, 59, 59.999999, $tzStd), $tuple->mx, $msg);
                     $this->assertEquals(TimestampTz::fromParts(-4713, 1, 1, 0, 0, 0, $lmtOffset), $tuple->mn, $msg);
                 }
             }
