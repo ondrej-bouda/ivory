@@ -8,13 +8,15 @@ env:
   - POSTGRESQL_VERSION=9.4
   - POSTGRESQL_VERSION=9.5
   - POSTGRESQL_VERSION=9.6
+  - POSTGRESQL_VERSION=10
 
 before_install:
   - sudo apt-get update
   - sudo apt-get install language-pack-cs language-pack-ja
-  - sudo /etc/init.d/postgresql stop
+  - sudo service postgresql stop
+  - if [ "$POSTGRESQL_VERSION" -eq 10 ]; then sudo apt-get install -q postgresql-10 postgresql-client-10 && sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf; fi
   - sudo sed -e 's~#\?max_prepared_transactions = 0~max_prepared_transactions = 1~' --in-place /etc/postgresql/$POSTGRESQL_VERSION/main/postgresql.conf
-  - sudo /etc/init.d/postgresql start $POSTGRESQL_VERSION
+  - sudo postgresql start $POSTGRESQL_VERSION
   - composer self-update
 
 install:
