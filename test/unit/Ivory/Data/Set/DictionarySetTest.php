@@ -34,6 +34,38 @@ class DictionarySetTest extends \PHPUnit\Framework\TestCase
         $another = new \stdClass();
         $this->assertFalse($set->contains($another));
         $another->a = 'abc';
-        $this->assertTrue($set->contains($another));
+        $this->assertTrue($set->contains($another)); // objects are compared as values, not as references
+
+        $this->assertSame(3, count($set));
+        $this->assertTrue($set->contains(1));
+        $set->clear();
+        $this->assertSame(0, count($set));
+        $this->assertFalse($set->contains(1));
+    }
+
+    public function testToArray()
+    {
+        $set = new DictionarySet();
+        $set->add(1);
+        $set->add(3);
+
+        $arr = $set->toArray();
+        sort($arr); // sets do not guarantee any specific order; sort the output to compare it with the expected value
+        $this->assertSame([1, 3], $arr);
+    }
+
+    public function testGenerateItems()
+    {
+        $set = new DictionarySet();
+        $set->add(1);
+        $set->add(3);
+
+        $arr = [];
+        foreach ($set->generateItems() as $item) {
+            $arr[] = $item;
+        }
+
+        sort($arr); // sets do not guarantee any specific order; sort the output to compare it with the expected value
+        $this->assertSame([1, 3], $arr);
     }
 }

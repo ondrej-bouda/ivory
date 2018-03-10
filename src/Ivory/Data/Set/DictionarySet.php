@@ -33,13 +33,30 @@ class DictionarySet implements ISet
     public function add($value): void
     {
         $key = $this->computeKey($value);
-        $this->data[$key] = true;
+        $this->data[$key] = $value;
     }
 
     public function remove($value): void
     {
         $key = $this->computeKey($value);
         unset($this->data[$key]);
+    }
+
+    public function clear(): void
+    {
+        $this->data = [];
+    }
+
+    public function toArray(): array
+    {
+        return array_values($this->data);
+    }
+
+    public function generateItems(): \Generator
+    {
+        foreach ($this->data as $item) {
+            yield $item;
+        }
     }
 
     //endregion
