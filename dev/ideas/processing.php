@@ -12,8 +12,6 @@
  */
 namespace Ivory\Dev\Ideas;
 
-use Ivory\Data\StatementRelation;
-
 /*
  * The following statement queries the database for lessons and persons (teachers) assigned to them.
  * There are two states of lesson-person relation:

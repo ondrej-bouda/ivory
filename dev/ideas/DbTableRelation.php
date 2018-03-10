@@ -1,9 +1,6 @@
 <?php
 namespace Ivory\Dev\Ideas;
 
-use Ivory\Data\DbTableRelation;
-
-
 $personRel = new DbTableRelation('person');
 
 $joesRel = $personRel->findWhere('firstname = %', 'Joe'); // the percent sign for no conversion - take "string"

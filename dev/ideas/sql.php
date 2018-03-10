@@ -1,10 +1,6 @@
 <?php
 namespace Ivory\Dev\Ideas;
 
-use Ivory\Data\DbTableRelation;
-use Ivory\Data\DbViewRelation;
-use Ivory\Data\StatementRelation;
-
 $personRel = new DbTableRelation('person');
 $availPersonRel = new DbViewRelation('vw_avail_person', 'datatemplate');
 
