@@ -41,8 +41,8 @@ interface ITuple extends \ArrayAccess, IEqualable
     /**
      * Converts the tuple to an associative array of column names to the corresponding values held by this tuple.
      *
-     * Note there might be several columns of the same name defined on the originating relation. It this is the case,
-     * `toMap()` throws a `AmbiguousException` as it would be ambiguous which value to return under the duplicated key.
+     * Note there might be several columns of the same name defined on the originating relation. If this is the case,
+     * `toMap()` throws an `AmbiguousException` as it would be ambiguous which value to return under the duplicated key.
      *
      * Also note some columns in the originating relation might not have name. Values of such anonymous columns are
      * omitted from the result of `toMap()` as there would be no key to give them.
