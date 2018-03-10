@@ -7,7 +7,7 @@ namespace Ivory\Data\Set;
  *
  * This implementation:
  * - uses the PHP array type to store the data;
- * - stores `int`s and `string`s as is, `serialize`()-ing other types of data.
+ * - stores `int`s as is, `serialize`()-ing other types of data.
  */
 class DictionarySet implements ISet
 {
@@ -15,7 +15,7 @@ class DictionarySet implements ISet
 
     protected function computeKey($value)
     {
-        if (is_int($value) || is_string($value)) {
+        if (is_int($value)) {
             return $value;
         } else {
             return serialize($value);
