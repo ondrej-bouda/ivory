@@ -312,6 +312,8 @@ CREATE TABLE album_track (
   name VARCHAR(100) NOT NULL,
   PRIMARY KEY (album_id, disc_no, track_no)
 );
+
+CREATE EXTENSION IF NOT EXISTS hstore;
 SQL
         );
     }

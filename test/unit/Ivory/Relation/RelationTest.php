@@ -703,4 +703,20 @@ class RelationTest extends IvoryTestCase
         } catch (AmbiguousException $e) {
         }
     }
+
+    public function testHstoreResult()
+    {
+        $tuple = $this->conn->querySingleTuple(
+            "SELECT hstore(ROW()) AS empty,
+                    hstore('k', 'v') AS singleton,
+                    hstore('k', NULL) AS null_value,
+                    hstore('k', '2') AS int_value,
+                    hstore(ARRAY['a', 'X', 'b', 'Y']) AS multi_value"
+        );
+        $this->assertSame([], $tuple->empty);
+        $this->assertSame(['k' => 'v'], $tuple->singleton);
+        $this->assertSame(['k' => null], $tuple->null_value);
+        $this->assertSame(['k' => '2'], $tuple->int_value);
+        $this->assertSame(['a' => 'X', 'b' => 'Y'], $tuple->multi_value);
+    }
 }

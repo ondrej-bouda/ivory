@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
+use Ivory\Lang\Sql\Types;
 use Ivory\Type\BaseType;
 
 /**
@@ -16,6 +17,41 @@ use Ivory\Type\BaseType;
  */
 class HstoreType extends BaseType
 {
+    public function serializeValue($val): string
+    {
+        if ($val === null) {
+            return 'NULL';
+        }
+
+        if (!is_array($val) && !is_object($val)) {
+            throw new \InvalidArgumentException('Invalid value to be serialized to "hstore".');
+        }
+
+        $res = "'";
+        $isFirst = true;
+        foreach ($val as $k => $v) {
+            if (!$isFirst) {
+                $res .= ',';
+            } else {
+                $isFirst = false;
+            }
+            $res .= $this->quoteAtom($k) . '=>' . $this->quoteAtom($v);
+        }
+        $type = Types::serializeIdent($this->getSchemaName()) . '.' . Types::serializeIdent($this->getName());
+        $res .= "'::$type";
+        return $res;
+    }
+
+    private function quoteAtom($atom): string
+    {
+        if ($atom === null) {
+            return 'NULL';
+        } else {
+            // NOTE: for performance reasons, we quote the apostrophe right away, although this is required one level above
+            return '"' . strtr((string)$atom, ['"' => '\\"', '\\' => '\\\\', "'" => "''"]) . '"';
+        }
+    }
+
     public function parseValue(string $extRepr)
     {
         $re = '~
@@ -62,38 +98,6 @@ class HstoreType extends BaseType
         }
 
         return $result;
-    }
-
-    public function serializeValue($val): string
-    {
-        if ($val === null) {
-            return 'NULL';
-        }
-
-        if (!is_array($val) && !is_object($val)) {
-            throw new \InvalidArgumentException('Invalid value to be serialized to "hstore".');
-        }
-
-        $res = '';
-        $isFirst = true;
-        foreach ($val as $k => $v) {
-            if (!$isFirst) {
-                $res .= ',';
-            } else {
-                $isFirst = false;
-            }
-            $res .= $this->quoteAtom($k) . '=>' . $this->quoteAtom($v);
-        }
-        return $res;
-    }
-
-    private function quoteAtom($atom): string
-    {
-        if ($atom === null) {
-            return 'NULL';
-        } else {
-            return '"' . strtr((string)$atom, ['"' => '\\"', '\\' => '\\\\']) . '"';
-        }
     }
 
     private function unescapeAtom(string $escapedAtom): string
