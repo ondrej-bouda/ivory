@@ -46,7 +46,7 @@ class MapTest extends IvoryTestCase
         );
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

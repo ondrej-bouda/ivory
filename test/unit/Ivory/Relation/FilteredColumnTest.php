@@ -10,7 +10,7 @@ class FilteredColumnTest extends IvoryTestCase
     /** @var IColumn */
     private $baseCol;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

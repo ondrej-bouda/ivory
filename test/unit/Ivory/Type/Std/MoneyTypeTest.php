@@ -14,7 +14,7 @@ class MoneyTypeTest extends IvoryTestCase
     /** @var ITxHandle */
     private $transaction;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -23,7 +23,7 @@ class MoneyTypeTest extends IvoryTestCase
         $this->getIvoryConnection()->getConfig()->setForTransaction(ConfigParam::LC_MONETARY, $val);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->transaction->rollback();
 

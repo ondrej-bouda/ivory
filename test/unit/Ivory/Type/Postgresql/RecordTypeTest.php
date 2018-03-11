@@ -9,7 +9,7 @@ class RecordTypeTest extends IvoryTestCase
     /** @var RecordType */
     private $recordType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -19,7 +19,7 @@ class RecordTypeTest extends IvoryTestCase
         $this->recordType->attachToConnection($conn);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->recordType->detachFromConnection();
     }

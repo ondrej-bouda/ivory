@@ -11,7 +11,7 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
     /** @var IConnection */
     private $conn;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

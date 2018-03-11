@@ -12,7 +12,7 @@ class SqlPatternTest extends IvoryTestCase
     /** @var SqlPattern */
     private $pattern;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parser = new SqlPatternParser();
         $this->pattern = $this->parser->parse(

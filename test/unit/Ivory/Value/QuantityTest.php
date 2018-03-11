@@ -97,7 +97,7 @@ class QuantityTest extends \PHPUnit\Framework\TestCase
 
         $q = Quantity::fromValue(15302.5, Quantity::KILOBYTE);
         $c = $q->convert(Quantity::GIGABYTE);
-        $this->assertEquals(0.014593601226806640625, $c->getValue(), null, 1e-20);
+        $this->assertEquals(0.014593601226806640625, $c->getValue(), '', 1e-20);
         $this->assertSame(Quantity::GIGABYTE, $c->getUnit());
 
         try {

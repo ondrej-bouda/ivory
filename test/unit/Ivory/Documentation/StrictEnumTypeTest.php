@@ -16,7 +16,7 @@ class StrictEnumTypeTest extends IvoryTestCase
     /** @var ITxHandle */
     private $tx;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -38,7 +38,7 @@ class StrictEnumTypeTest extends IvoryTestCase
         $typeRegister->registerType(new StrictEnumType('public', 'planet', Planet::class));
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         $this->tx->rollback();
@@ -116,6 +116,7 @@ class StrictEnumTypeTest extends IvoryTestCase
 
     public function testConstruction()
     {
+        /** @noinspection PhpNonStrictObjectEqualityInspection intentional - we want to test the comparison */
         $this->assertTrue(Planet::Mars() == new Planet('Mars'));
 
         try {

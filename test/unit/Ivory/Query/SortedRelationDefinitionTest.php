@@ -15,7 +15,7 @@ class SortedRelationDefinitionTest extends IvoryTestCase
     /** @var IRelationDefinition */
     private $relDef;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

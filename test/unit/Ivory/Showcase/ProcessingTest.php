@@ -37,7 +37,7 @@ class ProcessingTest extends IvoryTestCase
      * Set up the sample data. Note that Ivory can build the definitions for relations on top of each other, as
      * demonstrated in the WITH table expression "teacher".
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -11,7 +11,7 @@ class IPCControlTest extends IvoryTestCase
     /** @var IConnection */
     private $conn2;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -19,7 +19,7 @@ class IPCControlTest extends IvoryTestCase
         $this->conn2 = $this->createNewIvoryConnection('conn2');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

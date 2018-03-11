@@ -18,7 +18,7 @@ class ConnConfigTest extends IvoryTestCase
     /** @var ITxHandle */
     private $transaction;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -26,7 +26,7 @@ class ConnConfigTest extends IvoryTestCase
         $this->transaction = $this->getIvoryConnection()->startTransaction();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->transaction->rollback();
 

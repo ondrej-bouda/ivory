@@ -17,7 +17,7 @@ class RelationSerializerTest extends IvoryTestCase
     /** @var RelationSerializer */
     private $relationSerializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

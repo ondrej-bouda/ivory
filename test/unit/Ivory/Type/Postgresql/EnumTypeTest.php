@@ -13,7 +13,7 @@ class EnumTypeTest extends IvoryTestCase
     /** @var ITxHandle */
     private $tx;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class EnumTypeTest extends IvoryTestCase
         );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         $this->tx->rollback();

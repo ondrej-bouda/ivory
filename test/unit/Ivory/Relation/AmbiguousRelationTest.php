@@ -10,7 +10,7 @@ class AmbiguousRelationTest extends IvoryTestCase
     /** @var IRelation */
     private $rel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

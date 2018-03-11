@@ -23,7 +23,7 @@ class QueryingTest extends IvoryTestCase
     /** @var ITypeDictionary */
     private $typeDict;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,7 +32,7 @@ class QueryingTest extends IvoryTestCase
         $this->typeDict = $this->conn->getTypeDictionary();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->transaction->rollback();
 

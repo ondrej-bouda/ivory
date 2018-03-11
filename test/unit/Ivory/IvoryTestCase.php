@@ -24,13 +24,13 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
     /** @var array error exceptions triggered in the non-interrupt mode and not yet asserted */
     private $triggeredErrors = [];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->triggeredErrors = [];
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         if (!$this->errorInterrupt) {
