@@ -2,16 +2,17 @@
 declare(strict_types=1);
 namespace Ivory\Relation;
 
+use Ivory\Data\Map\IRelationMap;
+use Ivory\Data\Map\ITupleMap;
+use Ivory\Data\Map\IValueMap;
 use Ivory\Data\Set\ISet;
 use Ivory\Exception\AmbiguousException;
+use Ivory\Exception\InvalidStateException;
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Value\Alg\ITupleEqualizer;
 use Ivory\Value\Alg\ITupleEvaluator;
 use Ivory\Value\Alg\ITupleFilter;
 use Ivory\Value\Alg\ITupleHasher;
-use Ivory\Data\Map\IRelationMap;
-use Ivory\Data\Map\ITupleMap;
-use Ivory\Data\Map\IValueMap;
 
 /**
  * A client-side relation.
@@ -23,7 +24,14 @@ use Ivory\Data\Map\IValueMap;
 interface IRelation extends \Traversable, \Countable
 {
     /**
+     * Returns the list of columns constituting this relation.
+     *
+     * Note that if this relation implements {@link \Ivory\Type\IConnectionDependentObject}, it must be attached to the
+     * connection before this method may be called, or {@link InvalidStateException} may be thrown.
+     *
      * @return IColumn[] list of columns constituting this relation
+     * @throws InvalidStateException if this relation is an {@link \Ivory\Type\IConnectionDependentObject} but it has
+     *                               not been attached to the connection
      */
     function getColumns(): array;
 

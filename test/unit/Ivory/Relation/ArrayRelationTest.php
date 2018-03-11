@@ -6,15 +6,14 @@ use Ivory\IvoryTestCase;
 
 class ArrayRelationTest extends IvoryTestCase
 {
-    public function testAutodetect()
+    public function testCreateAutodetected()
     {
         $conn = $this->getIvoryConnection();
-        $arrRel = ArrayRelation::createAutodetect(
+        $arrRel = ArrayRelation::createAutodetected(
             [
                 [1, 'a', 3.14, false, null],
                 [5, 'g', 2.81, true, 'text'],
-            ],
-            $conn->getTypeDictionary()
+            ]
         );
         $tuple = $conn->querySingleTuple(
             "SELECT * FROM (%rel) AS vals (num, letter, decim, flag, txt) WHERE flag",

@@ -6,6 +6,7 @@ use Ivory\INamedDbObject;
 use Ivory\Query\IRelationDefinition;
 use Ivory\Relation\IRelation;
 use Ivory\Relation\ITuple;
+use Ivory\Type\IConnectionDependentObject;
 use Ivory\Type\IValueSerializer;
 use Ivory\Utils\StringUtils;
 
@@ -53,8 +54,16 @@ class RelationSerializer extends ConnectionDependentValueSerializer
      */
     private function recognizeRelationColumns(IRelation $relation): array
     {
+        if ($relation instanceof IConnectionDependentObject) {
+            $relation->attachToConnection($this->getConnection());
+            $relationColumns = $relation->getColumns();
+            $relation->detachFromConnection();
+        } else {
+            $relationColumns = $relation->getColumns();
+        }
+
         $columns = [];
-        foreach ($relation->getColumns() as $i => $column) {
+        foreach ($relationColumns as $i => $column) {
             $colName = ($column->getName() ?? 'column' . ($i + 1));
             $type = $column->getType();
             if ($type === null) {
