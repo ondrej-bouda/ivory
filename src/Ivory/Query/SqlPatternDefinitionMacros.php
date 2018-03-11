@@ -8,6 +8,7 @@ use Ivory\Ivory;
 use Ivory\Lang\SqlPattern\SqlPattern;
 use Ivory\Lang\SqlPattern\SqlPatternPlaceholder;
 use Ivory\Type\ITypeDictionary;
+use Ivory\Type\IValueSerializer;
 use Ivory\Utils\StringUtils;
 
 trait SqlPatternDefinitionMacros
@@ -261,8 +262,10 @@ trait SqlPatternDefinitionMacros
         return (bool)preg_match('~^[^ \t\r\n]~u', $curSqlTorso);
     }
 
-    public static function getRequiredTypeForTypeDictionary(SqlPatternPlaceholder $placeholder): array
-    {
+    public static function getReferencedSerializer(
+        SqlPatternPlaceholder $placeholder,
+        ITypeDictionary $typeDictionary
+    ): IValueSerializer {
         $typeName = $placeholder->getTypeName();
         if (!$placeholder->isTypeNameQuoted()) {
             $typeName = mb_strtolower($typeName); // OPT: SqlPatternPlaceholder might also store the lower-case name, which might be cached
@@ -277,7 +280,15 @@ trait SqlPatternDefinitionMacros
             $schemaName = false;
         }
 
-        return [$schemaName, $typeName];
+        $serializer = null;
+        if ($schemaName === null) {
+            $serializer = $typeDictionary->getValueSerializer($typeName);
+        }
+        if ($serializer === null) {
+            $serializer = $typeDictionary->requireTypeByName($typeName, $schemaName);
+        }
+
+        return $serializer;
     }
 
 
@@ -353,15 +364,7 @@ trait SqlPatternDefinitionMacros
             }
 
             if ($placeholder->getTypeName() !== null) {
-                [$schemaName, $typeName] = static::getRequiredTypeForTypeDictionary($placeholder);
-
-                $serializer = null;
-                if ($schemaName === null) {
-                    $serializer = $typeDictionary->getValueSerializer($typeName);
-                }
-                if ($serializer === null) {
-                    $serializer = $typeDictionary->requireTypeByName($typeName, $schemaName);
-                }
+                $serializer = static::getReferencedSerializer($placeholder, $typeDictionary);
             } else {
                 $serializer = $typeDictionary->requireTypeByValue($value);
             }

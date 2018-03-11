@@ -2,10 +2,10 @@
 declare(strict_types=1);
 namespace Ivory\Relation;
 
+use Ivory\Type\IValueSerializer;
 use Ivory\Value\Alg\IValueEqualizer;
 use Ivory\Value\Alg\IValueFilter;
 use Ivory\Value\Alg\IValueHasher;
-use Ivory\Type\IType;
 
 /**
  * Column of a relation.
@@ -22,9 +22,10 @@ interface IColumn extends \Traversable, \Countable
     function getName(): ?string;
 
     /**
-     * @return IType|null type of the column if known (it is unknown for columns on tuple evaluators)
+     * @return IValueSerializer|null type of the column if known (it is unknown for columns on tuple evaluators), or
+     *                               just a value serializer to be used for serializing the values to SQL
      */
-    function getType(): ?IType;
+    function getType(): ?IValueSerializer;
 
     /**
      * @param string $newName

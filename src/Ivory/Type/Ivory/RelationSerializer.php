@@ -50,7 +50,7 @@ class RelationSerializer extends ConnectionDependentValueSerializer
 
     /**
      * @param IRelation $relation
-     * @return array list: pair (column name, type object)
+     * @return array list: pair (column name, {@link IValueSerializer} object)
      */
     private function recognizeRelationColumns(IRelation $relation): array
     {
@@ -102,10 +102,10 @@ class RelationSerializer extends ConnectionDependentValueSerializer
     {
         $identSerializer = $this->getIdentifierSerializer();
         $result = 'SELECT';
-        foreach ($columns as $i => list($colName, $type)) {
+        foreach ($columns as $i => list($colName, $serializer)) {
             $result .= ($i == 0 ? ' ' : ', ') . 'NULL';
-            if ($type instanceof INamedDbObject) {
-                $result .= "::{$type->getSchemaName()}.{$type->getName()}";
+            if ($serializer instanceof INamedDbObject) {
+                $result .= "::{$serializer->getSchemaName()}.{$serializer->getName()}";
             }
             $result .= ' AS ' . $identSerializer->serializeValue($colName);
         }
@@ -132,8 +132,8 @@ VAL;
                 if ($colIdx > 0) {
                     $result .= ', ';
                 }
-                /** @var IValueSerializer $serializer */
                 $serializer = $columns[$colIdx][1];
+                assert($serializer instanceof IValueSerializer);
                 $result .= $serializer->serializeValue($val);
                 if ($isFirstTuple && $serializer instanceof INamedDbObject) {
                     $result .= "::{$serializer->getSchemaName()}.{$serializer->getName()}";

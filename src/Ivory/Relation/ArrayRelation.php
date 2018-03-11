@@ -8,7 +8,7 @@ use Ivory\Ivory;
 use Ivory\Query\SqlPatternDefinitionMacros;
 use Ivory\Type\ConnectionDependentObject;
 use Ivory\Type\IConnectionDependentObject;
-use Ivory\Type\IType;
+use Ivory\Type\IValueSerializer;
 
 /**
  * Relation built from an array of rows.
@@ -50,7 +50,7 @@ class ArrayRelation extends RelationBase implements IConnectionDependentObject
      *
      * The relation columns may optionally be defined using the second parameter `$typeMap`. It is an ordered map of
      * column names to the specification of their types, which may either be:
-     * - an {@link IType} object, or
+     * - an {@link IType} or {@link IValueSerializer} object, or
      * - a string type specification (name or alias) as it would be used in an {@link SqlPattern} after the `%` sign,
      * - `null` to let the type dictionary infer the type automatically (more details below).
      *
@@ -67,8 +67,6 @@ class ArrayRelation extends RelationBase implements IConnectionDependentObject
      * When inferring the type, the first non-`null` value of the column is used. If only `null`s are present in the
      * column, the type registered for `null` values is requested from the type dictionary. The autodetection is
      * performed using the type dictionary used by the connection which this relation gets attached to.
-     *
-     * @todo except IType objects, also support IValueSerializer objects - does IRelation Column really need IType, or is IValueSerializer sufficient?
      *
      * @param array $rows list of data rows, each a map of column names to values
      * @param array $typeMap optional map specifying columns mutual order and types
@@ -127,7 +125,7 @@ class ArrayRelation extends RelationBase implements IConnectionDependentObject
     }
 
     /**
-     * @return IType[] unordered map: column name => type converter
+     * @return IValueSerializer[] unordered map: column name => type converter
      */
     private function inferTypes(): array
     {
@@ -135,7 +133,7 @@ class ArrayRelation extends RelationBase implements IConnectionDependentObject
         $toParse = [];
         $toInfer = [];
         foreach ($this->typeMap as $colName => $typeSpec) {
-            if ($typeSpec instanceof IType) {
+            if ($typeSpec instanceof IValueSerializer) {
                 $result[$colName] = $typeSpec;
             } elseif (is_string($typeSpec)) {
                 $toParse[$colName] = $typeSpec;
@@ -154,8 +152,7 @@ class ArrayRelation extends RelationBase implements IConnectionDependentObject
             foreach ($toParse as $colName => $typeSpecStr) {
                 $pattern = $parser->parse('%' . $typeSpecStr);
                 $placeholder = $pattern->getPositionalPlaceholders()[0];
-                [$schemaName, $typeName] = SqlPatternDefinitionMacros::getRequiredTypeForTypeDictionary($placeholder);
-                $result[$colName] = $typeDictionary->requireTypeByName($typeName, $schemaName);
+                $result[$colName] = SqlPatternDefinitionMacros::getReferencedSerializer($placeholder, $typeDictionary);
             }
         }
 

@@ -2,9 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Relation;
 
+use Ivory\Type\IValueSerializer;
 use Ivory\Value\Alg\CallbackValueFilter;
 use Ivory\Value\Alg\IValueFilter;
-use Ivory\Type\IType;
 
 class FilteredColumn implements \IteratorAggregate, IColumn, ICachingDataProcessor
 {
@@ -51,7 +51,7 @@ class FilteredColumn implements \IteratorAggregate, IColumn, ICachingDataProcess
         return $this->baseCol->getName();
     }
 
-    public function getType(): ?IType
+    public function getType(): ?IValueSerializer
     {
         return $this->baseCol->getType();
     }

@@ -70,6 +70,25 @@ class ArrayRelationTest extends IvoryTestCase
         $this->assertNull($tuple1->{5});
     }
 
+    public function testFromRowsWithValueSerializers()
+    {
+        $arrRel = ArrayRelation::fromRows(
+            [
+                ['val' => 'a', 'cond' => 'TRUE'],
+                ['val' => 'b', 'cond' => '1 = 3'],
+            ],
+            ['val' => 'text', 'cond' => 'sql']
+        );
+
+        $conn = $this->getIvoryConnection();
+        $rel = $conn->query(
+            '%rel WHERE cond',
+            $arrRel
+        );
+        $this->assertSame(1, $rel->count());
+        $this->assertSame('a', $rel->value('val'));
+    }
+
     public function testSerialize()
     {
         $orig = ArrayRelation::fromRows(

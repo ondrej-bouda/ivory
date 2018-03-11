@@ -2,12 +2,12 @@
 declare(strict_types=1);
 namespace Ivory\Relation;
 
+use Ivory\Type\IValueSerializer;
 use Ivory\Value\Alg\CallbackValueEqualizer;
 use Ivory\Value\Alg\CallbackValueHasher;
 use Ivory\Value\Alg\ITupleEvaluator;
 use Ivory\Value\Alg\IValueEqualizer;
 use Ivory\Value\Alg\IValueHasher;
-use Ivory\Type\IType;
 use Ivory\Value\Alg\ComparisonUtils;
 
 class Column implements \IteratorAggregate, IColumn
@@ -22,9 +22,10 @@ class Column implements \IteratorAggregate, IColumn
      * @param IRelation $relation relation the column is a part of
      * @param int|string|ITupleEvaluator|\Closure $colDef offset or tuple evaluator of the column within the relation
      * @param string|null $name name of the column, or <tt>null</tt> if not named
-     * @param IType|null $type type of the column values
+     * @param IValueSerializer|null $type type of the column values, or just a serializer to SQL, or <tt>null</tt> if
+     *                                    this is a computed column without explicit type specification
      */
-    public function __construct(IRelation $relation, $colDef, ?string $name, ?IType $type)
+    public function __construct(IRelation $relation, $colDef, ?string $name, ?IValueSerializer $type)
     {
         $this->relation = $relation;
         $this->colDef = $colDef;
@@ -38,7 +39,7 @@ class Column implements \IteratorAggregate, IColumn
         return $this->name;
     }
 
-    public function getType(): ?IType
+    public function getType(): ?IValueSerializer
     {
         return $this->type;
     }
