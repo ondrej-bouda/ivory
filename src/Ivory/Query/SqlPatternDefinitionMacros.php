@@ -261,6 +261,26 @@ trait SqlPatternDefinitionMacros
         return (bool)preg_match('~^[^ \t\r\n]~u', $curSqlTorso);
     }
 
+    public static function getRequiredTypeForTypeDictionary(SqlPatternPlaceholder $placeholder): array
+    {
+        $typeName = $placeholder->getTypeName();
+        if (!$placeholder->isTypeNameQuoted()) {
+            $typeName = mb_strtolower($typeName); // OPT: SqlPatternPlaceholder might also store the lower-case name, which might be cached
+        }
+
+        $schemaName = $placeholder->getSchemaName();
+        if ($schemaName !== null) {
+            if (!$placeholder->isSchemaNameQuoted()) {
+                $schemaName = mb_strtolower($schemaName); // OPT: SqlPatternPlaceholder might also store the lower-case name, which might be cached
+            }
+        } elseif ($placeholder->isTypeNameQuoted()) {
+            $schemaName = false;
+        }
+
+        return [$schemaName, $typeName];
+    }
+
+
     final private function __construct(SqlPattern $sqlPattern, array $positionalParameters)
     {
         $this->sqlPattern = $sqlPattern;
@@ -333,18 +353,7 @@ trait SqlPatternDefinitionMacros
             }
 
             if ($placeholder->getTypeName() !== null) {
-                $typeName = $placeholder->getTypeName();
-                if (!$placeholder->isTypeNameQuoted()) {
-                    $typeName = mb_strtolower($typeName); // OPT: SqlPatternPlaceholder might also store the lower-case name, which might be cached
-                }
-                $schemaName = $placeholder->getSchemaName();
-                if ($schemaName !== null) {
-                    if (!$placeholder->isSchemaNameQuoted()) {
-                        $schemaName = mb_strtolower($schemaName); // OPT: SqlPatternPlaceholder might also store the lower-case name, which might be cached
-                    }
-                } elseif ($placeholder->isTypeNameQuoted()) {
-                    $schemaName = false;
-                }
+                [$schemaName, $typeName] = static::getRequiredTypeForTypeDictionary($placeholder);
 
                 $serializer = null;
                 if ($schemaName === null) {
