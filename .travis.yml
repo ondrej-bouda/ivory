@@ -18,15 +18,16 @@ before_install:
   - if [ "$POSTGRESQL_VERSION" -eq 10 ]; then sudo apt-get remove -q 'postgresql-*' && sudo apt-get install -q postgresql-10 postgresql-client-10 && sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf; fi
   - sudo sed -e 's~#\?max_prepared_transactions = 0~max_prepared_transactions = 1~' --in-place /etc/postgresql/$POSTGRESQL_VERSION/main/postgresql.conf
   - if [ "$POSTGRESQL_VERSION" -eq 10 ]; then sudo service postgresql restart; else sudo service postgresql start $POSTGRESQL_VERSION; fi
-  - psql -c "SELECT version()" -U postgres
+  - psql -U postgres -c "SELECT version()"
   - composer self-update
 
 install:
   - composer install
 
 before_script:
-  - psql -c "CREATE USER ivory PASSWORD 'ivoryivory'" -U postgres
-  - psql -c "CREATE DATABASE ivory_test OWNER ivory" -U postgres
+  - psql -U postgres -c "CREATE USER ivory PASSWORD 'ivoryivory'"
+  - psql -U postgres -c "CREATE DATABASE ivory_test OWNER ivory"
+  - psql -U postgres -d ivory_test -c "CREATE EXTENSION IF NOT EXISTS hstore"
   - cp test/phpunit.template.xml test/phpunit.xml
   - sed -e 's~\(name="DB_HOST" value="\).*\("\)~\1\2~' --in-place test/phpunit.xml
   - sed -e 's~\(name="DB_PORT" value="\).*\("\)~\1\2~' --in-place test/phpunit.xml
