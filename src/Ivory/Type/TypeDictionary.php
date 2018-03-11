@@ -137,7 +137,12 @@ class TypeDictionary implements ITypeDictionary
 
     private function inferObjectType($value, $ruleSet): ?array
     {
-        $valueClass = new \ReflectionClass($value);
+        try {
+            $valueClass = new \ReflectionClass($value);
+        } catch (\ReflectionException $e) {
+            throw new \InvalidArgumentException('$value is neither an object nor a classname');
+        }
+
         $class = $valueClass;
         do {
             $name = $class->getName();
