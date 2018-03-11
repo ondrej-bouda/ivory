@@ -28,6 +28,16 @@ class ArrayRelation extends RelationBase implements IConnectionDependentObject
     private $rows;
     private $numRows;
 
+    public function __sleep()
+    {
+        return ['typeMap', 'rows'];
+    }
+
+    public function __wakeup()
+    {
+        $this->init();
+    }
+
     /**
      * Creates an array relation from a list of rows.
      *
@@ -89,8 +99,13 @@ class ArrayRelation extends RelationBase implements IConnectionDependentObject
 
         $this->typeMap = $typeMap;
         $this->rows = $rows;
-        $this->numRows = count($rows);
-        $this->colNameMap = array_flip(array_keys($typeMap));
+        $this->init();
+    }
+
+    private function init()
+    {
+        $this->numRows = count($this->rows);
+        $this->colNameMap = array_flip(array_keys($this->typeMap));
     }
 
     public function attachToConnection(IConnection $connection): void

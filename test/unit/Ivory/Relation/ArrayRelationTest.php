@@ -35,24 +35,56 @@ class ArrayRelationTest extends IvoryTestCase
 
         $arrRel = ArrayRelation::fromRows(
             [
-                ['b' => true, '4.0', '4.0', 4.0, ['a' => 4, 'b' => 'str'], Range::fromBounds(5, 10, '[]')]
+                [null, null, null, null, null, null],
+                ['b' => true, '4.0', '4.0', 4.0, ['a' => 4, 'b' => 'str'], Range::fromBounds(5, 10, '[]'), null]
             ],
-            ['int', 'b' => 'bool', 's', null, 'public.hstore', $intRangeType]
+            ['int', 'b' => 'bool', 's', null, 'public.hstore', $intRangeType, null]
         );
-        $tuple = $conn->querySingleTuple(
+        $rel = $conn->query(
             '%rel',
             $arrRel
         );
+        $tuple0 = $rel->tuple(0);
+        $tuple1 = $rel->tuple(1);
+
         $this->assertSame(
-            [0, 'b', 1, 2, 3, 4],
-            array_keys($tuple->toMap()),
+            [0, 'b', 1, 2, 3, 4, 5],
+            array_keys($tuple1->toMap()),
             'The order of relation columns does not correspond to the type specification.'
         );
-        $this->assertSame(4, $tuple->{0});
-        $this->assertSame(true, $tuple->b);
-        $this->assertSame('4.0', $tuple->{1});
-        $this->assertSame(4.0, $tuple->{2});
-        $this->assertSame(['a' => '4', 'b' => 'str'], $tuple->{3});
-        $this->assertTrue(Range::fromBounds(5, 11)->equals($tuple->{4}));
+
+        $this->assertNull($tuple0->{0});
+        $this->assertNull($tuple0->b);
+        $this->assertNull($tuple0->{1});
+        $this->assertNull($tuple0->{2});
+        $this->assertNull($tuple0->{3});
+        $this->assertNull($tuple0->{4});
+        $this->assertNull($tuple0->{5});
+
+        $this->assertSame(4, $tuple1->{0});
+        $this->assertSame(true, $tuple1->b);
+        $this->assertSame('4.0', $tuple1->{1});
+        $this->assertSame(4.0, $tuple1->{2});
+        $this->assertSame(['a' => '4', 'b' => 'str'], $tuple1->{3});
+        $this->assertTrue(Range::fromBounds(5, 11)->equals($tuple1->{4}));
+        $this->assertNull($tuple1->{5});
+    }
+
+    public function testSerialize()
+    {
+        $orig = ArrayRelation::fromRows(
+            [
+                ['a' => 5, 'b' => true, 'c' => 6],
+                ['a' => 7, 'b' => false, 'c' => -1]
+            ],
+            ['a' => 'int', 'b' => null, 'c' => 's']
+        );
+        $serialized = serialize($orig);
+        $unserialized = unserialize($serialized);
+
+        $this->assertInstanceOf(ArrayRelation::class, $unserialized);
+        assert($unserialized instanceof ArrayRelation);
+
+        $this->assertSame(['a' => 5, 'b' => true, 'c' => 6], $unserialized->tuple(0)->toMap());
     }
 }
