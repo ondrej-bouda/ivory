@@ -24,7 +24,7 @@ class QueryResult extends Result implements IQueryResult
     private $columns;
     /** @var array map: column name => offset of the first column of the name, or {@link Tuple::AMBIGUOUS_COL} */
     private $colNameMap;
-    /** @var IType[] */
+    /** @var IType[] list of column type converters; $this->columns could be used, but this is faster */
     private $colTypes;
 
 
@@ -77,7 +77,7 @@ class QueryResult extends Result implements IQueryResult
             if ($typeOid === false || $typeOid === null) { // NOTE: besides false, pg_field_type_oid() might return NULL on error
                 throw new InvalidResultException("Error retrieving type OID of result column $i.");
             }
-            // NOTE: the type dictionary may change during the iterations, so taky a fresh one every time
+            // NOTE: the type dictionary may change during the iterations, so take a fresh one every time
             $typeDictionary = $typeControl->getTypeDictionary();
             $type = $typeDictionary->requireTypeByOid($typeOid);
 
