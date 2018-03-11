@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
-use Ivory\Connection\IConnection;
+use Ivory\Type\ConnectionDependentObject;
 use Ivory\Type\IConnectionDependentObject;
 
 /**
@@ -23,18 +23,7 @@ use Ivory\Type\IConnectionDependentObject;
  */
 class RecordType extends RowTypeBase implements IConnectionDependentObject
 {
-    /** @var IConnection */
-    private $conn;
-
-    public function attachToConnection(IConnection $connection): void
-    {
-        $this->conn = $connection;
-    }
-
-    public function detachFromConnection(): void
-    {
-        $this->conn = null;
-    }
+    use ConnectionDependentObject;
 
     protected function parseItem(int $pos, string $itemExtRepr)
     {
@@ -48,7 +37,7 @@ class RecordType extends RowTypeBase implements IConnectionDependentObject
 
     protected function serializeBody(string &$result, $value): int
     {
-        $typeDictionary = $this->conn->getTypeDictionary();
+        $typeDictionary = $this->getConnection()->getTypeDictionary();
 
         $cnt = 0;
         foreach ($value as $item) {

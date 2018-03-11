@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Type\Ivory;
 
 use Ivory\Connection\IConnection;
+use Ivory\Type\ConnectionDependentObject;
 use Ivory\Type\IConnectionDependentObject;
 use Ivory\Type\IValueSerializer;
 
@@ -11,27 +12,12 @@ use Ivory\Type\IValueSerializer;
  */
 abstract class ConnectionDependentValueSerializer implements IValueSerializer, IConnectionDependentObject
 {
-    private $conn;
+    use ConnectionDependentObject;
 
     public function __construct(?IConnection $connection = null)
     {
         if ($connection !== null) {
             $this->attachToConnection($connection);
         }
-    }
-
-    public function attachToConnection(IConnection $connection): void
-    {
-        $this->conn = $connection;
-    }
-
-    public function detachFromConnection(): void
-    {
-        $this->conn = null;
-    }
-
-    protected function getConnection(): IConnection
-    {
-        return $this->conn;
     }
 }
