@@ -8,8 +8,15 @@ namespace Ivory\Type;
 class TrackingTypeDictionary extends TypeDictionary
 {
     private $watchTypeUsage = true;
-    /** @var array map: SPL object hash of the type object => true */
-    private $usedTypes = [];
+    private $usedTypes;
+
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->usedTypes = new \SplObjectStorage();
+    }
 
     /**
      * Marks all types in this dictionary, which are also contained in the given dictionary, as used.
@@ -44,8 +51,7 @@ class TrackingTypeDictionary extends TypeDictionary
 
     private function markTypeUsage(IType $type): void
     {
-        $hash = spl_object_hash($type);
-        $this->usedTypes[$hash] = true;
+        $this->usedTypes->attach($type);
     }
 
     public function enableTypeUsageWatching(): void
@@ -60,15 +66,14 @@ class TrackingTypeDictionary extends TypeDictionary
 
     public function resetTypeUsageStats(): void
     {
-        $this->usedTypes = [];
+        $this->usedTypes = new \SplObjectStorage();
     }
 
     public function disposeUnusedTypes(): void
     {
         foreach ($this->collectObjects(IType::class) as $type) {
             assert($type instanceof IType);
-            $hash = spl_object_hash($type);
-            if (!isset($this->usedTypes[$hash])) {
+            if (!$this->usedTypes->contains($type)) {
                 $this->disposeType($type);
             }
         }

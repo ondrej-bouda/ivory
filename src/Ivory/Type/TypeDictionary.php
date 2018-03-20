@@ -41,6 +41,10 @@ class TypeDictionary implements ITypeDictionary
         ];
     }
 
+    public function __construct()
+    {
+    }
+
     //region ITypeDictionary
 
     public function requireTypeByOid(int $oid): IType
