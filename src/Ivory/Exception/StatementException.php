@@ -105,7 +105,7 @@ class StatementException extends \RuntimeException
      *                one of <tt>ERROR</tt>, <tt>FATAL</tt>, or <tt>PANIC</tt> (for errors), or <tt>WARNING</tt>,
      *                  <tt>NOTICE</tt>, <tt>DEBUG</tt>, <tt>INFO</tt>, or <tt>LOG</tt> (in a notice message)
      */
-    final public function getNonlocalizedSeverity(): string
+    final public function getNonlocalizedSeverity(): ?string
     {
         if (PHP_VERSION_ID >= 70300) {
             /** @noinspection PhpUndefinedConstantInspection */
