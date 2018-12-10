@@ -10,15 +10,16 @@ env:
   - POSTGRESQL_VERSION=9.5
   - POSTGRESQL_VERSION=9.6
   - POSTGRESQL_VERSION=10
+  - POSTGRESQL_VERSION=11
 
 before_install:
   - sudo apt-get update
   - sudo apt-get install -q language-pack-cs language-pack-ja
   - sudo service postgresql stop
   # PostgreSQL 10 is not supported on Travis yet; workaround taken from https://github.com/travis-ci/travis-ci/issues/8537#issuecomment-354020356
-  - if [ "$POSTGRESQL_VERSION" -eq 10 ]; then sudo apt-get remove -q 'postgresql-*' && sudo apt-get install -q postgresql-10 postgresql-client-10 && sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf; fi
-  - sudo sed -e 's~#\?max_prepared_transactions = 0~max_prepared_transactions = 1~' --in-place /etc/postgresql/$POSTGRESQL_VERSION/main/postgresql.conf
-  - if [ "$POSTGRESQL_VERSION" -eq 10 ]; then sudo service postgresql restart; else sudo service postgresql start $POSTGRESQL_VERSION; fi
+  - if [ "$POSTGRESQL_VERSION" -ge 10 ]; then sudo apt-get remove -q 'postgresql-*' && sudo apt-get install -q "postgresql-$POSTGRESQL_VERSION" "postgresql-client-$POSTGRESQL_VERSION" && sudo cp /etc/postgresql/{9.6,$POSTGRESQL_VERSION}/main/pg_hba.conf; fi
+  - sudo sed -e 's~#\?max_prepared_transactions = 0~max_prepared_transactions = 1~' --in-place "/etc/postgresql/$POSTGRESQL_VERSION/main/postgresql.conf"
+  - if [ "$POSTGRESQL_VERSION" -ge 10 ]; then sudo service postgresql restart; else sudo service postgresql start "$POSTGRESQL_VERSION"; fi
   - psql -U postgres -c "SELECT version()"
   - composer self-update
 
