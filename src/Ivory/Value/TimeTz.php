@@ -15,9 +15,9 @@ namespace Ivory\Value;
  * timezone, not just its offset.
  *
  * The objects are {@link IEqualable}, which considers two time representations equal only if they have both the time
- * part and the timezone offset equal. The same logic is used for the PHP `<`, `==`, and `>` operators. To compare the
- * physical time of two {@link TimeTz} objects, use the {@link TimeTz::occursBefore()}, {@link TimeTz::occursAt()} and
- * {@link TimeTz::occursAfter()} methods.
+ * part and the timezone offset equal. The same logic is used for the PHP `==` operator. Behaviour of the PHP `<` and
+ * `>` operators is undefined. To compare the physical time of two {@link TimeTz} objects, use the
+ * {@link TimeTz::occursBefore()}, {@link TimeTz::occursAt()} and {@link TimeTz::occursAfter()} methods.
  *
  * The objects are immutable, i.e., operations always produce a new object.
  *
@@ -203,6 +203,33 @@ class TimeTz extends TimeBase
     public function toUnixTimestamp($date = null)
     {
         return parent::toUnixTimestamp($date) - $this->offset;
+    }
+
+    /**
+     * @param TimeTz $other
+     * @return bool whether this and the other time happen in the exact same moment
+     */
+    public function occursAt(TimeTz $other): bool
+    {
+        return ($this->toUnixTimestamp() == $other->toUnixTimestamp());
+    }
+
+    /**
+     * @param TimeTz $other
+     * @return bool whether this time happens before the given other time
+     */
+    public function occursBefore(TimeTz $other): bool
+    {
+        return ($this->toUnixTimestamp() < $other->toUnixTimestamp());
+    }
+
+    /**
+     * @param TimeTz $other
+     * @return bool whether this time happens after the given other time
+     */
+    public function occursAfter(TimeTz $other): bool
+    {
+        return ($this->toUnixTimestamp() > $other->toUnixTimestamp());
     }
 
     /**

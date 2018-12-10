@@ -93,14 +93,51 @@ class TimeTzTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEquals(self::t(7, 45, 3, 3600), self::t(8, 45, 3, 7200));
     }
 
-    public function testInequalityOperator()
+    public function testOccursAt()
     {
-        // arguments for the less-than assertion: 1) the value to be the greater one, 2) the value to be the lesser one
-        $this->assertLessThan(self::t(8, 9, 10, 0), self::t(8, 9, 9.9999999, 0));
-        $this->assertLessThan(self::t(24, 0, 0, 0), self::t(23, 59, 59, 0));
+        $this->assertTrue(self::t(23, 59, 59, 0)->occursAt(self::t(23, 59, 59, 0)));
+        $this->assertTrue(self::t(11, 12, 13, 7200)->occursAt(self::t(10, 12, 13, 3600)));
 
-        $this->assertLessThan(self::t(11, 12, 13, 7200), self::t(11, 12, 13, 3600));
-        $this->assertLessThan(self::t(11, 12, 13, 3600), self::t(11, 12, 12, 7200));
+        $this->assertFalse(self::t(8, 9, 9.9999999, 0)->occursAt(self::t(8, 9, 10, 0)));
+        $this->assertFalse(self::t(23, 59, 59, 0)->occursAt(self::t(24, 0, 0, 0)));
+
+        $this->assertFalse(self::t(11, 12, 13, 7200)->occursAt(self::t(11, 12, 13, 3600)));
+    }
+
+    public function testOccursBefore()
+    {
+        $this->assertFalse(self::t(23, 59, 59, 0)->occursBefore(self::t(23, 59, 59, 0)));
+        $this->assertFalse(self::t(11, 12, 13, 7200)->occursBefore(self::t(10, 12, 13, 3600)));
+
+        $this->assertTrue(self::t(8, 9, 9.9999999, 0)->occursBefore(self::t(8, 9, 10, 0)));
+        $this->assertTrue(self::t(23, 59, 59, 0)->occursBefore(self::t(24, 0, 0, 0)));
+
+        $this->assertTrue(self::t(11, 12, 13, 7200)->occursBefore(self::t(11, 12, 13, 3600)));
+        $this->assertTrue(self::t(11, 12, 12, 7200)->occursBefore(self::t(11, 12, 13, 3600)));
+
+        $this->assertFalse(self::t(8, 9, 10, 0)->occursBefore(self::t(8, 9, 9.9999999, 0)));
+        $this->assertFalse(self::t(24, 0, 0, 0)->occursBefore(self::t(23, 59, 59, 0)));
+
+        $this->assertFalse(self::t(11, 12, 13, 3600)->occursBefore(self::t(11, 12, 13, 7200)));
+        $this->assertFalse(self::t(11, 12, 13, 3600)->occursBefore(self::t(11, 12, 12, 7200)));
+    }
+
+    public function testOccurAfter()
+    {
+        $this->assertFalse(self::t(23, 59, 59, 0)->occursAfter(self::t(23, 59, 59, 0)));
+        $this->assertFalse(self::t(11, 12, 13, 7200)->occursAfter(self::t(10, 12, 13, 3600)));
+
+        $this->assertTrue(self::t(8, 9, 10, 0)->occursAfter(self::t(8, 9, 9.9999999, 0)));
+        $this->assertTrue(self::t(24, 0, 0, 0)->occursAfter(self::t(23, 59, 59, 0)));
+
+        $this->assertTrue(self::t(11, 12, 13, 3600)->occursAfter(self::t(11, 12, 13, 7200)));
+        $this->assertTrue(self::t(11, 12, 13, 3600)->occursAfter(self::t(11, 12, 12, 7200)));
+
+        $this->assertFalse(self::t(8, 9, 9.9999999, 0)->occursAfter(self::t(8, 9, 10, 0)));
+        $this->assertFalse(self::t(23, 59, 59, 0)->occursAfter(self::t(24, 0, 0, 0)));
+
+        $this->assertFalse(self::t(11, 12, 13, 7200)->occursAfter(self::t(11, 12, 13, 3600)));
+        $this->assertFalse(self::t(11, 12, 12, 7200)->occursAfter(self::t(11, 12, 13, 3600)));
     }
 
     public function testFromString()
