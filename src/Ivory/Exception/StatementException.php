@@ -49,6 +49,10 @@ class StatementException extends \RuntimeException
             PGSQL_DIAG_INTERNAL_POSITION,
             PGSQL_DIAG_CONTEXT,
         ];
+        if (PHP_VERSION_ID >= 70300) {
+            /** @noinspection PhpUndefinedConstantInspection */
+            $fields[] = PGSQL_DIAG_SEVERITY_NONLOCALIZED;
+        }
         foreach ($fields as $f) {
             $this->errorFields[$f] = pg_result_error_field($resultHandler, $f);
         }
@@ -94,6 +98,21 @@ class StatementException extends \RuntimeException
     final public function getSeverity(): string
     {
         return $this->errorFields[PGSQL_DIAG_SEVERITY];
+    }
+
+    /**
+     * @return string the nonlocalized severity of the error;
+     *                one of <tt>ERROR</tt>, <tt>FATAL</tt>, or <tt>PANIC</tt> (for errors), or <tt>WARNING</tt>,
+     *                  <tt>NOTICE</tt>, <tt>DEBUG</tt>, <tt>INFO</tt>, or <tt>LOG</tt> (in a notice message)
+     */
+    final public function getNonlocalizedSeverity(): string
+    {
+        if (PHP_VERSION_ID >= 70300) {
+            /** @noinspection PhpUndefinedConstantInspection */
+            return $this->errorFields[PGSQL_DIAG_SEVERITY_NONLOCALIZED];
+        } else {
+            throw new UnsupportedException('Nonlocalized severity is only supported on PHP >= 7.3');
+        }
     }
 
     /**
