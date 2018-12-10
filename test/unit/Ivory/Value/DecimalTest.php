@@ -504,10 +504,10 @@ class DecimalTest extends \PHPUnit\Framework\TestCase
     public function testSqrt()
     {
         $this->assertTrue(Decimal::NaN()->sqrt()->isNaN());
-        $this->assertSame('4.00000000000000000', Decimal::fromNumber(16)->sqrt()->toString());
-        $this->assertSame('4.20000000000000000', Decimal::fromNumber(17.64)->sqrt()->toString());
-        $this->assertSame('4.12310562561766054', Decimal::fromNumber(17)->sqrt()->toString());
-        $this->assertSame('0', Decimal::fromNumber(0)->sqrt()->toString());
+        $this->assertSame('4.0000000000000000', Decimal::fromNumber(16)->sqrt()->toString());
+        $this->assertSame('4.2000000000000000', Decimal::fromNumber(17.64)->sqrt()->toString());
+        $this->assertSame('4.1231056256176605', Decimal::fromNumber(17)->sqrt()->toString());
+        $this->assertSame('0.0000000000000000', Decimal::fromNumber(0)->sqrt()->toString());
 
         try {
             Decimal::fromNumber(-9)->sqrt();

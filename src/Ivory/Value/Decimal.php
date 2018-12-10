@@ -645,7 +645,7 @@ class Decimal implements IComparable
             throw new UndefinedOperationException('square root of negative number');
         }
         $scale = max($this->scale, self::MIN_SIG_DIGITS);
-        return new Decimal(bcsqrt($this->val, $scale + 1));
+        return new Decimal(bcsqrt($this->val, $scale + 1), $scale);
     }
 
 
