@@ -34,6 +34,9 @@ coding_style:
                 after_type_cast: false
 
 build:
+    environment:
+        php:
+            version: 7.3
     nodes:
         analysis:
             project_setup:
