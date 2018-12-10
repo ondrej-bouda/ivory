@@ -6,7 +6,6 @@ use Ivory\Connection\ConnectionControl;
 use Ivory\Connection\IObservableTransactionControl;
 use Ivory\Connection\IStatementExecution;
 use Ivory\Exception\UnsupportedException;
-use Ivory\Result\IQueryResult;
 use Ivory\Value\Quantity;
 
 /**
@@ -329,7 +328,6 @@ class ConnConfig implements IObservableConnConfig
 
     public function getMoneyDecimalSeparator(): string
     {
-        /** @var IQueryResult $r */
         $r = $this->stmtExec->rawQuery('SELECT 1.2::money::text');
         $v = $r->value();
         if (preg_match('~1(\D*)2~', $v, $m)) {

@@ -3,7 +3,6 @@ declare(strict_types=1);
 namespace Ivory\Connection;
 
 use Ivory\Exception\InvalidStateException;
-use Ivory\Result\IQueryResult;
 use Ivory\Type\IValueSerializer;
 use Ivory\Type\Ivory\IdentifierSerializer;
 use Ivory\Type\Std\StringType;
@@ -114,7 +113,6 @@ class TxHandle implements ITxHandle
     {
         $this->assertOpen();
 
-        /** @var IQueryResult $r */
         $r = $this->stmtExec->rawQuery('SELECT pg_export_snapshot()');
         return $r->value();
     }

@@ -309,9 +309,7 @@ class TypeDictionary implements ITypeDictionary
             unset($this->searchedNameCache[$name]);
         }
 
-        if ($type instanceof IValueSerializer) {
-            self::removeAll($this->valueSerializers, $type);
-        }
+        self::removeAll($this->valueSerializers, $type);
     }
 
     private static function removeAll(array &$array, $item): void

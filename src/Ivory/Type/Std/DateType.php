@@ -110,42 +110,43 @@ class DateType extends ConnectionDependentBaseType implements ITotallyOrderedTyp
             return Date::minusInfinity();
         }
 
-        $parts = explode(' BC', $extRepr);
+        $bcPos = strpos($extRepr, ' BC');
+        $datePart = ($bcPos === false ? $extRepr : substr($extRepr, 0, $bcPos));
 
         switch ($this->modeRetriever->getValue()) {
             case self::MODE_ISO: // e.g., 1997-12-17
             case self::MODE_PG_YMD: // e.g., 1997-12-17
-                if (!isset($parts[1])) {
+                if ($bcPos === false) {
                     return Date::fromISOString($extRepr); // optimization of the major case
                 }
-                list($y, $m, $d) = explode('-', $parts[0]);
+                list($y, $m, $d) = explode('-', $datePart);
                 break;
 
             case self::MODE_GERMAN: // e.g., 17.12.1997
-                list($d, $m, $y) = explode('.', $parts[0]);
+                list($d, $m, $y) = explode('.', $datePart);
                 break;
 
             case self::MODE_SQL_DMY: // e.g., 17/12/1997
-                list($d, $m, $y) = explode('/', $parts[0]);
+                list($d, $m, $y) = explode('/', $datePart);
                 break;
 
             case self::MODE_SQL_MDY: // e.g., 12/17/1997
-                list($m, $d, $y) = explode('/', $parts[0]);
+                list($m, $d, $y) = explode('/', $datePart);
                 break;
 
             case self::MODE_PG_DMY: // e.g., 17-12-1997
-                list($d, $m, $y) = explode('-', $parts[0]);
+                list($d, $m, $y) = explode('-', $datePart);
                 break;
 
             case self::MODE_PG_MDY: // e.g., 12-17-1997
-                list($m, $d, $y) = explode('-', $parts[0]);
+                list($m, $d, $y) = explode('-', $datePart);
                 break;
 
             default:
                 throw new \UnexpectedValueException('Invalid parse mode: ' . $this->modeRetriever->getValue());
         }
 
-        if (isset($parts[1])) {
+        if ($bcPos !== false) {
             $y = -$y + 1; // year 2 BC is the ISO year -1
         }
         $isoStr = "$y-$m-$d";
