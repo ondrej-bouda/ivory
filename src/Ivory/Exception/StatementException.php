@@ -145,7 +145,11 @@ class StatementException extends \RuntimeException
      */
     final public function getStatementPosition(): ?int
     {
-        return $this->errorFields[PGSQL_DIAG_STATEMENT_POSITION];
+        if (isset($this->errorFields[PGSQL_DIAG_STATEMENT_POSITION])) {
+            return (int)$this->errorFields[PGSQL_DIAG_STATEMENT_POSITION];
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -164,7 +168,11 @@ class StatementException extends \RuntimeException
      */
     final public function getInternalPosition(): ?int
     {
-        return $this->errorFields[PGSQL_DIAG_INTERNAL_POSITION];
+        if (isset($this->errorFields[PGSQL_DIAG_INTERNAL_POSITION])) {
+            return (int)$this->errorFields[PGSQL_DIAG_INTERNAL_POSITION];
+        } else {
+            return null;
+        }
     }
 
     /**

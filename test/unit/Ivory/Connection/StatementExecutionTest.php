@@ -350,6 +350,57 @@ class StatementExecutionTest extends IvoryTestCase
             $tx->rollback();
         }
     }
+
+    public function testStatementException()
+    {
+        try {
+            $this->conn->query("SELECT\nfoo");
+            $this->fail(StatementException::class . ' expected');
+        } catch (StatementException $e) {
+            $this->assertSame("SELECT\nfoo", $e->getQuery());
+            $this->assertEquals(SqlState::fromCode(SqlState::UNDEFINED_COLUMN), $e->getSqlState());
+            $this->assertSame(SqlState::UNDEFINED_COLUMN, $e->getSqlStateCode());
+            $this->assertSame(8, $e->getStatementPosition());
+            $this->assertNull($e->getContext());
+            $this->assertNull($e->getInternalPosition());
+            $this->assertNull($e->getInternalQuery());
+            if (PHP_VERSION_ID >= 70300) {
+                $this->assertSame('ERROR', $e->getNonlocalizedSeverity());
+            }
+        }
+
+        $tx = $this->conn->startTransaction();
+        try {
+            $this->conn->command("SET lc_messages TO 'en_US.UTF-8'");
+            $this->conn->command(<<<'SQL'
+CREATE FUNCTION foo() RETURNS INT AS $$
+BEGIN
+    RETURN
+        bar;
+END;
+$$ LANGUAGE plpgsql
+SQL
+);
+            try {
+                $this->conn->query('SELECT foo()');
+                $this->fail(StatementException::class . ' expected');
+            } catch (StatementException $e) {
+                $this->assertSame('column "bar" does not exist', $e->getMessage());
+                $this->assertSame('SELECT foo()', $e->getQuery());
+                $this->assertEquals(SqlState::fromCode(SqlState::UNDEFINED_COLUMN), $e->getSqlState());
+                $this->assertSame(SqlState::UNDEFINED_COLUMN, $e->getSqlStateCode());
+                $this->assertNull($e->getStatementPosition());
+                $this->assertSame('PL/pgSQL function foo() line 3 at RETURN', $e->getContext());
+                $this->assertSame(8, $e->getInternalPosition());
+                $this->assertSame('SELECT bar', $e->getInternalQuery());
+                if (PHP_VERSION_ID >= 70300) {
+                    $this->assertSame('ERROR', $e->getNonlocalizedSeverity());
+                }
+            }
+        } finally {
+            $tx->rollback();
+        }
+    }
 }
 
 class StatementExecutionTest__LogarithmException extends StatementException
