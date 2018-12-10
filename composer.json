@@ -21,6 +21,7 @@
     "prefer-stable": true,
     "require": {
         "php": "^7.1",
+        "ext-bcmath": "*",
         "ext-mbstring": "*",
         "ext-pgsql": "*",
         "psr/cache": "^1.0"
