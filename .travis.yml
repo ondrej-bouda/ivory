@@ -27,7 +27,7 @@ install:
   - composer install
 
 before_script:
-  - psql -U postgres -c "CREATE USER ivory PASSWORD 'ivoryivory'"
+  - psql -U postgres -c "CREATE USER ivory PASSWORD 'ivoryivory' SUPERUSER NOCREATEDB NOCREATEROLE"
   - psql -U postgres -c "CREATE DATABASE ivory_test OWNER ivory"
   - psql -U postgres -d ivory_test -c "CREATE EXTENSION IF NOT EXISTS hstore"
   - cp test/phpunit.template.xml test/phpunit.xml
