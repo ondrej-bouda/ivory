@@ -34,7 +34,13 @@ class IPCControlTest extends IvoryTestCase
         $this->assertNull($this->conn1->pollNotification());
 
         $this->conn2->notify('test');
-        $notification = $this->conn1->pollNotification();
+        $safetyBreak = 100;
+        while (($notification = $this->conn1->pollNotification()) === null) {
+            if (--$safetyBreak < 0) {
+                break;
+            }
+            usleep(100000); // unfortunately, there is currently no better way than polling and waiting with php_pgsql
+        }
 
         $this->assertNotNull($notification);
         $this->assertSame('test', $notification->getChannel());

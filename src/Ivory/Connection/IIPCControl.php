@@ -6,6 +6,7 @@ namespace Ivory\Connection;
  * Encapsulation of the `LISTEN`/`NOTIFY` inter-process communication primitives.
  *
  * @todo extend to support object payload - consider serializing the payload, even if its a string
+ * @todo besides polling, offer waiting for a notification; currently, this requires PDO (PDO::pgsqlGetNotify())
  */
 interface IIPCControl
 {
@@ -57,7 +58,10 @@ interface IIPCControl
     /**
      * Polls the queue of waiting IPC notifications on channels being listened to.
      *
-     * @return Notification|null the next notification in the queue, or <tt>null</tt> if there is no notification there
+     * Execution is not blocked. The method returns immediately, either with the consumed notification, or with nothing.
+     *
+     * @return Notification|null the next notification in the queue, or <tt>null</tt> if there is currently no
+     *                             notification there
      */
     function pollNotification(): ?Notification;
 }
