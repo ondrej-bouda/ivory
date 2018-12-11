@@ -99,4 +99,9 @@ interface IConnConfig
      *                note this might even be an empty string if the currently configured currency has no decimal places
      */
     function getMoneyDecimalSeparator(): string;
+
+    /**
+     * @return int the PostgreSQL server version number, e.g., <tt>90600</tt> for 9.6.0 or <tt>110001</tt> for 11.1
+     */
+    function getServerVersionNumber(): int;
 }

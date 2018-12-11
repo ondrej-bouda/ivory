@@ -121,6 +121,7 @@ class ConnConfig implements IObservableConnConfig
             ConfigParam::INTEGER_DATETIMES => true,
             ConfigParam::SERVER_ENCODING => true,
             ConfigParam::SERVER_VERSION => true,
+            ConfigParam::SERVER_VERSION_NUM => true,
         ];
         if (isset($pgParStatusRecognized[$propertyName])) {
             $connHandler = $this->connCtl->requireConnection();
@@ -335,6 +336,11 @@ class ConnConfig implements IObservableConnConfig
         } else {
             return '';
         }
+    }
+
+    public function getServerVersionNumber(): int
+    {
+        return $this->get(ConfigParam::SERVER_VERSION_NUM);
     }
 
 

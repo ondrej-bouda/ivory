@@ -4,6 +4,7 @@ namespace Ivory\Connection;
 
 use Ivory\Exception\ResultDimensionException;
 use Ivory\Exception\StatementException;
+use Ivory\Exception\UnsupportedException;
 use Ivory\Exception\UsageException;
 use Ivory\IvoryTestCase;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
@@ -364,8 +365,14 @@ class StatementExecutionTest extends IvoryTestCase
             $this->assertNull($e->getContext());
             $this->assertNull($e->getInternalPosition());
             $this->assertNull($e->getInternalQuery());
-            if (PHP_VERSION_ID >= 70300) {
+            if (PHP_VERSION_ID >= 70300 && $this->conn->getConfig()->getServerVersionNumber() >= 90600) {
                 $this->assertSame('ERROR', $e->getNonlocalizedSeverity());
+            } else {
+                try {
+                    $e->getNonlocalizedSeverity();
+                    $this->fail(UnsupportedException::class . ' expected');
+                } catch (UnsupportedException $e) {
+                }
             }
         }
 
@@ -393,7 +400,7 @@ SQL
                 $this->assertSame('PL/pgSQL function foo() line 3 at RETURN', $e->getContext());
                 $this->assertSame(8, $e->getInternalPosition());
                 $this->assertSame('SELECT bar', $e->getInternalQuery());
-                if (PHP_VERSION_ID >= 70300) {
+                if (PHP_VERSION_ID >= 70300 && $this->conn->getConfig()->getServerVersionNumber() >= 90600) {
                     $this->assertSame('ERROR', $e->getNonlocalizedSeverity());
                 }
             }

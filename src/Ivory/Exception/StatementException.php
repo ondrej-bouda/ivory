@@ -90,8 +90,9 @@ class StatementException extends \RuntimeException
     }
 
     /**
-     * @return string the severity of the error;
-     *                one of <tt>ERROR</tt>, <tt>FATAL</tt>, or <tt>PANIC</tt> (for errors), or <tt>WARNING</tt>,
+     * Returns the localized severity of the error.
+     *
+     * @return string one of <tt>ERROR</tt>, <tt>FATAL</tt>, or <tt>PANIC</tt> (for errors), or <tt>WARNING</tt>,
      *                  <tt>NOTICE</tt>, <tt>DEBUG</tt>, <tt>INFO</tt>, or <tt>LOG</tt> (in a notice message), or a
      *                  localized translation of one of these
      */
@@ -101,18 +102,26 @@ class StatementException extends \RuntimeException
     }
 
     /**
-     * @return string the nonlocalized severity of the error;
-     *                one of <tt>ERROR</tt>, <tt>FATAL</tt>, or <tt>PANIC</tt> (for errors), or <tt>WARNING</tt>,
-     *                  <tt>NOTICE</tt>, <tt>DEBUG</tt>, <tt>INFO</tt>, or <tt>LOG</tt> (in a notice message)
+     * Returns the nonlocalized severity of the error.
+     *
+     * @since PostgreSQL 9.6
+     * @since PHP 7.3
+     * @return string one of <tt>ERROR</tt>, <tt>FATAL</tt>, or <tt>PANIC</tt> (for errors), or <tt>WARNING</tt>,
+     *                  <tt>NOTICE</tt>, <tt>DEBUG</tt>, <tt>INFO</tt>, or <tt>LOG</tt> (in a notice message);
+     * @throws UnsupportedException if used in PHP < 7.3 or PostgreSQL < 9.6 as such older versions do not support the
+     *                              nonlocalized severity
      */
-    final public function getNonlocalizedSeverity(): ?string
+    final public function getNonlocalizedSeverity(): string
     {
-        if (PHP_VERSION_ID >= 70300) {
-            /** @noinspection PhpUndefinedConstantInspection */
-            return $this->errorFields[PGSQL_DIAG_SEVERITY_NONLOCALIZED];
-        } else {
+        if (PHP_VERSION_ID < 70300) {
             throw new UnsupportedException('Nonlocalized severity is only supported on PHP >= 7.3');
         }
+        /** @noinspection PhpUndefinedConstantInspection */
+        if (!isset($this->errorFields[PGSQL_DIAG_SEVERITY_NONLOCALIZED])) {
+            throw new UnsupportedException('Nonlocalized severity is only supported on PostgreSQL >= 9.6');
+        }
+        /** @noinspection PhpUndefinedConstantInspection */
+        return $this->errorFields[PGSQL_DIAG_SEVERITY_NONLOCALIZED];
     }
 
     /**
