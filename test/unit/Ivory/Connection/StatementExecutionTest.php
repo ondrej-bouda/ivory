@@ -392,6 +392,7 @@ SQL
                 $this->conn->query('SELECT foo()');
                 $this->fail(StatementException::class . ' expected');
             } catch (StatementException $e) {
+                $tx->rollback();
                 $this->assertSame('column "bar" does not exist', $e->getMessage());
                 $this->assertSame('SELECT foo()', $e->getQuery());
                 $this->assertEquals(SqlState::fromCode(SqlState::UNDEFINED_COLUMN), $e->getSqlState());
@@ -405,7 +406,7 @@ SQL
                 }
             }
         } finally {
-            $tx->rollback();
+            $tx->rollbackIfOpen();
         }
     }
 }

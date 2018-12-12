@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Connection;
 
+use Ivory\Exception\ConnectionException;
+
 class IPCControl implements IIPCControl
 {
     private $connCtl;
@@ -54,5 +56,34 @@ class IPCControl implements IIPCControl
         }
         $payload = ($res['payload'] !== '' ? $res['payload'] : null);
         return new Notification($res['message'], $res['pid'], $payload);
+    }
+
+    public function waitForNotification(int $millisecondTimeout): ?Notification
+    {
+        $notification = $this->pollNotification();
+        if ($notification !== null) {
+            return $notification;
+        }
+
+        $handler = $this->connCtl->requireConnection();
+        $socket = pg_socket($handler);
+        if (!$socket) {
+            throw new ConnectionException('Error retrieving the connection socket while trying to wait for notifications');
+        }
+
+        $timeoutSec = (int)($millisecondTimeout / 1000);
+        $timeoutMicrosec = ($millisecondTimeout % 1000) * 1000;
+
+        $r = [$socket];
+        $w = [];
+        $ex = [];
+        $selected = stream_select($r, $w, $ex, $timeoutSec, $timeoutMicrosec);
+        if ($selected > 0) {
+            return $this->pollNotification();
+        } elseif ($selected === 0) {
+            return null;
+        } else {
+            throw new ConnectionException('Error selecting the stream while waiting for notifications');
+        }
     }
 }

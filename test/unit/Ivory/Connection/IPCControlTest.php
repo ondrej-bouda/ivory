@@ -6,6 +6,8 @@ use Ivory\IvoryTestCase;
 
 class IPCControlTest extends IvoryTestCase
 {
+    private const WAIT_TIMEOUT = 1000;
+
     /** @var IConnection */
     private $conn1;
     /** @var IConnection */
@@ -28,7 +30,7 @@ class IPCControlTest extends IvoryTestCase
     }
 
 
-    public function testSimpleListen()
+    public function testSimpleListenPoll()
     {
         $this->conn1->listen('test');
         $this->assertNull($this->conn1->pollNotification());
@@ -39,8 +41,22 @@ class IPCControlTest extends IvoryTestCase
             if (--$safetyBreak < 0) {
                 break;
             }
-            usleep(100000); // unfortunately, there is currently no better way than polling and waiting with php_pgsql
+            usleep(100000); // no better way to test polling
         }
+
+        $this->assertNotNull($notification);
+        $this->assertSame('test', $notification->getChannel());
+        $this->assertNull($notification->getPayload());
+        $this->assertSame($this->conn2->getBackendPID(), $notification->getSenderBackendPID());
+    }
+
+    public function testSimpleListenWait()
+    {
+        $this->conn1->listen('test');
+        $this->assertNull($this->conn1->waitForNotification(self::WAIT_TIMEOUT));
+
+        $this->conn2->notify('test');
+        $notification = $this->conn1->waitForNotification(self::WAIT_TIMEOUT);
 
         $this->assertNotNull($notification);
         $this->assertSame('test', $notification->getChannel());
@@ -55,34 +71,34 @@ class IPCControlTest extends IvoryTestCase
         $this->conn1->listen('t3');
         $this->conn1->unlisten('t3');
 
-        $this->assertNull($this->conn1->pollNotification());
+        $this->assertNull($this->conn1->waitForNotification(self::WAIT_TIMEOUT));
 
         $this->conn2->notify('t1', 'a');
-        $notification1 = $this->conn1->pollNotification();
+        $notification1 = $this->conn1->waitForNotification(self::WAIT_TIMEOUT);
         $this->assertNotNull($notification1);
         $this->assertSame('t1', $notification1->getChannel());
         $this->assertSame('a', $notification1->getPayload());
 
-        $this->assertNull($this->conn1->pollNotification());
+        $this->assertNull($this->conn1->waitForNotification(self::WAIT_TIMEOUT));
 
         $this->conn2->notify('t2');
-        $notification2 = $this->conn1->pollNotification();
+        $notification2 = $this->conn1->waitForNotification(self::WAIT_TIMEOUT);
         $this->assertNotNull($notification2);
         $this->assertSame('t2', $notification2->getChannel());
         $this->assertNull($notification2->getPayload());
 
-        $this->assertNull($this->conn1->pollNotification());
+        $this->assertNull($this->conn1->waitForNotification(self::WAIT_TIMEOUT));
 
         $this->conn2->notify('t3');
-        $this->assertNull($this->conn1->pollNotification());
+        $this->assertNull($this->conn1->waitForNotification(self::WAIT_TIMEOUT));
 
         $this->conn1->unlistenAll();
 
         $this->conn2->notify('t1');
-        $this->assertNull($this->conn1->pollNotification());
+        $this->assertNull($this->conn1->waitForNotification(self::WAIT_TIMEOUT));
 
         $this->conn2->notify('t2');
-        $this->assertNull($this->conn1->pollNotification());
+        $this->assertNull($this->conn1->waitForNotification(self::WAIT_TIMEOUT));
     }
 
     public function testQueue()
@@ -92,14 +108,22 @@ class IPCControlTest extends IvoryTestCase
         $this->conn2->notify('t', 'b');
         $this->conn2->notify('t', 'c');
 
-        $this->assertNull($this->conn1->pollNotification()->getPayload());
-        $this->assertSame('b', $this->conn1->pollNotification()->getPayload());
+        $notif1 = $this->conn1->waitForNotification(self::WAIT_TIMEOUT);
+        $this->assertNotNull($notif1);
+        $this->assertNull($notif1->getPayload());
+
+        $notif2 = $this->conn1->waitForNotification(self::WAIT_TIMEOUT);
+        $this->assertSame('b', $notif2->getPayload());
 
         $this->conn2->notify('t', 'd');
 
-        $this->assertSame('c', $this->conn1->pollNotification()->getPayload());
-        $this->assertSame('d', $this->conn1->pollNotification()->getPayload());
+        $notif3 = $this->conn1->waitForNotification(self::WAIT_TIMEOUT);
+        $this->assertSame('c', $notif3->getPayload());
 
-        $this->assertNull($this->conn1->pollNotification());
+        $notif4 = $this->conn1->waitForNotification(self::WAIT_TIMEOUT);
+        $this->assertSame('d', $notif4->getPayload());
+
+        $notif5 = $this->conn1->waitForNotification(self::WAIT_TIMEOUT);
+        $this->assertNull($notif5);
     }
 }

@@ -282,6 +282,11 @@ class Connection implements IConnection
         return $this->ipcCtl->pollNotification();
     }
 
+    public function waitForNotification(int $millisecondTimeout): ?Notification
+    {
+        return $this->ipcCtl->waitForNotification($millisecondTimeout);
+    }
+
     //endregion
 
     //region Cache Control

@@ -58,10 +58,22 @@ interface IIPCControl
     /**
      * Polls the queue of waiting IPC notifications on channels being listened to.
      *
-     * Execution is not blocked. The method returns immediately, either with the consumed notification, or with nothing.
+     * The execution is not blocked. The method returns immediately, either with the consumed notification, or with
+     * nothing.
      *
      * @return Notification|null the next notification in the queue, or <tt>null</tt> if there is currently no
      *                             notification there
      */
     function pollNotification(): ?Notification;
+
+    /**
+     * Waits for an IPC notification on channels being listened to, and returns the first one once it is delivered.
+     *
+     * The execution is blocked until a notification is received or until the timeout is reached.
+     *
+     * @param int $millisecondTimeout timeout, in milliseconds, to wait before giving up
+     * @return Notification|null the first notification in the queue, or <tt>null</tt> if there were no notifications
+     *                             for the whole <tt>$millisecondTimeout</tt> milliseconds
+     */
+    function waitForNotification(int $millisecondTimeout): ?Notification;
 }
