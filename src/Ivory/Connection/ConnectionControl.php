@@ -164,7 +164,7 @@ class ConnectionControl implements IConnectionControl
         }
 
         $socket = pg_socket($this->handler);
-        if (!$socket) {
+        if ($socket === false) {
             throw new ConnectionException('Error retrieving the connection socket while trying to wait for connection');
         }
 
