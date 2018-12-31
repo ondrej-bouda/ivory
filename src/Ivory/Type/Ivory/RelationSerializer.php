@@ -115,11 +115,10 @@ class RelationSerializer extends ConnectionDependentValueSerializer
 
     private function serializeNonEmptyRelation(IRelation $rel, array $columns): string
     {
-        $result = <<<VAL
-SELECT *
-FROM (
-  VALUES 
-VAL;
+        $result =
+            "SELECT *\n" .
+            "FROM (\n" .
+            "  VALUES ";
         $isFirstTuple = true;
         foreach ($rel as $tuple) {
             assert($tuple instanceof ITuple);
@@ -143,10 +142,9 @@ VAL;
             $result .= ')';
             $isFirstTuple = false;
         }
-        $result .= <<<VAL
-
-) t (
-VAL;
+        $result .=
+            "\n" .
+            ") t (";
         $identSerializer = $this->getIdentifierSerializer();
         foreach ($columns as $i => list($name, $serializer)) {
             if ($i > 0) {
