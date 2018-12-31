@@ -536,6 +536,7 @@ class Decimal implements IComparable
         }
 
         if (System::hasGMP()) {
+            /** @noinspection PhpComposerExtensionStubsInspection */
             return new Decimal(gmp_strval(gmp_fact($this->toGMP())));
         }
 
@@ -677,6 +678,7 @@ class Decimal implements IComparable
         return ($this->val === null ? 'NaN' : $this->val);
     }
 
+    /** @noinspection PhpComposerExtensionStubsInspection */
     /**
      * Converts the value to a {@link \GMP} object.
      *
@@ -687,11 +689,15 @@ class Decimal implements IComparable
      */
     public function toGMP()
     {
+        if (!System::hasGMP()) {
+            throw new \RuntimeException('The PHP gmp extension is not available');
+        }
         if (!$this->isInteger()) {
             throw new UndefinedOperationException('toGMP() is only defined for integers');
         }
         $decPoint = strpos($this->val, '.');
         $str = ($decPoint === false ? $this->val : substr($this->val, 0, $decPoint - 1));
+        /** @noinspection PhpComposerExtensionStubsInspection */
         return gmp_init($str);
     }
 

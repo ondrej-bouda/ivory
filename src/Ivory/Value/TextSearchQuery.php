@@ -26,7 +26,7 @@ class TextSearchQuery
      * @param string $format an {@link sprintf()}-like format string;
      *                       instead of each placeholder, a lexeme from <tt>$lexemes</tt> is used - quoted automatically
      *                         and escaped properly
-     * @param string[] ...$lexemes lexemes to put instead of the format string placeholders
+     * @param string[] $lexemes lexemes to put instead of the format string placeholders
      * @return TextSearchQuery
      */
     public static function fromFormat(string $format, string ...$lexemes): TextSearchQuery
