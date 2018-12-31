@@ -29,7 +29,13 @@ class Date extends DateBase implements IDiscreteStepper
      */
     public static function today(): Date
     {
-        return new Date(0, new \DateTimeImmutable('today', self::getUTCTimeZone()));
+        $tz = self::getUTCTimeZone();
+        try {
+            $datetime = new \DateTimeImmutable('today', $tz);
+        } catch (\Exception $e) {
+            throw new \LogicException('Date/time error', 0, $e);
+        }
+        return new Date(0, $datetime);
     }
 
     /**
@@ -37,7 +43,13 @@ class Date extends DateBase implements IDiscreteStepper
      */
     public static function tomorrow(): Date
     {
-        return new Date(0, new \DateTimeImmutable('tomorrow', self::getUTCTimeZone()));
+        $tz = self::getUTCTimeZone();
+        try {
+            $datetime = new \DateTimeImmutable('tomorrow', $tz);
+        } catch (\Exception $e) {
+            throw new \LogicException('Date/time error', 0, $e);
+        }
+        return new Date(0, $datetime);
     }
 
     /**
@@ -45,7 +57,13 @@ class Date extends DateBase implements IDiscreteStepper
      */
     public static function yesterday(): Date
     {
-        return new Date(0, new \DateTimeImmutable('yesterday', self::getUTCTimeZone()));
+        $tz = self::getUTCTimeZone();
+        try {
+            $datetime = new \DateTimeImmutable('yesterday', $tz);
+        } catch (\Exception $e) {
+            throw new \LogicException('Date/time error', 0, $e);
+        }
+        return new Date(0, $datetime);
     }
 
     /**
@@ -96,16 +114,23 @@ class Date extends DateBase implements IDiscreteStepper
     }
 
     /**
-     * @param int $timestamp the UNIX timestamp;
+     * @param int $datetime the UNIX timestamp;
      *                       just the date part is used, other information is ignored;
      *                       note that a UNIX timestamp represents the number of seconds since 1970-01-01 UTC, i.e., it
      *                         corresponds to usage of PHP functions {@link gmmktime()} and {@link gmdate()} rather than
      *                         {@link mktime()} or {@link date()}
      * @return Date the date of the given timestamp
      */
-    public static function fromUnixTimestamp(int $timestamp): Date
+    public static function fromUnixTimestamp(int $datetime): Date
     {
-        return new Date(0, new \DateTimeImmutable(gmdate('Y-m-d', $timestamp), self::getUTCTimeZone()));
+        $tz = self::getUTCTimeZone();
+        $dateStr = gmdate('Y-m-d', $datetime);
+        try {
+            $datetime = new \DateTimeImmutable($dateStr, $tz);
+        } catch (\Exception $e) {
+            throw new \LogicException('Date/time error', 0, $e);
+        }
+        return new Date(0, $datetime);
     }
 
     /**

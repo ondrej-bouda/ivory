@@ -18,14 +18,20 @@ abstract class TimestampBase extends DateBase
     public static function fromUnixTimestamp($timestamp)
     {
         $str = gmdate('Y-m-d H:i:s', (int)$timestamp);
-        $dt = new static(0, new \DateTimeImmutable($str, self::getUTCTimeZone()));
+        $tz = self::getUTCTimeZone();
+        try {
+            $datetime = new \DateTimeImmutable($str, $tz);
+        } catch (\Exception $e) {
+            throw new \LogicException('Date/time error', 0, $e);
+        }
+        $timestamp = new static(0, $datetime);
 
         // gmdate() only accepts an integer - add the fractional part separately
         $frac = $timestamp - (int)$timestamp;
         if ($frac) {
-            $dt = $dt->addSecond($frac);
+            $timestamp = $timestamp->addSecond($frac);
         }
-        return $dt;
+        return $timestamp;
     }
 
     /**

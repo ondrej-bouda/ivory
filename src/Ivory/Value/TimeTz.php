@@ -80,7 +80,12 @@ class TimeTz extends TimeBase
         }
 
         if (!isset($m['zone'])) {
-            $offset = (new \DateTime())->getOffset();
+            try {
+                $dateTime = new \DateTime();
+            } catch (\Exception $e) {
+                throw new \LogicException('Date/time error', 0, $e);
+            }
+            $offset = ($dateTime)->getOffset();
         } elseif ($m['zone'] == 'Z') {
             $offset = 0;
         } else {
@@ -238,7 +243,12 @@ class TimeTz extends TimeBase
      */
     public function format(string $timeFmt): string
     {
-        $ts = new \DateTime($this->toString()); // OPT: \DateTime::createFromFormat() is supposed to be twice as fast as new \DateTime()
+        $str = $this->toString();
+        try {
+            $ts = new \DateTime($str); // OPT: \DateTime::createFromFormat() is supposed to be twice as fast as new \DateTime()
+        } catch (\Exception $e) {
+            throw new \LogicException('Date/time error', 0, $e);
+        }
         $ts->setDate(1970, 1, 1);
         return $ts->format($timeFmt);
     }

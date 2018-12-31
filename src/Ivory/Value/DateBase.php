@@ -180,9 +180,13 @@ abstract class DateBase implements IComparable
     {
         if ($this->inf) {
             return null;
-        } else {
-            // OPT: \DateTime::createFromFormat() is supposed to be twice as fast as new \DateTime()
-            return new \DateTime($this->toISOString(), $timezone);
+        }
+        // OPT: \DateTime::createFromFormat() is supposed to be twice as fast as new \DateTime()
+        $isoStr = $this->toISOString();
+        try {
+            return new \DateTime($isoStr, $timezone);
+        } catch (\Exception $e) {
+            throw new \LogicException('Date/time error', 0, $e);
         }
     }
 
@@ -196,12 +200,16 @@ abstract class DateBase implements IComparable
     {
         if ($this->inf) {
             return null;
-        } else {
-            if ($timezone === $this->dt->getTimezone()) {
-                return $this->dt;
-            } else {
-                return new \DateTimeImmutable($this->toISOString(), $timezone);
-            }
+        }
+        if ($timezone === $this->dt->getTimezone()) {
+            return $this->dt;
+        }
+
+        $isoStr = $this->toISOString();
+        try {
+            return new \DateTimeImmutable($isoStr, $timezone);
+        } catch (\Exception $e) {
+            throw new \LogicException('Date/time error', 0, $e);
         }
     }
 
@@ -275,7 +283,13 @@ abstract class DateBase implements IComparable
         if ($fracSec != 0) {
             /** @noinspection PhpUndefinedVariableInspection */
             $resFracSecStr = substr((string)$resFracSec, 2); // cut off the leading '0.'
-            $dt = new \DateTimeImmutable($dt->format('Y-m-d H:i:s.') . $resFracSecStr, self::getUTCTimeZone());
+            $isoStr = $dt->format('Y-m-d H:i:s.') . $resFracSecStr;
+            $tz = self::getUTCTimeZone();
+            try {
+                $dt = new \DateTimeImmutable($isoStr, $tz);
+            } catch (\Exception $e) {
+                throw new \LogicException('Date/time error', 0, $e);
+            }
         }
 
         return new static(0, $dt);
