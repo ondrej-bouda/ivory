@@ -187,11 +187,11 @@ trait SqlPatternDefinitionMacros
                 $overallEndsWithPlaceholder = ($overallEndsWithPlaceholder || $plcHdr->getOffset() == $sqlTorsoLen);
             }
             foreach ($curFragment->getNamedPlaceholderMap() as $name => $occurrences) {
-                /** @var SqlPatternPlaceholder[] $occurrences */
                 if (!isset($overallNamedPlaceholderMap[$name])) {
                     $overallNamedPlaceholderMap[$name] = [];
                 }
                 foreach ($occurrences as $plcHdr) {
+                    assert($plcHdr instanceof SqlPatternPlaceholder);
                     $overallPlcHdr = new SqlPatternPlaceholder(
                         $sqlTorsoOffset + $plcHdr->getOffset(),
                         $name,
@@ -252,7 +252,7 @@ trait SqlPatternDefinitionMacros
         // OPT: Require SqlPattern::$namedPlaceholderMap to be sorted by offset of the first occurrence of the name.
         //      Then, take just the first item instead of iterating over all names.
         foreach ($curNamedParams as $name => $occurrences) {
-            /** @var SqlPatternPlaceholder[] $occurrences */
+            assert($occurrences[0] instanceof SqlPatternPlaceholder);
             if ($occurrences[0]->getOffset() == 0) { // occurrences are sorted, so checking only the first is sufficient
                 return true;
             }
@@ -349,8 +349,8 @@ trait SqlPatternDefinitionMacros
 
         $gen = $this->sqlPattern->generateSql();
         while ($gen->valid()) {
-            /** @var SqlPatternPlaceholder $placeholder */
             $placeholder = $gen->current();
+            assert($placeholder instanceof SqlPatternPlaceholder);
             $nameOrPos = $placeholder->getNameOrPosition();
 
             if (array_key_exists($nameOrPos, $namedParameterValues)) {

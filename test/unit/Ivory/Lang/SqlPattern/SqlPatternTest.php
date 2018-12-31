@@ -28,8 +28,8 @@ class SqlPatternTest extends IvoryTestCase
         );
         $gen = $pattern->generateSql();
         while ($gen->valid()) {
-            /** @var SqlPatternPlaceholder $plcHdr */
             $plcHdr = $gen->current();
+            assert($plcHdr instanceof SqlPatternPlaceholder);
             if ($plcHdr->getNameOrPosition() == 'tbl' && $plcHdr->getTypeName() == 'n') {
                 $gen->send('person');
             } elseif ($plcHdr->getNameOrPosition() == 'tbl' && $plcHdr->getTypeName() == 's') {

@@ -7,6 +7,7 @@ use Ivory\Data\Map\ArrayValueMap;
 use Ivory\Data\Map\IRelationMap;
 use Ivory\Data\Map\ITupleMap;
 use Ivory\Data\Map\IValueMap;
+use Ivory\Data\Map\IWritableTupleMap;
 use Ivory\Data\Map\IWritableValueMap;
 use Ivory\Data\Set\DictionarySet;
 use Ivory\Data\Set\ISet;
@@ -71,7 +72,8 @@ trait RelationMacros
     final public function toArray(): array
     {
         $result = [];
-        foreach ($this as $tuple) { /** @var ITuple $tuple */
+        foreach ($this as $tuple) {
+            assert($tuple instanceof ITuple);
             $result[] = $tuple->toMap();
         }
         return $result;
@@ -141,7 +143,8 @@ trait RelationMacros
         // FIXME: depending on the data type of the keys, either use an array-based implementation, or an object hashing implementation
         $map = new ArrayRelationMap();
         $emptyMap = new ArrayRelationMap();
-        foreach ($this as $tupleOffset => $tuple) { /** @var ITuple $tuple */
+        foreach ($this as $tupleOffset => $tuple) {
+            assert($tuple instanceof ITuple);
             $m = $map;
             foreach ($multiDimKeyCols as $col) {
                 $key = $tuple->value($col);
@@ -167,7 +170,8 @@ trait RelationMacros
     }
 
     /**
-     * @param \Closure $emptyMapFactory closure creating an empty map for storing the data
+     * @param \Closure $emptyMapFactory closure creating an empty <tt>IWritableTupleMap</tt> or
+     *                                    <tt>IWritableValueMap</tt> for storing the data
      * @param bool $lastForValues whether the last of <tt>$cols</tt> shall be used for mapped values
      * @param array $cols
      * @return IWritableValueMap|ITupleMap
@@ -178,10 +182,11 @@ trait RelationMacros
         $lastKeyCol = $cols[count($cols) - 1 - (int)$lastForValues];
         $valueCol = ($lastForValues ? $cols[count($cols) - 1] : null);
 
-        /** @var IWritableValueMap $map */
         $map = $emptyMapFactory();
+        assert($map instanceof IWritableTupleMap || $map instanceof IWritableValueMap);
         $emptyMap = $emptyMapFactory();
-        foreach ($this as $tuple) { /** @var ITuple $tuple */
+        foreach ($this as $tuple) {
+            assert($tuple instanceof ITuple);
             $m = $map;
             foreach ($multiDimKeyCols as $col) {
                 $key = $tuple->value($col);

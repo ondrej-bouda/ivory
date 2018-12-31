@@ -46,8 +46,8 @@ class LineType extends CompoundGeometricType
 
         // given by two distinct points
         try {
-            /** @var LineSegment $lineSeg */
             $lineSeg = $this->lineSegType->parseValue($extRepr);
+            assert($lineSeg instanceof LineSegment);
             return Line::fromPoints($lineSeg->getStart(), $lineSeg->getEnd());
         } catch (\InvalidArgumentException $e) {
             throw $this->invalidValueException($extRepr, $e);

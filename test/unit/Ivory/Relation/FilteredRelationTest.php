@@ -40,7 +40,7 @@ class FilteredRelationTest extends IvoryTestCase
         $i = 0;
         $expected = [[1, 2], [5, 6]];
         foreach ($filtered as $k => $tuple) {
-            /** @var ITuple $tuple */
+            assert($tuple instanceof ITuple);
             $this->assertSame($i, $k, "tuple $i");
             $this->assertSame($expected[$i], $tuple->toList(), "tuple $i");
             $i++;

@@ -38,7 +38,7 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
 
         $i = 0;
         foreach ($rel as $k => $tuple) {
-            /** @var ITuple $tuple */
+            assert($tuple instanceof ITuple);
             $this->assertSame($i, $k, "tuple $i");
             $this->assertSame([1, 2], $tuple->toList(), "tuple $i");
             $i++;
@@ -68,7 +68,7 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $i = 0;
         $expected = [[1, 2], [3, 4], [5, 6]];
         foreach ($rel as $k => $tuple) {
-            /** @var ITuple $tuple */
+            assert($tuple instanceof ITuple);
             $this->assertSame($i, $k, "tuple $i");
             $this->assertSame($expected[$i], $tuple->toList(), "tuple $i");
             $i++;
@@ -97,7 +97,7 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $i = 0;
         $expected = [[3, 4], [5, 6]];
         foreach ($rel as $k => $tuple) {
-            /** @var ITuple $tuple */
+            assert($tuple instanceof ITuple);
             $this->assertSame($i, $k, "tuple $i");
             $this->assertSame($expected[$i], $tuple->toList(), "tuple $i");
             $i++;
@@ -125,7 +125,7 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $i = 0;
         $expected = [[3, 4]];
         foreach ($rel as $k => $tuple) {
-            /** @var ITuple $tuple */
+            assert($tuple instanceof ITuple);
             $this->assertSame($i, $k, "tuple $i");
             $this->assertSame($expected[$i], $tuple->toList(), "tuple $i");
             $i++;
@@ -155,7 +155,7 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $i = 0;
         $expected = [[3, 4], [5, 6], [7, 8]];
         foreach ($rel as $k => $tuple) {
-            /** @var ITuple $tuple */
+            assert($tuple instanceof ITuple);
             $this->assertSame($i, $k, "tuple $i");
             $this->assertSame($expected[$i], $tuple->toList(), "tuple $i");
             $i++;

@@ -34,7 +34,6 @@ class MoneyTypeTest extends IvoryTestCase
     {
         $conn = $this->getIvoryConnection();
 
-        /** @var IQueryResult $r */
         $r = $conn->rawQuery('SELECT 12345.678::money'); // formatted as "$12,345.68"
         $this->assertEquals(Money::fromNumber(12345.68, 'Kč'), $r->value());
 

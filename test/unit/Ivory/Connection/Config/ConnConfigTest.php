@@ -92,42 +92,36 @@ class ConnConfigTest extends IvoryTestCase
     public function testDateStyle()
     {
         $this->cfg->setForTransaction(ConfigParam::DATE_STYLE, 'ISO');
-        /** @var QueryResult $res */
         $res = $this->getIvoryConnection()->rawQuery("SELECT '2016-03-05'::DATE AS d, '2016-03-05'::DATE::TEXT AS t");
         $tuple = $res->tuple();
         $this->assertEquals(Date::fromParts(2016, 3, 5), $tuple->d);
         $this->assertSame('2016-03-05', $tuple->t);
 
         $this->cfg->setForTransaction(ConfigParam::DATE_STYLE, 'SQL, DMY');
-        /** @var QueryResult $res */
         $res = $this->getIvoryConnection()->rawQuery("SELECT '2016-03-05'::DATE AS d, '2016-03-05'::DATE::TEXT AS t");
         $tuple = $res->tuple();
         $this->assertEquals(Date::fromParts(2016, 3, 5), $tuple->d);
         $this->assertSame('05/03/2016', $tuple->t);
 
         $this->cfg->setForTransaction(ConfigParam::DATE_STYLE, 'SQL, MDY');
-        /** @var QueryResult $res */
         $res = $this->getIvoryConnection()->rawQuery("SELECT '2016-03-05'::DATE AS d, '2016-03-05'::DATE::TEXT AS t");
         $tuple = $res->tuple();
         $this->assertEquals(Date::fromParts(2016, 3, 5), $tuple->d);
         $this->assertSame('03/05/2016', $tuple->t);
 
         $this->cfg->setForTransaction(ConfigParam::DATE_STYLE, 'German');
-        /** @var QueryResult $res */
         $res = $this->getIvoryConnection()->rawQuery("SELECT '2016-03-05'::DATE AS d, '2016-03-05'::DATE::TEXT AS t");
         $tuple = $res->tuple();
         $this->assertEquals(Date::fromParts(2016, 3, 5), $tuple->d);
         $this->assertSame('05.03.2016', $tuple->t);
 
         $this->cfg->setForTransaction(ConfigParam::DATE_STYLE, 'Postgres, MDY');
-        /** @var QueryResult $res */
         $res = $this->getIvoryConnection()->rawQuery("SELECT '2016-03-05'::DATE AS d, '2016-03-05'::DATE::TEXT AS t");
         $tuple = $res->tuple();
         $this->assertEquals(Date::fromParts(2016, 3, 5), $tuple->d);
         $this->assertSame('03-05-2016', $tuple->t);
 
         $this->cfg->setForTransaction(ConfigParam::DATE_STYLE, 'Postgres, DMY');
-        /** @var QueryResult $res */
         $res = $this->getIvoryConnection()->rawQuery("SELECT '2016-03-05'::DATE AS d, '2016-03-05'::DATE::TEXT AS t");
         $tuple = $res->tuple();
         $this->assertEquals(Date::fromParts(2016, 3, 5), $tuple->d);
@@ -135,7 +129,6 @@ class ConnConfigTest extends IvoryTestCase
 
         // YMD is unsupported for DateStyle Postgres, MDY is actually used
         $this->cfg->setForTransaction(ConfigParam::DATE_STYLE, 'Postgres, YMD');
-        /** @var QueryResult $res */
         $res = $this->getIvoryConnection()->rawQuery("SELECT '2016-03-05'::DATE AS d, '2016-03-05'::DATE::TEXT AS t");
         $tuple = $res->tuple();
         $this->assertEquals(Date::fromParts(2016, 3, 5), $tuple->d);

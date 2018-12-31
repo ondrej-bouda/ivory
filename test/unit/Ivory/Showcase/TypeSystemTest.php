@@ -78,24 +78,26 @@ class TypeSystemTest extends IvoryTestCase
 SQL
         );
 
-        /** @var Range[] $rangeArray */
         $rangeArray = $tuple->array;
+        assert($rangeArray[1] instanceof Range);
+        assert($rangeArray[2] instanceof Range);
+        assert($rangeArray[3] instanceof Range);
         $this->assertInstanceOf(Range::class, $rangeArray[2]);
         $this->assertSame('19.2.2017', $rangeArray[2]->getUpper()->format('j.n.Y'));
         $this->assertFalse($rangeArray[3]->isFinite());
 
-        /** @var Json $json */
         $json = $tuple->json;
+        assert($json instanceof Json);
         $this->assertInstanceOf(Json::class, $json);
         $this->assertEquals((object)['k1' => 42, 'k2' => false], $json->getValue());
 
-        /** @var XmlDocument $xml */
         $xml = $tuple->xml;
+        assert($xml instanceof XmlDocument);
         $this->assertInstanceOf(XmlContent::class, $xml);
         $this->assertEquals(['Manual'], $xml->toSimpleXMLElement()->xpath('//title/text()'));
 
-        /** @var Polygon $polygon */
         $polygon = $tuple->polygon;
+        assert($polygon instanceof Polygon);
         $this->assertInstanceOf(Polygon::class, $polygon);
         $this->assertEquals(6, $polygon->getArea(), '', 1e-12);
 

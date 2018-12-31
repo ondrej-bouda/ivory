@@ -106,7 +106,8 @@ class ProcessingTest extends IvoryTestCase
     public function testTraversal()
     {
         $exp = ['Dtn', 'Tir', null, null, null, null];
-        foreach ($this->teachers as $i => $tuple) { /** @var ITuple $tuple */
+        foreach ($this->teachers as $i => $tuple) {
+            assert($tuple instanceof ITuple);
             $this->assertSame($exp[$i], $tuple->abbr, "Tuple $i does not match");
         }
     }
@@ -188,7 +189,8 @@ class ProcessingTest extends IvoryTestCase
 
         $this->assertCount(2, $res);
         $exp = ['Angus', 'Ada'];
-        foreach ($res as $i => $tuple) { /** @var ITuple $tuple */
+        foreach ($res as $i => $tuple) {
+            assert($tuple instanceof ITuple);
             $this->assertSame($exp[$i], $tuple->value('firstname'), "Tuple $i does not match");
         }
     }
@@ -289,8 +291,8 @@ class ProcessingTest extends IvoryTestCase
 
         $this->assertInstanceOf(IRelation::class, $res['A']);
         $this->assertCount(2, $res['A']);
-        /** @var IRelation $jRel */
         $jRel = $res['J'];
+        assert($jRel instanceof IRelation);
         $this->assertEquals(
             [
                 ['id' => 2, 'firstname' => 'Jean', 'lastname' => 'Tirole', 'abbr' => 'Tir'],
@@ -306,8 +308,8 @@ class ProcessingTest extends IvoryTestCase
         $this->assertInstanceOf(IRelationMap::class, $res[1]);
         $this->assertInstanceOf(IRelation::class, $res[1]['actual']);
 
-        /** @var IRelation $deatonActualLessonRel */
         $deatonActualLessonRel = $res[1]['actual'];
+        assert($deatonActualLessonRel instanceof IRelation);
         $this->assertInstanceOf(IRelation::class, $deatonActualLessonRel);
         $this->assertSame('1+1', $deatonActualLessonRel->value('lesson_topic'));
         $this->assertSame(['1+1', '1+2'], $deatonActualLessonRel->col('lesson_topic')->toArray());
@@ -341,8 +343,7 @@ class ProcessingTest extends IvoryTestCase
         ];
         foreach ($res as $teacherId => $lessonsByStatus) {
             foreach ($lessonsByStatus as $status => $lessons) {
-                $this->assertInstanceOf(IRelation::class, $lessons);
-                /** @var IRelation $lessons */
+                assert($lessons instanceof IRelation);
                 $lessonTopics = $lessons->col('lesson_topic');
                 $this->assertSame($expectedMap[$teacherId][$status], $lessonTopics->toArray());
             }

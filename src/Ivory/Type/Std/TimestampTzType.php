@@ -77,8 +77,8 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
             return TimestampTz::minusInfinity();
         }
 
-        /** @var DateStyle $dateStyle */
         $dateStyle = $this->dateStyleRetriever->getValue();
+        assert($dateStyle instanceof DateStyle);
         switch ($dateStyle->getFormat()) {
             default:
                 trigger_error(

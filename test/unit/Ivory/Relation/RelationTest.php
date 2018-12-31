@@ -40,9 +40,9 @@ class RelationTest extends IvoryTestCase
         $rel = $this->conn->query(
             'SELECT id, name, is_active FROM artist WHERE id IN (1,2,3,4) ORDER BY name, id'
         );
-        /** @var ITuple[] $tuples */
         $tuples = [];
         foreach ($rel as $tuple) {
+            $this->assertInstanceOf(ITuple::class, $tuple);
             $tuples[] = $tuple;
         }
         $this->assertSame(
@@ -68,8 +68,10 @@ class RelationTest extends IvoryTestCase
              ORDER BY artist.name'
         );
 
-        /** @var ITuple[] $tuples */
         $tuples = iterator_to_array($rel);
+        assert($tuples[0] instanceof ITuple);
+        assert($tuples[1] instanceof ITuple);
+        assert($tuples[2] instanceof ITuple);
         $expArray = [
             ['artist_name' => 'Metallica', 'album_names' => [1 => 'Black Album', 'S & M']],
             ['artist_name' => 'The Piano Guys', 'album_names' => [1 => 'The Piano Guys']],
@@ -169,12 +171,14 @@ class RelationTest extends IvoryTestCase
 
         $ext = $rel->extend([
             'dist' => function (ITuple $tuple) {
-                /** @var Point $a */
                 $a = $tuple->A;
-                /** @var Point $b */
+                assert($a instanceof Point);
                 $b = $tuple->B;
+                assert($b instanceof Point);
+
                 $x = $a->getX() - $b->getX();
                 $y = $a->getY() - $b->getY();
+
                 return sqrt($x * $x + $y * $y);
             },
         ]);
@@ -335,7 +339,7 @@ class RelationTest extends IvoryTestCase
         );
         $areaSum = 0;
         foreach ($rel->value() as $box) {
-            /** @var Box $box */
+            assert($box instanceof Box);
             $areaSum += $box->getArea();
         }
         $this->assertEquals(112, $areaSum, '', 1e-9);

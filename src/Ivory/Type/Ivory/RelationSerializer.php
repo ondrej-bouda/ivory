@@ -122,7 +122,7 @@ FROM (
 VAL;
         $isFirstTuple = true;
         foreach ($rel as $tuple) {
-            /** @var ITuple $tuple */
+            assert($tuple instanceof ITuple);
             if (!$isFirstTuple) {
                 $result .= ',' . PHP_EOL . '         ';
             }

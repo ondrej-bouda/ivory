@@ -17,8 +17,8 @@ $dict->detachFromConnection();
 
 $serialized = serialize($dict);
 $mem1 = memory_get_usage();
-/** @var ITypeDictionary $unserialized */
 $unserialized = unserialize($serialized);
+assert($unserialized instanceof ITypeDictionary);
 $mem2 = memory_get_usage();
 
 echo 'TypeDictionary serialized size: ' . strlen($serialized) . ', memory size: ' . ($mem2 - $mem1) . PHP_EOL;

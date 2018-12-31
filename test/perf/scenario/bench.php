@@ -120,8 +120,8 @@ if ($command['recreate']) {
 }
 
 $benchmark = new Benchmark();
-/** @var IPerformanceTest $impl */
 $impl = $command[0];
+assert($impl instanceof IPerformanceTest);
 
 //endregion
 

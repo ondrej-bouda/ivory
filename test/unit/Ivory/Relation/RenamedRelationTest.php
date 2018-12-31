@@ -56,11 +56,11 @@ class RenamedRelationTest extends IvoryTestCase
         );
         $renOne = $relSimult->rename(['a']);
         $renTwo = $relSimult->rename(['b']);
-        /** @var $outer ITuple */
         foreach ($renOne as $i => $outer) {
+            assert($outer instanceof ITuple);
             $this->assertSame(['a' => $i + 1], $outer->toMap(), "row $i");
-            /** @var $inner ITuple */
             foreach ($renTwo as $j => $inner) {
+                assert($inner instanceof ITuple);
                 $this->assertSame(['b' => $j + 1], $inner->toMap(), "row $i|$j");
             }
         }

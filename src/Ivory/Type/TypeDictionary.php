@@ -233,7 +233,7 @@ class TypeDictionary implements ITypeDictionary
     {
         $connDepTypes = $this->collectObjects(IConnectionDependentObject::class);
         foreach ($connDepTypes as $type) {
-            /** @var IConnectionDependentObject $type */
+            assert($type instanceof IConnectionDependentObject);
             $type->attachToConnection($connection);
         }
     }
@@ -242,7 +242,7 @@ class TypeDictionary implements ITypeDictionary
     {
         $connDepTypes = $this->collectObjects(IConnectionDependentObject::class);
         foreach ($connDepTypes as $type) {
-            /** @var IConnectionDependentObject $type */
+            assert($type instanceof IConnectionDependentObject);
             $type->detachFromConnection();
         }
     }

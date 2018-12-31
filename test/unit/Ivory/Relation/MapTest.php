@@ -172,7 +172,7 @@ class MapTest extends IvoryTestCase
         ];
         $i = 0;
         foreach ($map as $key => $tuple) {
-            /** @var ITuple $tuple */
+            assert($tuple instanceof ITuple);
             list($expKey, $expVals) = $expected[$i];
             $this->assertSame($expKey, $key);
             $this->assertSame($expVals, $tuple->toMap());
@@ -202,12 +202,12 @@ class MapTest extends IvoryTestCase
         ];
         $i = 0;
         foreach ($map as $key => $inner) {
-            /** @var ITupleMap $inner */
+            assert($inner instanceof ITupleMap);
             list($expKey, $expTuples) = $expected[$i];
             $this->assertSame($expKey, $key);
             $j = 0;
             foreach ($inner as $innerKey => $tuple) {
-                /** @var ITuple $tuple */
+                assert($tuple instanceof ITuple);
                 list($expInnerKey, $expVals) = $expTuples[$j];
                 $this->assertSame($expInnerKey, $innerKey);
                 $this->assertSame($expVals, $tuple->toMap());

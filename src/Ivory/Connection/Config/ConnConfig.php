@@ -403,7 +403,6 @@ class ConnConfig implements IObservableConnConfig
 
     public function notifyPropertiesReset(): void
     {
-        /** @var IConfigObserver[] $obsSet */
         $obsSet = [];
         foreach ($this->observers as $k => $obsList) {
             foreach ($obsList as $obs) {
@@ -411,6 +410,7 @@ class ConnConfig implements IObservableConnConfig
             }
         }
         foreach ($obsSet as $obs) {
+            assert($obs instanceof IConfigObserver);
             $obs->handlePropertiesReset($this);
         }
     }
