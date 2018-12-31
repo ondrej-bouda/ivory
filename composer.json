@@ -22,11 +22,17 @@
     "require": {
         "php": "^7.1",
         "ext-bcmath": "*",
+        "ext-dom": "*",
+        "ext-iconv": "*",
+        "ext-json": "*",
         "ext-mbstring": "*",
         "ext-pgsql": "*",
+        "ext-simplexml": "*",
+        "ext-xmlreader": "*",
         "psr/cache": "^1.0"
     },
     "require-dev": {
+        "ext-gmp": "*",
         "ext-pdo_pgsql": "*",
         "phpunit/phpunit": "^7.0",
         "phpunit/dbunit": "^4.0",
