@@ -343,6 +343,10 @@ class ConnConfig implements IObservableConnConfig
         return $this->get(ConfigParam::SERVER_VERSION_NUM);
     }
 
+    public function getServerMajorVersionNumber(): int
+    {
+        return intdiv($this->getServerVersionNumber(), 10000);
+    }
 
     //region IObservableConnConfig
 

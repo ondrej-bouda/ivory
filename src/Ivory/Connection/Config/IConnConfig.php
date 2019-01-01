@@ -104,4 +104,9 @@ interface IConnConfig
      * @return int the PostgreSQL server version number, e.g., <tt>90600</tt> for 9.6.0 or <tt>110001</tt> for 11.1
      */
     function getServerVersionNumber(): int;
+
+    /**
+     * @return int the PostgreSQL server major version number, e.g., <tt>9</tt> for 9.6.0 or <tt>11</tt> for 11.1
+     */
+    function getServerMajorVersionNumber(): int;
 }

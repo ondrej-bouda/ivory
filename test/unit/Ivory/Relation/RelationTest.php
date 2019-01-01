@@ -728,22 +728,27 @@ class RelationTest extends IvoryTestCase
 
     public function testMacAddrResult()
     {
-        $tuple = $this->conn->querySingleTuple(
-            "SELECT macaddr8_set7bit(%macaddr) AS bit7set,
-                    %macaddr::macaddr AS a6,
-                    %macaddr8::macaddr8 AS a8,
-                    %::macaddr AS a6auto,
-                    %::macaddr8 AS a8auto",
-            '08:00:2b:01:02:03',
+        $a6tuple = $this->conn->querySingleTuple(
+            "SELECT %macaddr::macaddr AS a6,
+                    %::macaddr AS a6auto",
             MacAddr::fromString('08:00:2b:01:02:03'),
-            MacAddr8::fromString('08:00:2b:01:02:03:04:05'),
-            MacAddr::fromString('08:00:2b:01:02:03'),
-            MacAddr8::fromString('08:00:2b:01:02:03:04:05')
+            MacAddr::fromString('08:00:2b:01:02:03')
         );
-        $this->assertEquals(MacAddr8::fromString('0a:00:2b:ff:fe:01:02:03'), $tuple->bit7set);
-        $this->assertEquals(MacAddr::fromString('08:00:2b:01:02:03'), $tuple->a6);
-        $this->assertEquals(MacAddr8::fromString('08:00:2b:01:02:03:04:05'), $tuple->a8);
-        $this->assertEquals(MacAddr::fromString('08:00:2b:01:02:03'), $tuple->a6auto);
-        $this->assertEquals(MacAddr8::fromString('08:00:2b:01:02:03:04:05'), $tuple->a8auto);
+        $this->assertEquals(MacAddr::fromString('08:00:2b:01:02:03'), $a6tuple->a6);
+        $this->assertEquals(MacAddr::fromString('08:00:2b:01:02:03'), $a6tuple->a6auto);
+
+        if ($this->conn->getConfig()->getServerMajorVersionNumber() >= 10) { // macaddr8 only since PostgreSQL 10
+            $tuple = $this->conn->querySingleTuple(
+                "SELECT macaddr8_set7bit(%macaddr) AS bit7set,
+                        %macaddr8::macaddr8 AS a8,
+                        %::macaddr8 AS a8auto",
+                '08:00:2b:01:02:03',
+                MacAddr8::fromString('08:00:2b:01:02:03:04:05'),
+                MacAddr8::fromString('08:00:2b:01:02:03:04:05')
+            );
+            $this->assertEquals(MacAddr8::fromString('0a:00:2b:ff:fe:01:02:03'), $tuple->bit7set);
+            $this->assertEquals(MacAddr8::fromString('08:00:2b:01:02:03:04:05'), $tuple->a8);
+            $this->assertEquals(MacAddr8::fromString('08:00:2b:01:02:03:04:05'), $tuple->a8auto);
+        }
     }
 }
