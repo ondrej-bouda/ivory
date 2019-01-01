@@ -58,6 +58,12 @@ class MacAddress8Test extends \PHPUnit\Framework\TestCase
             $this->fail(ParseException::class . ' expected');
         } catch (ParseException $e) {
         }
+
+        try {
+            MacAddr8::fromString('0:8:002b0102030405');
+            $this->fail(ParseException::class . ' expected');
+        } catch (ParseException $e) {
+        }
     }
 
     public function testFrom6ByteMacAddr()

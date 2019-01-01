@@ -43,15 +43,16 @@ class MacAddr8
         $digits = 0;
         for ($i = 0; $i < $len; $i++) {
             $c = $addr[$i];
+            $digitPair = ($digits % 2 == 0);
             if (ctype_xdigit($c)) {
-                if (($digits % 2) == 0 && $digits > 0) {
+                if ($digitPair && $digits > 0) {
                     $canon .= ':';
                 }
                 $canon .= $c;
                 $digits++;
-            } elseif ($sep === null && ($c == ':' || $c == '-' || $c == '.')) {
+            } elseif ($sep === null && ($c == ':' || $c == '-' || $c == '.') && $digitPair) {
                 $sep = $c;
-            } elseif ($c !== $sep && !ctype_space($c)) {
+            } elseif (!($c === $sep && $digitPair) && !ctype_space($c)) {
                 throw new ParseException('Invalid macaddr8 string', $i);
             }
         }
