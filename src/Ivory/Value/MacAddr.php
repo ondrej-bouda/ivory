@@ -21,6 +21,7 @@ class MacAddr
      * - `'XXXXXX:XXXXXX'`
      * - `'XXXXXX-XXXXXX'`
      * - `'XXXX.XXXX.XXXX'`
+     * - `'XXXX-XXXX-XXXX'`
      * - `'XXXXXXXXXXXX'`
      *
      * @param string $addr the string representation of the MAC address in one of the formats mentioned above;
@@ -30,15 +31,19 @@ class MacAddr
     public static function fromString(string $addr): MacAddr
     {
         $re = '~^
-                [[:xdigit:]]{2}(?::[[:xdigit:]]{2}){5}
+                (?:
+                [[:xdigit:]]{2} (?: : [[:xdigit:]]{2} ){5}
                 |
-                [[:xdigit:]]{2}(?:-[[:xdigit:]]{2}){5}
+                [[:xdigit:]]{2} (?: - [[:xdigit:]]{2} ){5}
                 |
-                [[:xdigit:]]{6}[-:][[:xdigit:]]{6}
+                [[:xdigit:]]{6} [-:] [[:xdigit:]]{6}
                 |
-                [[:xdigit:]]{4}\.[[:xdigit:]]{4}\.[[:xdigit:]]{4}
+                [[:xdigit:]]{4} \. [[:xdigit:]]{4} \. [[:xdigit:]]{4}
+                |
+                [[:xdigit:]]{4} - [[:xdigit:]]{4} - [[:xdigit:]]{4}
                 |
                 [[:xdigit:]]{12}
+                )
                 $~x';
         if (!preg_match($re, $addr)) {
             throw new \InvalidArgumentException('$addr');
@@ -54,7 +59,7 @@ class MacAddr
             $pos += 2;
         }
 
-        return new MacAddr($canon);
+        return new MacAddr(strtolower($canon));
     }
 
     private function __construct(string $canonAddr)
