@@ -4,7 +4,7 @@ namespace Ivory\Value;
 
 use Ivory\Exception\ParseException;
 
-class MacAddressTest extends \PHPUnit\Framework\TestCase
+class MacAddrTest extends \PHPUnit\Framework\TestCase
 {
     public function testFromString()
     {
