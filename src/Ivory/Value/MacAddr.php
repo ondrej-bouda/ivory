@@ -2,8 +2,10 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
+use Ivory\Exception\ParseException;
+
 /**
- * Representation of a MAC address.
+ * Representation of a 6-byte MAC address.
  *
  * The objects are immutable.
  */
@@ -12,7 +14,7 @@ class MacAddr
     private $canonAddr;
 
     /**
-     * Creates a MAC address from its string representation.
+     * Creates a 6-byte MAC address from its string representation.
      *
      * The same input formats as by PostgreSQL are accepted. They are the following, where `X` stands for an
      * upper- or lowercase hexadecimal digit:
@@ -25,7 +27,7 @@ class MacAddr
      * - `'XXXXXXXXXXXX'`
      *
      * @param string $addr the string representation of the MAC address in one of the formats mentioned above;
-     *                     other formats are rejected by an <tt>\InvalidArgumentException</tt>
+     *                     other formats are rejected by a {@link ParseException}
      * @return MacAddr
      */
     public static function fromString(string $addr): MacAddr
@@ -46,7 +48,7 @@ class MacAddr
                 )
                 $~x';
         if (!preg_match($re, $addr)) {
-            throw new \InvalidArgumentException('$addr');
+            throw new ParseException('Invalid macaddr string');
         }
 
         $canon = substr($addr, 0, 2);

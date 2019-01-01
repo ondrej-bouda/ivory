@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
+use Ivory\Exception\ParseException;
+
 class MacAddressTest extends \PHPUnit\Framework\TestCase
 {
     public function testFromString()
@@ -32,20 +34,20 @@ class MacAddressTest extends \PHPUnit\Framework\TestCase
 
         try {
             MacAddr::fromString('7');
-            $this->fail('\InvalidArgumentException expected');
-        } catch (\InvalidArgumentException $e) {
+            $this->fail(ParseException::class . ' expected');
+        } catch (ParseException $e) {
         }
 
         try {
             MacAddr::fromString('08002b0102034');
-            $this->fail('\InvalidArgumentException expected');
-        } catch (\InvalidArgumentException $e) {
+            $this->fail(ParseException::class . ' expected');
+        } catch (ParseException $e) {
         }
 
         try {
             MacAddr::fromString('08002b01020g');
-            $this->fail('\InvalidArgumentException expected');
-        } catch (\InvalidArgumentException $e) {
+            $this->fail(ParseException::class . ' expected');
+        } catch (ParseException $e) {
         }
     }
 }

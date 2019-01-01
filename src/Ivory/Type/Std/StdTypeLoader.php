@@ -110,6 +110,8 @@ class StdTypeLoader implements ITypeLoader
                         return new CidrType($schemaName, $typeName);
                     case 'macaddr':
                         return new MacAddrType($schemaName, $typeName);
+                    case 'macaddr8':
+                        return new MacAddr8Type($schemaName, $typeName);
 
                     case 'money':
                         return new MoneyType($schemaName, $typeName);

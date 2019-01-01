@@ -99,6 +99,7 @@ class StdCoreFactory implements ICoreFactory
             Value\Circle::class => ['pg_catalog', 'circle'],
             Value\NetAddress::class => ['pg_catalog', 'inet'],
             Value\MacAddr::class => ['pg_catalog', 'macaddr'],
+            Value\MacAddr8::class => ['pg_catalog', 'macaddr8'],
             Value\Money::class => ['pg_catalog', 'money'],
             Value\PgLogSequenceNumber::class => ['pg_catalog', 'pg_lsn'],
             Value\TxIdSnapshot::class => ['pg_catalog', 'txid_snapshot'],

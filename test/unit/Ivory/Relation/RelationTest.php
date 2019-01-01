@@ -11,6 +11,8 @@ use Ivory\IvoryTestCase;
 use Ivory\Value\Composite;
 use Ivory\Value\Box;
 use Ivory\Value\Date;
+use Ivory\Value\MacAddr;
+use Ivory\Value\MacAddr8;
 use Ivory\Value\PgLogSequenceNumber;
 use Ivory\Value\Point;
 use Ivory\Value\TextSearchQuery;
@@ -722,5 +724,26 @@ class RelationTest extends IvoryTestCase
         $this->assertSame(['k' => null], $tuple->null_value);
         $this->assertSame(['k' => '2'], $tuple->int_value);
         $this->assertSame(['a' => 'X', 'b' => 'Y'], $tuple->multi_value);
+    }
+
+    public function testMacAddrResult()
+    {
+        $tuple = $this->conn->querySingleTuple(
+            "SELECT macaddr8_set7bit(%macaddr) AS bit7set,
+                    %macaddr::macaddr AS a6,
+                    %macaddr8::macaddr8 AS a8,
+                    %::macaddr AS a6auto,
+                    %::macaddr8 AS a8auto",
+            '08:00:2b:01:02:03',
+            MacAddr::fromString('08:00:2b:01:02:03'),
+            MacAddr8::fromString('08:00:2b:01:02:03:04:05'),
+            MacAddr::fromString('08:00:2b:01:02:03'),
+            MacAddr8::fromString('08:00:2b:01:02:03:04:05')
+        );
+        $this->assertEquals(MacAddr8::fromString('0a:00:2b:ff:fe:01:02:03'), $tuple->bit7set);
+        $this->assertEquals(MacAddr::fromString('08:00:2b:01:02:03'), $tuple->a6);
+        $this->assertEquals(MacAddr8::fromString('08:00:2b:01:02:03:04:05'), $tuple->a8);
+        $this->assertEquals(MacAddr::fromString('08:00:2b:01:02:03'), $tuple->a6auto);
+        $this->assertEquals(MacAddr8::fromString('08:00:2b:01:02:03:04:05'), $tuple->a8auto);
     }
 }
