@@ -7,6 +7,7 @@ use Ivory\Connection\IConnection;
 use Ivory\Data\Set\CustomSet;
 use Ivory\Exception\AmbiguousException;
 use Ivory\Exception\UndefinedColumnException;
+use Ivory\Exception\UndefinedTypeException;
 use Ivory\IvoryTestCase;
 use Ivory\Value\Composite;
 use Ivory\Value\Box;
@@ -750,5 +751,21 @@ class RelationTest extends IvoryTestCase
             $this->assertEquals(MacAddr8::fromString('08:00:2b:01:02:03:04:05'), $tuple->a8);
             $this->assertEquals(MacAddr8::fromString('08:00:2b:01:02:03:04:05'), $tuple->a8auto);
         }
+    }
+
+    public function testExceptionHintsOnUndefinedType()
+    {
+        try {
+            $this->conn->querySingleValue(
+                'SELECT 1 FROM %ident.pg_class', // an obvious error - %{ident}.pg_class should have been used instead
+                'pg_catalog'
+            );
+        } catch (UndefinedTypeException $e) {
+            $this->assertStringContainsStringIgnoringCase('did you mean', $e->getMessage());
+            $this->assertContains('%{ident}.pg_class', $e->getMessage());
+        }
+
+        $res = $this->conn->querySingleValue('SELECT 1 FROM %{ident}.pg_class LIMIT 1', 'pg_catalog');
+        $this->assertSame(1, $res);
     }
 }

@@ -77,6 +77,7 @@ class TypeDictionary implements ITypeDictionary
                 return $this->searchedNameCache[$typeName];
             }
         } else {
+            assert(is_string($schemaName));
             if (isset($this->qualNameTypeMap[$schemaName][$typeName])) {
                 return $this->qualNameTypeMap[$schemaName][$typeName];
             }
@@ -91,7 +92,12 @@ class TypeDictionary implements ITypeDictionary
 
         $msg = "There is no type defined for name \"$typeName\"";
         if ($schemaName !== null && $schemaName !== false) {
-            $msg .= " in schema \"$schemaName\"";
+            $msg .= " in schema \"$schemaName\".";
+            $serializer = $this->getValueSerializer($schemaName);
+            if ($serializer !== null) {
+                $msg .= " Did you mean the \"$schemaName\" serializer?";
+                $msg .= " (If so, use `%{{$schemaName}}.$typeName` instead of `%$schemaName.$typeName`.)";
+            }
         }
         throw new UndefinedTypeException($msg);
     }
