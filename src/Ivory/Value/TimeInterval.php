@@ -187,7 +187,7 @@ class TimeInterval implements IComparable
      * - SQL (e.g., `'200-10'` for 200 years and 10 months, or `'1 12:59:10'`);
      * - PostgreSQL (e.g., `'1 year 4.5 months 8 sec'`, `'@ 3 days 04:05:06'`, or just `'2'` for 2 seconds).
      *
-     * @see http://www.postgresql.org/docs/9.4/static/datatype-datetime.html#DATATYPE-INTERVAL-INPUT
+     * @see https://www.postgresql.org/docs/11/datatype-datetime.html#DATATYPE-INTERVAL-INPUT
      *
      * @param string $str interval specification in the ISO 8601, SQL, or PostgreSQL format
      * @return TimeInterval

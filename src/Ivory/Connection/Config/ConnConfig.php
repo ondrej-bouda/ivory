@@ -16,7 +16,7 @@ use Ivory\Value\Quantity;
  * Besides the interface-specified methods, this implementation exposes the database configuration parameters as dynamic
  * ("overloaded") properties. The value currently in effect is always returned. For accessing properties with non-word
  * characters in their names (e.g., when using
- * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-custom.html customized options}), the standard PHP
+ * {@link https://www.postgresql.org/docs/current/runtime-config-custom.html customized options}), the standard PHP
  * syntax `$config->{'some.prop'}` may be employed, or the {@link get()} method may simply be called.
  *
  * The implementation of read operations is lazy - no database query is made until actually needed. Some values are
@@ -25,7 +25,7 @@ use Ivory\Value\Quantity;
  *
  * Data types of non-standard settings are fetched once and cached for the whole {@link ConnConfig} object lifetime
  * ({@link ConnConfig::flushCache()} may, of course, be used for flushing it in any case). Note that
- * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-custom.html customized options} are always of type
+ * {@link https://www.postgresql.org/docs/current/runtime-config-custom.html customized options} are always of type
  * `text`.
  *
  * As for the {@link IObservableConnConfig} implementation, any changes of configuration parameters must be done through
@@ -241,7 +241,7 @@ class ConnConfig implements IObservableConnConfig
      */
     private static function isCustomOption(string $propertyName): bool
     {
-        // see http://www.postgresql.org/docs/9.4/static/runtime-config-custom.html
+        // see https://www.postgresql.org/docs/11/runtime-config-custom.html
         return (strpos($propertyName, '.') !== false);
     }
 

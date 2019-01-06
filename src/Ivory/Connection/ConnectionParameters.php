@@ -85,7 +85,7 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
      * Creates a connection parameters object from an RFC 3986 URI, e.g., `"postgresql://usr@localhost:5433/db"`.
      *
      * The accepted URI is the same as for the libpq connect function, described in the
-     * {@link http://www.postgresql.org/docs/9.4/static/libpq-connect.html PostgreSQL documentation}.
+     * {@link https://www.postgresql.org/docs/11/libpq-connect.html#LIBPQ-CONNSTRING PostgreSQL documentation}.
      *
      * The following holds for the accepted URIs:
      * - the URI scheme designator must either be `"postgresql"` or `"postgres"`,

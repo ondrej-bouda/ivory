@@ -29,8 +29,7 @@ interface ITxHandle
      *
      * Note that some options may only be set up before the first query or data-modifying statement is executed within
      * the transaction. See the PostgreSQL documentation on
-     * {@link http://www.postgresql.org/docs/9.4/static/sql-set-transaction.html `SQL SET TRANSACTION`} for more
-     * details.
+     * {@link https://www.postgresql.org/docs/current/sql-set-transaction.html `SQL SET TRANSACTION`} for more details.
      *
      * @param int|TxConfig $transactionOptions options for the transaction to be started;
      *                                         a {@link TxConfig} object, or a combination of {@link TxConfig} constants
@@ -45,8 +44,8 @@ interface ITxHandle
      * beginning of the importing transaction, it only makes sense for the {@link TxConfig::SERIALIZABLE} or the
      * {@link TxConfig::REPEATABLE_READ} isolation level of the importing transaction, and it merely synchronizes the
      * transactions with respect to pre-existing data. See the PostgreSQL documentation on
-     * {@link http://www.postgresql.org/docs/9.4/static/sql-set-transaction.html `SQL SET TRANSACTION`} and
-     * {@link http://www.postgresql.org/docs/9.4/static/functions-admin.html#FUNCTIONS-SNAPSHOT-SYNCHRONIZATION Snapshot Synchronization Functions}
+     * {@link https://www.postgresql.org/docs/current/sql-set-transaction.html `SQL SET TRANSACTION`} and
+     * {@link https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-SNAPSHOT-SYNCHRONIZATION Snapshot Synchronization Functions}
      * for detailed information.
      *
      * @param string $snapshotId a snapshot identifier exported by another existing transaction using
@@ -125,7 +124,7 @@ interface ITxHandle
      * the given savepoint are destroyed. The given savepoint itself remains valid, allowing to roll back to it multiple
      * times.
      *
-     * @see http://www.postgresql.org/docs/9.4/static/sql-rollback-to.html PostgreSQL docs on details regarding cursors
+     * @see https://www.postgresql.org/docs/current/sql-rollback-to.html PostgreSQL docs on details regarding cursors
      *
      * @param string $name name of the savepoint to roll back to;
      *                     if there are multiple savepoints of such name, the most recent is chosen
@@ -164,7 +163,7 @@ interface ITxHandle
      * After this operation, the transaction is closed and the handle gets stale and, as such, it cannot be used
      * anymore.
      *
-     * @see http://www.postgresql.org/docs/9.4/static/sql-prepare-transaction.html
+     * @see https://www.postgresql.org/docs/current/sql-prepare-transaction.html
      *
      * @param string|null $name name for the prepared transaction; must be server-wide unique;
      *                          if <tt>null</tt> is given, a random name is generated automatically

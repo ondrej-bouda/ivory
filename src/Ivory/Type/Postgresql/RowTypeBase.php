@@ -9,7 +9,7 @@ use Ivory\Type\ITotallyOrderedType;
 /**
  * A common base for types holding a tuple of values.
  *
- * @see http://www.postgresql.org/docs/9.4/static/rowtypes.html
+ * @see https://www.postgresql.org/docs/11/rowtypes.html
  */
 abstract class RowTypeBase extends BaseType implements ITotallyOrderedType
 {

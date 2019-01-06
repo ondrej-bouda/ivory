@@ -10,7 +10,7 @@ use Ivory\Value\TxIdSnapshot;
  *
  * Represented as a {@link \Ivory\Value\TxIdSnapshot} object.
  *
- * @see http://www.postgresql.org/docs/9.4/static/functions-info.html#FUNCTIONS-TXID-SNAPSHOT
+ * @see https://www.postgresql.org/docs/11/functions-info.html#FUNCTIONS-TXID-SNAPSHOT
  */
 class TxIdSnapshotType extends BaseType
 {

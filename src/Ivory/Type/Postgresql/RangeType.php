@@ -10,7 +10,7 @@ use Ivory\Value\Range;
 /**
  * Type object for ranges.
  *
- * @see http://www.postgresql.org/docs/9.4/static/rangetypes.html
+ * @see https://www.postgresql.org/docs/11/rangetypes.html
  */
 class RangeType implements ITotallyOrderedType
 {

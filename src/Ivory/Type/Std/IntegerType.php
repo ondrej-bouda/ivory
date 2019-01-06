@@ -10,7 +10,7 @@ use Ivory\Type\ITotallyOrderedType;
  *
  * Represented as the PHP `int` type.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html#DATATYPE-INT
+ * @see https://www.postgresql.org/docs/11/datatype-numeric.html#DATATYPE-INT
  */
 class IntegerType extends BaseType implements ITotallyOrderedType
 {

@@ -10,7 +10,7 @@ use Ivory\Type\ITotallyOrderedType;
  *
  * Represented as the PHP `float` type.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-numeric.html
+ * @see https://www.postgresql.org/docs/11/datatype-numeric.html
  */
 class FloatType extends BaseType implements ITotallyOrderedType
 {

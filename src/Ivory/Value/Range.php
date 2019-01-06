@@ -38,7 +38,7 @@ use Ivory\Value\Alg\IValueComparator;
  *
  * Note the range value is immutable, i.e., once constructed, it cannot be changed.
  *
- * @see http://www.postgresql.org/docs/9.4/static/rangetypes.html
+ * @see https://www.postgresql.org/docs/11/rangetypes.html
  */
 class Range implements IComparable
 {

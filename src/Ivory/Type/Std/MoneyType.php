@@ -23,7 +23,7 @@ use Ivory\Value\Money;
  * For a more thorough discussion of problems of the money type, see
  * {@link http://www.postgresql.org/message-id/flat/20130328092819.237c0106@imp#20130328092819.237c0106@imp}.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-money.html
+ * @see https://www.postgresql.org/docs/11/datatype-money.html
  */
 class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedType
 {

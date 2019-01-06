@@ -6,7 +6,7 @@ namespace Ivory\Lang\Sql;
  * Classes of SQL STATE codes.
  *
  * @see SqlState
- * @see http://www.postgresql.org/docs/10/static/errcodes-appendix.html
+ * @see https://www.postgresql.org/docs/11/errcodes-appendix.html
  */
 final class SqlStateClass
 {

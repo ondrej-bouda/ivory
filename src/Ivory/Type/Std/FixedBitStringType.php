@@ -9,7 +9,7 @@ use Ivory\Value\FixedBitString;
  *
  * Represented as a {@link \Ivory\Value\FixedBitString} object.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-bit.html
+ * @see https://www.postgresql.org/docs/11/datatype-bit.html
  */
 class FixedBitStringType extends BitStringType
 {

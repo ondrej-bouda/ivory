@@ -13,7 +13,7 @@ use Ivory\Value\Alg\IComparable;
  *
  * The objects are immutable.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-pg-lsn.html
+ * @see https://www.postgresql.org/docs/11/datatype-pg-lsn.html
  */
 class PgLogSequenceNumber implements IComparable
 {

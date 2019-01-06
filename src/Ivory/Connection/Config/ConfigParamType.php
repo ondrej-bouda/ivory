@@ -8,7 +8,7 @@ use Ivory\Value\Quantity;
 /**
  * Manages types of PostgreSQL configuration parameters.
  *
- * @see http://www.postgresql.org/docs/9.4/static/config-setting.html
+ * @see https://www.postgresql.org/docs/11/config-setting.html
  */
 class ConfigParamType
 {
@@ -91,8 +91,8 @@ class ConfigParamType
                     case 'fal':
                     case 'fa':
                     case 'f':
-                    case 'n':
                     case 'no':
+                    case 'n':
                     case '0':
                         return false;
 

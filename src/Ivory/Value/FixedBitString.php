@@ -15,8 +15,8 @@ use Ivory\Exception\IncomparableException;
  * from reading out of such a call, it does not test whether the given bit is *set* (i.e., whether it is 1) - it merely
  * tests whether it is legal to access it. Negative offsets may be used to get bits off the end of the string.
  *
- * @see http://www.postgresql.org/docs/current/static/datatype-bit.html PostgreSQL Bit String Types
- * @see http://www.postgresql.org/docs/current/static/functions-bitstring.html PostgreSQL Bit String Functions and Operators
+ * @see https://www.postgresql.org/docs/11/datatype-bit.html PostgreSQL Bit String Types
+ * @see https://www.postgresql.org/docs/11/functions-bitstring.html PostgreSQL Bit String Functions and Operators
  */
 class FixedBitString extends BitString
 {

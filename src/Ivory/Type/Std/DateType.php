@@ -17,7 +17,7 @@ use Ivory\Value\Date;
  *
  * The values recognized by the {@link DateType::parseValue()} method are expected to be in one of the four styles
  * PostgreSQL may use for output, depending on the
- * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-client.html#GUC-DATESTYLE DateStyle} environment
+ * {@link https://www.postgresql.org/docs/11/runtime-config-client.html#GUC-DATESTYLE DateStyle} environment
  * setting:
  * - `ISO`, e.g., `1997-12-17`,
  * - `SQL`, e.g., `12/17/1997`,
@@ -31,12 +31,12 @@ use Ivory\Value\Date;
  *
  * As for serializing values to PostgreSQL by the {@link DateType::serializeValue()} method, the `DateStyle` setting is
  * irrelevant - the values are serialized in `DateStyle`-agnostic way (see
- * {@link http://www.postgresql.org/docs/9.4/static/datetime-input-rules.html} for details on PostgreSQL reading date
+ * {@link https://www.postgresql.org/docs/11/datetime-input-rules.html } for details on PostgreSQL reading date
  * inputs).
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-datetime.html
- * @see http://www.postgresql.org/docs/9.4/static/datetime-units-history.html
- * @see http://www.postgresql.org/docs/9.4/static/runtime-config-client.html#GUC-DATESTYLE
+ * @see https://www.postgresql.org/docs/11/datatype-datetime.html
+ * @see https://www.postgresql.org/docs/11/datetime-units-history.html
+ * @see https://www.postgresql.org/docs/11/runtime-config-client.html#GUC-DATESTYLE
  */
 class DateType extends ConnectionDependentBaseType implements ITotallyOrderedType
 {

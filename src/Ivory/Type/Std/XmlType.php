@@ -12,8 +12,8 @@ use Ivory\Value\XmlDocument;
  *
  * Represented as an {@link \Ivory\Value\XmlContent} or {@link \Ivory\Value\XmlDocument} object.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-xml.html
- * @see http://www.postgresql.org/docs/9.4/static/functions-xml.html
+ * @see https://www.postgresql.org/docs/11/datatype-xml.html
+ * @see https://www.postgresql.org/docs/11/functions-xml.html
  */
 class XmlType extends BaseType
 {

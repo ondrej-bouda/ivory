@@ -10,7 +10,7 @@ use Ivory\Value\NetAddress;
  *
  * Represented as a {@link \Ivory\Value\NetAddress} object.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-net-types.html
+ * @see https://www.postgresql.org/docs/11/datatype-net-types.html#DATATYPE-INET
  * @todo #21 implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
 class InetType extends BaseType

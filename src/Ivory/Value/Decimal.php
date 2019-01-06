@@ -28,8 +28,8 @@ use Ivory\Utils\System;
  * extension. Currently, only few integer operations use GMP if it is available. It would be better if an alternative
  * class was used if the presence of the GMP extension was discovered at runtime.
  *
- * @see http://www.postgresql.org/docs/current/static/datatype-numeric.html PostgreSQL Numeric Types
- * @see http://www.postgresql.org/docs/current/static/functions-math.html PostgreSQL Mathematical Functions and Operators
+ * @see https://www.postgresql.org/docs/11/datatype-numeric.html PostgreSQL Numeric Types
+ * @see https://www.postgresql.org/docs/11/functions-math.html PostgreSQL Mathematical Functions and Operators
  */
 class Decimal implements IComparable
 {

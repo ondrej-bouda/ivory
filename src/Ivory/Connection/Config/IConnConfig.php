@@ -15,8 +15,8 @@ use Ivory\Value\Quantity;
  *
  * Apart from reading the values, it is also possible to write new values for some settings for the current transaction
  * or session. Note that not all settings may be changed at runtime. This class does not check for whether a setting
- * write operation is possible - all operations are simply passed to the database system (and they fail unless legal).
- * Consult the {@link http://www.postgresql.org/docs/9.4/static/config-setting.html PostgreSQL manual} for more details.
+ * write operation is possible - all operations are simply passed to the database system (and they fail if illegal).
+ * Consult the {@link https://www.postgresql.org/docs/current/config-setting.html PostgreSQL manual} for more details.
  *
  * There are several types a PostgreSQL setting may take:
  * * boolean, represented by the PHP `bool` type,
@@ -27,12 +27,12 @@ use Ivory\Value\Quantity;
  *
  * Generally, it is up to the user of this class to provide the correct type of value when writing a setting. There are
  * no checks performed by this class - everything is simply passed to the database system, as is. Note that
- * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-custom.html customized options} are treated as of
+ * {@link https://www.postgresql.org/docs/current/runtime-config-custom.html customized options} are treated as of
  * type `string` by PostgreSQL.
  *
  * @todo provide a way to get all configuration options; maybe as Iterable?
- * @see http://www.postgresql.org/docs/9.4/static/config-setting.html Description of Configuration Settings
- * @see http://www.postgresql.org/docs/9.4/static/runtime-config-client.html List of Standard Client Configuration Settings
+ * @see https://www.postgresql.org/docs/current/config-setting.html Description of Configuration Settings
+ * @see https://www.postgresql.org/docs/current/runtime-config-client.html List of Standard Client Configuration Settings
  */
 interface IConnConfig
 {

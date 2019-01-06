@@ -7,7 +7,7 @@ namespace Ivory\Value;
  *
  * The objects are immutable.
  *
- * @see http://www.postgresql.org/docs/9.4/static/functions-info.html#FUNCTIONS-TXID-SNAPSHOT
+ * @see https://www.postgresql.org/docs/11/functions-info.html#FUNCTIONS-TXID-SNAPSHOT
  */
 class TxIdSnapshot
 {

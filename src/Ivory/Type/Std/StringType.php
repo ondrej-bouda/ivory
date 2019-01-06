@@ -11,7 +11,7 @@ use Ivory\Type\Ivory\StringSerializer;
  *
  * Represented as the PHP `string` type.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-character.html
+ * @see https://www.postgresql.org/docs/11/datatype-character.html
  */
 class StringType extends StringSerializer implements ITotallyOrderedType
 {

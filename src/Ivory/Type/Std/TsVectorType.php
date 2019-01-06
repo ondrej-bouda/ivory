@@ -11,7 +11,7 @@ use Ivory\Value\TextSearchVector;
  *
  * Represented as a {@link \Ivory\Value\TextSearchVector} object.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-textsearch.html#DATATYPE-TSVECTOR
+ * @see https://www.postgresql.org/docs/11/datatype-textsearch.html#DATATYPE-TSVECTOR
  */
 class TsVectorType extends BaseType
 {

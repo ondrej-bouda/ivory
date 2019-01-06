@@ -15,7 +15,7 @@ use Ivory\Type\ITotallyOrderedType;
  * four digits may be separated by a hyphen from the rest of the string, and the whole string may be surrounded by
  * braces.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-uuid.html
+ * @see https://www.postgresql.org/docs/11/datatype-uuid.html
  */
 class UuidType extends BaseType implements ITotallyOrderedType
 {

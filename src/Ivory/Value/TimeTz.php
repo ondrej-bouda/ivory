@@ -21,7 +21,7 @@ namespace Ivory\Value;
  *
  * The objects are immutable, i.e., operations always produce a new object.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-datetime.html
+ * @see https://www.postgresql.org/docs/11/datatype-datetime.html
  */
 class TimeTz extends TimeBase
 {

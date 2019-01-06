@@ -9,7 +9,7 @@ use Ivory\Value\Json;
  *
  * Represented as a {@link \Ivory\Value\Json} object.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-json.html
+ * @see https://www.postgresql.org/docs/11/datatype-json.html
  */
 class JsonExactType extends JsonType
 {

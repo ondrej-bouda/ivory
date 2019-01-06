@@ -9,7 +9,7 @@ use Ivory\Value\Json;
 /**
  * Base for JSON types.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-json.html
+ * @see https://www.postgresql.org/docs/11/datatype-json.html
  */
 abstract class JsonType extends BaseType
 {

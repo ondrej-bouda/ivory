@@ -25,7 +25,7 @@ var_dump(pg_field_type(false, 0));
 var_dump(pg_field_type($result, $i));
 echo "\n";
 
-echo "Fully-qualified types: "; // NOTE: necessary even for the PostgreSQL standard types - pg_catalog may be placed after a user schema in the search path - see http://www.postgresql.org/docs/9.4/static/ddl-schemas.html#DDL-SCHEMAS-CATALOG
+echo "Fully-qualified types: "; // NOTE: necessary even for the PostgreSQL standard types - pg_catalog may be placed after a user schema in the search path - see https://www.postgresql.org/docs/11/ddl-schemas.html#DDL-SCHEMAS-CATALOG
 $typeOids = [];
 for ($i = 0; $i < $fieldCnt; $i++) {
 	$typeOids[] = pg_field_type_oid($result, $i);

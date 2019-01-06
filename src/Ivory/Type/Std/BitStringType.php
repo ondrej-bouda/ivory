@@ -9,7 +9,7 @@ use Ivory\Value\BitString;
 /**
  * Base for bit string types.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-bit.html
+ * @see https://www.postgresql.org/docs/11/datatype-bit.html
  */
 abstract class BitStringType extends BaseType implements ITotallyOrderedType
 {

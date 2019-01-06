@@ -6,7 +6,7 @@ namespace Ivory\Lang\Sql;
  * SQL STATE codes.
  *
  * @see SqlStateClass
- * @see http://www.postgresql.org/docs/10/static/errcodes-appendix.html
+ * @see https://www.postgresql.org/docs/11/errcodes-appendix.html
  */
 final class SqlState
 {
@@ -63,6 +63,8 @@ final class SqlState
     const INVALID_XML_COMMENT = '2200S';
     const INVALID_XML_PROCESSING_INSTRUCTION = '2200T';
     const INVALID_INDICATOR_PARAMETER_VALUE = '22010';
+    /** @since PostgreSQL 11 */
+    const INVALID_PRECEDING_OR_FOLLOWING_SIZE = '22013';
     const SUBSTRING_ERROR = '22011';
     const DIVISION_BY_ZERO = '22012';
     const INVALID_ARGUMENT_FOR_NTILE_FUNCTION = '22014';

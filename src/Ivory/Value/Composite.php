@@ -19,7 +19,7 @@ use Ivory\Value\Alg\ComparisonUtils;
  * multiple columns might have a same name. Moreover, it is customary to access tuples with array indices, while
  * composite attributes should only be accessed through attribute names. Hence, two different classes.
  *
- * @see http://www.postgresql.org/docs/9.4/static/rowtypes.html
+ * @see https://www.postgresql.org/docs/11/rowtypes.html
  */
 class Composite implements IComparable, \IteratorAggregate
 {

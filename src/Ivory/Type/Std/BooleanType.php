@@ -10,7 +10,7 @@ use Ivory\Type\ITotallyOrderedType;
  *
  * Represented as the PHP `bool` type.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-boolean.html
+ * @see https://www.postgresql.org/docs/11/datatype-boolean.html
  */
 class BooleanType extends BaseType implements ITotallyOrderedType
 {

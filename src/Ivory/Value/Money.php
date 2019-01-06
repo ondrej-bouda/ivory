@@ -15,7 +15,7 @@ use Ivory\Value\Alg\IComparable;
  *
  * Note that the special {@link Decimal::NaN()} values are not allowed for a money amount.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-money.html
+ * @see https://www.postgresql.org/docs/11/datatype-money.html
  */
 class Money implements IComparable
 {

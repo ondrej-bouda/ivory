@@ -11,7 +11,7 @@ use Ivory\Value\TimeTz;
  *
  * Represented as a {@link \Ivory\Value\TimeTz} object.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-datetime.html
+ * @see https://www.postgresql.org/docs/11/datatype-datetime.html
  */
 class TimeTzType extends BaseType implements ITotallyOrderedType
 {

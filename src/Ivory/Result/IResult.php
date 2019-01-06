@@ -34,7 +34,7 @@ interface IResult
 
     /**
      * @return string the command tag, e.g., <tt>SELECT 2</tt> or <tt>CREATE FUNCTION</tt>
-     * @see http://www.postgresql.org/docs/9.4/static/protocol-message-formats.html
+     * @see https://www.postgresql.org/docs/current/protocol-message-formats.html
      */
     function getCommandTag(): string;
 }

@@ -20,8 +20,8 @@ interface IIPCControl
     /**
      * Notifies all listeners of a given channel.
      *
-     * See the {@see http://www.postgresql.org/docs/9.4/static/sql-notify.html PostgreSQL documentation} for details
-     * regarding the asynchronous notifications, especially the behaviour regarding transactions.
+     * See the {@see https://www.postgresql.org/docs/current/sql-notify.html PostgreSQL documentation} for details
+     * on asynchronous notifications, especially the behaviour regarding transactions.
      *
      * @param string $channel name of channel to send notification to
      * @param string|null $payload optional payload to send along with the notification;

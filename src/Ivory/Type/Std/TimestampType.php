@@ -17,7 +17,7 @@ use Ivory\Value\Timestamp;
  *
  * The values recognized by the {@link TimestampType::parseValue()} method are expected to be in one of the four styles
  * PostgreSQL may use for output, depending on the
- * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-client.html#GUC-DATESTYLE DateStyle} environment
+ * {@link https://www.postgresql.org/docs/11/runtime-config-client.html#GUC-DATESTYLE DateStyle} environment
  * setting:
  * - `ISO`, e.g., `1997-12-17 07:37:16.1234` (the letter `T` might alternatively be used instead of the space),
  * - `SQL`, e.g., `12/17/1997 07:37:16.1234`,
@@ -31,12 +31,12 @@ use Ivory\Value\Timestamp;
  *
  * As for serializing values to PostgreSQL by the {@link TimestampType::serializeValue()} method, the `DateStyle`
  * setting is irrelevant - the values are serialized in `DateStyle`-agnostic way (see
- * {@link http://www.postgresql.org/docs/9.4/static/datetime-input-rules.html} for details on PostgreSQL reading date
+ * {@link https://www.postgresql.org/docs/11/datetime-input-rules.html} for details on PostgreSQL reading date
  * inputs).
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-datetime.html
- * @see http://www.postgresql.org/docs/9.4/static/datetime-units-history.html
- * @see http://www.postgresql.org/docs/9.4/static/runtime-config-client.html#GUC-DATESTYLE
+ * @see https://www.postgresql.org/docs/11/datatype-datetime.html
+ * @see https://www.postgresql.org/docs/11/datetime-units-history.html
+ * @see https://www.postgresql.org/docs/11/runtime-config-client.html#GUC-DATESTYLE
  */
 class TimestampType extends ConnectionDependentBaseType implements ITotallyOrderedType
 {

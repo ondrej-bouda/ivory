@@ -10,7 +10,7 @@ use Ivory\Value\LineSegment;
  *
  * Represented as a {@link \Ivory\Value\Line} object.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-geometric.html
+ * @see https://www.postgresql.org/docs/11/datatype-geometric.html
  */
 class LineType extends CompoundGeometricType
 {

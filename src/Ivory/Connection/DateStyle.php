@@ -4,7 +4,7 @@ namespace Ivory\Connection;
 
 /**
  * Manages date styles as configured by the
- * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-client.html#GUC-DATESTYLE `DateStyle`} configuration
+ * {@link https://www.postgresql.org/docs/11/runtime-config-client.html#GUC-DATESTYLE `DateStyle`} configuration
  * setting.
  */
 final class DateStyle

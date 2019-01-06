@@ -35,7 +35,7 @@ use Ivory\Type\IType;
  *   array keys completely. The elements are not sorted by their keys. When converting arrays from PostgreSQL to PHP,
  *   zero-based arrays are created. Conversely, arrays from PHP are converted to one-based PostgreSQL arrays.
  *
- * @see http://www.postgresql.org/docs/9.4/static/arrays.html
+ * @see https://www.postgresql.org/docs/11/arrays.html
  */
 class ArrayType implements ITotallyOrderedType
 {

@@ -73,7 +73,7 @@ interface ITransactionControl
      *
      * Not to be performed inside a transaction.
      *
-     * @see http://www.postgresql.org/docs/9.4/static/sql-commit-prepared.html
+     * @see https://www.postgresql.org/docs/current/sql-commit-prepared.html
      *
      * @param string $name name of the prepared transaction
      * @throws InvalidStateException when inside a transaction
@@ -85,7 +85,7 @@ interface ITransactionControl
      *
      * Not to be performed inside a transaction.
      *
-     * @see http://www.postgresql.org/docs/9.4/static/sql-rollback-prepared.html
+     * @see https://www.postgresql.org/docs/current/sql-rollback-prepared.html
      *
      * @param string $name name of the prepared transaction
      * @throws InvalidStateException when inside a transaction
@@ -98,7 +98,7 @@ interface ITransactionControl
      * See {@link ITxHandle::prepareTransaction()} for more details on preparing a transaction.
      *
      * @return IQueryResult result of query to all columns of
-     *                        {@link http://www.postgresql.org/docs/9.4/static/view-pg-prepared-xacts.html <tt>pg_catalog.pg_prepared_xacts</tt>}
+     *                        {@link https://www.postgresql.org/docs/current/view-pg-prepared-xacts.html <tt>pg_catalog.pg_prepared_xacts</tt>}
      */
     function listPreparedTransactions(): IQueryResult;
 }

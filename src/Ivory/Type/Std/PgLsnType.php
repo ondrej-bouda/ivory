@@ -11,7 +11,7 @@ use Ivory\Value\PgLogSequenceNumber;
  *
  * Represented as a {@link \Ivory\Value\PgLogSequenceNumber} object.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-pg-lsn.html
+ * @see https://www.postgresql.org/docs/11/datatype-pg-lsn.html
  */
 class PgLsnType extends BaseType implements ITotallyOrderedType
 {

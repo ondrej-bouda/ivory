@@ -17,12 +17,12 @@ use Ivory\Value\TimestampTz;
  * Represented as a {@link \Ivory\Value\TimestampTz} object.
  *
  * The format of recognized values is the same as for {@link \Ivory\Value\Timestamp}. All possible
- * {@link http://www.postgresql.org/docs/9.4/static/runtime-config-client.html#GUC-DATESTYLE DateStyle} settings are
+ * {@link https://www.postgresql.org/docs/11/runtime-config-client.html#GUC-DATESTYLE DateStyle} settings are
  * supported.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datatype-datetime.html
- * @see http://www.postgresql.org/docs/9.4/static/datetime-units-history.html
- * @see http://www.postgresql.org/docs/9.4/static/runtime-config-client.html#GUC-DATESTYLE
+ * @see https://www.postgresql.org/docs/11/datatype-datetime.html
+ * @see https://www.postgresql.org/docs/11/datetime-units-history.html
+ * @see https://www.postgresql.org/docs/11/runtime-config-client.html#GUC-DATESTYLE
  */
 class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrderedType
 {

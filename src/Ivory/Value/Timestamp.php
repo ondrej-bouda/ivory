@@ -20,7 +20,7 @@ namespace Ivory\Value;
  *
  * Note the date/time value is immutable, i.e., once constructed, its value cannot be changed.
  *
- * @see http://www.postgresql.org/docs/9.4/static/datetime-units-history.html
+ * @see https://www.postgresql.org/docs/11/datetime-units-history.html
  */
 class Timestamp extends TimestampBase
 {
