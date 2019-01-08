@@ -3,7 +3,6 @@ declare(strict_types=1);
 namespace Ivory\Lang\Sql;
 
 use Ivory\Type\Ivory\IdentifierSerializer;
-use Ivory\Type\Ivory\StringSerializer;
 
 /**
  * @see https://www.postgresql.org/docs/9.6/static/datatype-numeric.html
@@ -64,13 +63,13 @@ class Types
         ];
     }
 
-    public static function serializeString($str): string
+    public static function serializeString(?string $str): string
     {
-        static $stringSerializer = null;
-        if ($stringSerializer === null) {
-            $stringSerializer = new StringSerializer();
+        if ($str === null) {
+            return 'NULL';
+        } else {
+            return "'" . strtr($str, ["'" => "''"]) . "'";
         }
-        return $stringSerializer->serializeValue($str);
     }
 
     public static function serializeIdent(string $ident): string

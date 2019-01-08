@@ -3,8 +3,8 @@ declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
 use Ivory\Lang\Sql\Types;
-use Ivory\NamedDbObject;
 use Ivory\Type\ITotallyOrderedType;
+use Ivory\Type\TypeBase;
 use Ivory\Value\EnumItem;
 
 /**
@@ -25,15 +25,13 @@ use Ivory\Value\EnumItem;
  * For a stricter and, actually, a more comfortable solution, subclass {@link StrictEnum} for each PostgreSQL
  * enumeration type and use the class in {@link StrictEnumType}.
  */
-class EnumType implements ITotallyOrderedType
+class EnumType extends TypeBase implements ITotallyOrderedType
 {
-    use NamedDbObject;
-
     private $labelSet;
 
     public function __construct(string $schemaName, string $typeName, array $labels)
     {
-        $this->setName($schemaName, $typeName);
+        parent::__construct($schemaName, $typeName);
         $this->labelSet = array_flip($labels);
     }
 
@@ -47,31 +45,26 @@ class EnumType implements ITotallyOrderedType
         );
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         }
 
         if ($val instanceof EnumItem) {
             if ($val->getTypeSchema() != $this->getSchemaName() || $val->getTypeName() != $this->getName()) {
-                $msg = "Serializing enum item for a different type {$this->schemaName}.{$this->name}";
+                $msg = "Serializing enum item for a different type {$this->getSchemaName()}.{$this->getName()}";
                 trigger_error($msg, E_USER_WARNING);
             }
             $v = $val->getValue();
         } else {
             if (!isset($this->labelSet[$val])) {
-                $msg = "Value '$val' is not among defined labels of enumeration type {$this->schemaName}.{$this->name}";
+                $msg = "Value '$val' is not among defined labels of enumeration type {$this->getSchemaName()}.{$this->getName()}";
                 trigger_error($msg, E_USER_WARNING);
             }
             $v = $val;
         }
 
-        return sprintf(
-            '%s::%s.%s',
-            Types::serializeString($v),
-            Types::serializeIdent($this->getSchemaName()),
-            Types::serializeIdent($this->getName())
-        );
+        return $this->indicateType($forceType, Types::serializeString($v));
     }
 }

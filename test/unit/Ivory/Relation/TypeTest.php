@@ -522,13 +522,13 @@ class TypeTest extends IvoryTestCase
         $c = SqlRelationDefinition::fromPattern('SELECT * FROM %ident', 'a.b');
         $this->assertSame('SELECT * FROM "a.b"', $c->toSql($typeDict));
 
-        $d = SqlRelationDefinition::fromPattern('SELECT * FROM %qident', 't');
+        $d = SqlRelationDefinition::fromPattern('SELECT * FROM %ident!', 't');
         $this->assertSame('SELECT * FROM "t"', $d->toSql($typeDict));
 
-        $e = SqlRelationDefinition::fromPattern('SELECT * FROM %qident', 'T');
+        $e = SqlRelationDefinition::fromPattern('SELECT * FROM %ident!', 'T');
         $this->assertSame('SELECT * FROM "T"', $e->toSql($typeDict));
 
-        $f = SqlRelationDefinition::fromPattern('SELECT * FROM %qident', 'a.b');
+        $f = SqlRelationDefinition::fromPattern('SELECT * FROM %ident!', 'a.b');
         $this->assertSame('SELECT * FROM "a.b"', $f->toSql($typeDict));
     }
 
@@ -547,4 +547,42 @@ class TypeTest extends IvoryTestCase
         $res = $this->conn->querySingleValue('SELECT 1 FROM %{ident}.pg_class LIMIT 1', 'pg_catalog');
         $this->assertSame(1, $res);
     }
+
+//    public function testObjectIdentifierTypes()
+//    {
+//        $tuple = $this->conn->querySingleTuple(
+//            <<<'SQL'
+//            SELECT
+//                987::oid,
+//                'pg_catalog.pg_typeof'::regproc,
+//                'pg_catalog.pg_typeof("any")'::regprocedure,
+//                '!'::regoper,
+//                '+(integer, integer)'::regoperator,
+//                'pg_catalog.pg_class'::regclass,
+//                pg_catalog.pg_typeof(1.0),
+//                'postgres'::regrole,
+//                'pg_catalog'::regnamespace,
+//                'english'::regconfig,
+//                'simple'::regdictionary,
+//                '123'::xid,
+//                '456'::cid,
+//                '(7,8)'::tid
+//SQL
+//        );
+//        // TODO: test the result
+//    }
+
+    public function testDoublePrecision()
+    {
+        $tuple = $this->conn->querySingleTuple(
+            'SELECT
+                 pg_catalog.pg_typeof(%{double precision})::TEXT AS double,
+                 pg_catalog.pg_typeof(%{double precision}!)::TEXT AS double_explicit',
+            1.2,
+            1.2
+        );
+        $this->assertSame('numeric', $tuple->double);
+        $this->assertSame('double precision', $tuple->double_explicit);
+    }
+
 }

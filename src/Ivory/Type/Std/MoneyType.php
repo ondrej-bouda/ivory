@@ -54,24 +54,24 @@ class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedTy
         }
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         }
 
         if ($val instanceof Money) {
-            $str = $val->getAmount()->toString();
+            $expr = $val->getAmount()->toString();
         } elseif ($val instanceof Decimal) {
-            $str = $val->toString();
+            $expr = $val->toString();
         } elseif (is_int($val) || is_float($val) || filter_var($val, FILTER_VALIDATE_FLOAT)) {
-            $str = (string)$val;
+            $expr = (string)$val;
         } elseif (is_string($val)) {
-            $str = Money::fromString($val, '.')->getAmount()->toString();
+            $expr = Money::fromString($val, '.')->getAmount()->toString();
         } else {
             throw $this->invalidValueException($val);
         }
 
-        return $str . '::money';
+        return $this->typeCastExpr($forceType, $expr);
     }
 }

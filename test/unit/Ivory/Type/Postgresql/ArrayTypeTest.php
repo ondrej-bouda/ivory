@@ -26,14 +26,14 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testSerializeList()
     {
-        $this->assertSame("'[0:2]={1,4,5}'::pg_catalog.int4[]", $this->intArrayType->serializeValue([1, 4, 5]));
+        $this->assertSame("'[0:2]={1,4,5}'::pg_catalog.int4[]", $this->intArrayType->serializeValue([1, 4, 5], true));
         $this->assertSame("'{}'::pg_catalog.int4[]", $this->intArrayType->serializeValue([]));
-        $this->assertSame("'{-42}'::pg_catalog.int4[]", $this->intArrayType->serializeValue([1 => -42]));
-        $this->assertSame("'{3,NULL,1}'::pg_catalog.int4[]", $this->intArrayType->serializeValue([1 => 3, null, 1]));
+        $this->assertSame("'{-42}'::pg_catalog.int4[]", $this->intArrayType->serializeValue([1 => -42], true));
+        $this->assertSame("'{3,NULL,1}'", $this->intArrayType->serializeValue([1 => 3, null, 1]));
 
         $this->assertSame(
             "'[0:2]={abc,NULL,def}'::pg_catalog.text[]",
-            $this->strArrayType->serializeValue(['abc', null, 'def'])
+            $this->strArrayType->serializeValue(['abc', null, 'def'], true)
         );
 
         try {
@@ -50,7 +50,8 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 STR
             ,
             $this->strArrayType->serializeValue(
-                [1 => 'abc', null, 'NULL', 'NULLs', '', 'x,y', '{}', '1\\2', 'p q', '"r"', "'"]
+                [1 => 'abc', null, 'NULL', 'NULLs', '', 'x,y', '{}', '1\\2', 'p q', '"r"', "'"],
+                true
             )
         );
     }
@@ -59,11 +60,11 @@ STR
     {
         $this->assertSame(
             "'[0:1][0:2]={{1,4,5},{7,NULL,0}}'::pg_catalog.int4[]",
-            $this->intArrayType->serializeValue([[1, 4, 5], [7, null, 0]])
+            $this->intArrayType->serializeValue([[1, 4, 5], [7, null, 0]], true)
         );
 
         $this->assertSame(
-            "'{{1,4,5},{7,NULL,0}}'::pg_catalog.int4[]",
+            "'{{1,4,5},{7,NULL,0}}'",
             $this->intArrayType->serializeValue([1 => [1 => 1, 4, 5], [1 => 7, null, 0]])
         );
 
@@ -84,7 +85,7 @@ STR
     {
         $this->assertSame(
             "'[0:1][-3:-1]={{1,2,3},{4,5,6}}'::pg_catalog.int4[]",
-            $this->intArrayType->serializeValue([[-3 => 1, -2 => 2, -1 => 3], [-3 => 4, -1 => 6, -2 => 5]])
+            $this->intArrayType->serializeValue([[-3 => 1, -2 => 2, -1 => 3], [-3 => 4, -1 => 6, -2 => 5]], true)
         );
 
         try {
@@ -105,21 +106,22 @@ STR
         $this->intArrayType->switchToPlainMode();
         $this->strArrayType->switchToPlainMode();
 
-        $this->assertSame('ARRAY[1]::pg_catalog.int4[]', $this->intArrayType->serializeValue([1]));
+        $this->assertSame('ARRAY[1]', $this->intArrayType->serializeValue([1]));
+        $this->assertSame('ARRAY[1]::pg_catalog.int4[]', $this->intArrayType->serializeValue([1], true));
         $this->assertSame('ARRAY[]::pg_catalog.int4[]', $this->intArrayType->serializeValue([]));
 
         $this->assertSame(
-            "ARRAY['abc',NULL,'NULL']::pg_catalog.text[]",
+            "ARRAY['abc',NULL,'NULL']",
             $this->strArrayType->serializeValue(['abc', null, 'NULL'])
         );
 
         $this->assertSame(
-            'ARRAY[[1,2,NULL],[4,6,5]]::pg_catalog.int4[]',
+            'ARRAY[[1,2,NULL],[4,6,5]]',
             $this->intArrayType->serializeValue([[-3 => 1, -2 => 2, -1 => null], [-3 => 4, -1 => 6, -2 => 5]])
         );
         $this->assertSame(
             'ARRAY[[1,2,3]]::pg_catalog.int4[]',
-            $this->intArrayType->serializeValue([[1, 2 => 2, 3]])
+            $this->intArrayType->serializeValue([[1, 2 => 2, 3]], true)
         );
 
 

@@ -72,7 +72,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
     public function testArrayTypes()
     {
         $recip = SqlRelationDefinition::fromPattern(
-            'SELECT %pg_catalog.text[], %integer[]',
+            'SELECT %pg_catalog.text[]!, %integer[]!',
             ["Ivory's escaping"],
             [1 => 4, 5, 2, 3]
         );
@@ -81,7 +81,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
             $recip->toSql($this->typeDict)
         );
 
-        $recip = SqlRelationDefinition::fromPattern('SELECT %int[][][]', [1 => 42]);
+        $recip = SqlRelationDefinition::fromPattern('SELECT %int[][][]!', [1 => 42]);
         $this->assertSame("SELECT '{42}'::pg_catalog.int4[]", $recip->toSql($this->typeDict));
     }
 
@@ -271,7 +271,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
     public function testAutoTypesArray()
     {
         $recip = SqlRelationDefinition::fromFragments(
-            'SELECT %, %:emptyArr, %:nullStartArr, %:allNullArr, %:nestedArr, %:decArr',
+            'SELECT %!, %!:emptyArr, %!:nullStartArr, %!:allNullArr, %!:nestedArr, %!:decArr',
             [1 => 1, 2, 3]
         );
         $recip->setParams([

@@ -43,17 +43,20 @@ class CompositeTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testSerializeSimple()
     {
-        $this->assertSame('NULL::s.t1', $this->intSingletonType->serializeValue(null));
+        $this->assertSame('NULL::s.t1', $this->intSingletonType->serializeValue(null, true));
 
-        $this->assertSame('ROW()::s.t0', $this->zeroType->serializeValue(Composite::fromMap([])));
+        $this->assertSame('ROW()::s.t0', $this->zeroType->serializeValue(Composite::fromMap([]), true));
 
-        $this->assertSame('ROW(1)::s.t1', $this->intSingletonType->serializeValue(Composite::fromMap(['a' => 1])));
-        $this->assertSame('ROW(NULL)::s.t1', $this->intSingletonType->serializeValue(Composite::fromMap(['a' => null])));
+        $this->assertSame('ROW(1)', $this->intSingletonType->serializeValue(Composite::fromMap(['a' => 1])));
+        $this->assertSame(
+            'ROW(NULL)::s.t1',
+            $this->intSingletonType->serializeValue(Composite::fromMap(['a' => null]), true)
+        );
 
-        $this->assertSame("(1,'ab')::s.t2", $this->intTextPairType->serializeValue($this->intText(1, 'ab')));
-        $this->assertSame("(1,'2')::s.t2", $this->intTextPairType->serializeValue($this->intText(1, 2)));
-        $this->assertSame("(NULL,'')::s.t2", $this->intTextPairType->serializeValue($this->intText(null, '')));
-        $this->assertSame('(0,NULL)::s.t2', $this->intTextPairType->serializeValue($this->intText(0, null)));
+        $this->assertSame("(1,'ab')::s.t2", $this->intTextPairType->serializeValue($this->intText(1, 'ab'), true));
+        $this->assertSame("(1,'2')::s.t2", $this->intTextPairType->serializeValue($this->intText(1, 2), true));
+        $this->assertSame("(NULL,'')::s.t2", $this->intTextPairType->serializeValue($this->intText(null, ''), true));
+        $this->assertSame('(0,NULL)::s.t2', $this->intTextPairType->serializeValue($this->intText(0, null), true));
     }
 
     private function intText($a, $b)

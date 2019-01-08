@@ -54,10 +54,10 @@ class LineType extends CompoundGeometricType
         }
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         } elseif ($val instanceof Line) {
             list($p1, $p2) = $val->getPoints();
             return sprintf('line(%s,%s)',

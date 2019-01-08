@@ -5,7 +5,6 @@ namespace Ivory\Type\Std;
 use Ivory\Connection\Config\ConfigParam;
 use Ivory\Connection\ITxHandle;
 use Ivory\IvoryTestCase;
-use Ivory\Result\IQueryResult;
 use Ivory\Utils\System;
 use Ivory\Value\Money;
 

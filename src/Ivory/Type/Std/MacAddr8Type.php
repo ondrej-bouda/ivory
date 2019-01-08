@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Value\MacAddr8;
 
 /**
@@ -13,7 +13,7 @@ use Ivory\Value\MacAddr8;
  * @see https://www.postgresql.org/docs/11/datatype-net-types.html#DATATYPE-MACADDR8
  * @todo #21 implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
-class MacAddr8Type extends BaseType
+class MacAddr8Type extends TypeBase
 {
     public function parseValue(string $extRepr)
     {
@@ -24,16 +24,16 @@ class MacAddr8Type extends BaseType
         }
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         }
 
         if (!$val instanceof MacAddr8) {
             $val = MacAddr8::fromString($val);
         }
 
-        return "'" . $val->toString() . "'";
+        return $this->indicateType($forceType, "'" . $val->toString() . "'");
     }
 }

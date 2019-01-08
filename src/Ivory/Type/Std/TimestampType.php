@@ -110,10 +110,10 @@ class TimestampType extends ConnectionDependentBaseType implements ITotallyOrder
         return Timestamp::fromParts((int)$y, (int)$m, (int)$d, (int)$h, (int)$i, $s);
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         }
 
         if (!$val instanceof Timestamp) {
@@ -121,17 +121,18 @@ class TimestampType extends ConnectionDependentBaseType implements ITotallyOrder
         }
 
         if ($val->isFinite()) {
-            return sprintf(
+            $tsStr = sprintf(
                 "'%04d-%s%s%s'",
                 abs($val->getYear()),
                 $val->format('m-d H:i:s'),
                 ($val->format('u') ? $val->format('.u') : ''),
                 ($val->getYear() < 0 ? ' BC' : '')
             );
+            return $this->indicateType($forceType, $tsStr);
         } elseif ($val === Timestamp::infinity()) {
-            return "'infinity'";
+            return $this->indicateType($forceType, "'infinity'");
         } elseif ($val === Timestamp::minusInfinity()) {
-            return "'-infinity'";
+            return $this->indicateType($forceType, "'-infinity'");
         } else {
             throw new \LogicException('A non-finite timestamp not recognized');
         }

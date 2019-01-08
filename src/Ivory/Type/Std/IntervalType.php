@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\TimeInterval;
 
@@ -13,17 +13,17 @@ use Ivory\Value\TimeInterval;
  *
  * @see https://www.postgresql.org/docs/11/datatype-datetime.html
  */
-class IntervalType extends BaseType implements ITotallyOrderedType
+class IntervalType extends TypeBase implements ITotallyOrderedType
 {
     public function parseValue(string $extRepr)
     {
         return TimeInterval::fromString($extRepr);
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         }
 
         if (!$val instanceof TimeInterval) {
@@ -34,6 +34,6 @@ class IntervalType extends BaseType implements ITotallyOrderedType
             }
         }
 
-        return "'" . $val->toIsoString() . "'";
+        return $this->indicateType($forceType, "'" . $val->toIsoString() . "'");
     }
 }

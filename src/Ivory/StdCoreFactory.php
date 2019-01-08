@@ -20,7 +20,6 @@ use Ivory\Lang\SqlPattern\SqlPatternParser;
 use Ivory\Type\Ivory\CommandSerializer;
 use Ivory\Type\Ivory\IdentifierSerializer;
 use Ivory\Type\Ivory\LikeExpressionSerializer;
-use Ivory\Type\Ivory\QuotedIdentifierSerializer;
 use Ivory\Type\Ivory\RelationSerializer;
 use Ivory\Type\Ivory\SqlSerializer;
 use Ivory\Type\Std\StdTypeLoader;
@@ -47,7 +46,6 @@ class StdCoreFactory implements ICoreFactory
         $reg->registerValueSerializers([
             'sql' => new SqlSerializer(),
             'ident' => new IdentifierSerializer(),
-            'qident' => new QuotedIdentifierSerializer(),
             'rel' => new RelationSerializer(),
             'cmd' => new CommandSerializer(),
             'like' => new LikeExpressionSerializer(LikeExpressionSerializer::WILDCARD_NONE),

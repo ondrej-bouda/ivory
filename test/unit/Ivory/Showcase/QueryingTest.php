@@ -63,7 +63,7 @@ class QueryingTest extends IvoryTestCase
         $this->conn->getTypeRegister()->registerTypeInferenceRule(\stdClass::class, 'pg_catalog', 'json');
         $this->conn->flushTypeDictionary(); // the type dictionary was changed while in use - explicit flush necessary
 
-        $relDef = SqlRelationDefinition::fromPattern('SELECT %js, %', Json::null(), (object)['a' => 42]);
+        $relDef = SqlRelationDefinition::fromPattern('SELECT %js!, %!', Json::null(), (object)['a' => 42]);
         $sql = $relDef->toSql($this->conn->getTypeDictionary());
         $this->assertSame("SELECT pg_catalog.json 'null', pg_catalog.json '{\"a\":42}'", $sql);
 

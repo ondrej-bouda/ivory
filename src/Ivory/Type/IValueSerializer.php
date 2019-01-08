@@ -12,9 +12,9 @@ interface IValueSerializer
      *
      * In case `null` is given, the `'NULL'` string is returned.
      *
-     * @todo #1 unify whether the result shall contain the typecast or not; whether it is necessary depends on the context, so the output of this method shall probably contain no typecasts - the caller should include it, if required
-     * @param mixed $val
+     * @param mixed $val value to be serialized
+     * @param bool $forceType whether the SQL expression should tell PostgreSQL the type explicitly, if relevant
      * @return string
      */
-    function serializeValue($val): string;
+    function serializeValue($val, bool $forceType = false): string;
 }

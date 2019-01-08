@@ -36,10 +36,10 @@ class BoxType extends CompoundGeometricType
         }
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         } elseif ($val instanceof Box) {
             return sprintf('box(%s,%s)',
                 $this->pointType->serializeValue($val->getUpperRight()),

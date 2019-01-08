@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\Decimal;
 
@@ -13,7 +13,7 @@ use Ivory\Value\Decimal;
  *
  * @see https://www.postgresql.org/docs/11/datatype-numeric.html
  */
-class DecimalType extends BaseType implements ITotallyOrderedType
+class DecimalType extends TypeBase implements ITotallyOrderedType
 {
     public function parseValue(string $extRepr)
     {
@@ -24,10 +24,10 @@ class DecimalType extends BaseType implements ITotallyOrderedType
         return Decimal::fromNumber($extRepr);
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         }
 
         if (!$val instanceof Decimal) {
@@ -35,9 +35,9 @@ class DecimalType extends BaseType implements ITotallyOrderedType
         }
 
         if ($val->isNaN()) {
-            return "'NaN'";
+            return $this->indicateType($forceType, "'NaN'");
         } else {
-            return $val->toString();
+            return $this->typeCastExpr($forceType, $val->toString());
         }
     }
 }

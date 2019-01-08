@@ -81,14 +81,14 @@ class EnumTypeTest extends IvoryTestCase
         $conn = $this->getIvoryConnection();
         $this->assertTrue(
             $conn->querySingleValue(
-                'SELECT %planet < %planet',
+                'SELECT %planet! < %planet!',
                 'Venus',
                 EnumItem::forType('public', 'planet', 'Uranus')
             )
         );
 
         try {
-            $conn->querySingleValue('SELECT %planet', 'Pluto');
+            $conn->querySingleValue('SELECT %planet!', 'Pluto');
             $this->fail('A warning was expected');
         } catch (\PHPUnit\Framework\Error\Warning $e) {
         }

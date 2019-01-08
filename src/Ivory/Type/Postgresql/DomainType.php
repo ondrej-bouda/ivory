@@ -2,18 +2,16 @@
 declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
-use Ivory\NamedDbObject;
 use Ivory\Type\IType;
+use Ivory\Type\TypeBase;
 
-class DomainType implements IType
+class DomainType extends TypeBase implements IType
 {
-    use NamedDbObject;
-
     private $baseType;
 
     public function __construct(string $schemaName, string $typeName, IType $baseType)
     {
-        $this->setName($schemaName, $typeName);
+        parent::__construct($schemaName, $typeName);
         $this->baseType = $baseType;
     }
 
@@ -22,8 +20,9 @@ class DomainType implements IType
         return $this->baseType->parseValue($extRepr);
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
-        return $this->baseType->serializeValue($val);
+        $baseExpr = $this->baseType->serializeValue($val, false);
+        return $this->typeCastExpr($forceType, $baseExpr);
     }
 }

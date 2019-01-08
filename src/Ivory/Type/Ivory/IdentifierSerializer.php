@@ -7,8 +7,7 @@ use Ivory\Type\IValueSerializer;
 /**
  * Identifier, e.g., table or column name.
  *
- * Unlike {@link QuotedIdentifierSerializer}, identifiers serialized by this serializer are only quoted if reasonable.
- * There are two reasons for quoting:
+ * Identifiers serialized by this serializer are only quoted if reasonable. There are two reasons for quoting:
  * - uppercase characters in the identifier (without quoting, Postgres would convert the identifier to lowercase), or
  * - characters which would be illegal for an unquoted identifier according to the PostgreSQL lexical rules.
  *
@@ -20,18 +19,17 @@ use Ivory\Type\IValueSerializer;
  * As identifiers are expected to be used in contexts where `NULL` is illegal, serializing `null` will result in an
  * {@link \InvalidArgumentException}.
  *
- * @see QuotedIdentifierSerializer - a serializer always quoting the identifier
- * @see https://www.postgresql.org/docs/9.6/static/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+ * @see https://www.postgresql.org/docs/11/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
  */
 class IdentifierSerializer implements IValueSerializer
 {
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
             throw new \InvalidArgumentException('Expecting an identifier, NULL encountered.');
         }
 
-        if ($this->needsQuotes($val)) {
+        if ($forceType || $this->needsQuotes($val)) {
             return '"' . str_replace('"', '""', $val) . '"';
         } else {
             return $val;

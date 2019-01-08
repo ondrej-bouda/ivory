@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Type\ITotallyOrderedType;
 
 /**
@@ -12,7 +12,7 @@ use Ivory\Type\ITotallyOrderedType;
  *
  * @see https://www.postgresql.org/docs/11/datatype-boolean.html
  */
-class BooleanType extends BaseType implements ITotallyOrderedType
+class BooleanType extends TypeBase implements ITotallyOrderedType
 {
     public function parseValue(string $extRepr)
     {
@@ -38,10 +38,10 @@ class BooleanType extends BaseType implements ITotallyOrderedType
         }
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         } elseif ($val) {
             return 'TRUE';
         } else {

@@ -56,11 +56,15 @@ class RangeTypeTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertSame(
-            "'empty'::pg_catalog.int4range",
+            "'empty'",
             $this->intRangeType->serializeValue(Range::empty())
         );
         $this->assertSame(
-            "'empty'::pg_catalog.int4range",
+            "pg_catalog.int4range 'empty'",
+            $this->intRangeType->serializeValue(Range::empty(), true)
+        );
+        $this->assertSame(
+            "'empty'",
             $this->intRangeType->serializeValue([1, 0])
         );
 

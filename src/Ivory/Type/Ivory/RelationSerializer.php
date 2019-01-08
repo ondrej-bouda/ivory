@@ -22,7 +22,7 @@ class RelationSerializer extends ConnectionDependentValueSerializer
 {
     private $identifierSerializer = null;
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val instanceof IRelationDefinition) {
             $typeDictionary = $this->getConnection()->getTypeDictionary();

@@ -31,7 +31,7 @@ class UndefinedType extends ConnectionDependentBaseType
         throw new UndefinedTypeException("{$this->getSchemaName()}.{$this->getName()} on connection {$this->connName}");
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         throw new UndefinedTypeException("{$this->getSchemaName()}.{$this->getName()} on connection {$this->connName}");
     }

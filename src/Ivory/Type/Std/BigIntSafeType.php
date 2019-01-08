@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Type\IType;
 
@@ -14,7 +14,7 @@ use Ivory\Type\IType;
  *
  * @see https://www.postgresql.org/docs/11/datatype-numeric.html#DATATYPE-INT
  */
-class BigIntSafeType extends BaseType implements ITotallyOrderedType
+class BigIntSafeType extends TypeBase implements ITotallyOrderedType
 {
     public static function isIntegerString($str): bool
     {
@@ -39,15 +39,15 @@ class BigIntSafeType extends BaseType implements ITotallyOrderedType
         }
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         } elseif ($val >= PHP_INT_MIN && $val <= PHP_INT_MAX) {
-            return (string)(int)$val;
+            return $this->typeCastExpr($forceType, (string)(int)$val);
         } else {
             if (self::isIntegerString($val)) {
-                return (string)$val;
+                return $this->typeCastExpr($forceType, (string)$val);
             } else {
                 throw $this->invalidValueException($val);
             }

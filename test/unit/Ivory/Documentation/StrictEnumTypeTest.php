@@ -89,20 +89,20 @@ class StrictEnumTypeTest extends IvoryTestCase
         $conn = $this->getIvoryConnection();
         $this->assertTrue(
             $conn->querySingleValue(
-                'SELECT %planet < %planet',
+                'SELECT %planet! < %planet!',
                 Planet::Venus(),
                 new Planet('Uranus')
             )
         );
 
         try {
-            $conn->querySingleValue('SELECT %planet', 'Mars');
+            $conn->querySingleValue('SELECT %planet!', 'Mars');
             $this->fail(\InvalidArgumentException::class . ' was expected');
         } catch (\InvalidArgumentException $e) {
         }
 
         try {
-            $conn->querySingleValue('SELECT %planet', ChocolateBar::Mars());
+            $conn->querySingleValue('SELECT %planet!', ChocolateBar::Mars());
             $this->fail(\InvalidArgumentException::class . ' was expected');
         } catch (\InvalidArgumentException $e) {
         }

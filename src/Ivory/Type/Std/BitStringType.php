@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\BitString;
 
@@ -11,14 +11,14 @@ use Ivory\Value\BitString;
  *
  * @see https://www.postgresql.org/docs/11/datatype-bit.html
  */
-abstract class BitStringType extends BaseType implements ITotallyOrderedType
+abstract class BitStringType extends TypeBase implements ITotallyOrderedType
 {
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         } elseif ($val instanceof BitString) {
-            return "B'" . $val->toString() . "'";
+            return $this->typeCastExpr($forceType, "B'" . $val->toString() . "'");
         } else {
             throw $this->invalidValueException($val);
         }

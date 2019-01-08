@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Type\Std;
 
 use Ivory\Lang\Sql\Types;
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Value\Json;
 
 /**
@@ -11,12 +11,12 @@ use Ivory\Value\Json;
  *
  * @see https://www.postgresql.org/docs/11/datatype-json.html
  */
-abstract class JsonType extends BaseType
+abstract class JsonType extends TypeBase
 {
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         }
 
         if (!$val instanceof Json) {
@@ -27,11 +27,6 @@ abstract class JsonType extends BaseType
             }
         }
 
-        return sprintf(
-            '%s.%s %s',
-            Types::serializeIdent($this->getSchemaName()),
-            Types::serializeIdent($this->getName()),
-            Types::serializeString($val->getEncoded())
-        );
+        return $this->indicateType($forceType, Types::serializeString($val->getEncoded()));
     }
 }

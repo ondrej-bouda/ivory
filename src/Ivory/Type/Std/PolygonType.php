@@ -44,10 +44,10 @@ class PolygonType extends CompoundGeometricType
         }
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         }
 
         if (!$val instanceof Polygon) {
@@ -63,6 +63,6 @@ class PolygonType extends CompoundGeometricType
             $points[] = $this->pointType->serializeValue($point);
         }
 
-        return sprintf("polygon '(%s)'", implode(',', $points));
+        return $this->indicateType($forceType, sprintf("'(%s)'", implode(',', $points)));
     }
 }

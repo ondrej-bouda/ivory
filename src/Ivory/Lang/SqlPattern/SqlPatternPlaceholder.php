@@ -15,6 +15,7 @@ class SqlPatternPlaceholder
     private $typeNameQuoted;
     private $schemaName;
     private $schemaNameQuoted;
+    private $typeForced;
 
     /**
      * @param int $offset byte offset where is the place in the parsed SQL to insert value for the placeholder
@@ -24,6 +25,7 @@ class SqlPatternPlaceholder
      * @param string|null $schemaName name of schema of the type specified for the placeholder, or <tt>null</tt> if no
      *                                  schema is given
      * @param bool $schemaNameQuoted whether the schema name is quoted
+     * @param bool $typeForced whether the type should be forced to PostgreSQL
      */
     public function __construct(
         int $offset,
@@ -31,7 +33,8 @@ class SqlPatternPlaceholder
         ?string $typeName = null,
         bool $typeNameQuoted = false,
         ?string $schemaName = null,
-        bool $schemaNameQuoted = false
+        bool $schemaNameQuoted = false,
+        bool $typeForced = false
     ) {
         $this->offset = $offset;
         $this->nameOrPosition = $nameOrPosition;
@@ -39,6 +42,7 @@ class SqlPatternPlaceholder
         $this->typeNameQuoted = $typeNameQuoted;
         $this->schemaName = $schemaName;
         $this->schemaNameQuoted = $schemaNameQuoted;
+        $this->typeForced = $typeForced;
     }
 
     /**
@@ -89,5 +93,13 @@ class SqlPatternPlaceholder
     public function isSchemaNameQuoted(): bool
     {
         return $this->schemaNameQuoted;
+    }
+
+    /**
+     * @return bool whether the type should be forced to PostgreSQL
+     */
+    public function isTypeForced(): bool
+    {
+        return $this->typeForced;
     }
 }

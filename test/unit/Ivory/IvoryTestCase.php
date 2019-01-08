@@ -85,7 +85,7 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
      *
      * Adapted from https://github.com/sebastianbergmann/phpunit/issues/1798#issuecomment-134219493
      *
-     * @param string|array $expectedTypeOrTypeMessagePair either the expected type, or pair (expected type, message)
+     * @param string|string[] $expectedTypeOrTypeMessagePair either the expected type, or pair (expected type, message)
      * @param \Closure $function piece of code within which an exception is expected to be thrown
      * @param string $message message to show upon failure
      */

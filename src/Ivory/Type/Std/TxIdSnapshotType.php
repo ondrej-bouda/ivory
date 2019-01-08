@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Value\TxIdSnapshot;
 
 /**
@@ -12,23 +12,23 @@ use Ivory\Value\TxIdSnapshot;
  *
  * @see https://www.postgresql.org/docs/11/functions-info.html#FUNCTIONS-TXID-SNAPSHOT
  */
-class TxIdSnapshotType extends BaseType
+class TxIdSnapshotType extends TypeBase
 {
     public function parseValue(string $extRepr)
     {
         return TxIdSnapshot::fromString($extRepr);
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $forceType = false): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($forceType, 'NULL');
         }
 
         if (!$val instanceof TxIdSnapshot) {
             $val = TxIdSnapshot::fromString($val);
         }
 
-        return "'" . $val->toString() . "'";
+        return $this->indicateType($forceType, "'" . $val->toString() . "'");
     }
 }
