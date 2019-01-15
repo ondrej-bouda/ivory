@@ -2,8 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Lang\Sql\Types;
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 
 /**
  * String hash table.
@@ -13,14 +12,14 @@ use Ivory\Type\BaseType;
  * For serializing to PostgreSQL `hstore`, objects are also accepted, the attributes of which are iterated using regular
  * `foreach` and key-value pairs stored in the hash.
  *
- * @see https://www.postgresql.org/docs/9.6/static/hstore.html
+ * @see https://www.postgresql.org/docs/11/hstore.html
  */
-class HstoreType extends BaseType
+class HstoreType extends TypeBase
 {
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!is_array($val) && !is_object($val)) {
@@ -37,9 +36,8 @@ class HstoreType extends BaseType
             }
             $res .= $this->quoteAtom($k) . '=>' . $this->quoteAtom($v);
         }
-        $type = Types::serializeIdent($this->getSchemaName()) . '.' . Types::serializeIdent($this->getName());
-        $res .= "'::$type";
-        return $res;
+        $res .= "'";
+        return $this->indicateType($strictType, $res);
     }
 
     private function quoteAtom($atom): string

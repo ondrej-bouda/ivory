@@ -157,10 +157,10 @@ class DateType extends ConnectionDependentBaseType implements ITotallyOrderedTyp
         }
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof Date) {
@@ -176,17 +176,18 @@ class DateType extends ConnectionDependentBaseType implements ITotallyOrderedTyp
         }
 
         if ($val->isFinite()) {
-            return sprintf(
+            $dateStr = sprintf(
                 "'%04d-%02d-%02d%s'",
                 abs($val->getYear()),
                 $val->getMonth(),
                 $val->getDay(),
                 ($val->getYear() < 0 ? ' BC' : '')
             );
+            return $this->indicateType($strictType, $dateStr);
         } elseif ($val === Date::infinity()) {
-            return "'infinity'";
+            return $this->indicateType($strictType, "'infinity'");
         } elseif ($val === Date::minusInfinity()) {
-            return "'-infinity'";
+            return $this->indicateType($strictType, "'-infinity'");
         } else {
             throw new \LogicException('A non-finite date not recognized');
         }

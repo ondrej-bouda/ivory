@@ -2,8 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Lang\Sql\Types;
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 
 /**
  * Representation of the PostgreSQL void type, i.e., nothing.
@@ -11,7 +10,7 @@ use Ivory\Type\BaseType;
  * There are just two possible values accepted or returned by this type object: `null` and {@link VoidType::void()},
  * which is an empty singleton object.
  */
-class VoidType extends BaseType
+class VoidType extends TypeBase
 {
     public static function void()
     {
@@ -27,16 +26,12 @@ class VoidType extends BaseType
         return self::void();
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         } elseif ($val === self::void()) {
-            return sprintf(
-                "''::%s.%s",
-                Types::serializeIdent($this->getSchemaName()),
-                Types::serializeIdent($this->getName())
-            );
+            return $this->indicateType($strictType, "''");
         } else {
             throw $this->invalidValueException($val);
         }

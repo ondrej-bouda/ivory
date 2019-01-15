@@ -22,29 +22,31 @@ class SqlPatternParser implements ISqlPatternParser
 	    	      (?:                                       #   optional type specification
 	    	        (?:                                     #
 	    	          (?:                                   #     optional schema name
-	    	            ( [[:alpha:]_] [[:alnum:]_]*        #       either a token
+	    	            (                                   #       (1)
+	    	              [[:alpha:]_] [[:alnum:]_]*        #       either a token
 	    	              |                                 #       or
 	    	              " (?: [^"]+ | "" )* "             #       a quoted string
 	    	            )                                   #
 	    	            \.                                  #     separated from type name with a dot
 	    	          )?                                    #
-	    	          (                                     #     type name
+	    	          (                                     #     (2) type name
 	    	            [[:alpha:]_] [[:alnum:]_]*          #       either a token
 	    	            |                                   #       or
 	    	            " (?: [^"]+ | "" )* "               #       a quoted string
 	    	          )                                     #
 	    	          |                                     #
-	    	          \{ ([^}]+) \}                         #     or just anything enclosed in curly braces, taken as is
+	    	          \{ ([^}]+) \}                         #     (3) or just anything enclosed in curly braces, taken as is
 	    	        )                                       #
-	    	        ( \[\] )*                               #     optionally ended with pairs of brackets
+	    	        ( \[\] )*                               #     (4) optionally ended with pairs of brackets
 	    	      )?                                        #
-	    	      (?: : ( [[:alpha:]_] [[:alnum:]_]* ) )?   #   optional parameter name, starting with a letter or underscore
+	    	      ( \? )?                                   #   (5) optional question mark for loose type mode
+	    	      (?: : ( [[:alpha:]_] [[:alnum:]_]* ) )?   #   (6) optional parameter name, starting with a letter or underscore
 	    	    |                                           # or
-	    	    ( % )                                       # another percent sign -> literal %
+	    	    ( % )                                       # (7) another percent sign -> literal %
 	    	  )
 	    	 ~xu',
             function ($matchWithOffsets) use (&$positionalPlaceholders, &$namedPlaceholderMap, &$rawOffsetDelta) {
-                if (isset($matchWithOffsets[6])) {
+                if (isset($matchWithOffsets[7])) {
                     $rawOffsetDelta--; // put one character instead of two
                     return '%';
                 }
@@ -66,10 +68,11 @@ class SqlPatternParser implements ISqlPatternParser
                 if (!empty($matchWithOffsets[4][0])) {
                     $typeName .= '[]'; // regardless of the number of bracket pairs, just a single pair is taken
                 }
-                if (isset($matchWithOffsets[5])) {
-                    $name = $matchWithOffsets[5][0];
+                $looseTypeMode = !empty($matchWithOffsets[5][0]);
+                if (isset($matchWithOffsets[6])) {
+                    $name = $matchWithOffsets[6][0];
                     $plcHld = new SqlPatternPlaceholder(
-                        $offset, $name, $typeName, $typeNameQuoted, $schemaName, $schemaNameQuoted
+                        $offset, $name, $typeName, $typeNameQuoted, $schemaName, $schemaNameQuoted, $looseTypeMode
                     );
                     if (!isset($namedPlaceholderMap[$name])) {
                         $namedPlaceholderMap[$name] = [];
@@ -78,7 +81,7 @@ class SqlPatternParser implements ISqlPatternParser
                 } else {
                     $pos = count($positionalPlaceholders);
                     $plcHld = new SqlPatternPlaceholder(
-                        $offset, $pos, $typeName, $typeNameQuoted, $schemaName, $schemaNameQuoted
+                        $offset, $pos, $typeName, $typeNameQuoted, $schemaName, $schemaNameQuoted, $looseTypeMode
                     );
                     $positionalPlaceholders[] = $plcHld;
                 }

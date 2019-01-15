@@ -2,7 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Type\BaseType;
+use Ivory\Lang\Sql\Types;
+use Ivory\Type\TypeBase;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Value\TimeTz;
 
@@ -13,17 +14,17 @@ use Ivory\Value\TimeTz;
  *
  * @see https://www.postgresql.org/docs/11/datatype-datetime.html
  */
-class TimeTzType extends BaseType implements ITotallyOrderedType
+class TimeTzType extends TypeBase implements ITotallyOrderedType
 {
     public function parseValue(string $extRepr)
     {
         return TimeTz::fromString($extRepr);
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof TimeTz) {
@@ -44,6 +45,6 @@ class TimeTzType extends BaseType implements ITotallyOrderedType
             }
         }
 
-        return "'" . $val->toString() . "'";
+        return $this->indicateType($strictType, Types::serializeString($val->toString()));
     }
 }

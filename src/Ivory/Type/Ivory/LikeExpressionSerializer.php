@@ -2,8 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Type\Ivory;
 
+use Ivory\Lang\Sql\Types;
 use Ivory\Type\IValueSerializer;
-use Ivory\Type\Std\StringType;
 
 /**
  * Serializer for `LIKE` expressions.
@@ -33,8 +33,6 @@ class LikeExpressionSerializer implements IValueSerializer
 
     const ESCAPE_CHAR = '\\';
 
-    /** @var IValueSerializer */
-    private $stringSerializer;
     /** @var string pattern to prepend to the string to escape */
     private $prefix;
     /** @var string pattern to append to the string to escape */
@@ -42,13 +40,11 @@ class LikeExpressionSerializer implements IValueSerializer
 
     public function __construct(int $wildcard = self::WILDCARD_NONE)
     {
-        $this->stringSerializer = new StringType(LikeExpressionSerializer::class, 'string');
-
         $this->prefix = (($wildcard & self::WILDCARD_PREPEND) != 0 ? '%' : '');
         $this->postfix = (($wildcard & self::WILDCARD_APPEND) != 0 ? '%' : '');
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
             return 'NULL';
@@ -61,6 +57,6 @@ class LikeExpressionSerializer implements IValueSerializer
         ];
         $pattern = $this->prefix . strtr($val, $escapeMap) . $this->postfix;
 
-        return $this->stringSerializer->serializeValue($pattern);
+        return Types::serializeString($pattern);
     }
 }

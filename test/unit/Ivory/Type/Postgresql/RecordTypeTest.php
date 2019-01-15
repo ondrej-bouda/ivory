@@ -48,14 +48,16 @@ STR
 
     public function testSerializeSimple()
     {
-        $this->assertSame('NULL', $this->recordType->serializeValue(null));
+        $this->assertSame('NULL', $this->recordType->serializeValue(null, false));
+        $this->assertSame('NULL::pg_catalog.record', $this->recordType->serializeValue(null));
         $this->assertSame('ROW()', $this->recordType->serializeValue([]));
-        $this->assertSame('ROW(NULL)', $this->recordType->serializeValue([null]));
-        $this->assertSame("ROW(1)", $this->recordType->serializeValue([1]));
-        $this->assertSame("ROW('ab')", $this->recordType->serializeValue(['ab']));
-        $this->assertSame("(1,'ab')", $this->recordType->serializeValue([1, 'ab']));
-        $this->assertSame("(1,2)", $this->recordType->serializeValue([1, 2]));
-        $this->assertSame("(NULL,1.2)", $this->recordType->serializeValue([null, 1.2]));
+        $this->assertSame('ROW(NULL)', $this->recordType->serializeValue([null], false));
+        $this->assertSame('ROW(NULL::pg_catalog.text)', $this->recordType->serializeValue([null]));
+        $this->assertSame("ROW(1)", $this->recordType->serializeValue([1], false));
+        $this->assertSame("ROW('ab')", $this->recordType->serializeValue(['ab'], false));
+        $this->assertSame("(1,'ab')", $this->recordType->serializeValue([1, 'ab'], false));
+        $this->assertSame("(1,2)", $this->recordType->serializeValue([1, 2], false));
+        $this->assertSame("(NULL,1.2)", $this->recordType->serializeValue([null, 1.2], false));
     }
 
     public function testSerializeSpecialStrings()
@@ -66,7 +68,8 @@ STR
 STR
             ,
             $this->recordType->serializeValue(
-                [null, 'NULL', '', '()', ',', '1\\2', 'p q', '"r"', "'", '"', ' , \\ " \'']
+                [null, 'NULL', '', '()', ',', '1\\2', 'p q', '"r"', "'", '"', ' , \\ " \''],
+                false
             )
         );
     }

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Type\ITotallyOrderedType;
 
 /**
@@ -12,7 +12,7 @@ use Ivory\Type\ITotallyOrderedType;
  *
  * @see https://www.postgresql.org/docs/11/datatype-numeric.html
  */
-class FloatType extends BaseType implements ITotallyOrderedType
+class FloatType extends TypeBase implements ITotallyOrderedType
 {
     public function parseValue(string $extRepr)
     {
@@ -29,18 +29,18 @@ class FloatType extends BaseType implements ITotallyOrderedType
         }
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         } elseif (is_finite($val)) {
-            return (string)$val;
+            return $this->typeCastExpr($strictType, (string)(float)$val);
         } elseif (is_nan($val)) {
-            return "'NaN'";
+            return $this->indicateType($strictType, "'NaN'");
         } elseif ($val < 0) {
-            return "'-Infinity'";
+            return $this->indicateType($strictType, "'-Infinity'");
         } else {
-            return "'Infinity'";
+            return $this->indicateType($strictType, "'Infinity'");
         }
     }
 }

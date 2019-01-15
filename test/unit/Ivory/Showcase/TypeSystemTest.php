@@ -4,9 +4,9 @@ namespace Ivory\Showcase;
 
 use Ivory\Connection\IConnection;
 use Ivory\IvoryTestCase;
+use Ivory\Lang\Sql\Types;
 use Ivory\Query\SqlRelationDefinition;
-use Ivory\Type\BaseType;
-use Ivory\Type\IType;
+use Ivory\Type\TypeBase;
 use Ivory\Type\IValueSerializer;
 use Ivory\Type\Postgresql\ArrayType;
 use Ivory\Type\Std\StringType;
@@ -137,14 +137,7 @@ SQL
         // define the serializer...
         $strListSerializer = new class implements IValueSerializer
         {
-            private $stringType;
-
-            public function __construct()
-            {
-                $this->stringType = new StringType('%strlist', 'string'); // it requires some name for identification
-            }
-
-            public function serializeValue($val): string
+            public function serializeValue($val, bool $forceType = false): string
             {
                 if (!is_array($val)) {
                     throw new \InvalidArgumentException('%strlist expects an array');
@@ -157,8 +150,7 @@ SQL
                         $result .= ', ';
                     }
                     $isFirst = false;
-
-                    $result .= $this->stringType->serializeValue($str);
+                    $result .= Types::serializeString($str);
                 }
                 if ($isFirst) {
                     throw new \InvalidArgumentException('%strlist list cannot be empty');
@@ -182,18 +174,10 @@ SQL
      */
     public function testCustomType()
     {
-        // Just implement the IType (or ITotallyOrderedType, for the type to be usable in ranges)...
-        $customTimeType = new class implements IType {
-            public function getSchemaName(): string
-            {
-                return 'pg_catalog';
-            }
-
-            public function getName(): string
-            {
-                return 'time';
-            }
-
+        // Just implement the IType (or ITotallyOrderedType, for the type to be usable in ranges); extending TypeBase
+        // will help...
+        $customTimeType = new class('pg_catalog', 'time') extends TypeBase
+        {
             public function parseValue(string $extRepr)
             {
                 $dt = \DateTime::createFromFormat('H:i:s.u', $extRepr);
@@ -208,12 +192,12 @@ SQL
                 }
             }
 
-            public function serializeValue($val): string
+            public function serializeValue($val, bool $strictType = true): string
             {
                 if ($val === null) {
-                    return 'NULL';
+                    return $this->typeCastExpr($strictType, 'NULL');
                 } elseif ($val instanceof \DateTime) {
-                    return $val->format("'H:i:s.u'");
+                    return $this->indicateType($strictType, $val->format("'H:i:s.u'"));
                 } else {
                     throw new \InvalidArgumentException('Invalid value to serialize as TIME');
                 }
@@ -239,23 +223,22 @@ SQL
         $this->assertInstanceOf(Date::class, $dateVal);
 
         // Prefer standard \DateTime over the custom Date class:
-        $myDateType = new class('pg_catalog', 'date') extends BaseType
+        $myDateType = new class('pg_catalog', 'date') extends TypeBase
         {
             public function parseValue(string $extRepr)
             {
                 return \DateTime::createFromFormat('!Y-m-d', $extRepr);
             }
 
-            public function serializeValue($val): string
+            public function serializeValue($val, bool $forceType = false): string
             {
                 if ($val === null) {
-                    return 'NULL';
-                }
-                if (!$val instanceof \DateTime) {
+                    return $this->typeCastExpr($forceType, 'NULL');
+                } elseif ($val instanceof \DateTime) {
+                    return $this->indicateType($forceType, $val->format("'Y-m-d'"));
+                } else {
                     throw new \InvalidArgumentException();
                 }
-
-                return $val->format("'Y-m-d'");
             }
         };
         $this->conn->getTypeRegister()->registerType($myDateType);

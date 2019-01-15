@@ -35,7 +35,16 @@ class RecordType extends RowTypeBase implements IConnectionDependentObject
         return $items;
     }
 
-    protected function serializeBody(string &$result, $value): int
+    public function serializeValue($val, bool $strictType = true): string
+    {
+        if ($val === null) {
+            return $this->typeCastExpr($strictType, 'NULL');
+        } else {
+            return $this->makeRowExpression($val, $strictType); // no need for typecast, ROW is a record implicitly
+        }
+    }
+
+    protected function serializeBody(string &$result, $value, bool $strictType = true): int
     {
         $typeDictionary = $this->getConnection()->getTypeDictionary();
 
@@ -45,7 +54,7 @@ class RecordType extends RowTypeBase implements IConnectionDependentObject
                 $result .= ',';
             }
             $type = $typeDictionary->requireTypeByValue($item);
-            $result .= $type->serializeValue($item);
+            $result .= $type->serializeValue($item, $strictType);
             $cnt++;
         }
         return $cnt;

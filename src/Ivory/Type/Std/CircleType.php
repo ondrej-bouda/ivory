@@ -35,13 +35,13 @@ class CircleType extends CompoundGeometricType
         }
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         } elseif ($val instanceof Circle) {
             return sprintf('circle(%s,%s)',
-                $this->pointType->serializeValue($val->getCenter()),
+                $this->pointType->serializeValue($val->getCenter(), false),
                 $val->getRadius()
             );
         } else {

@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Type\Ivory;
 
 use Ivory\Exception\UnsupportedException;
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Type\ITotallyOrderedType;
 
 /**
@@ -12,7 +12,7 @@ use Ivory\Type\ITotallyOrderedType;
  * Objects of this class only serve as null-objects. Any operation on `UnorderedRangeType` objects, even with `null`
  * values, results in an {@link \Ivory\Exception\UnsupportedException} being thrown.
  */
-class UnorderedRangeType extends BaseType
+class UnorderedRangeType extends TypeBase
 {
     public function parseValue(string $extRepr)
     {
@@ -22,7 +22,7 @@ class UnorderedRangeType extends BaseType
         );
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         throw new UnsupportedException(
             "{$this->getSchemaName()}.{$this->getName()} cannot be used - its subtype is not parsed by a " .

@@ -16,13 +16,14 @@ class HstoreTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testSerializeValue()
     {
-        $this->assertSame('NULL', $this->hstoreType->serializeValue(null));
-        $this->assertSame('\'\'::public.hstore', $this->hstoreType->serializeValue([]));
-        $this->assertSame('\'"1"=>"2"\'::public.hstore', $this->hstoreType->serializeValue([1 => 2]));
+        $this->assertSame('NULL', $this->hstoreType->serializeValue(null, false));
+        $this->assertSame("public.hstore ''", $this->hstoreType->serializeValue([]));
+        $this->assertSame('public.hstore \'"1"=>"2"\'', $this->hstoreType->serializeValue([1 => 2]));
         $this->assertSame(
-            '\'"a"=>"1","-32"=>NULL,"null str"=>"NULL"," space "=>"a \\"quoted str\\"",""=>"","\\\\"=>"\\\\\\\\\\""\'::public.hstore',
+            '\'"a"=>"1","-32"=>NULL,"null str"=>"NULL"," space "=>"a \\"quoted str\\"",""=>"","\\\\"=>"\\\\\\\\\\""\'',
             $this->hstoreType->serializeValue(
-                ['a' => 1, -32 => null, 'null str' => 'NULL', ' space ' => 'a "quoted str"', '' => '', '\\' => '\\\\"']
+                ['a' => 1, -32 => null, 'null str' => 'NULL', ' space ' => 'a "quoted str"', '' => '', '\\' => '\\\\"'],
+                false
             )
         );
 
@@ -31,13 +32,13 @@ class HstoreTypeTest extends \PHPUnit\Framework\TestCase
         $obj->nul = null;
         $obj->other = 1;
         $this->assertSame(
-            '\'"att"=>"val","nul"=>NULL,"other"=>"1"\'::public.hstore',
-            $this->hstoreType->serializeValue($obj)
+            '\'"att"=>"val","nul"=>NULL,"other"=>"1"\'',
+            $this->hstoreType->serializeValue($obj, false)
         );
 
         $arrObj = new \ArrayObject([1, 2, 3]);
         $this->assertSame(
-            '\'"0"=>"1","1"=>"2","2"=>"3"\'::public.hstore',
+            'public.hstore \'"0"=>"1","1"=>"2","2"=>"3"\'',
             $this->hstoreType->serializeValue($arrObj)
         );
 

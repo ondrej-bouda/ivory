@@ -2,12 +2,12 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 
 /**
  * A common base for geometric types compound of points on a plane.
  */
-abstract class CompoundGeometricType extends BaseType
+abstract class CompoundGeometricType extends TypeBase
 {
     /** @var PointType */
     protected $pointType;

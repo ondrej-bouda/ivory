@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Type\Std;
 
 use Ivory\Lang\Sql\Types;
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Value\XmlContent;
 use Ivory\Value\XmlDocument;
 
@@ -15,17 +15,17 @@ use Ivory\Value\XmlDocument;
  * @see https://www.postgresql.org/docs/11/datatype-xml.html
  * @see https://www.postgresql.org/docs/11/functions-xml.html
  */
-class XmlType extends BaseType
+class XmlType extends TypeBase
 {
     public function parseValue(string $extRepr)
     {
         return XmlContent::fromValue($extRepr);
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         try {

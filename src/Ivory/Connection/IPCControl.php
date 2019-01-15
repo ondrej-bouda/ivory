@@ -28,7 +28,7 @@ class IPCControl implements IIPCControl
         if ($payload === null) {
             $this->stmtExec->command('NOTIFY %ident', $channel);
         } else {
-            $this->stmtExec->command('NOTIFY %ident, %s', $channel, $payload);
+            $this->stmtExec->command('NOTIFY %ident, %s?', $channel, $payload);
         }
     }
 

@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Type\Std;
 
 use Ivory\Lang\Sql\Types;
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Value\TextSearchVector;
 
 /**
@@ -13,7 +13,7 @@ use Ivory\Value\TextSearchVector;
  *
  * @see https://www.postgresql.org/docs/11/datatype-textsearch.html#DATATYPE-TSVECTOR
  */
-class TsVectorType extends BaseType
+class TsVectorType extends TypeBase
 {
     const DEFAULT_WEIGHT = 'D';
 
@@ -39,10 +39,10 @@ class TsVectorType extends BaseType
         return TextSearchVector::fromMap($lexemes);
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof TextSearchVector) {
@@ -66,6 +66,6 @@ class TsVectorType extends BaseType
             $tokens[] = $tok;
         }
 
-        return Types::serializeString(implode(' ', $tokens));
+        return $this->indicateType($strictType, Types::serializeString(implode(' ', $tokens)));
     }
 }

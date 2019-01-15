@@ -6,6 +6,7 @@ use Ivory\Exception\InternalException;
 use Ivory\Exception\ParseException;
 use Ivory\Type\ITotallyOrderedType;
 use Ivory\Type\IType;
+use Ivory\Type\TypeBase;
 
 /**
  * Array type object.
@@ -37,7 +38,7 @@ use Ivory\Type\IType;
  *
  * @see https://www.postgresql.org/docs/11/arrays.html
  */
-class ArrayType implements ITotallyOrderedType
+class ArrayType extends TypeBase implements ITotallyOrderedType
 {
     private $elemType;
     private $delim;
@@ -46,6 +47,12 @@ class ArrayType implements ITotallyOrderedType
 
     public function __construct(IType $elemType, string $delimiter)
     {
+        parent::__construct(
+            $elemType->getSchemaName(),
+            $elemType->getName() . '[]',
+            '[]'
+        );
+
         $this->elemType = $elemType;
         $this->delim = $delimiter;
         $this->elemNeedsQuotesRegex = '~[{}\\s"\\\\' . preg_quote($delimiter, '~') . ']|^NULL$|^$~i';
@@ -59,16 +66,6 @@ class ArrayType implements ITotallyOrderedType
     public function switchToStrictMode(): void
     {
         $this->ignoreIndexes = false;
-    }
-
-    public function getSchemaName(): string
-    {
-        return $this->elemType->getSchemaName();
-    }
-
-    public function getName(): string
-    {
-        return $this->elemType->getName() . '[]';
     }
 
     private function throwParseException(
@@ -209,7 +206,7 @@ class ArrayType implements ITotallyOrderedType
      *
      * @todo eliminate recursion, process multidimensional arrays using iteration instead
      */
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val !== null && !is_array($val)) {
             throw new \InvalidArgumentException("Value '$val' is not valid for array type");
@@ -238,11 +235,7 @@ class ArrayType implements ITotallyOrderedType
             $str = "'$str'"; // NOTE: literal single quotes in serialized elements are already doubled
         }
 
-        return sprintf("%s::%s.%s[]",
-            $str,
-            $this->elemType->getSchemaName(),
-            $this->elemType->getName()
-        );
+        return $this->typeCastExpr($strictType, $str);
     }
 
     /**
@@ -287,7 +280,7 @@ class ArrayType implements ITotallyOrderedType
                     throw new \InvalidArgumentException($msg);
                 }
                 
-                $out .= $this->elemType->serializeValue($v);
+                $out .= $this->elemType->serializeValue($v, false);
             }
         }
         $out .= ']';
@@ -348,7 +341,7 @@ class ArrayType implements ITotallyOrderedType
                 if ($v === null) {
                     $valOut = 'NULL';
                 } else {
-                    $valOut = $this->elemType->serializeValue($v);
+                    $valOut = $this->elemType->serializeValue($v, false);
                     /* Trim the single quotes and other decoration - the value will be used inside a string literal.
                        As an optimization, doubled single quotes (meaning the literal single quote) will be preserved
                        not to undo and do the job again on the whole array.

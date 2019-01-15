@@ -15,7 +15,7 @@ use Ivory\Query\ICommand;
  */
 class CommandSerializer extends ConnectionDependentValueSerializer
 {
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val instanceof ICommand) {
             $typeDictionary = $this->getConnection()->getTypeDictionary();

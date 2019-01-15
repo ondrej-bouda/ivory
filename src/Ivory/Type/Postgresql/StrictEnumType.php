@@ -3,20 +3,19 @@ declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
 use Ivory\Lang\Sql\Types;
-use Ivory\NamedDbObject;
 use Ivory\Type\ITotallyOrderedType;
+use Ivory\Type\TypeBase;
 use Ivory\Value\StrictEnum;
 
-class StrictEnumType implements ITotallyOrderedType
+// TODO: document the intended usage - see EnumType class docs
+class StrictEnumType extends TypeBase implements ITotallyOrderedType
 {
-    use NamedDbObject;
-
     private $enumClass;
 
     public function __construct(string $schemaName, string $typeName, string $enumClass)
     {
+        parent::__construct($schemaName, $typeName);
         assert(is_subclass_of($enumClass, StrictEnum::class));
-        $this->setName($schemaName, $typeName);
         $this->enumClass = $enumClass;
     }
 
@@ -25,10 +24,10 @@ class StrictEnumType implements ITotallyOrderedType
         return new $this->enumClass($extRepr);
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof StrictEnum) {
@@ -38,11 +37,6 @@ class StrictEnumType implements ITotallyOrderedType
             throw new \InvalidArgumentException('Serializing enumeration value for a different type');
         }
 
-        return sprintf(
-            '%s::%s.%s',
-            Types::serializeString($val->getValue()),
-            Types::serializeIdent($this->getSchemaName()),
-            Types::serializeIdent($this->getName())
-        );
+        return $this->indicateType($strictType, Types::serializeString($val->getValue()));
     }
 }

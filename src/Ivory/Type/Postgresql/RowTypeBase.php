@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
 use Ivory\Exception\ParseException;
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Type\ITotallyOrderedType;
 
 /**
@@ -11,7 +11,7 @@ use Ivory\Type\ITotallyOrderedType;
  *
  * @see https://www.postgresql.org/docs/11/rowtypes.html
  */
-abstract class RowTypeBase extends BaseType implements ITotallyOrderedType
+abstract class RowTypeBase extends TypeBase implements ITotallyOrderedType
 {
     public function parseValue(string $extRepr)
     {
@@ -85,14 +85,10 @@ abstract class RowTypeBase extends BaseType implements ITotallyOrderedType
      */
     abstract protected function makeParsedValue(array $items);
 
-    public function serializeValue($val): string
+    final protected function makeRowExpression($value, bool $strictType = true): string
     {
-        if ($val === null) {
-            return 'NULL';
-        }
-
         $res = '(';
-        $cnt = $this->serializeBody($res, $val);
+        $cnt = $this->serializeBody($res, $value, $strictType);
         $res .= ')';
         if ($cnt < 2) {
             $res = 'ROW' . $res;
@@ -100,5 +96,5 @@ abstract class RowTypeBase extends BaseType implements ITotallyOrderedType
         return $res;
     }
 
-    abstract protected function serializeBody(string &$result, $value): int;
+    abstract protected function serializeBody(string &$result, $value, bool $strictType = true): int;
 }

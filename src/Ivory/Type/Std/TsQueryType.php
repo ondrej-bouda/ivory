@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Type\Std;
 
 use Ivory\Lang\Sql\Types;
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Value\TextSearchQuery;
 
 /**
@@ -13,23 +13,23 @@ use Ivory\Value\TextSearchQuery;
  *
  * @see https://www.postgresql.org/docs/11/datatype-textsearch.html#DATATYPE-TSQUERY
  */
-class TsQueryType extends BaseType
+class TsQueryType extends TypeBase
 {
     public function parseValue(string $extRepr)
     {
         return TextSearchQuery::fromString($extRepr);
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof TextSearchQuery) {
             $val = TextSearchQuery::fromString($val);
         }
 
-        return Types::serializeString($val->toString());
+        return $this->indicateType($strictType, Types::serializeString($val->toString()));
     }
 }

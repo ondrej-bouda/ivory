@@ -3,8 +3,8 @@ declare(strict_types=1);
 namespace Ivory\Type\Postgresql;
 
 use Ivory\Lang\Sql\Types;
-use Ivory\NamedDbObject;
 use Ivory\Type\ITotallyOrderedType;
+use Ivory\Type\TypeBase;
 use Ivory\Value\Range;
 
 /**
@@ -12,15 +12,13 @@ use Ivory\Value\Range;
  *
  * @see https://www.postgresql.org/docs/11/rangetypes.html
  */
-class RangeType implements ITotallyOrderedType
+class RangeType extends TypeBase implements ITotallyOrderedType
 {
-    use NamedDbObject;
-
     private $subtype;
 
     public function __construct(string $schemaName, string $name, ITotallyOrderedType $subtype)
     {
-        $this->setName($schemaName, $name);
+        parent::__construct($schemaName, $name);
         $this->subtype = $subtype;
     }
 
@@ -78,10 +76,10 @@ class RangeType implements ITotallyOrderedType
         return $this->subtype->parseValue($unescaped);
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof Range) {
@@ -94,11 +92,7 @@ class RangeType implements ITotallyOrderedType
         }
 
         if ($val->isEmpty()) {
-            return sprintf(
-                "'empty'::%s.%s",
-                Types::serializeIdent($this->getSchemaName()),
-                Types::serializeIdent($this->getName())
-            );
+            return $this->indicateType($strictType, "'empty'");
         }
 
         $boundsSpec = $val->getBoundsSpec();
@@ -106,9 +100,10 @@ class RangeType implements ITotallyOrderedType
             "%s.%s(%s,%s%s)",
             Types::serializeIdent($this->getSchemaName()),
             Types::serializeIdent($this->getName()),
-            $this->subtype->serializeValue($val->getLower()),
-            $this->subtype->serializeValue($val->getUpper()),
+            $this->subtype->serializeValue($val->getLower(), false),
+            $this->subtype->serializeValue($val->getUpper(), false),
             ($boundsSpec == '[)' || ($boundsSpec == '()' && $val->getLower() === null) ? '' : ",'$boundsSpec'")
         );
+        // FIXME: the fact that '[)' bounds are default is rather conventional, and might not hold for user-defined ranges
     }
 }

@@ -149,4 +149,26 @@ class SqlPatternParserTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($pattern->getPositionalPlaceholders());
         $this->assertEmpty($pattern->getNamedPlaceholderMap());
     }
+
+    public function testLooseTypeModePlaceholders()
+    {
+        $pattern = $this->parser->parse('SELECT %?, %t?, %?:name, %t?:name');
+        $this->assertEquals('SELECT , , , ', $pattern->getSqlTorso());
+        $this->assertEquals(
+            [
+                new SqlPatternPlaceholder(7, 0, null, false, null, false, true),
+                new SqlPatternPlaceholder(9, 1, 't', false, null, false, true),
+            ],
+            $pattern->getPositionalPlaceholders()
+        );
+        $this->assertEquals(
+            [
+                'name' => [
+                    new SqlPatternPlaceholder(11, 'name', null, false, null, false, true),
+                    new SqlPatternPlaceholder(13, 'name', 't', false, null, false, true),
+                ],
+            ],
+            $pattern->getNamedPlaceholderMap()
+        );
+    }
 }

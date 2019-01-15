@@ -42,14 +42,14 @@ class SqlRelationDefinitionTest extends IvoryTestCase
     {
         $recip = SqlRelationDefinition::fromPattern('SELECT %s, %num', "Ivory's escaping", 3.14);
         $sql = $recip->toSql($this->typeDict);
-        $this->assertSame("SELECT 'Ivory''s escaping', 3.14", $sql);
+        $this->assertSame("SELECT pg_catalog.text 'Ivory''s escaping', 3.14::pg_catalog.numeric", $sql);
     }
 
     public function testAliasedTypes()
     {
         $recip = SqlRelationDefinition::fromPattern('SELECT %integer', 42);
         $sql = $recip->toSql($this->typeDict);
-        $this->assertSame("SELECT 42", $sql);
+        $this->assertSame("SELECT 42::pg_catalog.int4", $sql);
     }
 
     public function testTypeQualifiedNames()
@@ -59,14 +59,14 @@ class SqlRelationDefinitionTest extends IvoryTestCase
             "Ivory's escaping", 3.14
         );
         $sql = $recip->toSql($this->typeDict);
-        $this->assertSame("SELECT 'Ivory''s escaping', 3.14", $sql);
+        $this->assertSame("SELECT pg_catalog.text 'Ivory''s escaping', 3.14::pg_catalog.numeric", $sql);
     }
 
     public function testTypeUnqualifiedNames()
     {
         $recip = SqlRelationDefinition::fromPattern('SELECT %text, %numeric', "Ivory's escaping", 3.14);
         $sql = $recip->toSql($this->typeDict);
-        $this->assertSame("SELECT 'Ivory''s escaping', 3.14", $sql);
+        $this->assertSame("SELECT pg_catalog.text 'Ivory''s escaping', 3.14::pg_catalog.numeric", $sql);
     }
 
     public function testArrayTypes()
@@ -89,17 +89,17 @@ class SqlRelationDefinitionTest extends IvoryTestCase
     {
         $this->conn->rawCommand('CREATE DOMAIN public."name with "" and ." AS TEXT');
         $recip = SqlRelationDefinition::fromPattern('SELECT %public."name with "" and ."', 'Ivory');
-        $this->assertSame("SELECT 'Ivory'", $recip->toSql($this->typeDict));
+        $this->assertSame("SELECT 'Ivory'::public.\"name with \"\" and .\"", $recip->toSql($this->typeDict));
 
         $this->conn->rawCommand('CREATE DOMAIN public."int" AS TEXT');
         $recip = SqlRelationDefinition::fromPattern('SELECT %public."int"', '42');
-        $this->assertSame("SELECT '42'", $recip->toSql($this->typeDict));
+        $this->assertSame("SELECT '42'::public.int", $recip->toSql($this->typeDict));
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %"int"', '42');
-        $this->assertSame("SELECT '42'", $recip->toSql($this->typeDict));
+        $this->assertSame("SELECT '42'::public.int", $recip->toSql($this->typeDict));
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %int', '42');
-        $this->assertSame('SELECT 42', $recip->toSql($this->typeDict));
+        $this->assertSame('SELECT 42::pg_catalog.int4', $recip->toSql($this->typeDict));
     }
 
     public function testQuotedSchemaNames()
@@ -108,7 +108,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
         $this->conn->rawCommand('CREATE DOMAIN "__Ivory_test".d AS INT');
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %"__Ivory_test".d', 42);
-        $this->assertSame('SELECT 42', $recip->toSql($this->typeDict));
+        $this->assertSame('SELECT 42::"__Ivory_test".d', $recip->toSql($this->typeDict));
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %__ivory_test.d', 42);
         try {
@@ -129,7 +129,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
         $this->conn->rawCommand('CREATE DOMAIN "__ivory_test".d AS TEXT');
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %__ivory_test.d', 42);
-        $this->assertSame("SELECT '42'", $recip->toSql($this->typeDict));
+        $this->assertSame("SELECT '42'::__ivory_test.d", $recip->toSql($this->typeDict));
     }
 
     public function testBraceEnclosedTypeNames()
@@ -137,10 +137,10 @@ class SqlRelationDefinitionTest extends IvoryTestCase
         $this->conn->rawCommand('CREATE DOMAIN public."double precision" AS TEXT');
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %"double precision"', 42);
-        $this->assertSame("SELECT '42'", $recip->toSql($this->typeDict));
+        $this->assertSame("SELECT '42'::public.\"double precision\"", $recip->toSql($this->typeDict));
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %{double precision}', 42);
-        $this->assertSame('SELECT 42', $recip->toSql($this->typeDict));
+        $this->assertSame('SELECT 42::pg_catalog.float8', $recip->toSql($this->typeDict));
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %{"double precision"}', 42);
         try {
@@ -158,10 +158,10 @@ class SqlRelationDefinitionTest extends IvoryTestCase
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %tp', 42);
 
-        $this->assertSame('SELECT 42', $recip->toSql($this->typeDict));
+        $this->assertSame('SELECT 42::public.tp', $recip->toSql($this->typeDict));
 
         $this->conn->getConfig()->setForSession(ConfigParam::SEARCH_PATH, 's, public');
-        $this->assertSame("SELECT '42'", $recip->toSql($this->typeDict));
+        $this->assertSame("SELECT '42'::s.tp", $recip->toSql($this->typeDict));
     }
 
     public function testFromFragments()
@@ -192,7 +192,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
 
 
         $recipWithArgs = SqlRelationDefinition::fromFragments(
-            'SELECT %int, %char', 42, 'C', 'UNION SELECT', "%integer , 'D'", 53
+            'SELECT %int?, %char?', 42, 'C', 'UNION SELECT', "%integer? , 'D'", 53
         );
         $this->assertSame("SELECT ,  UNION SELECT  , 'D'", $recipWithArgs->getSqlPattern()->getSqlTorso());
         $this->assertSame("SELECT 42, 'C' UNION SELECT 53 , 'D'", $recipWithArgs->toSql($this->typeDict));
@@ -205,22 +205,22 @@ class SqlRelationDefinitionTest extends IvoryTestCase
     {
         $recip = SqlRelationDefinition::fromFragments(
             'WITH data AS (
-               %rel', SqlRelationDefinition::fromPattern('SELECT x FROM %ident', 'r'), '
+                 %rel', SqlRelationDefinition::fromPattern('SELECT x FROM %ident', 'r'), '
              ),
              inserted AS (
-               %cmd', SqlCommand::fromPattern('INSERT INTO t (a) SELECT x FROM data'), '
-               RETURNING a, b
+                 %cmd', SqlCommand::fromPattern('INSERT INTO t (a) SELECT x FROM data'), '
+                 RETURNING a, b
              )
              SELECT * FROM inserted %sql', 'ORDER BY 1, 2'
         );
 
         $this->assertSame(
             'WITH data AS (
-               SELECT x FROM r
+                 SELECT x FROM r
              ),
              inserted AS (
-               INSERT INTO t (a) SELECT x FROM data
-               RETURNING a, b
+                 INSERT INTO t (a) SELECT x FROM data
+                 RETURNING a, b
              )
              SELECT * FROM inserted ORDER BY 1, 2',
             $recip->toSql($this->typeDict)
@@ -230,7 +230,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
     public function testNamedParametersMap()
     {
         $recip = SqlRelationDefinition::fromFragments(
-            'SELECT %ident:tbl.col + %int', 1, 'FROM %ident:tbl',
+            'SELECT %ident:tbl.col + %int?', 1, 'FROM %ident:tbl',
             ['tbl' => 't']
         );
 
@@ -248,7 +248,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
         );
 
         $this->assertSame(
-            "SELECT TRUE, 42, 3.14, 'wheee', NULL",
+            "SELECT TRUE, 42::pg_catalog.int8, 3.14::pg_catalog.float8, pg_catalog.text 'wheee', NULL::pg_catalog.text",
             $recip->toSql($this->typeDict)
         );
     }
@@ -263,7 +263,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
         );
 
         $this->assertSame(
-            "SELECT 2.81, box(point(9,14),point(3,5)), '13:49:00'",
+            "SELECT 2.81::pg_catalog.numeric, box(point(9,14),point(3,5)), pg_catalog.time '13:49:00'",
             $recip->toSql($this->typeDict)
         );
     }

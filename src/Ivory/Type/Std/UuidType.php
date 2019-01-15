@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Type\Std;
 
 use Ivory\Lang\Sql\Types;
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Type\ITotallyOrderedType;
 
 /**
@@ -17,23 +17,23 @@ use Ivory\Type\ITotallyOrderedType;
  *
  * @see https://www.postgresql.org/docs/11/datatype-uuid.html
  */
-class UuidType extends BaseType implements ITotallyOrderedType
+class UuidType extends TypeBase implements ITotallyOrderedType
 {
     public function parseValue(string $extRepr)
     {
         return $extRepr;
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!preg_match('~^(\{)?(?:[[:xdigit:]]{4}-?){7}[[:xdigit:]]{4}(?(1)\})$~i', $val)) {
             throw $this->invalidValueException($val);
         }
 
-        return Types::serializeString($val);
+        return $this->indicateType($strictType, Types::serializeString($val));
     }
 }

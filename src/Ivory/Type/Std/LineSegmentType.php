@@ -36,14 +36,14 @@ class LineSegmentType extends CompoundGeometricType
         }
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         } elseif ($val instanceof LineSegment) {
             return sprintf('lseg(%s,%s)',
-                $this->pointType->serializeValue($val->getStart()),
-                $this->pointType->serializeValue($val->getEnd())
+                $this->pointType->serializeValue($val->getStart(), false),
+                $this->pointType->serializeValue($val->getEnd(), false)
             );
         } else {
             throw $this->invalidValueException($val);

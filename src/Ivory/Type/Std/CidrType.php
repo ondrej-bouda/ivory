@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-use Ivory\Type\BaseType;
+use Ivory\Type\TypeBase;
 use Ivory\Value\NetAddress;
 
 /**
@@ -13,7 +13,7 @@ use Ivory\Value\NetAddress;
  * @see https://www.postgresql.org/docs/11/datatype-net-types.html#DATATYPE-CIDR
  * @todo #21 implement ITotallyOrderedType for this type to be applicable as a range subtype
  */
-class CidrType extends BaseType
+class CidrType extends TypeBase
 {
     public function parseValue(string $extRepr)
     {
@@ -24,16 +24,16 @@ class CidrType extends BaseType
         }
     }
 
-    public function serializeValue($val): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return 'NULL';
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof NetAddress) {
             $val = NetAddress::fromString($val);
         }
 
-        return "'" . $val->toCidrString() . "'";
+        return $this->indicateType($strictType, "'" . $val->toCidrString() . "'");
     }
 }
