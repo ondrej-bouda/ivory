@@ -24,16 +24,16 @@ class UuidType extends TypeBase implements ITotallyOrderedType
         return $extRepr;
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!preg_match('~^(\{)?(?:[[:xdigit:]]{4}-?){7}[[:xdigit:]]{4}(?(1)\})$~i', $val)) {
             throw $this->invalidValueException($val);
         }
 
-        return $this->indicateType($forceType, Types::serializeString($val));
+        return $this->indicateType($strictType, Types::serializeString($val));
     }
 }

@@ -21,10 +21,10 @@ class TimeTzType extends TypeBase implements ITotallyOrderedType
         return TimeTz::fromString($extRepr);
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof TimeTz) {
@@ -45,6 +45,6 @@ class TimeTzType extends TypeBase implements ITotallyOrderedType
             }
         }
 
-        return $this->indicateType($forceType, Types::serializeString($val->toString()));
+        return $this->indicateType($strictType, Types::serializeString($val->toString()));
     }
 }

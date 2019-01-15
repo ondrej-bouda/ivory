@@ -25,10 +25,10 @@ class PointType extends TypeBase implements ITotallyOrderedType
         }
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (is_array($val)) {

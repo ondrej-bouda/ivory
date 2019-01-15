@@ -24,10 +24,10 @@ class DecimalType extends TypeBase implements ITotallyOrderedType
         return Decimal::fromNumber($extRepr);
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof Decimal) {
@@ -35,9 +35,9 @@ class DecimalType extends TypeBase implements ITotallyOrderedType
         }
 
         if ($val->isNaN()) {
-            return $this->indicateType($forceType, "'NaN'");
+            return $this->indicateType($strictType, "'NaN'");
         } else {
-            return $this->typeCastExpr($forceType, $val->toString());
+            return $this->typeCastExpr($strictType, $val->toString());
         }
     }
 }

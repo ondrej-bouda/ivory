@@ -19,12 +19,12 @@ class IntegerType extends TypeBase implements ITotallyOrderedType
         return (int)$extRepr;
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         } else {
-            return $this->typeCastExpr($forceType, (string)(int)$val);
+            return $this->typeCastExpr($strictType, (string)(int)$val);
         }
     }
 }

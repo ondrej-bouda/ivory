@@ -76,10 +76,10 @@ class RangeType extends TypeBase implements ITotallyOrderedType
         return $this->subtype->parseValue($unescaped);
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof Range) {
@@ -92,7 +92,7 @@ class RangeType extends TypeBase implements ITotallyOrderedType
         }
 
         if ($val->isEmpty()) {
-            return $this->indicateType($forceType, "'empty'");
+            return $this->indicateType($strictType, "'empty'");
         }
 
         $boundsSpec = $val->getBoundsSpec();
@@ -100,8 +100,8 @@ class RangeType extends TypeBase implements ITotallyOrderedType
             "%s.%s(%s,%s%s)",
             Types::serializeIdent($this->getSchemaName()),
             Types::serializeIdent($this->getName()),
-            $this->subtype->serializeValue($val->getLower()),
-            $this->subtype->serializeValue($val->getUpper()),
+            $this->subtype->serializeValue($val->getLower(), false),
+            $this->subtype->serializeValue($val->getUpper(), false),
             ($boundsSpec == '[)' || ($boundsSpec == '()' && $val->getLower() === null) ? '' : ",'$boundsSpec'")
         );
         // FIXME: the fact that '[)' bounds are default is rather conventional, and might not hold for user-defined ranges

@@ -125,10 +125,10 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
         return TimestampTz::fromParts((int)$y, (int)$m, (int)$d, (int)$h, (int)$i, $s, $z);
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof TimestampTz) {
@@ -144,11 +144,11 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
                 $val->getOffsetISOString(),
                 ($val->getYear() < 0 ? ' BC' : '')
             );
-            return $this->indicateType($forceType, $tsStr);
+            return $this->indicateType($strictType, $tsStr);
         } elseif ($val === TimestampTz::infinity()) {
-            return $this->indicateType($forceType, "'infinity'");
+            return $this->indicateType($strictType, "'infinity'");
         } elseif ($val === TimestampTz::minusInfinity()) {
-            return $this->indicateType($forceType, "'-infinity'");
+            return $this->indicateType($strictType, "'-infinity'");
         } else {
             throw new \LogicException('A non-finite timezone-aware timestamp not recognized');
         }

@@ -206,7 +206,7 @@ class ArrayType extends TypeBase implements ITotallyOrderedType
      *
      * @todo eliminate recursion, process multidimensional arrays using iteration instead
      */
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val !== null && !is_array($val)) {
             throw new \InvalidArgumentException("Value '$val' is not valid for array type");
@@ -235,7 +235,7 @@ class ArrayType extends TypeBase implements ITotallyOrderedType
             $str = "'$str'"; // NOTE: literal single quotes in serialized elements are already doubled
         }
 
-        return $this->typeCastExpr(($forceType || !$val), $str); // NOTE: empty arrays must be typecast
+        return $this->typeCastExpr($strictType, $str);
     }
 
     /**
@@ -280,7 +280,7 @@ class ArrayType extends TypeBase implements ITotallyOrderedType
                     throw new \InvalidArgumentException($msg);
                 }
                 
-                $out .= $this->elemType->serializeValue($v);
+                $out .= $this->elemType->serializeValue($v, false);
             }
         }
         $out .= ']';
@@ -341,7 +341,7 @@ class ArrayType extends TypeBase implements ITotallyOrderedType
                 if ($v === null) {
                     $valOut = 'NULL';
                 } else {
-                    $valOut = $this->elemType->serializeValue($v);
+                    $valOut = $this->elemType->serializeValue($v, false);
                     /* Trim the single quotes and other decoration - the value will be used inside a string literal.
                        As an optimization, doubled single quotes (meaning the literal single quote) will be preserved
                        not to undo and do the job again on the whole array.

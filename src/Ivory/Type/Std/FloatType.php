@@ -29,18 +29,18 @@ class FloatType extends TypeBase implements ITotallyOrderedType
         }
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         } elseif (is_finite($val)) {
-            return $this->typeCastExpr($forceType, (string)(float)$val);
+            return $this->typeCastExpr($strictType, (string)(float)$val);
         } elseif (is_nan($val)) {
-            return $this->indicateType($forceType, "'NaN'");
+            return $this->indicateType($strictType, "'NaN'");
         } elseif ($val < 0) {
-            return $this->indicateType($forceType, "'-Infinity'");
+            return $this->indicateType($strictType, "'-Infinity'");
         } else {
-            return $this->indicateType($forceType, "'Infinity'");
+            return $this->indicateType($strictType, "'Infinity'");
         }
     }
 }

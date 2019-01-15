@@ -85,20 +85,16 @@ abstract class RowTypeBase extends TypeBase implements ITotallyOrderedType
      */
     abstract protected function makeParsedValue(array $items);
 
-    public function serializeValue($val, bool $forceType = false): string
+    final protected function makeRowExpression($value, bool $strictType = true): string
     {
-        if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
-        }
-
         $res = '(';
-        $cnt = $this->serializeBody($res, $val);
+        $cnt = $this->serializeBody($res, $value, $strictType);
         $res .= ')';
         if ($cnt < 2) {
             $res = 'ROW' . $res;
         }
-        return $this->typeCastExpr($forceType, $res);
+        return $res;
     }
 
-    abstract protected function serializeBody(string &$result, $value): int;
+    abstract protected function serializeBody(string &$result, $value, bool $strictType = true): int;
 }

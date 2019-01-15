@@ -61,7 +61,17 @@ class CompositeType extends RowTypeBase
         return Composite::fromMap($valueMap);
     }
 
-    protected function serializeBody(string &$result, $value): int
+    public function serializeValue($val, bool $strictType = true): string
+    {
+        if ($val === null) {
+            $expr = 'NULL';
+        } else {
+            $expr = $this->makeRowExpression($val, $strictType);
+        }
+        return $this->typeCastExpr($strictType, $expr);
+    }
+
+    protected function serializeBody(string &$result, $value, bool $strictType = true): int
     {
         if (is_array($value)) {
             $value = Composite::fromMap($value);
@@ -75,7 +85,7 @@ class CompositeType extends RowTypeBase
                 $result .= ',';
             }
             $type = $this->attTypes[$pos];
-            $result .= $type->serializeValue(($value->{$name} ?? null));
+            $result .= $type->serializeValue(($value->{$name} ?? null), $strictType);
             $cnt++;
         }
         return $cnt;

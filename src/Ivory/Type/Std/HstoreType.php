@@ -16,10 +16,10 @@ use Ivory\Type\TypeBase;
  */
 class HstoreType extends TypeBase
 {
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!is_array($val) && !is_object($val)) {
@@ -37,7 +37,7 @@ class HstoreType extends TypeBase
             $res .= $this->quoteAtom($k) . '=>' . $this->quoteAtom($v);
         }
         $res .= "'";
-        return $this->indicateType($forceType, $res);
+        return $this->indicateType($strictType, $res);
     }
 
     private function quoteAtom($atom): string

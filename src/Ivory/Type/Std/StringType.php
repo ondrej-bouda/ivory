@@ -20,12 +20,12 @@ class StringType extends TypeBase implements ITotallyOrderedType
         return $extRepr;
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         } else {
-            return $this->indicateType($forceType, Types::serializeString((string)$val));
+            return $this->indicateType($strictType, Types::serializeString((string)$val));
         }
     }
 }

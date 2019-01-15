@@ -522,13 +522,13 @@ class TypeTest extends IvoryTestCase
         $c = SqlRelationDefinition::fromPattern('SELECT * FROM %ident', 'a.b');
         $this->assertSame('SELECT * FROM "a.b"', $c->toSql($typeDict));
 
-        $d = SqlRelationDefinition::fromPattern('SELECT * FROM %ident!', 't');
-        $this->assertSame('SELECT * FROM "t"', $d->toSql($typeDict));
+        $d = SqlRelationDefinition::fromPattern('SELECT * FROM %ident?', 't');
+        $this->assertSame('SELECT * FROM t', $d->toSql($typeDict));
 
-        $e = SqlRelationDefinition::fromPattern('SELECT * FROM %ident!', 'T');
+        $e = SqlRelationDefinition::fromPattern('SELECT * FROM %ident?', 'T');
         $this->assertSame('SELECT * FROM "T"', $e->toSql($typeDict));
 
-        $f = SqlRelationDefinition::fromPattern('SELECT * FROM %ident!', 'a.b');
+        $f = SqlRelationDefinition::fromPattern('SELECT * FROM %ident?', 'a.b');
         $this->assertSame('SELECT * FROM "a.b"', $f->toSql($typeDict));
     }
 
@@ -576,12 +576,12 @@ class TypeTest extends IvoryTestCase
     {
         $tuple = $this->conn->querySingleTuple(
             'SELECT
-                 pg_catalog.pg_typeof(%{double precision})::TEXT AS double,
-                 pg_catalog.pg_typeof(%{double precision}!)::TEXT AS double_explicit',
+                 pg_catalog.pg_typeof(%{double precision}?)::TEXT AS double_implicit,
+                 pg_catalog.pg_typeof(%{double precision})::TEXT AS double_explicit',
             1.2,
             1.2
         );
-        $this->assertSame('numeric', $tuple->double);
+        $this->assertSame('numeric', $tuple->double_implicit);
         $this->assertSame('double precision', $tuple->double_explicit);
     }
 

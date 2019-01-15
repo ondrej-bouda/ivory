@@ -54,10 +54,10 @@ class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedTy
         }
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if ($val instanceof Money) {
@@ -72,6 +72,6 @@ class MoneyType extends ConnectionDependentBaseType implements ITotallyOrderedTy
             throw $this->invalidValueException($val);
         }
 
-        return $this->typeCastExpr($forceType, $expr);
+        return $this->typeCastExpr($strictType, $expr);
     }
 }

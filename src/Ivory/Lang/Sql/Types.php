@@ -78,6 +78,6 @@ class Types
         if ($identSerializer === null) {
             $identSerializer = new IdentifierSerializer();
         }
-        return $identSerializer->serializeValue($ident);
+        return $identSerializer->serializeValue($ident, false);
     }
 }

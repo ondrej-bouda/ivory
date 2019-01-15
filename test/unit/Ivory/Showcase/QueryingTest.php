@@ -46,13 +46,13 @@ class QueryingTest extends IvoryTestCase
         // defined on the database connection are used. See \Ivory\Lang\SqlPattern\SqlPattern class docs for details.
         $relDef = SqlRelationDefinition::fromPattern('SELECT %s, %num, %bool', "Ivory's escaping", '3.14', false);
         $sql = $relDef->toSql($this->typeDict);
-        $this->assertSame("SELECT 'Ivory''s escaping', 3.14, FALSE", $sql);
+        $this->assertSame("SELECT pg_catalog.text 'Ivory''s escaping', 3.14::pg_catalog.numeric, FALSE", $sql);
 
         // Moreover, the types need not be specified explicitly. There are rules for inferring the type from the actual
         // value.
         $relDef = SqlRelationDefinition::fromPattern('SELECT %, %, %', "Automatic type inference", 3.14, false);
         $sql = $relDef->toSql($this->typeDict);
-        $this->assertSame("SELECT 'Automatic type inference', 3.14, FALSE", $sql);
+        $this->assertSame("SELECT pg_catalog.text 'Automatic type inference', 3.14::pg_catalog.float8, FALSE", $sql);
 
         // All the standard PostgreSQL types are already set up in Ivory by default. Besides, there are special value
         // serializers for specific usage, e.g., LIKE operands.
@@ -63,7 +63,7 @@ class QueryingTest extends IvoryTestCase
         $this->conn->getTypeRegister()->registerTypeInferenceRule(\stdClass::class, 'pg_catalog', 'json');
         $this->conn->flushTypeDictionary(); // the type dictionary was changed while in use - explicit flush necessary
 
-        $relDef = SqlRelationDefinition::fromPattern('SELECT %js!, %!', Json::null(), (object)['a' => 42]);
+        $relDef = SqlRelationDefinition::fromPattern('SELECT %js, %', Json::null(), (object)['a' => 42]);
         $sql = $relDef->toSql($this->conn->getTypeDictionary());
         $this->assertSame("SELECT pg_catalog.json 'null', pg_catalog.json '{\"a\":42}'", $sql);
 
@@ -80,10 +80,12 @@ class QueryingTest extends IvoryTestCase
         $tuple = $this->conn->querySingleTuple($relDef);
         $this->assertEquals([true, 'str', Decimal::fromNumber('3.14')], $tuple->toList());
 
-        // ...or as a base for another definition. Note the construction from "fragments" - parts of the SQL pattern put together.
+        // ...or as a base for another definition. Note the construction from "fragments" - parts of the SQL pattern put
+        // together. Also note we specify data type explicitly for the date column so that a null may be matched with
+        // date.
         $valsDef = SqlRelationDefinition::fromFragments(
-            'VALUES (%, %),', 4, Date::fromParts(2017, 2, 25),
-            '       (%, %)', 7, null
+            'VALUES (%, %date),', 4, Date::fromParts(2017, 2, 25),
+            '       (%, %date)', 7, null
         );
         $relDef = SqlRelationDefinition::fromPattern(
             'SELECT * FROM (%rel) AS t (id, creat)',

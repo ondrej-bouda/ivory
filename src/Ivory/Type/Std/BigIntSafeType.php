@@ -39,15 +39,15 @@ class BigIntSafeType extends TypeBase implements ITotallyOrderedType
         }
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         } elseif ($val >= PHP_INT_MIN && $val <= PHP_INT_MAX) {
-            return $this->typeCastExpr($forceType, (string)(int)$val);
+            return $this->typeCastExpr($strictType, (string)(int)$val);
         } else {
             if (self::isIntegerString($val)) {
-                return $this->typeCastExpr($forceType, (string)$val);
+                return $this->typeCastExpr($strictType, (string)$val);
             } else {
                 throw $this->invalidValueException($val);
             }

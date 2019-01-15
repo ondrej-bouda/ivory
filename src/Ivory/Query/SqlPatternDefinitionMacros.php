@@ -182,7 +182,7 @@ trait SqlPatternDefinitionMacros
                     $plcHdr->isTypeNameQuoted(),
                     $plcHdr->getSchemaName(),
                     $plcHdr->isSchemaNameQuoted(),
-                    $plcHdr->isTypeForced()
+                    $plcHdr->isLooseTypeMode()
                 );
                 $overallPosPlaceholders[] = $overallPlcHdr;
                 $overallEndsWithPlaceholder = ($overallEndsWithPlaceholder || $plcHdr->getOffset() == $sqlTorsoLen);
@@ -200,7 +200,7 @@ trait SqlPatternDefinitionMacros
                         $plcHdr->isTypeNameQuoted(),
                         $plcHdr->getSchemaName(),
                         $plcHdr->isSchemaNameQuoted(),
-                        $plcHdr->isTypeForced()
+                        $plcHdr->isLooseTypeMode()
                     );
                     $overallNamedPlaceholderMap[$name][] = $overallPlcHdr;
                     $overallEndsWithPlaceholder = ($overallEndsWithPlaceholder || $plcHdr->getOffset() == $sqlTorsoLen);
@@ -370,7 +370,7 @@ trait SqlPatternDefinitionMacros
             } else {
                 $serializer = $typeDictionary->requireTypeByValue($value);
             }
-            $serializedValue = $serializer->serializeValue($value, $placeholder->isTypeForced());
+            $serializedValue = $serializer->serializeValue($value, !$placeholder->isLooseTypeMode());
 
             $gen->send($serializedValue);
         }

@@ -44,7 +44,7 @@ class LikeExpressionSerializer implements IValueSerializer
         $this->postfix = (($wildcard & self::WILDCARD_APPEND) != 0 ? '%' : '');
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
             return 'NULL';

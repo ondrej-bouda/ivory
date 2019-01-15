@@ -4,6 +4,7 @@ namespace Ivory\Showcase;
 
 use Ivory\Connection\IConnection;
 use Ivory\IvoryTestCase;
+use Ivory\Lang\Sql\Types;
 use Ivory\Query\SqlRelationDefinition;
 use Ivory\Type\TypeBase;
 use Ivory\Type\IValueSerializer;
@@ -32,13 +33,13 @@ class TypeSystemTest extends IvoryTestCase
 
     public function testArrayType()
     {
-        $arr = $this->conn->querySingleValue('SELECT %!', ['a', 'b', 'c']);
+        $arr = $this->conn->querySingleValue('SELECT %', ['a', 'b', 'c']);
         $this->assertSame(['a', 'b', 'c'], $arr);
 
-        $arr = $this->conn->querySingleValue('SELECT %!', [4 => 'a', 6 => 'c', 5 => 'b']);
+        $arr = $this->conn->querySingleValue('SELECT %', [4 => 'a', 6 => 'c', 5 => 'b']);
         $this->assertSame([4 => 'a', 5 => 'b', 6 => 'c'], $arr);
 
-        $pattern = SqlRelationDefinition::fromPattern('INSERT INTO t (a) VALUES (%!)', ['a', 'b', 'c']);
+        $pattern = SqlRelationDefinition::fromPattern('INSERT INTO t (a) VALUES (%)', ['a', 'b', 'c']);
         $sql = $pattern->toSql($this->conn->getTypeDictionary());
         $this->assertSame("INSERT INTO t (a) VALUES ('[0:2]={a,b,c}'::pg_catalog.text[])", $sql);
 
@@ -50,7 +51,7 @@ class TypeSystemTest extends IvoryTestCase
             $plainArr = $this->conn->querySingleValue("SELECT ARRAY['a', 'b', 'c']");
             $this->assertSame(['a', 'b', 'c'], $plainArr);
 
-            $plainPattern = SqlRelationDefinition::fromPattern('INSERT INTO t (a) VALUES (%!)', ['a', 'b', 'c']);
+            $plainPattern = SqlRelationDefinition::fromPattern('INSERT INTO t (a) VALUES (%)', ['a', 'b', 'c']);
             $plainSql = $plainPattern->toSql($this->conn->getTypeDictionary());
             $this->assertSame("INSERT INTO t (a) VALUES (ARRAY['a','b','c']::pg_catalog.text[])", $plainSql);
         } finally {
@@ -136,13 +137,6 @@ SQL
         // define the serializer...
         $strListSerializer = new class implements IValueSerializer
         {
-            private $stringType;
-
-            public function __construct()
-            {
-                $this->stringType = new StringType('%strlist', 'string'); // it requires some name for identification
-            }
-
             public function serializeValue($val, bool $forceType = false): string
             {
                 if (!is_array($val)) {
@@ -156,8 +150,7 @@ SQL
                         $result .= ', ';
                     }
                     $isFirst = false;
-
-                    $result .= $this->stringType->serializeValue($str);
+                    $result .= Types::serializeString($str);
                 }
                 if ($isFirst) {
                     throw new \InvalidArgumentException('%strlist list cannot be empty');
@@ -199,12 +192,12 @@ SQL
                 }
             }
 
-            public function serializeValue($val, bool $forceType = false): string
+            public function serializeValue($val, bool $strictType = true): string
             {
                 if ($val === null) {
-                    return $this->typeCastExpr($forceType, 'NULL');
+                    return $this->typeCastExpr($strictType, 'NULL');
                 } elseif ($val instanceof \DateTime) {
-                    return $this->indicateType($forceType, $val->format("'H:i:s.u'"));
+                    return $this->indicateType($strictType, $val->format("'H:i:s.u'"));
                 } else {
                     throw new \InvalidArgumentException('Invalid value to serialize as TIME');
                 }

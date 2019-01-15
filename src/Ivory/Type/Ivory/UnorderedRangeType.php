@@ -22,7 +22,7 @@ class UnorderedRangeType extends TypeBase
         );
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         throw new UnsupportedException(
             "{$this->getSchemaName()}.{$this->getName()} cannot be used - its subtype is not parsed by a " .

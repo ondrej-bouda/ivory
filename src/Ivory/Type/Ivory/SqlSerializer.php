@@ -13,7 +13,7 @@ use Ivory\Type\IValueSerializer;
  */
 class SqlSerializer implements IValueSerializer
 {
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
             throw new \InvalidArgumentException('Expecting an SQL string, NULL encountered.');

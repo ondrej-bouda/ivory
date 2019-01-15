@@ -24,16 +24,16 @@ class MacAddr8Type extends TypeBase
         }
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof MacAddr8) {
             $val = MacAddr8::fromString($val);
         }
 
-        return $this->indicateType($forceType, "'" . $val->toString() . "'");
+        return $this->indicateType($strictType, "'" . $val->toString() . "'");
     }
 }

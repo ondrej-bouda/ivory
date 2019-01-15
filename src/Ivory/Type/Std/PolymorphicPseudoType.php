@@ -15,10 +15,10 @@ class PolymorphicPseudoType extends TypeBase
         throw new InternalException('A non-null value to be parsed for a polymorphic pseudo-type');
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         } else {
             throw $this->invalidValueException($val);
         }

@@ -13,12 +13,12 @@ use Ivory\Value\BitString;
  */
 abstract class BitStringType extends TypeBase implements ITotallyOrderedType
 {
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         } elseif ($val instanceof BitString) {
-            return $this->typeCastExpr($forceType, "B'" . $val->toString() . "'");
+            return $this->typeCastExpr($strictType, "B'" . $val->toString() . "'");
         } else {
             throw $this->invalidValueException($val);
         }

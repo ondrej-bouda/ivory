@@ -13,10 +13,10 @@ use Ivory\Value\Json;
  */
 abstract class JsonType extends TypeBase
 {
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof Json) {
@@ -27,6 +27,6 @@ abstract class JsonType extends TypeBase
             }
         }
 
-        return $this->indicateType($forceType, Types::serializeString($val->getEncoded()));
+        return $this->indicateType($strictType, Types::serializeString($val->getEncoded()));
     }
 }

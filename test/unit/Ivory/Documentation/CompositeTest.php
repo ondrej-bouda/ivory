@@ -25,7 +25,7 @@ class CompositeTest extends IvoryTestCase
             $this->assertSame('Unexpected )', $val->message);
 
             $err = Composite::fromMap(['file' => 'bar.c', 'line' => 2]);
-            $line = $conn->querySingleValue('SELECT (%parse_error!).line', $err);
+            $line = $conn->querySingleValue('SELECT (%parse_error).line', $err);
             $this->assertSame(2, $line);
         } finally {
             $tx->rollback();

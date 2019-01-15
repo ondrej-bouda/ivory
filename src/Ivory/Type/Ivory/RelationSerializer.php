@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Type\Ivory;
 
 use Ivory\INamedDbObject;
+use Ivory\Lang\Sql\Types;
 use Ivory\Query\IRelationDefinition;
 use Ivory\Relation\IRelation;
 use Ivory\Relation\ITuple;
@@ -20,9 +21,7 @@ use Ivory\Utils\StringUtils;
  */
 class RelationSerializer extends ConnectionDependentValueSerializer
 {
-    private $identifierSerializer = null;
-
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val instanceof IRelationDefinition) {
             $typeDictionary = $this->getConnection()->getTypeDictionary();
@@ -100,14 +99,13 @@ class RelationSerializer extends ConnectionDependentValueSerializer
      */
     private function serializeEmptyRelation(array $columns): string
     {
-        $identSerializer = $this->getIdentifierSerializer();
         $result = 'SELECT';
         foreach ($columns as $i => list($colName, $serializer)) {
             $result .= ($i == 0 ? ' ' : ', ') . 'NULL';
             if ($serializer instanceof INamedDbObject) {
                 $result .= "::{$serializer->getSchemaName()}.{$serializer->getName()}";
             }
-            $result .= ' AS ' . $identSerializer->serializeValue($colName);
+            $result .= ' AS ' . Types::serializeIdent($colName);
         }
         $result .= ' WHERE FALSE';
         return $result;
@@ -133,10 +131,8 @@ class RelationSerializer extends ConnectionDependentValueSerializer
                 }
                 $serializer = $columns[$colIdx][1];
                 assert($serializer instanceof IValueSerializer);
-                $result .= $serializer->serializeValue($val);
-                if ($isFirstTuple && $serializer instanceof INamedDbObject) {
-                    $result .= "::{$serializer->getSchemaName()}.{$serializer->getName()}";
-                }
+                $result .= $serializer->serializeValue($val, $isFirstTuple);
+                // following tuples will be converted automatically to the type of the first, explicitly specified one
                 $colIdx++;
             }
             $result .= ')';
@@ -145,23 +141,14 @@ class RelationSerializer extends ConnectionDependentValueSerializer
         $result .=
             "\n" .
             ") t (";
-        $identSerializer = $this->getIdentifierSerializer();
         foreach ($columns as $i => list($name, $serializer)) {
             if ($i > 0) {
                 $result .= ', ';
             }
-            $result .= $identSerializer->serializeValue($name);
+            $result .= Types::serializeIdent($name);
         }
         $result .= ')';
 
         return $result;
-    }
-
-    private function getIdentifierSerializer(): IdentifierSerializer
-    {
-        if ($this->identifierSerializer === null) {
-            $this->identifierSerializer = new IdentifierSerializer();
-        }
-        return $this->identifierSerializer;
     }
 }

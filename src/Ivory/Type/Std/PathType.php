@@ -45,10 +45,10 @@ class PathType extends CompoundGeometricType
         }
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof Path) {
@@ -61,7 +61,7 @@ class PathType extends CompoundGeometricType
 
         $points = [];
         foreach ($val->getPoints() as $point) {
-            $points[] = $this->pointType->serializeValue($point);
+            $points[] = $this->pointType->serializeValue($point, false);
         }
 
         $expr =
@@ -69,6 +69,6 @@ class PathType extends CompoundGeometricType
             implode(',', $points) .
             ($val->isOpen() ? ']' : ')');
 
-        return $this->indicateType($forceType, $expr);
+        return $this->indicateType($strictType, $expr);
     }
 }

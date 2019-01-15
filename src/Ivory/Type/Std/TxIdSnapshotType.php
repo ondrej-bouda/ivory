@@ -19,16 +19,16 @@ class TxIdSnapshotType extends TypeBase
         return TxIdSnapshot::fromString($extRepr);
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof TxIdSnapshot) {
             $val = TxIdSnapshot::fromString($val);
         }
 
-        return $this->indicateType($forceType, "'" . $val->toString() . "'");
+        return $this->indicateType($strictType, "'" . $val->toString() . "'");
     }
 }

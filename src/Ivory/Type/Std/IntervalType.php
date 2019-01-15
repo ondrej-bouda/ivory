@@ -20,10 +20,10 @@ class IntervalType extends TypeBase implements ITotallyOrderedType
         return TimeInterval::fromString($extRepr);
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof TimeInterval) {
@@ -34,6 +34,6 @@ class IntervalType extends TypeBase implements ITotallyOrderedType
             }
         }
 
-        return $this->indicateType($forceType, "'" . $val->toIsoString() . "'");
+        return $this->indicateType($strictType, "'" . $val->toIsoString() . "'");
     }
 }

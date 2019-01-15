@@ -23,13 +23,13 @@ use Ivory\Type\IValueSerializer;
  */
 class IdentifierSerializer implements IValueSerializer
 {
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
             throw new \InvalidArgumentException('Expecting an identifier, NULL encountered.');
         }
 
-        if ($forceType || $this->needsQuotes($val)) {
+        if ($this->needsQuotes($val)) {
             return '"' . str_replace('"', '""', $val) . '"';
         } else {
             return $val;

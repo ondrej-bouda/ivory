@@ -24,10 +24,10 @@ class StrictEnumType extends TypeBase implements ITotallyOrderedType
         return new $this->enumClass($extRepr);
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         }
 
         if (!$val instanceof StrictEnum) {
@@ -37,6 +37,6 @@ class StrictEnumType extends TypeBase implements ITotallyOrderedType
             throw new \InvalidArgumentException('Serializing enumeration value for a different type');
         }
 
-        return $this->indicateType($forceType, Types::serializeString($val->getValue()));
+        return $this->indicateType($strictType, Types::serializeString($val->getValue()));
     }
 }

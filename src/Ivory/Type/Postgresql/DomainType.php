@@ -20,9 +20,9 @@ class DomainType extends TypeBase implements IType
         return $this->baseType->parseValue($extRepr);
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         $baseExpr = $this->baseType->serializeValue($val, false);
-        return $this->typeCastExpr($forceType, $baseExpr);
+        return $this->typeCastExpr($strictType, $baseExpr);
     }
 }

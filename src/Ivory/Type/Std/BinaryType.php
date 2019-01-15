@@ -26,12 +26,12 @@ class BinaryType extends TypeBase implements ITotallyOrderedType
         }
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         } else {
-            return $this->indicateType($forceType, "E'\\\\x" . bin2hex($val) . "'");
+            return $this->indicateType($strictType, "E'\\\\x" . bin2hex($val) . "'");
         }
     }
 }

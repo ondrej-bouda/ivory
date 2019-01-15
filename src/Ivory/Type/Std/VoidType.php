@@ -26,12 +26,12 @@ class VoidType extends TypeBase
         return self::void();
     }
 
-    public function serializeValue($val, bool $forceType = false): string
+    public function serializeValue($val, bool $strictType = true): string
     {
         if ($val === null) {
-            return $this->typeCastExpr($forceType, 'NULL');
+            return $this->typeCastExpr($strictType, 'NULL');
         } elseif ($val === self::void()) {
-            return $this->indicateType($forceType, "''");
+            return $this->indicateType($strictType, "''");
         } else {
             throw $this->invalidValueException($val);
         }
