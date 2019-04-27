@@ -637,24 +637,27 @@ SQL
             $regTypeRel->toSql($typeDict)
         );
 
-        $regRoleRel = SqlRelationDefinition::fromPattern('SELECT %regrole, %regrole', 'postgres', null);
-        $this->assertSame(
-            "SELECT pg_catalog.regrole 'postgres', NULL::pg_catalog.regrole",
-            $regRoleRel->toSql($typeDict)
-        );
+        // NOTE: regrole and regnamespace have been introduced in PostgreSQL 9.5
+        if ($this->conn->getConfig()->getServerVersionNumber() >= 90500) {
+            $regRoleRel = SqlRelationDefinition::fromPattern('SELECT %regrole, %regrole', 'postgres', null);
+            $this->assertSame(
+                "SELECT pg_catalog.regrole 'postgres', NULL::pg_catalog.regrole",
+                $regRoleRel->toSql($typeDict)
+            );
 
-        $regNamespaceRel = SqlRelationDefinition::fromPattern(
-            'SELECT %regnamespace, %regnamespace',
-            'some."schema"',
-            null
-        );
-        $this->assertSame(
-            <<<'SQL'
+            $regNamespaceRel = SqlRelationDefinition::fromPattern(
+                'SELECT %regnamespace, %regnamespace',
+                'some."schema"',
+                null
+            );
+            $this->assertSame(
+                <<<'SQL'
 SELECT pg_catalog.regnamespace '"some.""schema"""', NULL::pg_catalog.regnamespace
 SQL
-,
-            $regNamespaceRel->toSql($typeDict)
-        );
+                ,
+                $regNamespaceRel->toSql($typeDict)
+            );
+        }
 
         $regConfigRel = SqlRelationDefinition::fromPattern(
             'SELECT %, %regconfig',
@@ -719,9 +722,6 @@ SQL
                     'pg_catalog.pg_class'::regclass AS regclass,
                     '"some.""schema"""."""tbl"""'::regclass AS regclass_tbl,
                     pg_catalog.pg_typeof(FALSE) AS regtype,
-                    'postgres'::regrole AS regrole,
-                    'pg_catalog'::regnamespace AS regnamespace,
-                    '"some.""schema"""'::regnamespace AS regnamespace_some_schema,
                     '"some.""schema""".fts_config'::regconfig AS regconfig,
                     '"some.""schema""".fts_dict'::regdictionary AS regdictionary,
                     '123'::xid AS xid,
@@ -747,9 +747,6 @@ SQL
             $this->assertEquals(PgRelationRef::fromUnqualifiedName('pg_class'), $tuple->regclass);
             $this->assertEquals(PgRelationRef::fromQualifiedName('some."schema"', '"tbl"'), $tuple->regclass_tbl);
             $this->assertEquals(PgTypeRef::fromUnqualifiedName('boolean'), $tuple->regtype);
-            $this->assertSame('postgres', $tuple->regrole);
-            $this->assertSame('pg_catalog', $tuple->regnamespace);
-            $this->assertSame('some."schema"', $tuple->regnamespace_some_schema);
             $this->assertEquals(
                 PgTextSearchConfigRef::fromQualifiedName('some."schema"', 'fts_config'),
                 $tuple->regconfig
@@ -761,6 +758,21 @@ SQL
             $this->assertSame(123, $tuple->xid);
             $this->assertSame(456, $tuple->cid);
             $this->assertEquals(TupleId::fromCoordinates(7, 8), $tuple->tid);
+
+            // NOTE: regrole and regnamespace have been introduced in PostgreSQL 9.5
+            if ($this->conn->getConfig()->getServerVersionNumber() >= 90500) {
+                $tuple = $this->conn->querySingleTuple(
+                    <<<'SQL'
+                    SELECT
+                        'postgres'::regrole AS regrole,
+                        'pg_catalog'::regnamespace AS regnamespace,
+                        '"some.""schema"""'::regnamespace AS regnamespace_some_schema
+SQL
+                );
+                $this->assertSame('postgres', $tuple->regrole);
+                $this->assertSame('pg_catalog', $tuple->regnamespace);
+                $this->assertSame('some."schema"', $tuple->regnamespace_some_schema);
+            }
         } finally {
             $tx->rollback();
         }
