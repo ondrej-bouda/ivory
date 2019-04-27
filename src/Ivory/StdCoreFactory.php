@@ -103,6 +103,15 @@ class StdCoreFactory implements ICoreFactory
             Value\TxIdSnapshot::class => ['pg_catalog', 'txid_snapshot'],
             Value\TextSearchVector::class => ['pg_catalog', 'tsvector'],
             Value\TextSearchQuery::class => ['pg_catalog', 'tsquery'],
+            Value\PgOperatorNameRef::class => ['pg_catalog', 'regoper'],
+            Value\PgOperatorRef::class => ['pg_catalog', 'regoperator'],
+            Value\PgProcedureNameRef::class => ['pg_catalog', 'regproc'],
+            Value\PgProcedureRef::class => ['pg_catalog', 'regprocedure'],
+            Value\PgRelationRef::class => ['pg_catalog', 'regclass'],
+            Value\PgTextSearchConfigRef::class => ['pg_catalog', 'regconfig'],
+            Value\PgTextSearchDictionaryRef::class => ['pg_catalog', 'regdictionary'],
+            Value\PgTypeRef::class => ['pg_catalog', 'regtype'],
+            Value\TupleId::class => ['pg_catalog', 'tid'],
         ]);
 
         return $reg;

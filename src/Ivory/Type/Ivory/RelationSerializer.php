@@ -2,12 +2,12 @@
 declare(strict_types=1);
 namespace Ivory\Type\Ivory;
 
-use Ivory\INamedDbObject;
 use Ivory\Lang\Sql\Types;
 use Ivory\Query\IRelationDefinition;
 use Ivory\Relation\IRelation;
 use Ivory\Relation\ITuple;
 use Ivory\Type\IConnectionDependentObject;
+use Ivory\Type\IType;
 use Ivory\Type\IValueSerializer;
 use Ivory\Utils\StringUtils;
 
@@ -102,7 +102,7 @@ class RelationSerializer extends ConnectionDependentValueSerializer
         $result = 'SELECT';
         foreach ($columns as $i => list($colName, $serializer)) {
             $result .= ($i == 0 ? ' ' : ', ') . 'NULL';
-            if ($serializer instanceof INamedDbObject) {
+            if ($serializer instanceof IType) {
                 $result .= "::{$serializer->getSchemaName()}.{$serializer->getName()}";
             }
             $result .= ' AS ' . Types::serializeIdent($colName);

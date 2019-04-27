@@ -132,6 +132,33 @@ class StdTypeLoader implements ITypeLoader
                     case 'record':
                         return new RecordType($schemaName, $typeName);
 
+                    case 'oid':
+                        return new IntegerType($schemaName, $typeName);
+                    case 'regproc':
+                        return new RegProcType($schemaName, $typeName);
+                    case 'regprocedure':
+                        return new RegProcedureType($schemaName, $typeName);
+                    case 'regoper':
+                        return new RegOperType($schemaName, $typeName);
+                    case 'regoperator':
+                        return new RegOperatorType($schemaName, $typeName);
+                    case 'regclass':
+                        return new RegClassType($schemaName, $typeName);
+                    case 'regtype':
+                        return new RegTypeType($schemaName, $typeName);
+                    case 'regrole':
+                    case 'regnamespace':
+                        return new PgDatabaseWideRefType($schemaName, $typeName);
+                    case 'regconfig':
+                        return new RegConfigType($schemaName, $typeName);
+                    case 'regdictionary':
+                        return new RegDictionaryType($schemaName, $typeName);
+                    case 'xid':
+                    case 'cid':
+                        return new PgIdType($schemaName, $typeName);
+                    case 'tid':
+                        return new TupleIdType($schemaName, $typeName);
+
                     case 'any':
                     case 'anyelement':
                     case 'anyarray':

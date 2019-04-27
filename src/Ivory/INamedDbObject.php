@@ -13,7 +13,7 @@ interface INamedDbObject
     function getName(): string;
 
     /**
-     * @return string name of schema this object is defined in
+     * @return string|null name of schema this object is defined in, or <tt>null</tt> if define outside of any schema
      */
-    function getSchemaName(): string;
+    function getSchemaName(): ?string;
 }

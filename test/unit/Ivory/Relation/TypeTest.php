@@ -13,6 +13,14 @@ use Ivory\Value\Date;
 use Ivory\Value\MacAddr;
 use Ivory\Value\MacAddr8;
 use Ivory\Value\PgLogSequenceNumber;
+use Ivory\Value\PgOperatorNameRef;
+use Ivory\Value\PgOperatorRef;
+use Ivory\Value\PgProcedureNameRef;
+use Ivory\Value\PgProcedureRef;
+use Ivory\Value\PgRelationRef;
+use Ivory\Value\PgTextSearchConfigRef;
+use Ivory\Value\PgTextSearchDictionaryRef;
+use Ivory\Value\PgTypeRef;
 use Ivory\Value\Point;
 use Ivory\Value\TextSearchQuery;
 use Ivory\Value\TextSearchVector;
@@ -21,6 +29,7 @@ use Ivory\Value\TimeInterval;
 use Ivory\Value\Timestamp;
 use Ivory\Value\TimestampTz;
 use Ivory\Value\TimeTz;
+use Ivory\Value\TupleId;
 use Ivory\Value\TxIdSnapshot;
 
 class TypeTest extends IvoryTestCase
@@ -548,29 +557,214 @@ class TypeTest extends IvoryTestCase
         $this->assertSame(1, $res);
     }
 
-//    public function testObjectIdentifierTypes()
-//    {
-//        $tuple = $this->conn->querySingleTuple(
-//            <<<'SQL'
-//            SELECT
-//                987::oid,
-//                'pg_catalog.pg_typeof'::regproc,
-//                'pg_catalog.pg_typeof("any")'::regprocedure,
-//                '!'::regoper,
-//                '+(integer, integer)'::regoperator,
-//                'pg_catalog.pg_class'::regclass,
-//                pg_catalog.pg_typeof(1.0),
-//                'postgres'::regrole,
-//                'pg_catalog'::regnamespace,
-//                'english'::regconfig,
-//                'simple'::regdictionary,
-//                '123'::xid,
-//                '456'::cid,
-//                '(7,8)'::tid
-//SQL
-//        );
-//        // TODO: test the result
-//    }
+    public function testSerializeObjectIdentifierTypes()
+    {
+        $typeDict = $this->conn->getTypeDictionary();
+
+        $oidRel = SqlRelationDefinition::fromPattern('SELECT %oid, %oid', 987, null);
+        $this->assertSame(
+            'SELECT 987::pg_catalog.oid, NULL::pg_catalog.oid',
+            $oidRel->toSql($typeDict)
+        );
+
+        $regProcRel = SqlRelationDefinition::fromPattern(
+            'SELECT %, %regproc',
+            PgProcedureNameRef::fromQualifiedName('pg_catalog', 'pg_typeof'),
+            null
+        );
+        $this->assertSame(
+            "SELECT pg_catalog.regproc 'pg_catalog.pg_typeof', NULL::pg_catalog.regproc",
+            $regProcRel->toSql($typeDict)
+        );
+
+        $regProcedureRel = SqlRelationDefinition::fromPattern(
+            'SELECT %regprocedure, %, %regprocedure',
+            PgProcedureRef::fromUnqualifiedName('abs', PgTypeRef::fromUnqualifiedName('integer')),
+            PgProcedureRef::fromUnqualifiedName('abbrev', PgTypeRef::fromQualifiedName('pg_catalog', 'cidr')),
+            null
+        );
+        $this->assertSame(
+            "SELECT pg_catalog.regprocedure 'abs(integer)', pg_catalog.regprocedure 'abbrev(pg_catalog.cidr)', " .
+            "NULL::pg_catalog.regprocedure",
+            $regProcedureRel->toSql($typeDict)
+        );
+
+        $regOperRel = SqlRelationDefinition::fromPattern(
+            'SELECT %, %regoper',
+            PgOperatorNameRef::fromUnqualifiedName('!'),
+            null
+        );
+        $this->assertSame(
+            "SELECT pg_catalog.regoper '\"!\"', NULL::pg_catalog.regoper",
+            $regOperRel->toSql($typeDict)
+        );
+
+        $regOperatorRel = SqlRelationDefinition::fromPattern(
+            'SELECT %, %regoperator',
+            PgOperatorRef::fromUnqualifiedName(
+                '+',
+                PgTypeRef::fromUnqualifiedName('integer'),
+                PgTypeRef::fromUnqualifiedName('integer')
+            ),
+            null
+        );
+        $this->assertSame(
+            "SELECT pg_catalog.regoperator '\"+\"(integer, integer)', NULL::pg_catalog.regoperator",
+            $regOperatorRel->toSql($typeDict)
+        );
+
+        $regClassRel = SqlRelationDefinition::fromPattern(
+            'SELECT %, %regclass, %regclass',
+            PgRelationRef::fromUnqualifiedName('pg_class'),
+            PgRelationRef::fromQualifiedName('some."schema"', '"tbl"'),
+            null
+        );
+        $this->assertSame(
+            <<<'SQL'
+SELECT pg_catalog.regclass 'pg_class', pg_catalog.regclass '"some.""schema"""."""tbl"""', NULL::pg_catalog.regclass
+SQL
+,
+            $regClassRel->toSql($typeDict)
+        );
+
+        $regTypeRel = SqlRelationDefinition::fromPattern(
+            'SELECT %, %regtype',
+            PgTypeRef::fromQualifiedName('pg_catalog', 'bool'),
+            null
+        );
+        $this->assertSame(
+            "SELECT pg_catalog.regtype 'pg_catalog.bool', NULL::pg_catalog.regtype",
+            $regTypeRel->toSql($typeDict)
+        );
+
+        $regRoleRel = SqlRelationDefinition::fromPattern('SELECT %regrole, %regrole', 'postgres', null);
+        $this->assertSame(
+            "SELECT pg_catalog.regrole 'postgres', NULL::pg_catalog.regrole",
+            $regRoleRel->toSql($typeDict)
+        );
+
+        $regNamespaceRel = SqlRelationDefinition::fromPattern(
+            'SELECT %regnamespace, %regnamespace',
+            'some."schema"',
+            null
+        );
+        $this->assertSame(
+            <<<'SQL'
+SELECT pg_catalog.regnamespace '"some.""schema"""', NULL::pg_catalog.regnamespace
+SQL
+,
+            $regNamespaceRel->toSql($typeDict)
+        );
+
+        $regConfigRel = SqlRelationDefinition::fromPattern(
+            'SELECT %, %regconfig',
+            PgTextSearchConfigRef::fromQualifiedName('some."schema"', 'fts_config'),
+            null
+        );
+        $this->assertSame(
+            <<<'SQL'
+SELECT pg_catalog.regconfig '"some.""schema""".fts_config', NULL::pg_catalog.regconfig
+SQL
+            ,
+            $regConfigRel->toSql($typeDict)
+        );
+
+        $regDictionaryRel = SqlRelationDefinition::fromPattern(
+            'SELECT %, %regdictionary',
+            PgTextSearchDictionaryRef::fromQualifiedName('some."schema"', 'fts_dict'),
+            null
+        );
+        $this->assertSame(
+            <<<'SQL'
+SELECT pg_catalog.regdictionary '"some.""schema""".fts_dict', NULL::pg_catalog.regdictionary
+SQL
+            ,
+            $regDictionaryRel->toSql($typeDict)
+        );
+
+        $tupleIdRel = SqlRelationDefinition::fromPattern(
+            'SELECT %, %tid',
+            TupleId::fromCoordinates(4013, 824928),
+            null
+        );
+        $this->assertSame(
+            "SELECT pg_catalog.tid '(4013,824928)', NULL::pg_catalog.tid",
+            $tupleIdRel->toSql($typeDict)
+        );
+
+        $otherRel = SqlRelationDefinition::fromPattern('SELECT %xid, %cid', 123, 456);
+        $this->assertSame(
+            "SELECT pg_catalog.xid '123', pg_catalog.cid '456'",
+            $otherRel->toSql($typeDict)
+        );
+    }
+
+    public function testParseObjectIdentifierTypes()
+    {
+        $tx = $this->conn->startTransaction();
+        try {
+            $this->conn->command('CREATE SCHEMA "some.""schema"""');
+            $this->conn->command('CREATE TABLE "some.""schema"""."""tbl""" ()');
+            $this->conn->command('CREATE TEXT SEARCH CONFIGURATION "some.""schema""".fts_config (PARSER = default)');
+            $this->conn->command('CREATE TEXT SEARCH DICTIONARY "some.""schema""".fts_dict (TEMPLATE = simple)');
+
+            $tuple = $this->conn->querySingleTuple(
+                <<<'SQL'
+                SELECT
+                    987::oid AS oid,
+                    'pg_catalog.pg_typeof'::regproc AS regproc,
+                    'pg_catalog.abs(integer)'::regprocedure AS regprocedure,
+                    '!'::regoper AS regoper,
+                    '+(integer, integer)'::regoperator AS regoperator,
+                    'pg_catalog.pg_class'::regclass AS regclass,
+                    '"some.""schema"""."""tbl"""'::regclass AS regclass_tbl,
+                    pg_catalog.pg_typeof(FALSE) AS regtype,
+                    'postgres'::regrole AS regrole,
+                    'pg_catalog'::regnamespace AS regnamespace,
+                    '"some.""schema"""'::regnamespace AS regnamespace_some_schema,
+                    '"some.""schema""".fts_config'::regconfig AS regconfig,
+                    '"some.""schema""".fts_dict'::regdictionary AS regdictionary,
+                    '123'::xid AS xid,
+                    '456'::cid AS cid,
+                    '(7,8)'::tid AS tid
+SQL
+            );
+            $this->assertSame(987, $tuple->oid);
+            $this->assertEquals(PgProcedureNameRef::fromUnqualifiedName('pg_typeof'), $tuple->regproc);
+            $this->assertEquals(
+                PgProcedureRef::fromUnqualifiedName('abs', PgTypeRef::fromUnqualifiedName('integer')),
+                $tuple->regprocedure
+            );
+            $this->assertEquals(PgOperatorNameRef::fromUnqualifiedName('!'), $tuple->regoper);
+            $this->assertEquals(
+                PgOperatorRef::fromUnqualifiedName(
+                    '+',
+                    PgTypeRef::fromUnqualifiedName('integer'),
+                    PgTypeRef::fromUnqualifiedName('integer')
+                ),
+                $tuple->regoperator
+            );
+            $this->assertEquals(PgRelationRef::fromUnqualifiedName('pg_class'), $tuple->regclass);
+            $this->assertEquals(PgRelationRef::fromQualifiedName('some."schema"', '"tbl"'), $tuple->regclass_tbl);
+            $this->assertEquals(PgTypeRef::fromUnqualifiedName('boolean'), $tuple->regtype);
+            $this->assertSame('postgres', $tuple->regrole);
+            $this->assertSame('pg_catalog', $tuple->regnamespace);
+            $this->assertSame('some."schema"', $tuple->regnamespace_some_schema);
+            $this->assertEquals(
+                PgTextSearchConfigRef::fromQualifiedName('some."schema"', 'fts_config'),
+                $tuple->regconfig
+            );
+            $this->assertEquals(
+                PgTextSearchDictionaryRef::fromQualifiedName('some."schema"', 'fts_dict'),
+                $tuple->regdictionary
+            );
+            $this->assertSame(123, $tuple->xid);
+            $this->assertSame(456, $tuple->cid);
+            $this->assertEquals(TupleId::fromCoordinates(7, 8), $tuple->tid);
+        } finally {
+            $tx->rollback();
+        }
+    }
 
     public function testDoublePrecision()
     {

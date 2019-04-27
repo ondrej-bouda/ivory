@@ -10,6 +10,11 @@ use Ivory\INamedDbObject;
 interface IType extends IValueSerializer, INamedDbObject
 {
     /**
+     * @return string name of schema this object is defined in
+     */
+    function getSchemaName(): string;
+
+    /**
      * Parses a value from its PostgreSQL external representation.
      *
      * The external representation is given by the output function of the PostgreSQL type this type object represents.

@@ -28,11 +28,15 @@ class UndefinedType extends ConnectionDependentBaseType
 
     public function parseValue(string $extRepr)
     {
-        throw new UndefinedTypeException("{$this->getSchemaName()}.{$this->getName()} on connection {$this->connName}");
+        throw new UndefinedTypeException(
+            "{$this->getSchemaName()}.{$this->getName()} on connection `{$this->connName}`"
+        );
     }
 
     public function serializeValue($val, bool $strictType = true): string
     {
-        throw new UndefinedTypeException("{$this->getSchemaName()}.{$this->getName()} on connection {$this->connName}");
+        throw new UndefinedTypeException(
+            "{$this->getSchemaName()}.{$this->getName()} on connection `{$this->connName}`"
+        );
     }
 }
