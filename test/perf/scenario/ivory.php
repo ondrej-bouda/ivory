@@ -10,8 +10,11 @@ use League\Flysystem\Filesystem;
 
 class IvoryPerformanceTest implements IPerformanceTest
 {
+    /** Flag to use synchronous connection (instead of the asynchronous default). */
     const SYNCHRONOUS = 1;
+    /** Flag to use no cache. If neither this nor `FILE_CACHE` is used, a memory cache is used. */
     const NO_CACHE = 2;
+    /** Flag to use a file-based cache. If neither this nor `NO_CACHE` is used, a memory cache is used. */
     const FILE_CACHE = 4;
 
     const FILE_CACHE_DIR = __DIR__ . '/out';

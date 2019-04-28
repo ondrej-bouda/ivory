@@ -170,8 +170,7 @@ for ($round = 1 - $command['warmup']; $round <= $command['rounds']; $round++) {
         $buffer = ob_get_clean();
         fprintf(STDERR, "%s", $buffer);
         $printData = false;
-    }
-    else {
+    } else {
         ob_end_clean();
     }
 }
@@ -252,20 +251,13 @@ class Benchmark
     private $warmUp = false;
     private $peakMemoryUsage = null;
 
-    public function benchmarkSection(string $label, \Closure $body)
-    {
-        $this->startSection($label);
-        $body();
-        $this->endSection();
-    }
-
-    public function startSection(string $label)
+    public function startSection(string $label): void
     {
         $this->curSection = $label;
         $this->startTime = microtime(true);
     }
 
-    public function endSection()
+    public function endSection(): void
     {
         $endTime = microtime(true);
         $lapTime = $endTime - $this->startTime;
@@ -281,12 +273,12 @@ class Benchmark
         $this->startTime = null;
     }
 
-    public function takePeakMemoryUsage()
+    public function takePeakMemoryUsage(): void
     {
         $this->peakMemoryUsage = memory_get_peak_usage();
     }
 
-    public function printReport()
+    public function printReport(): void
     {
         echo str_repeat('=', 80) . "\n";
         printf("%-40s %-8s|%-8s|%-8s\n", 'Section', 'Mean[ms]', 'Std.Dev', '95pct[ms]');
@@ -307,7 +299,7 @@ class Benchmark
         }
     }
 
-    private function printMeasurementStats(string $label, array $lapTimeList)
+    private function printMeasurementStats(string $label, array $lapTimeList): void
     {
         $sorted = $lapTimeList;
         sort($sorted);
@@ -344,7 +336,7 @@ class Benchmark
         return sqrt($sum / count($sortedValues)) / $mean;
     }
 
-    public function busyLoop(int $rounds)
+    public function busyLoop(int $rounds): void
     {
         $num = 0;
         for ($i = 1; $i < $rounds; $i++) {
@@ -352,7 +344,7 @@ class Benchmark
         }
     }
 
-    public function setWarmUp(bool $warmUp)
+    public function setWarmUp(bool $warmUp): void
     {
         $this->warmUp = $warmUp;
     }

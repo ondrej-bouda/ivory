@@ -135,7 +135,7 @@ class DibiPerformanceTest implements IPerformanceTest
                 $introDate->format('n/j/Y'),
                 $row['description']
             );
-            foreach (json_decode($row['params']) as $parName => $parValue) {
+            foreach ($row['params'] as $parName => $parValue) {
                 echo "; $parName: " . strtr(var_export($parValue, true), "\n", ' ');
             }
             echo "\n";
