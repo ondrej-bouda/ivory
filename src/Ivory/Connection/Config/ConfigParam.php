@@ -643,7 +643,8 @@ class ConfigParam
         self::VACUUM_FREEZE_TABLE_AGE => ConfigParamType::INTEGER,
         self::VACUUM_FREEZE_MIN_AGE => ConfigParamType::INTEGER,
         self::VACUUM_MULTIXACT_FREEZE_TABLE_AGE => ConfigParamType::INTEGER,
-        self::VACUUM_MULTIXACT_FREEZE_MIN_AGE => ConfigParamType::INTEGER,
+//        self::VACUUM_MULTIXACT_FREEZE_MIN_AGE => ConfigParamType::INTEGER, // until PhpStorm bug WI-46010 gets fixed:
+        'vacuum_multixact_freeze_min_age' => ConfigParamType::INTEGER,
         self::VACUUM_CLEANUP_INDEX_SCALE_FACTOR => ConfigParamType::REAL,
         self::BYTEA_OUTPUT => ConfigParamType::ENUM,
         self::XMLBINARY => ConfigParamType::ENUM,

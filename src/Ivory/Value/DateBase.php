@@ -268,7 +268,7 @@ abstract class DateBase implements IComparable
         $fracSec = $seconds - $wholeSec;
         if ($fracSec != 0) {
             // in current PHP, there is no method for modifying the microseconds of a date/time - we must do it by hand
-            $resFracSec = $fracSec + $this->dt->format('.u');
+            $resFracSec = $fracSec + (double)$this->dt->format('.u');
             if ($resFracSec < 0) {
                 $resFracSec++;
                 $wholeSec--;

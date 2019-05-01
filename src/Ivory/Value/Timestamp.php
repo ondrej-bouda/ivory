@@ -195,7 +195,7 @@ class Timestamp extends TimestampBase
                 (int)$this->dt->format('j'),
                 (int)$this->dt->format('G'),
                 (int)$this->dt->format('i'),
-                $this->dt->format('s') + ($u ? $u / 1000000 : 0),
+                (int)$this->dt->format('s') + ($u ? $u / 1000000 : 0),
             ];
         }
     }
