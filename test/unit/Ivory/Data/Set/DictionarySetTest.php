@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Data\Set;
 
-class DictionarySetTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class DictionarySetTest extends TestCase
 {
     public function testBasic()
     {

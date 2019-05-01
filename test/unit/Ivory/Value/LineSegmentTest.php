@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-class LineSegmentTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class LineSegmentTest extends TestCase
 {
     public function testGetLength()
     {

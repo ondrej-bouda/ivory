@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-class BoxTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class BoxTest extends TestCase
 {
     public function testGetArea()
     {

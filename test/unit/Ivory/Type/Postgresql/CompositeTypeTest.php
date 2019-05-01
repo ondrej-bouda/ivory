@@ -5,8 +5,9 @@ namespace Ivory\Type\Postgresql;
 use Ivory\Type\Std\IntegerType;
 use Ivory\Type\Std\StringType;
 use Ivory\Value\Composite;
+use PHPUnit\Framework\TestCase;
 
-class CompositeTypeTest extends \PHPUnit\Framework\TestCase
+class CompositeTypeTest extends TestCase
 {
     /** @var CompositeType */
     private $zeroType;

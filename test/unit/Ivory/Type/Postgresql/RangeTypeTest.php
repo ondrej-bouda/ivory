@@ -4,8 +4,9 @@ namespace Ivory\Type\Postgresql;
 
 use Ivory\Type\Std\IntegerType;
 use Ivory\Value\Range;
+use PHPUnit\Framework\TestCase;
 
-class RangeTypeTest extends \PHPUnit\Framework\TestCase
+class RangeTypeTest extends TestCase
 {
     /** @var  RangeType */
     private $intRangeType;

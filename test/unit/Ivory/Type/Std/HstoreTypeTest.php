@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Type\Std;
 
-class HstoreTypeTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class HstoreTypeTest extends TestCase
 {
     /** @var HstoreType */
     private $hstoreType;

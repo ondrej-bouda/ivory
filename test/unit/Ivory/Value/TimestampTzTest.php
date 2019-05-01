@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-class TimestampTzTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class TimestampTzTest extends TestCase
 {
     public function testNow()
     {

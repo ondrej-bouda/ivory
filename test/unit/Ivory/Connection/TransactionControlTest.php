@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Connection;
 
 use Ivory\IvoryTestCase;
+use PHPUnit\Framework\Error\Warning;
 
 class TransactionControlTest extends IvoryTestCase
 {
@@ -50,7 +51,7 @@ class TransactionControlTest extends IvoryTestCase
         try {
             unset($tx);
             $this->fail('A warning was expected due to destroying an open transaction handle.');
-        } catch (\PHPUnit\Framework\Error\Warning $warning) {
+        } catch (Warning $warning) {
             $this->assertContains(
                 'open', $warning->getMessage(),
                 'The warning message should mention the transaction handle stayed open', true

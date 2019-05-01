@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-class TextSearchQueryTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class TextSearchQueryTest extends TestCase
 {
     public function testFromFormat()
     {

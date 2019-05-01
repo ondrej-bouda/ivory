@@ -3,8 +3,10 @@ declare(strict_types=1);
 namespace Ivory\Value;
 
 use Ivory\Utils\System;
+use PHPUnit\Framework\Error\Warning;
+use PHPUnit\Framework\TestCase;
 
-class NetAddressTest extends \PHPUnit\Framework\TestCase
+class NetAddressTest extends TestCase
 {
     public function testFromString()
     {
@@ -40,8 +42,8 @@ class NetAddressTest extends \PHPUnit\Framework\TestCase
 
         try {
             NetAddress::fromString('1.2.3.4/24', 16);
-            $this->fail(\PHPUnit\Framework\Error\Warning::class . ' expected');
-        } catch (\PHPUnit\Framework\Error\Warning $e) {
+            $this->fail(Warning::class . ' expected');
+        } catch (Warning $e) {
         }
 
         try {

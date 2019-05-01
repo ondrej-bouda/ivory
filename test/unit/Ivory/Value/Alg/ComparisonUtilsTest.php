@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Value\Alg;
 
-class ComparisonUtilsTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class ComparisonUtilsTest extends TestCase
 {
     public function testCompareArrays()
     {

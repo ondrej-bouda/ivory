@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Type\Ivory;
 
-class LikeExpressionSerializerTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class LikeExpressionSerializerTest extends TestCase
 {
     public function testBasic()
     {

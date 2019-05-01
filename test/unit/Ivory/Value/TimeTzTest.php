@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-class TimeTzTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class TimeTzTest extends TestCase
 {
     private static function t($hour, $min, $sec, $offset)
     {

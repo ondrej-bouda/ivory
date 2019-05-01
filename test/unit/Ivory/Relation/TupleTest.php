@@ -7,8 +7,9 @@ use Ivory\Exception\ImmutableException;
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\Value\Alg\ITupleEvaluator;
 use Ivory\Value\Alg\IEqualable;
+use PHPUnit\Framework\TestCase;
 
-class TupleTest extends \PHPUnit\Framework\TestCase
+class TupleTest extends TestCase
 {
     /** @var ITuple */
     private $simpleTuple;

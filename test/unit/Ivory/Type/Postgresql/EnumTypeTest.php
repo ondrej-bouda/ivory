@@ -7,6 +7,7 @@ use Ivory\Exception\IncomparableException;
 use Ivory\IvoryTestCase;
 use Ivory\Value\EnumItem;
 use Ivory\Value\Range;
+use PHPUnit\Framework\Error\Warning;
 
 class EnumTypeTest extends IvoryTestCase
 {
@@ -90,7 +91,7 @@ class EnumTypeTest extends IvoryTestCase
         try {
             $conn->querySingleValue('SELECT %planet', 'Pluto');
             $this->fail('A warning was expected');
-        } catch (\PHPUnit\Framework\Error\Warning $e) {
+        } catch (Warning $e) {
         }
     }
 }

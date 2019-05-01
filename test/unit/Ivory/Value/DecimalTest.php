@@ -3,8 +3,9 @@ declare(strict_types=1);
 namespace Ivory\Value;
 
 use Ivory\Exception\UndefinedOperationException;
+use PHPUnit\Framework\TestCase;
 
-class DecimalTest extends \PHPUnit\Framework\TestCase
+class DecimalTest extends TestCase
 {
     public function testEquals()
     {

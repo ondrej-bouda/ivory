@@ -4,8 +4,9 @@ namespace Ivory\Type\Postgresql;
 
 use Ivory\Type\Std\IntegerType;
 use Ivory\Type\Std\StringType;
+use PHPUnit\Framework\TestCase;
 
-class ArrayTypeTest extends \PHPUnit\Framework\TestCase
+class ArrayTypeTest extends TestCase
 {
     /** @var ArrayType */
     private $intArrayType;

@@ -5,6 +5,7 @@ namespace Ivory\Relation;
 use Ivory\Data\Map\ITupleMap;
 use Ivory\Exception\UndefinedColumnException;
 use Ivory\IvoryTestCase;
+use PHPUnit\Framework\Error\Warning;
 
 class MapTest extends IvoryTestCase
 {
@@ -138,7 +139,7 @@ class MapTest extends IvoryTestCase
         try {
             $this->fullRel->map(...$mappingCols);
             $this->fail('A warning expected due to multiple tuples mapping to the same key.');
-        } catch (\PHPUnit\Framework\Error\Warning $e) {
+        } catch (Warning $e) {
             $expDesc = implode(', ', $dupKeys);
             $this->assertContains($expDesc, $e->getMessage());
         }

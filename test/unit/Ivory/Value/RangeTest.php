@@ -4,8 +4,9 @@ namespace Ivory\Value;
 
 use Ivory\Exception\UnsupportedException;
 use Ivory\Value\Alg\IDiscreteStepper;
+use PHPUnit\Framework\TestCase;
 
-class RangeTest extends \PHPUnit\Framework\TestCase
+class RangeTest extends TestCase
 {
     /** @var Range */
     private $empty;

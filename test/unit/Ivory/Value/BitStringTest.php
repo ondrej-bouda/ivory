@@ -3,11 +3,12 @@ declare(strict_types=1);
 namespace Ivory\Value;
 
 use Ivory\Exception\UndefinedOperationException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests of operations combining objects of different BitString subclasses as operands.
  */
-class BitStringTest extends \PHPUnit\Framework\TestCase
+class BitStringTest extends TestCase
 {
     public function testEquals()
     {

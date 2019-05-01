@@ -3,8 +3,9 @@ declare(strict_types=1);
 namespace Ivory\Value;
 
 use Ivory\Exception\ParseException;
+use PHPUnit\Framework\TestCase;
 
-class MacAddr8Test extends \PHPUnit\Framework\TestCase
+class MacAddr8Test extends TestCase
 {
     public function testFromString()
     {

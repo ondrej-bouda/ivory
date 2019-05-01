@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Data\Set;
 
-class CustomSetTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class CustomSetTest extends TestCase
 {
     public function testBasic()
     {

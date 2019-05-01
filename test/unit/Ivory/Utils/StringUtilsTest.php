@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Utils;
 
-class StringUtilsTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class StringUtilsTest extends TestCase
 {
     public function testPregReplaceCallbackWithOffset()
     {

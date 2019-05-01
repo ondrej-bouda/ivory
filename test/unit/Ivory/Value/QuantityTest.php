@@ -4,8 +4,9 @@ namespace Ivory\Value;
 
 use Ivory\Exception\UndefinedOperationException;
 use Ivory\Exception\UnsupportedException;
+use PHPUnit\Framework\TestCase;
 
-class QuantityTest extends \PHPUnit\Framework\TestCase
+class QuantityTest extends TestCase
 {
     public function testFromString()
     {

@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Type\Ivory;
 
-class IdentifierSerializerTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class IdentifierSerializerTest extends TestCase
 {
     /** @var IdentifierSerializer */
     private $identSerializer;

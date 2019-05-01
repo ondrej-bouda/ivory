@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-class TimestampTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class TimestampTest extends TestCase
 {
     private static function dt($year, $month, $day, $hour, $min, $sec)
     {

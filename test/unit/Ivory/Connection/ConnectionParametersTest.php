@@ -3,8 +3,9 @@ declare(strict_types=1);
 namespace Ivory\Connection;
 
 use Ivory\Exception\UnsupportedException;
+use PHPUnit\Framework\TestCase;
 
-class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
+class ConnectionParametersTest extends TestCase
 {
     public function testFromConnectionString()
     {

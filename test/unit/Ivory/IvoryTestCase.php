@@ -4,14 +4,16 @@ namespace Ivory;
 
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
+use PHPUnit\DbUnit\Database\Connection as DbUnitConnection;
+use PHPUnit\DbUnit\TestCase;
 use PHPUnit\Framework\Constraint;
 
-abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
+abstract class IvoryTestCase extends TestCase
 {
     /** @var \PDO only instantiated once for test clean-up/fixture load */
     private static $pdo = null;
 
-    /** @var \PHPUnit\DbUnit\Database\Connection instantiated once per test */
+    /** @var DbUnitConnection instantiated once per test */
     private $phpUnitConn = null;
 
     /** @var IConnection|null */
