@@ -198,6 +198,7 @@ class ConnConfig implements IObservableConnConfig
         $inTx = $this->txCtl->inTransaction();
         $savepoint = false;
         $needsRollback = false;
+        $result = null;
         try {
             if ($inTx) {
                 $spRes = @pg_query($connHandler, 'SAVEPOINT _ivory_customized_option');
@@ -208,13 +209,13 @@ class ConnConfig implements IObservableConnConfig
             }
             $res = @pg_query_params($connHandler, 'SELECT pg_catalog.current_setting($1)', [$customOptionName]);
             if ($res !== false) {
-                return pg_fetch_result($res, 0, 0);
+                $result = pg_fetch_result($res, 0, 0);
             } else {
                 $needsRollback = true;
-                return null;
+                $result = null;
             }
         } finally {
-            // anything might have been thrown, which must not break the (savepoint-release savepoint) pair
+            // anything might have been thrown, which must not break the (savepoint - release savepoint) pair
             if ($savepoint) {
                 if ($needsRollback) {
                     $rbRes = @pg_query($connHandler, 'ROLLBACK TO SAVEPOINT _ivory_customized_option');
@@ -232,6 +233,7 @@ class ConnConfig implements IObservableConnConfig
                     );
                 }
             }
+            return $result;
         }
     }
 

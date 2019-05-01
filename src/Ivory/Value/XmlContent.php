@@ -72,7 +72,7 @@ class XmlContent
     private static function isXmlDocument(string $xmlStr): bool
     {
         $reader = new \XMLReader();
-        $reader->xml($xmlStr);
+        $reader->XML($xmlStr);
 
         if (!@$reader->read()) {
             return false;

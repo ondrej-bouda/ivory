@@ -47,7 +47,7 @@ abstract class StreamlinedRelation extends RelationBase
 
     public function col($offsetOrNameOrEvaluator): IColumn
     {
-        return $this->_colImpl($offsetOrNameOrEvaluator, $this->getColumns(), $this->getColNameMap(), $this);
+        return $this->colImpl($offsetOrNameOrEvaluator, $this->getColumns(), $this->getColNameMap(), $this);
     }
 
     public function count()

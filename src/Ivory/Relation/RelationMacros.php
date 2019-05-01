@@ -31,7 +31,7 @@ trait RelationMacros
     {
         $thisRel = $this;
         assert($thisRel instanceof IRelation);
-        return $this->_colImpl($offsetOrNameOrEvaluator, $this->columns, $this->colNameMap, $thisRel);
+        return $this->colImpl($offsetOrNameOrEvaluator, $this->columns, $this->colNameMap, $thisRel);
     }
 
 
@@ -84,7 +84,15 @@ trait RelationMacros
         return $this->tuple($tupleOffset)->value($colOffsetOrNameOrEvaluator);
     }
 
-    final protected function _colImpl($offsetOrNameOrEvaluator, $columns, $colNameMap, IRelation $relation): IColumn
+    /**
+     * @param $offsetOrNameOrEvaluator
+     * @param $columns
+     * @param $colNameMap
+     * @param IRelation $relation
+     * @return IColumn
+     * @internal
+     */
+    final protected function colImpl($offsetOrNameOrEvaluator, $columns, $colNameMap, IRelation $relation): IColumn
     {
         if (is_scalar($offsetOrNameOrEvaluator)) {
             if (filter_var($offsetOrNameOrEvaluator, FILTER_VALIDATE_INT) !== false) {

@@ -96,6 +96,7 @@ class TimestampTz extends TimestampBase
         }
     }
 
+    /** @noinspection PhpTooManyParametersInspection */
     /**
      * Creates a date/time from the given year, month, day, hour, minute, second, and timezone.
      *
@@ -160,6 +161,7 @@ class TimestampTz extends TimestampBase
         }
     }
 
+    /** @noinspection PhpTooManyParametersInspection */
     /**
      * Creates a date/time from the given year, month, day, hour, minute, second, and timezone while strictly checking
      * for the validity of the data.
