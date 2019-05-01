@@ -21,6 +21,7 @@ class RecordTypeTest extends IvoryTestCase
 
     protected function tearDown(): void
     {
+        parent::tearDown();
         $this->recordType->detachFromConnection();
     }
 

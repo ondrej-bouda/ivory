@@ -6,6 +6,7 @@ use PHPUnit\DbUnit;
 
 class IvoryTester extends DbUnit\DefaultTester
 {
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function getSetUpOperation()
     {
         // cascading is necessary for truncating tables referred to by foreign keys

@@ -9,6 +9,7 @@ class IdentifierSerializerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
+        parent::setUp();
         $this->identSerializer = new IdentifierSerializer();
     }
 

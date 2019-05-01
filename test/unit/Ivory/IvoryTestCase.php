@@ -279,6 +279,7 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
         return $coreFactory->createConnection($name, $params);
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function newDatabaseTester()
     {
         return new IvoryTester($this->getConnection());

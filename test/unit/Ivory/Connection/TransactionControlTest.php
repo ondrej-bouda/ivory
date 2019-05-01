@@ -22,6 +22,7 @@ class TransactionControlTest extends IvoryTestCase
         {
             public $rollbackCalled = 0;
 
+            /** @noinspection PhpMissingParentCallCommonInspection */
             public function handleTransactionRollback(): void
             {
                 $this->rollbackCalled++;
