@@ -42,19 +42,19 @@ class DecimalTest extends TestCase
         self::assertFalse(Decimal::fromNumber('123.457')->lessThan(123456e-3));
         self::assertTrue(Decimal::fromNumber('123.457')->greaterThan(123456e-3));
 
-        self::assertEquals(Decimal::NaN(), Decimal::NaN());
-        self::assertNotEquals(Decimal::NaN(), Decimal::fromNumber(0));
-        self::assertNotEquals(Decimal::NaN(), Decimal::fromNumber(1));
-        self::assertNotEquals(Decimal::fromNumber(0), Decimal::NaN());
-        self::assertNotEquals(Decimal::fromNumber(1), Decimal::NaN());
-        self::assertTrue(Decimal::NaN()->equals(Decimal::NaN()));
-        self::assertFalse(Decimal::NaN()->equals(0));
-        self::assertFalse(Decimal::NaN()->equals(1));
-        self::assertEquals(0, Decimal::NaN()->compareTo(Decimal::NaN()));
-        self::assertTrue(Decimal::NaN()->greaterThan(0));
-        self::assertFalse(Decimal::fromNumber(0)->greaterThan(Decimal::NaN()));
-        self::assertTrue(Decimal::fromNumber(0)->lessThan(Decimal::NaN()));
-        self::assertFalse(Decimal::NaN()->lessThan(0));
+        self::assertEquals(Decimal::createNaN(), Decimal::createNaN());
+        self::assertNotEquals(Decimal::createNaN(), Decimal::fromNumber(0));
+        self::assertNotEquals(Decimal::createNaN(), Decimal::fromNumber(1));
+        self::assertNotEquals(Decimal::fromNumber(0), Decimal::createNaN());
+        self::assertNotEquals(Decimal::fromNumber(1), Decimal::createNaN());
+        self::assertTrue(Decimal::createNaN()->equals(Decimal::createNaN()));
+        self::assertFalse(Decimal::createNaN()->equals(0));
+        self::assertFalse(Decimal::createNaN()->equals(1));
+        self::assertEquals(0, Decimal::createNaN()->compareTo(Decimal::createNaN()));
+        self::assertTrue(Decimal::createNaN()->greaterThan(0));
+        self::assertFalse(Decimal::fromNumber(0)->greaterThan(Decimal::createNaN()));
+        self::assertTrue(Decimal::fromNumber(0)->lessThan(Decimal::createNaN()));
+        self::assertFalse(Decimal::createNaN()->lessThan(0));
 
         self::assertEquals(Decimal::fromNumber('1234.00'), Decimal::fromNumber(1234, 2));
         self::assertNotEquals(Decimal::fromNumber('1234.00'), Decimal::fromNumber(1234));
@@ -217,10 +217,10 @@ class DecimalTest extends TestCase
 
     public function testNan()
     {
-        self::assertSame('NaN', Decimal::NaN()->toString());
-        self::assertNull(Decimal::NaN()->getScale());
+        self::assertSame('NaN', Decimal::createNaN()->toString());
+        self::assertNull(Decimal::createNaN()->getScale());
 
-        self::assertTrue(Decimal::NaN()->isNaN());
+        self::assertTrue(Decimal::createNaN()->isNaN());
         self::assertFalse(Decimal::zero()->isNaN());
     }
 
@@ -232,7 +232,7 @@ class DecimalTest extends TestCase
         self::assertTrue(Decimal::zero()->isZero());
         self::assertTrue(Decimal::fromNumber(0)->isZero());
         self::assertTrue(Decimal::fromNumber(0.1, 0)->isZero());
-        self::assertFalse(Decimal::NaN()->isZero());
+        self::assertFalse(Decimal::createNaN()->isZero());
         self::assertFalse(Decimal::fromNumber(1)->isZero());
         self::assertFalse(Decimal::fromNumber(-0.5)->isZero());
     }
@@ -243,7 +243,7 @@ class DecimalTest extends TestCase
         self::assertFalse(Decimal::fromNumber(0.1, 0)->isPositive());
         self::assertFalse(Decimal::zero()->isPositive());
         self::assertFalse(Decimal::fromNumber(-0.1)->isPositive());
-        self::assertFalse(Decimal::NaN()->isPositive());
+        self::assertFalse(Decimal::createNaN()->isPositive());
     }
 
     public function testIsNegative()
@@ -252,7 +252,7 @@ class DecimalTest extends TestCase
         self::assertFalse(Decimal::fromNumber(-0.1, 0)->isNegative());
         self::assertFalse(Decimal::zero()->isNegative());
         self::assertFalse(Decimal::fromNumber(0.1)->isNegative());
-        self::assertFalse(Decimal::NaN()->isNegative());
+        self::assertFalse(Decimal::createNaN()->isNegative());
     }
 
     public function testIsInteger()
@@ -263,7 +263,7 @@ class DecimalTest extends TestCase
         self::assertTrue(Decimal::fromNumber(1.2, 0)->isInteger());
         self::assertTrue(Decimal::fromNumber('123456789123456789123456798')->isInteger());
 
-        self::assertFalse(Decimal::NaN()->isInteger());
+        self::assertFalse(Decimal::createNaN()->isInteger());
         self::assertFalse(Decimal::fromNumber(1.2, 1)->isInteger());
         self::assertFalse(Decimal::fromNumber('123.456789123456798123456789123456798')->isInteger());
     }
@@ -277,9 +277,9 @@ class DecimalTest extends TestCase
         );
         self::assertSame('-736.00', Decimal::zero()->add(Decimal::fromNumber('-736.0', 2))->toString());
 
-        self::assertTrue(Decimal::fromNumber(7.4)->add(Decimal::NaN())->isNaN());
-        self::assertTrue(Decimal::NaN()->add(7.4)->isNaN());
-        self::assertTrue(Decimal::NaN()->add(Decimal::NaN())->isNaN());
+        self::assertTrue(Decimal::fromNumber(7.4)->add(Decimal::createNaN())->isNaN());
+        self::assertTrue(Decimal::createNaN()->add(7.4)->isNaN());
+        self::assertTrue(Decimal::createNaN()->add(Decimal::createNaN())->isNaN());
     }
 
     public function testSubtract()
@@ -291,9 +291,9 @@ class DecimalTest extends TestCase
         );
         self::assertSame('-736.00', Decimal::zero()->subtract(Decimal::fromNumber('736.0', 2))->toString());
 
-        self::assertTrue(Decimal::fromNumber(7.4)->subtract(Decimal::NaN())->isNaN());
-        self::assertTrue(Decimal::NaN()->subtract(7.4)->isNaN());
-        self::assertTrue(Decimal::NaN()->subtract(Decimal::NaN())->isNaN());
+        self::assertTrue(Decimal::fromNumber(7.4)->subtract(Decimal::createNaN())->isNaN());
+        self::assertTrue(Decimal::createNaN()->subtract(7.4)->isNaN());
+        self::assertTrue(Decimal::createNaN()->subtract(Decimal::createNaN())->isNaN());
     }
 
     public function testMultiply()
@@ -303,9 +303,9 @@ class DecimalTest extends TestCase
         self::assertSame('0', Decimal::zero()->multiply('123456789123456789123456789')->toString());
         self::assertSame('-73169.6487562430', Decimal::fromNumber('-74.5497890')->multiply(981.487)->toString());
 
-        self::assertTrue(Decimal::fromNumber(7.4)->multiply(Decimal::NaN())->isNaN());
-        self::assertTrue(Decimal::NaN()->multiply(7.4)->isNaN());
-        self::assertTrue(Decimal::NaN()->multiply(Decimal::NaN())->isNaN());
+        self::assertTrue(Decimal::fromNumber(7.4)->multiply(Decimal::createNaN())->isNaN());
+        self::assertTrue(Decimal::createNaN()->multiply(7.4)->isNaN());
+        self::assertTrue(Decimal::createNaN()->multiply(Decimal::createNaN())->isNaN());
     }
 
     public function testDivide()
@@ -320,9 +320,9 @@ class DecimalTest extends TestCase
         } catch (\RuntimeException $e) {
         }
 
-        self::assertTrue(Decimal::fromNumber(7.4)->divide(Decimal::NaN())->isNaN());
-        self::assertTrue(Decimal::NaN()->divide(7.4)->isNaN());
-        self::assertTrue(Decimal::NaN()->divide(Decimal::NaN())->isNaN());
+        self::assertTrue(Decimal::fromNumber(7.4)->divide(Decimal::createNaN())->isNaN());
+        self::assertTrue(Decimal::createNaN()->divide(7.4)->isNaN());
+        self::assertTrue(Decimal::createNaN()->divide(Decimal::createNaN())->isNaN());
     }
 
     public function testMod()
@@ -338,9 +338,9 @@ class DecimalTest extends TestCase
         } catch (\RuntimeException $e) {
         }
 
-        self::assertTrue(Decimal::fromNumber(7.4)->mod(Decimal::NaN())->isNaN());
-        self::assertTrue(Decimal::NaN()->mod(7.4)->isNaN());
-        self::assertTrue(Decimal::NaN()->mod(Decimal::NaN())->isNaN());
+        self::assertTrue(Decimal::fromNumber(7.4)->mod(Decimal::createNaN())->isNaN());
+        self::assertTrue(Decimal::createNaN()->mod(7.4)->isNaN());
+        self::assertTrue(Decimal::createNaN()->mod(Decimal::createNaN())->isNaN());
     }
 
     public function testPow()
@@ -363,14 +363,14 @@ class DecimalTest extends TestCase
         } catch (\RuntimeException $e) {
         }
 
-        self::assertTrue(Decimal::fromNumber(7.4)->pow(Decimal::NaN())->isNaN());
-        self::assertTrue(Decimal::NaN()->pow(7.4)->isNaN());
-        self::assertTrue(Decimal::NaN()->pow(Decimal::NaN())->isNaN());
+        self::assertTrue(Decimal::fromNumber(7.4)->pow(Decimal::createNaN())->isNaN());
+        self::assertTrue(Decimal::createNaN()->pow(7.4)->isNaN());
+        self::assertTrue(Decimal::createNaN()->pow(Decimal::createNaN())->isNaN());
     }
 
     public function testAbs()
     {
-        self::assertTrue(Decimal::NaN()->abs()->isNaN());
+        self::assertTrue(Decimal::createNaN()->abs()->isNaN());
         self::assertSame('123.00', Decimal::fromNumber('123.00')->abs()->toString());
         self::assertSame('123.00', Decimal::fromNumber('-123.00')->abs()->toString());
         self::assertSame('0', Decimal::zero()->abs()->toString());
@@ -380,7 +380,7 @@ class DecimalTest extends TestCase
 
     public function testNegate()
     {
-        self::assertTrue(Decimal::NaN()->negate()->isNaN());
+        self::assertTrue(Decimal::createNaN()->negate()->isNaN());
         self::assertSame('-123.00', Decimal::fromNumber('123.00')->negate()->toString());
         self::assertSame('123.00', Decimal::fromNumber('-123.00')->negate()->toString());
         self::assertSame('0', Decimal::zero()->negate()->toString());
@@ -430,7 +430,7 @@ class DecimalTest extends TestCase
             Decimal::fromNumber(1234)->factorial()->toString()
         );
 
-        self::assertTrue(Decimal::NaN()->factorial()->isNaN());
+        self::assertTrue(Decimal::createNaN()->factorial()->isNaN());
 
         try {
             Decimal::fromNumber(1.1)->factorial();
@@ -467,9 +467,9 @@ class DecimalTest extends TestCase
         self::assertSame('-1.45', Decimal::fromNumber('-1.45')->round(2)->toString());
         self::assertSame('0', Decimal::fromNumber('-1.45')->round(-1)->toString());
 
-        self::assertTrue(Decimal::NaN()->round()->isNaN());
-        self::assertTrue(Decimal::NaN()->round(2)->isNaN());
-        self::assertTrue(Decimal::NaN()->round(-3)->isNaN());
+        self::assertTrue(Decimal::createNaN()->round()->isNaN());
+        self::assertTrue(Decimal::createNaN()->round(2)->isNaN());
+        self::assertTrue(Decimal::createNaN()->round(-3)->isNaN());
     }
 
     public function testFloor()
@@ -482,7 +482,7 @@ class DecimalTest extends TestCase
         self::assertSame('-1', Decimal::fromNumber('-0.0000000000000000000000001')->floor()->toString());
         self::assertSame('-2', Decimal::fromNumber('-1.3')->floor()->toString());
 
-        self::assertTrue(Decimal::NaN()->floor()->isNaN());
+        self::assertTrue(Decimal::createNaN()->floor()->isNaN());
     }
 
     public function testCeil()
@@ -495,7 +495,7 @@ class DecimalTest extends TestCase
         self::assertSame('0', Decimal::fromNumber('-0.0000000000000000000000001')->ceil()->toString());
         self::assertSame('-1', Decimal::fromNumber('-1.3')->ceil()->toString());
 
-        self::assertTrue(Decimal::NaN()->ceil()->isNaN());
+        self::assertTrue(Decimal::createNaN()->ceil()->isNaN());
     }
 
     public function testMax()
@@ -509,8 +509,8 @@ class DecimalTest extends TestCase
         self::assertNotSame($b, Decimal::fromNumber(12)->max($b));
         self::assertTrue(Decimal::fromNumber(12)->max($b)->equals(12));
 
-        $m = Decimal::NaN();
-        self::assertSame($m, $m->max(Decimal::NaN()));
+        $m = Decimal::createNaN();
+        self::assertSame($m, $m->max(Decimal::createNaN()));
         self::assertSame($m, $m->max(Decimal::fromNumber('123456789123456789123456798')));
         self::assertSame($m, Decimal::fromNumber(123)->max($m));
     }
@@ -526,16 +526,16 @@ class DecimalTest extends TestCase
         self::assertNotSame($b, Decimal::fromNumber(12)->min($b));
         self::assertTrue(Decimal::fromNumber(12)->min($b)->equals(12));
 
-        $m = Decimal::NaN();
+        $m = Decimal::createNaN();
         $n = Decimal::fromNumber('123456789123456789123456798');
-        self::assertSame($m, $m->min(Decimal::NaN()));
+        self::assertSame($m, $m->min(Decimal::createNaN()));
         self::assertSame($n, $m->min($n));
         self::assertTrue(Decimal::fromNumber(123)->min($m)->equals(123));
     }
 
     public function testSqrt()
     {
-        self::assertTrue(Decimal::NaN()->sqrt()->isNaN());
+        self::assertTrue(Decimal::createNaN()->sqrt()->isNaN());
         self::assertSame('4.0000000000000000', Decimal::fromNumber(16)->sqrt()->toString());
         self::assertSame('4.2000000000000000', Decimal::fromNumber(17.64)->sqrt()->toString());
         self::assertSame('4.1231056256176605', Decimal::fromNumber(17)->sqrt()->toString());
@@ -556,7 +556,7 @@ class DecimalTest extends TestCase
         self::assertSame(12, Decimal::fromNumber(12.945)->toInt());
         self::assertSame(-12, Decimal::fromNumber(-12.5987)->toInt());
         self::assertSame(PHP_INT_MAX, Decimal::fromNumber('123456789123456789123456789123456789123456798')->toInt());
-        self::assertNull(Decimal::NaN()->toInt());
+        self::assertNull(Decimal::createNaN()->toInt());
     }
 
     public function testToFloat()
@@ -565,7 +565,7 @@ class DecimalTest extends TestCase
         self::assertSame(-123456.0, Decimal::fromNumber('-123456')->toFloat());
         self::assertSame(0.0, Decimal::zero()->toFloat());
         self::assertSame(12.345, Decimal::fromNumber(12.345)->toFloat());
-        self::assertTrue(is_nan(Decimal::NaN()->toFloat()));
+        self::assertTrue(is_nan(Decimal::createNaN()->toFloat()));
     }
 
     public function testToString()
@@ -574,7 +574,7 @@ class DecimalTest extends TestCase
         self::assertSame('-123456', Decimal::fromNumber('-123456')->toString());
         self::assertSame('0', Decimal::fromNumber('00')->toString());
         self::assertSame('12.345', Decimal::fromNumber(12.345)->toString());
-        self::assertSame('NaN', Decimal::NaN()->toString());
+        self::assertSame('NaN', Decimal::createNaN()->toString());
 
         self::assertSame('123', (string)Decimal::fromNumber(123));
     }
@@ -589,7 +589,7 @@ class DecimalTest extends TestCase
         self::assertSame('0', gmp_strval(Decimal::zero()->toGMP()));
 
         try {
-            Decimal::NaN()->toGMP();
+            Decimal::createNaN()->toGMP();
             self::fail('UndefinedOperationException expected');
         } catch (UndefinedOperationException $e) {
         }

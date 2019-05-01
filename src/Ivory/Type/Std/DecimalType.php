@@ -18,7 +18,7 @@ class DecimalType extends TypeBase implements ITotallyOrderedType
     public function parseValue(string $extRepr)
     {
         if (strcasecmp($extRepr, 'NaN') == 0) {
-            return Decimal::NaN();
+            return Decimal::createNaN();
         }
 
         return Decimal::fromNumber($extRepr);

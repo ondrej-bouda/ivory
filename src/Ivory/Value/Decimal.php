@@ -124,10 +124,8 @@ class Decimal implements IComparable
      *
      * It only equals to the not-a-number, and is greater than any number value. The result of any operation is, again,
      * the not-a-number.
-     *
-     * @return Decimal the not-a-number value
      */
-    public static function NaN(): Decimal
+    public static function createNaN(): Decimal
     {
         static $dec = null;
         if ($dec === null) {
@@ -138,8 +136,6 @@ class Decimal implements IComparable
 
     /**
      * Gets the decimal object representing the number zero. Returns the same object every time.
-     *
-     * @return Decimal
      */
     public static function zero(): Decimal
     {
