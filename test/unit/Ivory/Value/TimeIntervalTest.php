@@ -189,7 +189,8 @@ class TimeIntervalTest extends \PHPUnit\Framework\TestCase
                 TimeInterval::MILLISECOND => 11, TimeInterval::MICROSECOND => 12,
             ]),
             TimeInterval::fromString(
-                '1 millennium 2 century 3 decade 4 year 5 month 6 week 7 day 8 hour 9 minute 10 second 11 millisecond 12 microsecond'
+                '1 millennium 2 century 3 decade 4 year 5 month 6 week 7 day 8 hour 9 minute 10 second ' .
+                '11 millisecond 12 microsecond'
             ),
             'pg full'
         );
@@ -201,7 +202,8 @@ class TimeIntervalTest extends \PHPUnit\Framework\TestCase
                 TimeInterval::MILLISECOND => 11, TimeInterval::MICROSECOND => 12,
             ]),
             TimeInterval::fromString(
-                '1 millenniums 2 centuries 3 decades 4 years 5 months 6 weeks 7 days 8 hours 9 minutes 10 seconds 11 milliseconds 12 microseconds'
+                '1 millenniums 2 centuries 3 decades 4 years 5 months 6 weeks 7 days 8 hours 9 minutes 10 seconds ' .
+                '11 milliseconds 12 microseconds'
             ),
             'pg full plural'
         );
@@ -212,7 +214,9 @@ class TimeIntervalTest extends \PHPUnit\Framework\TestCase
                 TimeInterval::HOUR => 8, TimeInterval::MINUTE => 9, TimeInterval::SECOND => 10,
                 TimeInterval::MILLISECOND => 11, TimeInterval::MICROSECOND => 12,
             ]),
-            TimeInterval::fromString('1 mil 2 cent 3 dec 4 y 5 mon 6 w 7 d 8 h 9 min 10 sec 11 millisecond 12 microsecond'),
+            TimeInterval::fromString(
+                '1 mil 2 cent 3 dec 4 y 5 mon 6 w 7 d 8 h 9 min 10 sec 11 millisecond 12 microsecond'
+            ),
             'pg abbr'
         );
         $this->assertEquals(
@@ -222,7 +226,10 @@ class TimeIntervalTest extends \PHPUnit\Framework\TestCase
                 TimeInterval::HOUR => 8, TimeInterval::MINUTE => 9, TimeInterval::SECOND => 10,
                 TimeInterval::MILLISECOND => 11, TimeInterval::MICROSECOND => 12,
             ]),
-            TimeInterval::fromString('1 mils 2 centuries 3 decs 4 years 5 mons 6 weeks 7 days 8 hours 9 mins 10 secs 11 millisecond 12 microsecond'),
+            TimeInterval::fromString(
+                '1 mils 2 centuries 3 decs 4 years 5 mons 6 weeks 7 days 8 hours 9 mins 10 secs 11 millisecond ' .
+                '12 microsecond'
+            ),
             'pg_abbr_plural'
         );
         $this->assertEquals(

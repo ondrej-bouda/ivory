@@ -64,7 +64,10 @@ class DateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(self::d(2016, 2, 27), Date::fromDateTime(new \DateTime('2016-02-27 15:48:12.1234', $utc)));
 
         $this->assertEquals(self::d(2016, 2, 27), Date::fromDateTime(new \DateTimeImmutable('2016-02-27', $utc)));
-        $this->assertEquals(self::d(2016, 2, 27), Date::fromDateTime(new \DateTimeImmutable('2016-02-27 15:48:12.1234', $utc)));
+        $this->assertEquals(
+            self::d(2016, 2, 27),
+            Date::fromDateTime(new \DateTimeImmutable('2016-02-27 15:48:12.1234', $utc))
+        );
     }
 
     public function testFromParts()

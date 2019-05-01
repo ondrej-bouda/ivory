@@ -68,14 +68,34 @@ class TypeTest extends IvoryTestCase
         $this->assertEquals(
             [
                 'Metallica' => [
-                    ['id' => 2, 'name' => 'Black Album', 'year' => 1991, 'released' => Date::fromISOString('1991-08-12')],
-                    ['id' => 3, 'name' => 'S & M', 'year' => 1999, 'released' => Date::fromISOString('1999-11-23')],
+                    [
+                        'id' => 2,
+                        'name' => 'Black Album',
+                        'year' => 1991,
+                        'released' => Date::fromISOString('1991-08-12'),
+                    ],
+                    [
+                        'id' => 3,
+                        'name' => 'S & M',
+                        'year' => 1999,
+                        'released' => Date::fromISOString('1999-11-23'),
+                    ],
                 ],
                 'The Piano Guys' => [
-                    ['id' => 1, 'name' => 'The Piano Guys', 'year' => 2012, 'released' => Date::fromISOString('2012-10-02')],
+                    [
+                        'id' => 1,
+                        'name' => 'The Piano Guys',
+                        'year' => 2012,
+                        'released' => Date::fromISOString('2012-10-02'),
+                    ],
                 ],
                 'Tommy Emmanuel' => [
-                    ['id' => 4, 'name' => 'Live One', 'year' => 2005, 'released' => Date::fromISOString('2005-01-01')],
+                    [
+                        'id' => 4,
+                        'name' => 'Live One',
+                        'year' => 2005,
+                        'released' => Date::fromISOString('2005-01-01'),
+                    ],
                 ],
             ],
             $results

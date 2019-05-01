@@ -277,7 +277,8 @@ class ConnConfigTest extends IvoryTestCase
             $tx->rollback();
             $this->assertSame([ConnConfigTestObserver::RESET], $obs->fetchObserved());
 
-            // reset all - only notify about the reset again upon rolling back to savepoint since which the reset was made
+            // reset all - only notify about the reset again upon rolling back to savepoint since which the reset was
+            // made
             $this->cfg->setForSession(ConfigParam::APPLICATION_NAME, 'Ivory');
             $this->assertSame([[ConfigParam::APPLICATION_NAME, 'Ivory']], $obs->fetchObserved());
             $tx = $conn->startTransaction();

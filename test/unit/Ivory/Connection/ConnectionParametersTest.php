@@ -29,7 +29,9 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
                 ConnectionParameters::OPTIONS => '-c geqo=off',
             ],
             iterator_to_array(
-                ConnectionParameters::fromConnectionString("user = johndoe password='' dbname   =foo host=/tmp options='-c geqo=off'")
+                ConnectionParameters::fromConnectionString(
+                    "user = johndoe password='' dbname   =foo host=/tmp options='-c geqo=off'"
+                )
             )
         );
 
@@ -117,7 +119,9 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
                 ConnectionParameters::APPLICATION_NAME => 'myapp',
             ],
             iterator_to_array(
-                ConnectionParameters::fromUri('postgresql://other@localhost/otherdb?connect_timeout=10&application_name=myapp')
+                ConnectionParameters::fromUri(
+                    'postgresql://other@localhost/otherdb?connect_timeout=10&application_name=myapp'
+                )
             )
         );
 
@@ -265,7 +269,9 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($cp1->getPassword());
         $this->assertSame('dbname', $cp1->getDbName());
 
-        $cp2 = ConnectionParameters::fromConnectionString('host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10');
+        $cp2 = ConnectionParameters::fromConnectionString(
+            'host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10'
+        );
         $this->assertSame('localhost', $cp2->getHost());
         $this->assertSame(5432, $cp2->getPort());
         $this->assertSame('john', $cp2->getUsername());
@@ -280,7 +286,9 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(isset($cp1[ConnectionParameters::PORT]));
         $this->assertSame('dbname', $cp1[ConnectionParameters::DBNAME]);
 
-        $cp2 = ConnectionParameters::fromConnectionString('host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10');
+        $cp2 = ConnectionParameters::fromConnectionString(
+            'host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10'
+        );
         $this->assertSame('5432', $cp2[ConnectionParameters::PORT]);
         $this->assertSame('john', $cp2[ConnectionParameters::USER]);
         $this->assertSame('10', $cp2[ConnectionParameters::CONNECT_TIMEOUT]);
@@ -301,8 +309,9 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             'host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10',
-            ConnectionParameters::fromConnectionString('host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10')
-                ->buildConnectionString()
+            ConnectionParameters::fromConnectionString(
+                'host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10'
+            )->buildConnectionString()
         );
 
         $this->assertSame(
@@ -312,8 +321,9 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             "user=johndoe password='' dbname=foo host=/tmp options='-c geqo=off'",
-            ConnectionParameters::fromConnectionString("user = johndoe password='' dbname   =foo host=/tmp options='-c geqo=off'")
-                ->buildConnectionString()
+            ConnectionParameters::fromConnectionString(
+                "user = johndoe password='' dbname   =foo host=/tmp options='-c geqo=off'"
+            )->buildConnectionString()
         );
 
         $this->assertSame('', ConnectionParameters::fromArray([])->buildConnectionString());

@@ -319,7 +319,9 @@ class RangeTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->intRng(0, 4)->equals($this->intRng(null, 4)->intersect($this->intRng(0, null))));
         $this->assertTrue($this->intRng(5, 6)->equals($this->intRng(null, null)->intersect($this->intRng(5, 6))));
         $this->assertTrue($this->intRng(null, 8)->equals($this->intRng(null, 8)->intersect($this->intRng(null, null))));
-        $this->assertTrue($this->intRng(null, null)->equals($this->intRng(null, null)->intersect($this->intRng(null, null))));
+        $this->assertTrue(
+            $this->intRng(null, null)->equals($this->intRng(null, null)->intersect($this->intRng(null, null)))
+        );
 
         $this->assertTrue($this->empty->equals($this->intRng(1, 8)->intersect($this->intRng(9, 12))));
         $this->assertTrue($this->empty->equals($this->intRng(1, 8)->intersect($this->intRng(8, 10))));

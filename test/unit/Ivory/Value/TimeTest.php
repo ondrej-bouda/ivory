@@ -205,7 +205,10 @@ class TimeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(gmmktime(8, 9, 10, 1, 1, 1970), self::t(8, 9, 10)->toUnixTimestamp());
         $this->assertSame(gmmktime(8, 9, 10, 1, 1, 1970) + .1234, self::t(8, 9, 10.1234)->toUnixTimestamp());
         $this->assertSame(gmmktime(8, 9, 10, 3, 14, 2016), self::t(8, 9, 10)->toUnixTimestamp('2016-03-14'));
-        $this->assertSame(gmmktime(8, 9, 10, 3, 14, 2016), self::t(8, 9, 10)->toUnixTimestamp(Date::fromISOString('2016-03-14')));
+        $this->assertSame(
+            gmmktime(8, 9, 10, 3, 14, 2016),
+            self::t(8, 9, 10)->toUnixTimestamp(Date::fromISOString('2016-03-14'))
+        );
 
         try {
             self::t(8, 9, 10)->toUnixTimestamp('abc');

@@ -126,7 +126,9 @@ class FixedBitStringTest extends \PHPUnit\Framework\TestCase
             );
             $this->assertSame(
                 0,
-                FixedBitString::fromString('110011000000000000000000000000000000000000000000000000000000000000000')->toInt()
+                FixedBitString::fromString(
+                    '110011000000000000000000000000000000000000000000000000000000000000000'
+                )->toInt()
             );
         } elseif (PHP_INT_SIZE == 8) {
             $this->assertSame(2147483653, FixedBitString::fromString('10000000000000000000000000000101')->toInt());
@@ -137,7 +139,9 @@ class FixedBitStringTest extends \PHPUnit\Framework\TestCase
             );
             $this->assertSame(
                 0,
-                FixedBitString::fromString('110011000000000000000000000000000000000000000000000000000000000000000')->toInt()
+                FixedBitString::fromString(
+                    '110011000000000000000000000000000000000000000000000000000000000000000'
+                )->toInt()
             );
         }
     }

@@ -256,7 +256,10 @@ class TimeTzTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertSame('08:45:03 0 +0000 +00:00', self::t(8, 45, 3, 0)->format('H:i:s Z O P'));
         $this->assertSame('08:45:03 3600 +0100 +01:00', self::t(8, 45, 3, 3600)->format('H:i:s Z O P'));
-        $this->assertSame('15:45:03.012340 -9000 -0230 -02:30', self::t(15, 45, 3.01234, -9000)->format('H:i:s.u Z O P'));
+        $this->assertSame(
+            '15:45:03.012340 -9000 -0230 -02:30',
+            self::t(15, 45, 3.01234, -9000)->format('H:i:s.u Z O P')
+        );
         $this->assertSame('15:46:00.000000 46800 +1300 +13:00', self::t(15, 45, 60, 46800)->format('H:i:s.u Z O P'));
 
         $this->assertSame('15:45:03|123400|123400', self::t(15, 45, 3.1234, -46800)->format('H:i:s|u|u'));

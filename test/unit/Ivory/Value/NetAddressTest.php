@@ -502,7 +502,8 @@ class NetAddressTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(str_repeat(chr(0), 16), NetAddress::fromString('::')->toByteString());
         $this->assertSame(
-            chr(0) . chr(10) . chr(0xf7) . chr(0) . chr(1) . str_repeat(chr(0), 7) . chr(183) . chr(15) . chr(2) . chr(1),
+            chr(0) . chr(10) . chr(0xf7) . chr(0) . chr(1) . chr(0) . chr(0) . chr(0) .
+            chr(0) . chr(0) . chr(0) . chr(0) . chr(183) . chr(15) . chr(2) . chr(1),
             NetAddress::fromString('a:f700:100::183.15.2.1')->toByteString()
         );
     }

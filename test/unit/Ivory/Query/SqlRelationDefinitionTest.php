@@ -145,7 +145,9 @@ class SqlRelationDefinitionTest extends IvoryTestCase
         $recip = SqlRelationDefinition::fromPattern('SELECT %{"double precision"}', 42);
         try {
             $recip->toSql($this->typeDict);
-            $this->fail('Type "double precision" (name including the quotes) should have not been recognized as defined.');
+            $this->fail(
+                'Type "double precision" (name including the quotes) should have not been recognized as defined.'
+            );
         } catch (UndefinedTypeException $e) {
         }
     }
