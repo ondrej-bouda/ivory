@@ -120,7 +120,7 @@ class StrictEnumTypeTest extends IvoryTestCase
         $this->assertTrue(Planet::Mars() == new Planet('Mars'));
 
         try {
-            $p = new Planet('mars');
+            new Planet('mars');
             $this->fail(\InvalidArgumentException::class . ' expected');
         } catch (\InvalidArgumentException $e) {
         }

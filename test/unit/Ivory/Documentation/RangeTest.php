@@ -15,11 +15,6 @@ class RangeTest extends IvoryTestCase
 {
     public function testOperations()
     {
-        $roomReservationRange = Range::fromBounds(
-            Timestamp::fromParts(2010, 1, 1, 14, 30, 0),
-            Timestamp::fromParts(2010, 1, 1, 15, 30, 0)
-        );
-
         // Containment
         $this->assertFalse(
             Range::fromBounds(10, 20)->containsElement(3)

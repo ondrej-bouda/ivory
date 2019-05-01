@@ -9,7 +9,6 @@ use Ivory\Query\SqlRelationDefinition;
 use Ivory\Type\TypeBase;
 use Ivory\Type\IValueSerializer;
 use Ivory\Type\Postgresql\ArrayType;
-use Ivory\Type\Std\StringType;
 use Ivory\Value\Date;
 use Ivory\Value\Json;
 use Ivory\Value\Polygon;
