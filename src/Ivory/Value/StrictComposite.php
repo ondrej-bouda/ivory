@@ -13,6 +13,7 @@ use Ivory\Exception\NotImplementedException;
  */
 abstract class StrictComposite extends Composite
 {
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public static function fromMap(array $valueMap): Composite
     {
         throw new NotImplementedException(

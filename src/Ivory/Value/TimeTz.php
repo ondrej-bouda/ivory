@@ -237,6 +237,7 @@ class TimeTz extends TimeBase
         return ($this->toUnixTimestamp() > $other->toUnixTimestamp());
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     /**
      * @param string $timeFmt the format string as accepted by {@link date()}
      * @return string the time formatted according to <tt>$timeFmt</tt>

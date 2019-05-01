@@ -35,6 +35,7 @@ class CherryPickedRelation extends StreamlinedRelation
         return $this;
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function count()
     {
         return count($this->offsetMap);
@@ -51,6 +52,7 @@ class CherryPickedRelation extends StreamlinedRelation
         }
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function getIterator()
     {
         return new RelationSeekableIterator($this);
