@@ -28,19 +28,19 @@ use Ivory\Exception\ConnectionException;
  * `INSERT` without the `RETURNING` clause) is an error, as well as calling {@link IStatementExecution::command()} with
  * an SQL statement returning data (such as `SELECT`), and will result in a {@link UsageException}.
  *
- * @internal Ivory design note: Traditionally, in other database layers (including the pgsql extension), methods like
- * query() serve both for reading data from the database and for writing data to it, requiring the user to use the
- * results of such a query() method in the right way. The approach applied in Ivory is not to confuse the terms by
- * defining a *query()* method documented as "Executes an SQL statement", but rather to enhance type safety and promote
- * code clarity. Thus the separation in two distinct methods, {@link IStatementExecution::query()} and
+ * _Ivory design note: Traditionally, in other database layers (including the pgsql extension), methods like query()
+ * serve both for reading data from the database and for writing data to it, requiring the user to use the results of
+ * such a query() method in the right way. The approach applied in Ivory is not to confuse the terms by defining a
+ * *query()* method documented as "Executes an SQL statement", but rather to enhance type safety and promote code
+ * clarity. Thus the separation in two distinct methods, {@link IStatementExecution::query()} and
  * {@link IStatementExecution::command()}. After all, processing the result of either of them is fairly different from
  * the result of the other one. And even if one changes a plain <tt>INSERT</tt> to <tt>INSERT ... RETURNING</tt>, the
- * change from <tt>query()</tt> to <tt>command()</tt> will be the tiniest adjustment of the related source code.
+ * change from <tt>query()</tt> to <tt>command()</tt> will be the tiniest adjustment of the related source code._
  *
- * @internal Ivory design note: Originally, intertwined <tt>query()</tt> and <tt>command()</tt> were handled gracefully,
- * issuing a mere warning and returning a substitute object (empty relation). A stricter approach is applied, now, to
- * promote the strict separation of the two families of methods, as it clearly signifies a wrong code (e.g., specific
- * parameter values are irrelevant in the question of whether the statement is a query or a command).
+ * _Ivory design note: Originally, intertwined <tt>query()</tt> and <tt>command()</tt> were handled gracefully, issuing
+ * a mere warning and returning a substitute object (empty relation). A stricter approach is applied, now, to promote
+ * the strict separation of the two families of methods, as it clearly signifies a wrong code (e.g., specific parameter
+ * values are irrelevant in the question of whether the statement is a query or a command)._
  */
 interface IStatementExecution
 {
@@ -75,8 +75,8 @@ interface IStatementExecution
      *
      * If executing the query immediately is not appropriate, consider using {@link dataSource()} instead.
      *
-     * @internal Ivory design note: There does not seem to be a natural way to provide values for named parameters. The
-     * only reasonable solution would be to call <tt>query()</tt> using the "named parameters"
+     * _Ivory design note: There does not seem to be a natural way to provide values for named parameters. The only
+     * reasonable solution would be to call <tt>query()</tt> using the "named parameters"
      * {@link https://wiki.php.net/rfc/named_params#what_are_the_benefits_of_named_arguments proposed} for a future PHP
      * version.
      * The current interface is considered as the best from all the bad ones. The obvious disadvantage of the current
@@ -84,7 +84,7 @@ interface IStatementExecution
      * case the caller forgets to provide any of the positional parameter values. Of course, an alternative way is to
      * avoid specifying all at once, but instead build an {@link IRelationDefinition}, fill it with parameter values,
      * and provide it to <tt>query()</tt>. Another alternative would be to use the {@link dataSource()} method and,
-     * again, fill that with parameter values.
+     * again, fill that with parameter values._
      *
      * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
      * @param array ...$fragmentsAndParams

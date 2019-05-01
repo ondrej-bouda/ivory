@@ -115,10 +115,10 @@ trait SqlPatternDefinitionMacros
      * {@link \Ivory\Ivory::getSqlPatternParser()}. Depending on Ivory configuration, the parser will cache the results
      * and reuse them for the same pattern next time.
      *
-     * @internal Ivory design note: The single space added between each two fragments aspires to be more practical than
-     * a mere concatenation, which would require the user to specify spaces where the next fragment immediately
-     * continued with the query. After all, the method has ambitions to at least partly understand the user wants to
-     * compose an SQL query from several parts, thus, it is legitimate the query is modified appropriately.
+     * _Ivory design note: The single space added between each two fragments aspires to be more practical than a mere
+     * concatenation, which would require the user to specify spaces where the next fragment immediately continued with
+     * the query. After all, the method has ambitions to at least partly understand the user wants to compose an SQL
+     * query from several parts, thus, it is legitimate the query is modified appropriately._
      *
      * @param string|SqlPattern $fragment
      * @param array ...$fragmentsAndParamValues

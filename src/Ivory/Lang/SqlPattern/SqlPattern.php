@@ -88,16 +88,16 @@ use Ivory\Exception\NoDataException;
  * more complex definition, e.g., a
  * {@link https://www.postgresql.org/docs/current/static/queries-with.html Common Table Expression}.
  *
- * @internal Ivory design note: The positional parameters could have been treated as parameters named by their
- * zero-based position. This is not the case, though. If placeholders could refer to positional parameters (e.g.,
- * <tt>%s:0</tt>), it would only complicate the specification without any significant benefit. Especially the
+ * _Ivory design note: The positional parameters could have been treated as parameters named by their zero-based
+ * position. This is not the case, though. If placeholders could refer to positional parameters (e.g., <tt>%s:0</tt>),
+ * it would only complicate the specification without any significant benefit. Especially the
  * {@link SqlPatternDefinitionMacros::fromFragments()} would be overcomplicated as the placeholders would have to be
- * re-numbered.
+ * re-numbered._
  *
- * @internal Ivory design note: The common placeholder syntax ":name" is intentionally unsupported. PostgreSQL uses
+ * _Ivory design note: The common placeholder syntax ":name" is intentionally unsupported. PostgreSQL uses
  * <tt>::type</tt> for typecasts, which could be mistaken for the named arguments written as ":name". Moreover, it would
  * collide with Embedded SQL which also uses the same syntax. Rather than complicating the queries with escaping, Ivory
- * requires the leading % sign, which also simplifies parsing the patterns - both for the machine and for the humans.
+ * requires the leading % sign, which also simplifies parsing the patterns - both for the machine and for the humans._
  */
 class SqlPattern
 {

@@ -14,10 +14,10 @@ use Ivory\Value\Alg\ComparisonUtils;
  *
  * Note the composite value is immutable, i.e., once constructed, its values cannot be changed.
  *
- * @internal Ivory design note: Although Composite seems similar to Tuple and using the same class for both might look
+ * _Ivory design note: Although Composite seems similar to Tuple and using the same class for both might look
  * reasonable, there is a significant difference: in Composite, each attribute name is unique, whereas in Tuple,
  * multiple columns might have a same name. Moreover, it is customary to access tuples with array indices, while
- * composite attributes should only be accessed through attribute names. Hence, two different classes.
+ * composite attributes should only be accessed through attribute names. Hence, two different classes._
  *
  * @see https://www.postgresql.org/docs/11/rowtypes.html
  */

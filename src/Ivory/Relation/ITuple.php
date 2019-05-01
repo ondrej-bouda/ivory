@@ -24,8 +24,8 @@ use Ivory\Value\Alg\IEqualable;
  *
  * There might also be a column with no name. The value of an anonymous column is only accessible by the column offset.
  *
- * @internal Ivory design note: ITuple is intentionally not iterable as there seems to be no real value with it. It
- * might be added later with a use case in hand.
+ * _Ivory design note: ITuple is intentionally not iterable as there seems to be no real value with it. It might be
+ * added later with a use case in hand._
  */
 interface ITuple extends \ArrayAccess, IEqualable
 {
@@ -47,15 +47,14 @@ interface ITuple extends \ArrayAccess, IEqualable
      * Also note some columns in the originating relation might not have name. Values of such anonymous columns are
      * omitted from the result of `toMap()` as there would be no key to give them.
      *
-     * @see toList()
-     *
-     * @internal Ivory design note: The original specification for the case of multiple same-named columns was to return
-     * the value of the first column of the group. The current specification goes with the more restrictive API,
-     * throwing exception on ambiguous name, just as PostgreSQL does. If that proves too strict, the API might be
-     * relaxed in later versions.
+     * _Ivory design note: The original specification for the case of multiple same-named columns was to return the
+     * value of the first column of the group. The current specification goes with the more restrictive API, throwing
+     * exception on ambiguous name, just as PostgreSQL does. If that proves too strict, the API might be relaxed in
+     * later versions._
      *
      * @return array map: column name => value
      * @throws AmbiguousException
+     * @see toList()
      */
     function toMap(): array;
 

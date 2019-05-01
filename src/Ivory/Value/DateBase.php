@@ -94,7 +94,7 @@ abstract class DateBase implements IComparable
      * Returns the year from this date/time, interpreting years before Christ as non-positive numbers: 0 for year 1 BC,
      * -1 for year 2 BC, etc. This is the number appearing as year in the ISO 8601 date string format.
      *
-     * Ivory design note: not named <tt>getISOYear()</tt> to avoid confusion with <tt>EXTRACT(ISOYEAR FROM ...)</tt>.
+     * _Ivory design note: not named <tt>getISOYear()</tt> to avoid confusion with <tt>EXTRACT(ISOYEAR FROM ...)</tt>._
      *
      * @return int|null the year of the date/time, basing year 1 BC as zero;
      *                  <tt>null</tt> iff the date/time is not finite

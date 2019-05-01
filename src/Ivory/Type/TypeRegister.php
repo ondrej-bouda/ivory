@@ -243,14 +243,15 @@ class TypeRegister implements ITypeProvider
      *
      * Note the rules are case sensitive.
      *
-     * @internal Ivory design note: Alternatively, the data types inference might be defined by the registered type
-     * objects. That would not work for two reasons: multiple type objects might collide about the inferred type
-     * and, more importantly, the same type object class is registered for multiple types (e.g., IntegerType) and
-     * Ivory could not decide which type object instance to actually use.
-     * @internal Ivory design note: Regarding the alphabetical order of interfaces matched against the rules: a more
+     * _Ivory design note: Alternatively, the data types inference might be defined by the registered type objects. That
+     * would not work for two reasons: multiple type objects might collide about the inferred type and, more
+     * importantly, the same type object class is registered for multiple types (e.g., IntegerType) and Ivory could not
+     * decide which type object instance to actually use._
+     *
+     * _Ivory design note: Regarding the alphabetical order of interfaces matched against the rules: a more
      * sophisticated preference system might be used. We prefer simplicity, though, over perfection (in the perfect
      * system, the fact which parent declared implementing which interfaces should be considered, complicated with
-     * parent interfaces...).
+     * parent interfaces...)._
      *
      * @param string $phpType either one of <tt>'bool'</tt>, <tt>'int'</tt>, <tt>'float'</tt>, <tt>'string'</tt> or
      *                          <tt>'null'</tt>, or a fully-qualified name of a PHP class or interface

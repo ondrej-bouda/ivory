@@ -34,12 +34,12 @@ interface ITransactionControl
      *
      * Transaction options may be specified, overriding the defaults set up by {@link setupSubsequentTransactions()}.
      *
-     * @internal Ivory design note: Usual database access layers only define a thin API for transaction control,
-     * offering all the transaction control commands on the connection itself. In the real world, however, one must keep
-     * track of where exactly the transaction is open and when it comes closed (either committed or rolled back). To
-     * make this fact more explicit, the transaction is represented by a handle, only through which it may further be
-     * controlled. It is clear, then, which methods are expected to be called within an open transaction, and which
-     * control commands are, conversely, to be executed outside of a transaction.
+     * _Ivory design note: Usual database access layers only define a thin API for transaction control, offering all the
+     * transaction control commands on the connection itself. In the real world, however, one must keep track of where
+     * exactly the transaction is open and when it comes closed (either committed or rolled back). To make this fact
+     * more explicit, the transaction is represented by a handle, only through which it may further be controlled. It is
+     * clear, then, which methods are expected to be called within an open transaction, and which control commands are,
+     * conversely, to be executed outside of a transaction._
      *
      * @param int|TxConfig $transactionOptions options for the transaction to be started, overriding the defaults;
      *                                         a {@link TxConfig} object, or a combination of {@link TxConfig} constants
