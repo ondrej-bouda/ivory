@@ -45,7 +45,7 @@ interface ITxHandle
      * {@link TxConfig::REPEATABLE_READ} isolation level of the importing transaction, and it merely synchronizes the
      * transactions with respect to pre-existing data. See the PostgreSQL documentation on
      * {@link https://www.postgresql.org/docs/current/sql-set-transaction.html `SQL SET TRANSACTION`} and
-     * {@link https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-SNAPSHOT-SYNCHRONIZATION Snapshot Synchronization Functions}
+     * {@link https://www.postgresql.org/docs/current/functions-admin.html Snapshot Synchronization Functions}
      * for detailed information.
      *
      * @param string $snapshotId a snapshot identifier exported by another existing transaction using

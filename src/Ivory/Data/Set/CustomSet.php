@@ -27,6 +27,7 @@ class CustomSet extends DictionarySet
         }
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function computeKey($value)
     {
         return $this->converter->hash($value);

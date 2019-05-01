@@ -16,11 +16,11 @@ class BoxType extends CompoundGeometricType
     public function parseValue(string $extRepr)
     {
         $re = '~^ \s*
-                (\()? \s*                           # optional opening parenthesis
-                ((?(1)\()[^,]+,[^,]+(?(1)\))) \s*   # corner; parenthesized if the whole segment is parenthesized
+                (\()? \s*                         # optional opening parenthesis
+                ((?(1)\()[^,]+,[^,]+(?(1)\))) \s* # corner; parenthesized if the whole segment is parenthesized
                 , \s*
-                ((?(1)\().+(?(1)\))) \s*            # opposite corner; parenthesized if the whole segment is parenthesized
-                (?(1)\)) \s*                        # pairing closing parenthesis
+                ((?(1)\().+(?(1)\))) \s*          # opposite corner; parenthesized if the whole segment is parenthesized
+                (?(1)\)) \s*                      # pairing closing parenthesis
                 $~x';
 
         if (preg_match($re, $extRepr, $m)) {

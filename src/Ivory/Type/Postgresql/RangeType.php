@@ -104,6 +104,7 @@ class RangeType extends TypeBase implements ITotallyOrderedType
             $this->subtype->serializeValue($val->getUpper(), false),
             ($boundsSpec == '[)' || ($boundsSpec == '()' && $val->getLower() === null) ? '' : ",'$boundsSpec'")
         );
-        // FIXME: the fact that '[)' bounds are default is rather conventional, and might not hold for user-defined ranges
+        // FIXME: The fact that '[)' bounds are default is rather conventional, and might not hold for user-defined
+        //        ranges.
     }
 }

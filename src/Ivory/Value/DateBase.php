@@ -94,10 +94,12 @@ abstract class DateBase implements IComparable
      * Returns the year from this date/time, interpreting years before Christ as non-positive numbers: 0 for year 1 BC,
      * -1 for year 2 BC, etc. This is the number appearing as year in the ISO 8601 date string format.
      *
+     * Ivory design note: not named <tt>getISOYear()</tt> to avoid confusion with <tt>EXTRACT(ISOYEAR FROM ...)</tt>.
+     *
      * @return int|null the year of the date/time, basing year 1 BC as zero;
      *                  <tt>null</tt> iff the date/time is not finite
      */
-    final public function getZeroBasedYear(): ?int // NOTE: not named getISOYear() to avoid confusion with EXTRACT(ISOYEAR FROM ...)
+    final public function getZeroBasedYear(): ?int
     {
         return ($this->inf ? null : (int)$this->dt->format('Y'));
     }
@@ -266,7 +268,7 @@ abstract class DateBase implements IComparable
         $fracSec = $seconds - $wholeSec;
         if ($fracSec != 0) {
             // in current PHP, there is no method for modifying the microseconds of a date/time - we must do it by hand
-            $resFracSec = $fracSec + $this->dt->format('.u');
+            $resFracSec = $fracSec + (double)$this->dt->format('.u');
             if ($resFracSec < 0) {
                 $resFracSec++;
                 $wholeSec--;
@@ -277,8 +279,9 @@ abstract class DateBase implements IComparable
         }
         $sp = ($wholeSec >= 0 ? '+' : '');
 
-        $mod = "$yp$years years $mp$months months $dp$days days $hp$hours hours $ip$minutes minutes $sp$wholeSec seconds";
-        $dt = $this->dt->modify($mod);
+        $dt = $this->dt->modify(
+            "$yp$years years $mp$months months $dp$days days $hp$hours hours $ip$minutes minutes $sp$wholeSec seconds"
+        );
 
         if ($fracSec != 0) {
             /** @noinspection PhpUndefinedVariableInspection */

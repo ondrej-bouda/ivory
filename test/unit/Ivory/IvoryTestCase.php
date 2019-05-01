@@ -4,14 +4,16 @@ namespace Ivory;
 
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
+use PHPUnit\DbUnit\Database\Connection as DbUnitConnection;
+use PHPUnit\DbUnit\TestCase;
 use PHPUnit\Framework\Constraint;
 
-abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
+abstract class IvoryTestCase extends TestCase
 {
     /** @var \PDO only instantiated once for test clean-up/fixture load */
     private static $pdo = null;
 
-    /** @var \PHPUnit\DbUnit\Database\Connection instantiated once per test */
+    /** @var DbUnitConnection instantiated once per test */
     private $phpUnitConn = null;
 
     /** @var IConnection|null */
@@ -128,7 +130,7 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
             if (strlen($message) > 0) {
                 $failMsg = "$message ($failMsg)";
             }
-            $this->fail($failMsg);
+            self::fail($failMsg);
         }
 
         $err = array_shift($this->triggeredErrors);
@@ -142,10 +144,10 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
             if (strlen($message) > 0) {
                 $failMsg = "$message ($failMsg)";
             }
-            $this->fail($failMsg);
+            self::fail($failMsg);
         }
 
-        $this->assertRegExp($expectedErrMsgRegex, $err['msg'], $message);
+        self::assertRegExp($expectedErrMsgRegex, $err['msg'], $message);
     }
 
     protected function assertErrorsTriggered($count, $expectedErrMsgRegex, $expectedErrType = E_ALL, $message = '')
@@ -227,10 +229,10 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
             if (strlen($message) > 0) {
                 $failMsg = "$message ($failMsg)";
             }
-            $this->fail($failMsg);
+            self::fail($failMsg);
         }
 
-        $this->assertEmpty($this->triggeredErrors, $message);
+        self::assertEmpty($this->triggeredErrors, $message);
     }
 
 
@@ -279,6 +281,7 @@ abstract class IvoryTestCase extends \PHPUnit\DbUnit\TestCase
         return $coreFactory->createConnection($name, $params);
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function newDatabaseTester()
     {
         return new IvoryTester($this->getConnection());

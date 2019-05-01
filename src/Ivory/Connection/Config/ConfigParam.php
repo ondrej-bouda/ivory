@@ -255,7 +255,7 @@ class ConfigParam
     const LOG_TIMEZONE = 'log_timezone';
     /** @since PostgreSQL 9.5 */
     const CLUSTER_NAME = 'cluster_name';
-    const UPDATE_PROCESS_TITLE = 'update_process_title'; // categorized under Run-time Statistics Settings on PostgreSQL <= 9.4
+    const UPDATE_PROCESS_TITLE = 'update_process_title'; // listed in Run-time Statistics Settings on PostgreSQL <= 9.4
     //endregion
     //region Run-time Statistics Settings
     const TRACK_ACTIVITIES = 'track_activities';
@@ -643,7 +643,8 @@ class ConfigParam
         self::VACUUM_FREEZE_TABLE_AGE => ConfigParamType::INTEGER,
         self::VACUUM_FREEZE_MIN_AGE => ConfigParamType::INTEGER,
         self::VACUUM_MULTIXACT_FREEZE_TABLE_AGE => ConfigParamType::INTEGER,
-        self::VACUUM_MULTIXACT_FREEZE_MIN_AGE => ConfigParamType::INTEGER,
+//        self::VACUUM_MULTIXACT_FREEZE_MIN_AGE => ConfigParamType::INTEGER, // until PhpStorm bug WI-46010 gets fixed:
+        'vacuum_multixact_freeze_min_age' => ConfigParamType::INTEGER,
         self::VACUUM_CLEANUP_INDEX_SCALE_FACTOR => ConfigParamType::REAL,
         self::BYTEA_OUTPUT => ConfigParamType::ENUM,
         self::XMLBINARY => ConfigParamType::ENUM,

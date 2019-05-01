@@ -170,7 +170,9 @@ final class Ivory
                     }
                 }
                 if ($i >= $safetyBreak) {
-                    throw new \RuntimeException('Error auto-generating name for the new connection: all suffixes taken');
+                    throw new \RuntimeException(
+                        'Error auto-generating name for the new connection: all suffixes taken'
+                    );
                 }
             }
         }

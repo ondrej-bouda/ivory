@@ -1,9 +1,13 @@
 <?php
 declare(strict_types=1);
 
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Connectors\PostgresConnector;
+use Illuminate\Database\PostgresConnection;
+
 class LaravelPerformanceTest implements IPerformanceTest
 {
-    /** @var \Illuminate\Database\ConnectionInterface */
+    /** @var ConnectionInterface */
     private $conn;
 
     public function connect(string $connString, string $searchPathSchema)
@@ -21,10 +25,10 @@ class LaravelPerformanceTest implements IPerformanceTest
             $config[$trans[$k]] = $v;
         }
 
-        $connector = new \Illuminate\Database\Connectors\PostgresConnector();
+        $connector = new PostgresConnector();
         $pdo = $connector->connect($config);
 
-        $this->conn = new \Illuminate\Database\PostgresConnection($pdo);
+        $this->conn = new PostgresConnection($pdo);
     }
 
     public function trivialQuery()

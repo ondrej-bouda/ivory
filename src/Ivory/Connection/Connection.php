@@ -40,13 +40,17 @@ class Connection implements IConnection
     public function __construct(string $name, $params)
     {
         $this->name = $name;
-        $this->connCtl = new ConnectionControl($this, $params); // TODO: extract all usages of ConnectionControl::requireConnection() - consider introducing an interface specifying the method, named like PGSQLDriver or ConnectionManager or ConnectionPool
+        // TODO: Extract all usages of ConnectionControl::requireConnection() - consider introducing an interface
+        //       specifying the method, named like PGSQLDriver or ConnectionManager or ConnectionPool.
+        $this->connCtl = new ConnectionControl($this, $params);
         $this->typeCtl = new TypeControl($this, $this->connCtl);
         $this->stmtExec = new StatementExecution($this->connCtl, $this->typeCtl);
         $this->txCtl = new TransactionControl($this->connCtl, $this->stmtExec, $this);
         $this->ipcCtl = new IPCControl($this->connCtl, $this->stmtExec);
         $this->config = new ConnConfig($this->connCtl, $this->stmtExec, $this->txCtl);
-        $this->cacheCtl = Ivory::getCoreFactory()->createCacheControl($this); // TODO: consider moving cacheCtl initialization out of Connection itself (let the core factory set it up), or do not hold cache control here but rather besides the connection register at Ivory
+        // TODO: Consider moving cacheCtl initialization out of Connection itself (let the core factory set it up), or
+        //       do not hold cache control here but rather besides the connection register at Ivory.
+        $this->cacheCtl = Ivory::getCoreFactory()->createCacheControl($this);
     }
 
     final public function getName(): string

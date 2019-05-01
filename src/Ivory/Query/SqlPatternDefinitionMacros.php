@@ -160,7 +160,9 @@ trait SqlPatternDefinitionMacros
                     break;
                 } else {
                     $ord = StringUtils::englishOrd($curFragmentNum);
-                    throw new \InvalidArgumentException("Invalid type of $ord fragment. Isn't it a misplaced parameter value?");
+                    throw new \InvalidArgumentException(
+                        "Invalid type of $ord fragment. Isn't it a misplaced parameter value?"
+                    );
                 }
             }
 
@@ -270,13 +272,15 @@ trait SqlPatternDefinitionMacros
     ): IValueSerializer {
         $typeName = $placeholder->getTypeName();
         if (!$placeholder->isTypeNameQuoted()) {
-            $typeName = mb_strtolower($typeName); // OPT: SqlPatternPlaceholder might also store the lower-case name, which might be cached
+            $typeName = mb_strtolower($typeName);
+            // OPT: SqlPatternPlaceholder might also store the lower-case name, which might be cached
         }
 
         $schemaName = $placeholder->getSchemaName();
         if ($schemaName !== null) {
             if (!$placeholder->isSchemaNameQuoted()) {
-                $schemaName = mb_strtolower($schemaName); // OPT: SqlPatternPlaceholder might also store the lower-case name, which might be cached
+                $schemaName = mb_strtolower($schemaName);
+                // OPT: SqlPatternPlaceholder might also store the lower-case name, which might be cached
             }
         } elseif ($placeholder->isTypeNameQuoted()) {
             $schemaName = false;

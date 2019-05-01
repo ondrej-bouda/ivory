@@ -55,8 +55,8 @@ class IPCTest extends IvoryTestCase
             }
             usleep(10000);
         }
-        $this->assertNotNull($n1);
-        $this->assertSame('Starting IPC test...', $n1->getPayload());
+        self::assertNotNull($n1);
+        self::assertSame('Starting IPC test...', $n1->getPayload());
 
         $n2 = null;
         for ($i = 0; $i < 1000; $i++) {
@@ -66,8 +66,8 @@ class IPCTest extends IvoryTestCase
             }
             usleep(10000);
         }
-        $this->assertNotNull($n2);
-        $this->assertSame('Sleeping for 200 ms', $n2->getPayload());
+        self::assertNotNull($n2);
+        self::assertSame('Sleeping for 200 ms', $n2->getPayload());
 
         $n3 = null;
         for ($i = 0; $i < 1000; $i++) {
@@ -77,8 +77,8 @@ class IPCTest extends IvoryTestCase
             }
             usleep(10000);
         }
-        $this->assertNotNull($n3);
-        $this->assertSame('Woke up. Sleeping for another 5000 ms', $n3->getPayload());
+        self::assertNotNull($n3);
+        self::assertSame('Woke up. Sleeping for another 5000 ms', $n3->getPayload());
 
         $n4 = null;
         for ($i = 0; $i < 1000; $i++) {
@@ -88,8 +88,8 @@ class IPCTest extends IvoryTestCase
             }
             usleep(10000);
         }
-        $this->assertNotNull($n4);
-        $this->assertSame('Woke up again. Done.', $n4->getPayload());
+        self::assertNotNull($n4);
+        self::assertSame('Woke up again. Done.', $n4->getPayload());
 
         $n5 = null;
         for ($i = 0; $i < 1000; $i++) {
@@ -99,7 +99,7 @@ class IPCTest extends IvoryTestCase
             }
             usleep(10000);
         }
-        $this->assertNull($n5);
+        self::assertNull($n5);
     }
 
     public function testWaitingForNotification()
@@ -110,22 +110,22 @@ class IPCTest extends IvoryTestCase
         $this->runIPCTestNotifierInBackground();
 
         $n1 = $conn->waitForNotification(10000);
-        $this->assertNotNull($n1);
-        $this->assertSame('Starting IPC test...', $n1->getPayload());
+        self::assertNotNull($n1);
+        self::assertSame('Starting IPC test...', $n1->getPayload());
 
         $n2 = $conn->waitForNotification(10000);
-        $this->assertNotNull($n2);
-        $this->assertSame('Sleeping for 200 ms', $n2->getPayload());
+        self::assertNotNull($n2);
+        self::assertSame('Sleeping for 200 ms', $n2->getPayload());
 
         $n3 = $conn->waitForNotification(10000);
-        $this->assertNotNull($n3);
-        $this->assertSame('Woke up. Sleeping for another 5000 ms', $n3->getPayload());
+        self::assertNotNull($n3);
+        self::assertSame('Woke up. Sleeping for another 5000 ms', $n3->getPayload());
 
         $n4 = $conn->waitForNotification(10000);
-        $this->assertNotNull($n4);
-        $this->assertSame('Woke up again. Done.', $n4->getPayload());
+        self::assertNotNull($n4);
+        self::assertSame('Woke up again. Done.', $n4->getPayload());
 
         $n5 = $conn->waitForNotification(10000);
-        $this->assertNull($n5);
+        self::assertNull($n5);
     }
 }

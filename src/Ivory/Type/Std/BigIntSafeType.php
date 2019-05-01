@@ -32,7 +32,8 @@ class BigIntSafeType extends TypeBase implements ITotallyOrderedType
 
     public function parseValue(string $extRepr)
     {
-        if ($extRepr >= PHP_INT_MIN && $extRepr <= PHP_INT_MAX) { // correctness: int does not overflow, but rather gets converted to a float
+        if ($extRepr >= PHP_INT_MIN && $extRepr <= PHP_INT_MAX) {
+            // correctness: int does not overflow, but rather gets converted to a float
             return (int)$extRepr;
         } else {
             return $extRepr;

@@ -152,9 +152,12 @@ class ArrayType extends TypeBase implements ITotallyOrderedType
         }
 
         $strOffset++;
-        $dim = 0; // the current dimension of the input being processed
-        $keys = [$dim => $lowerBounds[$dim]]; // map: dimension => key under which to add the next element in the dimension
-        $refs = [$dim => &$result]; // map: dimension => reference to the array to add the next element to at the dimension
+        /** @var int $dim the current dimension of the input being processed */
+        $dim = 0;
+        /** @var array $keys map: dimension => key under which to add the next element in the dimension */
+        $keys = [$dim => $lowerBounds[$dim]];
+        /** @var array $refs map: dimension => reference to the array to add the next element to at the dimension */
+        $refs = [$dim => &$result];
 
         foreach ($matches[0] as list($elem, $elemOffset)) {
             for (; $strOffset < $elemOffset; $strOffset++) {
@@ -258,7 +261,8 @@ class ArrayType extends TypeBase implements ITotallyOrderedType
         } else {
             $expSize = $dims[$curDim];
             if ($expSize != count($val)) {
-                $msg = 'The array is not rectangular: item ' . print_r($val, true) . ' contains a wrong number of elements';
+                $itemDesc = print_r($val, true);
+                $msg = "The array is not rectangular: item $itemDesc contains a wrong number of elements";
                 throw new \InvalidArgumentException($msg);
             }
         }

@@ -99,9 +99,9 @@ class ConnectionControl implements IConnectionControl
             call_user_func($hook);
         }
 
-        // TODO: handle the case when there are some open LO handles (an LO shall be an IType registered at the connection)
+        // TODO: handle open LO handles (an LO shall be an IType registered at the connection)
 
-        $closed = pg_close($this->handler); // NOTE: it seems correct to close a not yet established asynchronous connection
+        $closed = pg_close($this->handler); // it seems correct to close a not yet established asynchronous connection
         if (!$closed) {
             throw new ConnectionException('Error closing the connection');
         }
@@ -141,7 +141,8 @@ class ConnectionControl implements IConnectionControl
         $this->finishedConnecting = !($connectFlags & PGSQL_CONNECT_ASYNC);
         if ($this->handler === false || pg_connection_status($this->handler) === PGSQL_CONNECTION_BAD) {
             $this->handler = null;
-            throw new ConnectionException('Error connecting to the database'); // TODO: try to squeeze the client to get some useful information; maybe trap errors issued by pg_connect()?
+            // TODO: try to squeeze the client to get some useful information; maybe trap errors issued by pg_connect()?
+            throw new ConnectionException('Error connecting to the database');
         }
     }
 

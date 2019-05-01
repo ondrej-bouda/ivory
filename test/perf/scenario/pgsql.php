@@ -34,7 +34,11 @@ class PgSQLPerformanceTest implements IPerformanceTest
             exit('User inactive');
         }
 
-        $res = pg_query_params($this->conn, 'UPDATE usr SET last_login = CURRENT_TIMESTAMP WHERE id = $1', [$user['id']]);
+        $res = pg_query_params(
+            $this->conn,
+            'UPDATE usr SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
+            [$user['id']]
+        );
         pg_free_result($res);
         if ($user['last_login']) {
             echo 'Welcome back since ' . date('n/j/Y H:i:s', strtotime($user['last_login'])) . "\n";

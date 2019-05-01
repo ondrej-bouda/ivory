@@ -30,7 +30,7 @@ class ConstrainedRelationDefinitionTest extends IvoryTestCase
         $constrained = $this->relDef->where('a %% % = 1', 2);
         $rel = $this->conn->query($constrained);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 1, 'b' => 2],
                 ['a' => 7, 'b' => 8],
@@ -46,7 +46,7 @@ class ConstrainedRelationDefinitionTest extends IvoryTestCase
         $constrained = $this->relDef->where($pattern, 2);
         $rel = $this->conn->query($constrained);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 1, 'b' => 2],
                 ['a' => 7, 'b' => 8],
@@ -66,7 +66,7 @@ class ConstrainedRelationDefinitionTest extends IvoryTestCase
         $constrained = $this->relDef->where($predicate);
         $rel = $this->conn->query($constrained);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 4, 'b' => 3],
                 ['a' => 6, 'b' => 6],
@@ -83,7 +83,7 @@ class ConstrainedRelationDefinitionTest extends IvoryTestCase
             ->where('a != b');
         $rel = $this->conn->query($constained);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 4, 'b' => 3],
             ],

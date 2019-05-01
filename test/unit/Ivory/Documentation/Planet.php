@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace Ivory\Documentation;
 
+use Ivory\Value\StrictEnum;
+
 /**
  * @method static Planet Mercury()
  * @method static Planet Venus()
@@ -12,7 +14,7 @@ namespace Ivory\Documentation;
  * @method static Planet Uranus()
  * @method static Planet Neptune()
  */
-class Planet extends \Ivory\Value\StrictEnum
+class Planet extends StrictEnum
 {
     protected static function getValues(): array
     {

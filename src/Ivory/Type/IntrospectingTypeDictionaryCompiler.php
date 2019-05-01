@@ -102,9 +102,9 @@ SQL;
                         break;
 
                     case 'b':
-                    case 'p': // treating pseudo-types as base types - they must be recognized, not built up on another type
+                    case 'p': // treating pseudo-types as base types - they must be recognized by Ivory
                         $type = $this->createBaseType($schemaName, $typeName, $typeProvider);
-                        // OPT: types not recognized by the type provider are asked twice
+                        // OPT: types not recognized by the type provider are queried twice
                         break;
 
                     case 'c':

@@ -84,7 +84,7 @@ class TypeControl implements ITypeControl
 
         if ($dict instanceof ITypeDictionary) {
             if ($dict instanceof TrackingTypeDictionary) {
-                // type usage watching is no more necessary - all types retrieved from cache are considered as being used
+                // type usage watching is no more necessary, all types retrieved from cache are considered as being used
                 $dict->disableTypeUsageWatching();
             }
             return $dict;

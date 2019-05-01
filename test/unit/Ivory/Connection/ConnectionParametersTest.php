@@ -3,12 +3,13 @@ declare(strict_types=1);
 namespace Ivory\Connection;
 
 use Ivory\Exception\UnsupportedException;
+use PHPUnit\Framework\TestCase;
 
-class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
+class ConnectionParametersTest extends TestCase
 {
     public function testFromConnectionString()
     {
-        $this->assertEquals(
+        self::assertEquals(
             [
                 ConnectionParameters::HOST => 'localhost',
                 ConnectionParameters::PORT => 5432,
@@ -20,7 +21,7 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 ConnectionParameters::USER => 'johndoe',
                 ConnectionParameters::PASSWORD => '',
@@ -29,11 +30,13 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
                 ConnectionParameters::OPTIONS => '-c geqo=off',
             ],
             iterator_to_array(
-                ConnectionParameters::fromConnectionString("user = johndoe password='' dbname   =foo host=/tmp options='-c geqo=off'")
+                ConnectionParameters::fromConnectionString(
+                    "user = johndoe password='' dbname   =foo host=/tmp options='-c geqo=off'"
+                )
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [],
             iterator_to_array(
                 ConnectionParameters::fromConnectionString('')
@@ -42,62 +45,62 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
 
         try {
             ConnectionParameters::fromConnectionString('bagr=');
-            $this->fail('InvalidArgumentException expected');
+            self::fail('InvalidArgumentException expected');
         } catch (\InvalidArgumentException $e) {
         }
 
         try {
             ConnectionParameters::fromConnectionString("foo = 'incomplete");
-            $this->fail('InvalidArgumentException expected');
+            self::fail('InvalidArgumentException expected');
         } catch (\InvalidArgumentException $e) {
         }
     }
 
     public function testFromUri()
     {
-        $this->assertEquals(
+        self::assertEquals(
             [],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://')
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [ConnectionParameters::HOST => 'localhost'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://localhost')
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [ConnectionParameters::HOST => 'localhost'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgres://localhost')
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [ConnectionParameters::HOST => 'localhost', ConnectionParameters::PORT => 5433],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://localhost:5433')
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [ConnectionParameters::HOST => 'localhost', ConnectionParameters::DBNAME => 'mydb'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://localhost/mydb')
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [ConnectionParameters::HOST => 'localhost', ConnectionParameters::USER => 'user'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://user@localhost')
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 ConnectionParameters::HOST => 'localhost',
                 ConnectionParameters::USER => 'user',
@@ -108,7 +111,7 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 ConnectionParameters::HOST => 'localhost',
                 ConnectionParameters::USER => 'other',
@@ -117,11 +120,13 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
                 ConnectionParameters::APPLICATION_NAME => 'myapp',
             ],
             iterator_to_array(
-                ConnectionParameters::fromUri('postgresql://other@localhost/otherdb?connect_timeout=10&application_name=myapp')
+                ConnectionParameters::fromUri(
+                    'postgresql://other@localhost/otherdb?connect_timeout=10&application_name=myapp'
+                )
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 ConnectionParameters::DBNAME => 'mydb',
                 ConnectionParameters::HOST => 'localhost',
@@ -132,21 +137,21 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [ConnectionParameters::HOST => '[2001:db8::1234]', ConnectionParameters::DBNAME => 'database'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://[2001:db8::1234]/database')
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [ConnectionParameters::DBNAME => 'dbname', ConnectionParameters::HOST => '/var/lib/postgresql'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql:///dbname?host=/var/lib/postgresql')
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [ConnectionParameters::HOST => '/var/lib/postgresql', ConnectionParameters::DBNAME => 'dbname'],
             iterator_to_array(
                 ConnectionParameters::fromUri('postgresql://%2Fvar%2Flib%2Fpostgresql/dbname')
@@ -155,26 +160,26 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
 
         try {
             ConnectionParameters::fromUri('localhost');
-            $this->fail('InvalidArgumentException expected');
+            self::fail('InvalidArgumentException expected');
         } catch (\InvalidArgumentException $e) {
         }
 
         try {
             ConnectionParameters::fromUri('1234');
-            $this->fail('InvalidArgumentException expected');
+            self::fail('InvalidArgumentException expected');
         } catch (\InvalidArgumentException $e) {
         }
 
         try {
             ConnectionParameters::fromUri('pgsql://localhost');
-            $this->fail('\Ivory\UnsupportedException expected');
+            self::fail('\Ivory\UnsupportedException expected');
         } catch (UnsupportedException $e) {
         }
     }
 
     public function testCreate()
     {
-        $this->assertEquals(
+        self::assertEquals(
             [
                 ConnectionParameters::HOST => 'localhost',
                 ConnectionParameters::PORT => 5432,
@@ -186,7 +191,7 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 ConnectionParameters::USER => 'johndoe',
                 ConnectionParameters::PASSWORD => '',
@@ -199,7 +204,7 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [],
             iterator_to_array(
                 ConnectionParameters::create('')
@@ -208,31 +213,31 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
 
         try {
             ConnectionParameters::create('bagr=');
-            $this->fail('InvalidArgumentException expected');
+            self::fail('InvalidArgumentException expected');
         } catch (\InvalidArgumentException $e) {
         }
 
         try {
             ConnectionParameters::create("foo = 'incomplete");
-            $this->fail('InvalidArgumentException expected');
+            self::fail('InvalidArgumentException expected');
         } catch (\InvalidArgumentException $e) {
         }
 
-        $this->assertEquals(
+        self::assertEquals(
             [],
             iterator_to_array(
                 ConnectionParameters::create('postgresql://')
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [ConnectionParameters::HOST => 'localhost', ConnectionParameters::DBNAME => 'mydb'],
             iterator_to_array(
                 ConnectionParameters::create('postgresql://localhost/mydb')
             )
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [ConnectionParameters::HOST => 'localhost', ConnectionParameters::DBNAME => 'mydb'],
             iterator_to_array(
                 ConnectionParameters::create([
@@ -246,12 +251,12 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
             ConnectionParameters::HOST => 'localhost',
             ConnectionParameters::DBNAME => 'mydb',
             ]);
-        $this->assertEquals($orig, ConnectionParameters::create($orig));
-        $this->assertNotSame($orig, ConnectionParameters::create($orig));
+        self::assertEquals($orig, ConnectionParameters::create($orig));
+        self::assertNotSame($orig, ConnectionParameters::create($orig));
 
         try {
             ConnectionParameters::create(1);
-            $this->fail('InvalidArgumentException expected');
+            self::fail('InvalidArgumentException expected');
         } catch (\InvalidArgumentException $e) {
         }
     }
@@ -259,66 +264,72 @@ class ConnectionParametersTest extends \PHPUnit\Framework\TestCase
     public function testGetters()
     {
         $cp1 = ConnectionParameters::fromUri('postgresql:///dbname?host=/var/lib/postgresql');
-        $this->assertSame('/var/lib/postgresql', $cp1->getHost());
-        $this->assertNull($cp1->getPort());
-        $this->assertNull($cp1->getUsername());
-        $this->assertNull($cp1->getPassword());
-        $this->assertSame('dbname', $cp1->getDbName());
+        self::assertSame('/var/lib/postgresql', $cp1->getHost());
+        self::assertNull($cp1->getPort());
+        self::assertNull($cp1->getUsername());
+        self::assertNull($cp1->getPassword());
+        self::assertSame('dbname', $cp1->getDbName());
 
-        $cp2 = ConnectionParameters::fromConnectionString('host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10');
-        $this->assertSame('localhost', $cp2->getHost());
-        $this->assertSame(5432, $cp2->getPort());
-        $this->assertSame('john', $cp2->getUsername());
-        $this->assertSame('doe', $cp2->getPassword());
-        $this->assertSame('mydb', $cp2->getDbName());
+        $cp2 = ConnectionParameters::fromConnectionString(
+            'host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10'
+        );
+        self::assertSame('localhost', $cp2->getHost());
+        self::assertSame(5432, $cp2->getPort());
+        self::assertSame('john', $cp2->getUsername());
+        self::assertSame('doe', $cp2->getPassword());
+        self::assertSame('mydb', $cp2->getDbName());
     }
 
     public function testArrayAccess()
     {
         $cp1 = ConnectionParameters::fromUri('postgresql:///dbname?host=/var/lib/postgresql');
-        $this->assertSame('/var/lib/postgresql', $cp1[ConnectionParameters::HOST]);
-        $this->assertFalse(isset($cp1[ConnectionParameters::PORT]));
-        $this->assertSame('dbname', $cp1[ConnectionParameters::DBNAME]);
+        self::assertSame('/var/lib/postgresql', $cp1[ConnectionParameters::HOST]);
+        self::assertFalse(isset($cp1[ConnectionParameters::PORT]));
+        self::assertSame('dbname', $cp1[ConnectionParameters::DBNAME]);
 
-        $cp2 = ConnectionParameters::fromConnectionString('host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10');
-        $this->assertSame('5432', $cp2[ConnectionParameters::PORT]);
-        $this->assertSame('john', $cp2[ConnectionParameters::USER]);
-        $this->assertSame('10', $cp2[ConnectionParameters::CONNECT_TIMEOUT]);
-        $this->assertTrue(isset($cp2[ConnectionParameters::PASSWORD]));
+        $cp2 = ConnectionParameters::fromConnectionString(
+            'host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10'
+        );
+        self::assertSame('5432', $cp2[ConnectionParameters::PORT]);
+        self::assertSame('john', $cp2[ConnectionParameters::USER]);
+        self::assertSame('10', $cp2[ConnectionParameters::CONNECT_TIMEOUT]);
+        self::assertTrue(isset($cp2[ConnectionParameters::PASSWORD]));
         unset($cp2[ConnectionParameters::PASSWORD]);
-        $this->assertFalse(isset($cp2[ConnectionParameters::PASSWORD]));
+        self::assertFalse(isset($cp2[ConnectionParameters::PASSWORD]));
         $cp2[ConnectionParameters::PASSWORD] = 1234;
-        $this->assertTrue(isset($cp2[ConnectionParameters::PASSWORD]));
-        $this->assertSame('1234', $cp2[ConnectionParameters::PASSWORD]);
+        self::assertTrue(isset($cp2[ConnectionParameters::PASSWORD]));
+        self::assertSame('1234', $cp2[ConnectionParameters::PASSWORD]);
     }
 
     public function testBuildConnectionString()
     {
-        $this->assertSame(
+        self::assertSame(
             'dbname=dbname host=/var/lib/postgresql',
             ConnectionParameters::fromUri('postgresql:///dbname?host=/var/lib/postgresql')->buildConnectionString()
         );
 
-        $this->assertSame(
+        self::assertSame(
             'host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10',
-            ConnectionParameters::fromConnectionString('host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10')
-                ->buildConnectionString()
+            ConnectionParameters::fromConnectionString(
+                'host=localhost port=5432 user=john password=doe dbname=mydb connect_timeout=10'
+            )->buildConnectionString()
         );
 
-        $this->assertSame(
+        self::assertSame(
             'host=[2001:db8::1234] dbname=database',
             ConnectionParameters::fromUri('postgresql://[2001:db8::1234]/database')->buildConnectionString()
         );
 
-        $this->assertSame(
+        self::assertSame(
             "user=johndoe password='' dbname=foo host=/tmp options='-c geqo=off'",
-            ConnectionParameters::fromConnectionString("user = johndoe password='' dbname   =foo host=/tmp options='-c geqo=off'")
-                ->buildConnectionString()
+            ConnectionParameters::fromConnectionString(
+                "user = johndoe password='' dbname   =foo host=/tmp options='-c geqo=off'"
+            )->buildConnectionString()
         );
 
-        $this->assertSame('', ConnectionParameters::fromArray([])->buildConnectionString());
+        self::assertSame('', ConnectionParameters::fromArray([])->buildConnectionString());
 
-        $this->assertSame(
+        self::assertSame(
             "user='john doe' password='' opt='\\'' opt2='\\\\\\''",
             ConnectionParameters::fromArray([
                 'user' => 'john doe',

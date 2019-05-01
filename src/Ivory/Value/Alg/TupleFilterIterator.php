@@ -19,6 +19,7 @@ class TupleFilterIterator extends \FilterIterator
         return $this->decider->accept($this->current());
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function key()
     {
         return $this->k;

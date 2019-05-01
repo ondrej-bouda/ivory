@@ -14,10 +14,14 @@ $connStringRetriever = function () {
     $phpUnitElmtList = $doc->getElementsByTagName('phpunit');
     assert($phpUnitElmtList->length == 1);
 
-    $phpElmtList = $phpUnitElmtList->item(0)->getElementsByTagName('php');
+    $phpUnitElmt = $phpUnitElmtList->item(0);
+    assert($phpUnitElmt instanceof DOMElement);
+    $phpElmtList = $phpUnitElmt->getElementsByTagName('php');
     assert($phpElmtList->length == 1);
 
-    $varElmtList = $phpElmtList->item(0)->getElementsByTagName('var');
+    $phpElmt = $phpElmtList->item(0);
+    assert($phpElmt instanceof DOMElement);
+    $varElmtList = $phpElmt->getElementsByTagName('var');
     $connStrItems = [];
     $itemMap = [
         'DB_HOST' => ConnectionParameters::HOST,
@@ -28,6 +32,7 @@ $connStringRetriever = function () {
     ];
     for ($i = 0; $i < $varElmtList->length; $i++) {
         $varElmt = $varElmtList->item($i);
+        assert($varElmt instanceof DOMElement);
         $key = $varElmt->getAttribute('name');
         $val = $varElmt->getAttribute('value');
 

@@ -131,7 +131,7 @@ interface IRelation extends \Traversable, \Countable
      * @throws AmbiguousException if any <tt>$columns</tt> item refers to a column by its name, which is used by
      *                              multiple columns
      */
-    function project($columns): IRelation; // TODO: decide whether it is rather expected to interpret the key and values the other way round (see the ProcessingTest)
+    function project($columns): IRelation;
 
     /**
      * Extends this relation with some extra columns.

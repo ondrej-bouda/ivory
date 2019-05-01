@@ -124,10 +124,8 @@ class Decimal implements IComparable
      *
      * It only equals to the not-a-number, and is greater than any number value. The result of any operation is, again,
      * the not-a-number.
-     *
-     * @return Decimal the not-a-number value
      */
-    public static function NaN(): Decimal
+    public static function createNaN(): Decimal
     {
         static $dec = null;
         if ($dec === null) {
@@ -138,8 +136,6 @@ class Decimal implements IComparable
 
     /**
      * Gets the decimal object representing the number zero. Returns the same object every time.
-     *
-     * @return Decimal
      */
     public static function zero(): Decimal
     {
@@ -540,7 +536,7 @@ class Decimal implements IComparable
             return new Decimal(gmp_strval(gmp_fact($this->toGMP())));
         }
 
-        // OPT: there are more efficient algorithms calculating the factorial; see, e.g., http://www.luschny.de/math/factorial/index.html
+        // OPT: there are more efficient algorithms calculating the factorial; see http://www.luschny.de/math/factorial/
         $result = new Decimal('2');
         for ($i = new Decimal('3'); $i->compareTo($this) <= 0; $i = $i->add(1)) {
             $result = $result->multiply($i);

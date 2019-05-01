@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Utils;
 
-class StringUtilsTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class StringUtilsTest extends TestCase
 {
     public function testPregReplaceCallbackWithOffset()
     {
@@ -15,20 +17,20 @@ class StringUtilsTest extends \PHPUnit\Framework\TestCase
         ];
         $i = 0;
         $tester = function ($matchesWithOffsets) use ($expectedMatches, &$i) {
-            $this->assertSame($expectedMatches[$i], $matchesWithOffsets, "Match $i");
+            self::assertSame($expectedMatches[$i], $matchesWithOffsets, "Match $i");
             $i++;
             return str_repeat('X', strlen($matchesWithOffsets[0][0]));
         };
         $repl = StringUtils::pregReplaceCallbackWithOffset($re, $tester, $str, 3, $count);
-        $this->assertSame('foo XXX   XXXX XXX  aaa', $repl);
-        $this->assertSame(3, $count);
+        self::assertSame('foo XXX   XXXX XXX  aaa', $repl);
+        self::assertSame(3, $count);
     }
 
     public function testRandomHexString()
     {
         for ($i = 0; $i <= 33; $i++) {
             $s = StringUtils::randomHexString($i);
-            $this->assertEquals($i, strlen($s), "Error generating string of length $i");
+            self::assertEquals($i, strlen($s), "Error generating string of length $i");
         }
 
         $this->expectException(\DomainException::class);

@@ -35,6 +35,7 @@ abstract class StreamlinedRelation extends RelationBase
         return $this->colNameMap;
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function getIterator()
     {
         return ($this->source instanceof \Iterator ? $this->source : new \IteratorIterator($this->source));
@@ -45,9 +46,10 @@ abstract class StreamlinedRelation extends RelationBase
         return $this->source->tuple($offset);
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function col($offsetOrNameOrEvaluator): IColumn
     {
-        return $this->_colImpl($offsetOrNameOrEvaluator, $this->getColumns(), $this->getColNameMap(), $this);
+        return $this->colImpl($offsetOrNameOrEvaluator, $this->getColumns(), $this->getColNameMap(), $this);
     }
 
     public function count()

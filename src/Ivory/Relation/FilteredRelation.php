@@ -47,6 +47,7 @@ class FilteredRelation extends StreamlinedRelation implements ICachingDataProces
         $this->acceptMap = null;
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function count()
     {
         $this->populate();

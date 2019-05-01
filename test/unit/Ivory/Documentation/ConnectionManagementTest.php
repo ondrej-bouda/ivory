@@ -13,8 +13,8 @@ class ConnectionManagementTest extends IvoryTestCase
         $secondConn = Ivory::setupNewConnection('postgresql://usr@localhost:5433/otherdb', 'other');
 
         // The following assertions hold:
-        $this->assertSame($firstConn, Ivory::getConnection()); // the first is the default
-        $this->assertSame($secondConn, Ivory::getConnection('other')); // identified by the given name
-        $this->assertSame($firstConn, Ivory::getConnection('mydb')); // connection name defaults to the database name
+        self::assertSame($firstConn, Ivory::getConnection()); // the first is the default
+        self::assertSame($secondConn, Ivory::getConnection('other')); // identified by the given name
+        self::assertSame($firstConn, Ivory::getConnection('mydb')); // connection name defaults to the database name
     }
 }

@@ -15,32 +15,27 @@ class RangeTest extends IvoryTestCase
 {
     public function testOperations()
     {
-        $roomReservationRange = Range::fromBounds(
-            Timestamp::fromParts(2010, 1, 1, 14, 30, 0),
-            Timestamp::fromParts(2010, 1, 1, 15, 30, 0)
-        );
-
         // Containment
-        $this->assertFalse(
+        self::assertFalse(
             Range::fromBounds(10, 20)->containsElement(3)
         );
 
         // Overlaps
-        $this->assertTrue(
+        self::assertTrue(
             Range::fromBounds(11.1, 22.2)->overlaps(Range::fromBounds(20.0, 30.0))
         );
 
         // Extract the upper bound
-        $this->assertSame(25, Range::fromBounds(15, 25)->getUpper());
+        self::assertSame(25, Range::fromBounds(15, 25)->getUpper());
 
         // Compute the intersection
-        $this->assertEquals(
+        self::assertEquals(
             Range::fromBounds(15, 20),
             Range::fromBounds(10, 20)->intersect(Range::fromBounds(15, 25))
         );
 
         // Is the range empty?
-        $this->assertFalse(Range::fromBounds(1, 5)->isEmpty());
+        self::assertFalse(Range::fromBounds(1, 5)->isEmpty());
     }
 
     public function testQueries()
@@ -63,7 +58,7 @@ class RangeTest extends IvoryTestCase
                 Timestamp::fromParts(2010, 1, 1, 0, 0, 0),
                 Timestamp::fromParts(2010, 1, 2, 0, 0, 0)
             );
-            $this->assertTrue($dayRange->containsRange($resRange));
+            self::assertTrue($dayRange->containsRange($resRange));
         } finally {
             $tx->rollback();
         }
@@ -72,16 +67,16 @@ class RangeTest extends IvoryTestCase
     public function testBounds()
     {
         $range = Range::fromBounds(10, 20, '[]');
-        $this->assertSame(10, $range->getLower());
-        $this->assertSame(20, $range->getUpper());
+        self::assertSame(10, $range->getLower());
+        self::assertSame(20, $range->getUpper());
 
-        $this->assertSame([10, 21], $range->toBounds('[)'));
-        $this->assertSame([9, 20], $range->toBounds('(]'));
+        self::assertSame([10, 21], $range->toBounds('[)'));
+        self::assertSame([9, 20], $range->toBounds('(]'));
     }
 
     public function testDiscreteRanges()
     {
-        $this->assertTrue(Range::fromBounds(3, 4, '[)')->isSinglePoint());
-        $this->assertTrue(Range::fromBounds(3, 4, '()')->isEmpty());
+        self::assertTrue(Range::fromBounds(3, 4, '[)')->isSinglePoint());
+        self::assertTrue(Range::fromBounds(3, 4, '()')->isEmpty());
     }
 }

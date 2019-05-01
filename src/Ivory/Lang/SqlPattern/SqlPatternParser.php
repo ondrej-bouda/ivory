@@ -17,34 +17,36 @@ class SqlPatternParser implements ISqlPatternParser
 
         $sqlTorso = StringUtils::pregReplaceCallbackWithOffset(
             '~
-	    	  %                                             # the percent sign introducing the sequence
-	    	  (?: (?! % )                                   # anything but another percent sign -> placeholder
-	    	      (?:                                       #   optional type specification
-	    	        (?:                                     #
-	    	          (?:                                   #     optional schema name
-	    	            (                                   #       (1)
-	    	              [[:alpha:]_] [[:alnum:]_]*        #       either a token
-	    	              |                                 #       or
-	    	              " (?: [^"]+ | "" )* "             #       a quoted string
-	    	            )                                   #
-	    	            \.                                  #     separated from type name with a dot
-	    	          )?                                    #
-	    	          (                                     #     (2) type name
-	    	            [[:alpha:]_] [[:alnum:]_]*          #       either a token
-	    	            |                                   #       or
-	    	            " (?: [^"]+ | "" )* "               #       a quoted string
-	    	          )                                     #
-	    	          |                                     #
-	    	          \{ ([^}]+) \}                         #     (3) or just anything enclosed in curly braces, taken as is
-	    	        )                                       #
-	    	        ( \[\] )*                               #     (4) optionally ended with pairs of brackets
-	    	      )?                                        #
-	    	      ( \? )?                                   #   (5) optional question mark for loose type mode
-	    	      (?: : ( [[:alpha:]_] [[:alnum:]_]* ) )?   #   (6) optional parameter name, starting with a letter or underscore
-	    	    |                                           # or
-	    	    ( % )                                       # (7) another percent sign -> literal %
-	    	  )
-	    	 ~xu',
+              %                                             # the percent sign introducing the sequence
+              (?: (?! % )                                   # anything but another percent sign -> placeholder
+                  (?:                                       #   optional type specification
+                    (?:                                     #
+                      (?:                                   #     optional schema name
+                        (                                   #       (1)
+                          [[:alpha:]_] [[:alnum:]_]*        #       either a token
+                          |                                 #       or
+                          " (?: [^"]+ | "" )* "             #       a quoted string
+                        )                                   #
+                        \.                                  #     separated from type name with a dot
+                      )?                                    #
+                      (                                     #     (2) type name
+                        [[:alpha:]_] [[:alnum:]_]*          #       either a token
+                        |                                   #       or
+                        " (?: [^"]+ | "" )* "               #       a quoted string
+                      )                                     #
+                      |                                     #
+                      \{ ([^}]+) \}                         #     (3) or just anything enclosed in curly braces, taken
+                                                            #         as is
+                    )                                       #
+                    ( \[\] )*                               #     (4) optionally ended with pairs of brackets
+                  )?                                        #
+                  ( \? )?                                   #   (5) optional question mark for loose type mode
+                  (?: : ( [[:alpha:]_] [[:alnum:]_]* ) )?   #   (6) optional parameter name, starting with a letter or
+                                                            #       underscore
+                |                                           # or
+                ( % )                                       # (7) another percent sign -> literal %
+              )
+             ~xu',
             function ($matchWithOffsets) use (&$positionalPlaceholders, &$namedPlaceholderMap, &$rawOffsetDelta) {
                 if (isset($matchWithOffsets[7])) {
                     $rawOffsetDelta--; // put one character instead of two
@@ -59,9 +61,11 @@ class SqlPatternParser implements ISqlPatternParser
                     $typeName = $matchWithOffsets[3][0];
                     $typeNameQuoted = false;
                 } else {
-                    $schemaItem = (!empty($matchWithOffsets[1][0]) ? $matchWithOffsets[1][0] : null); // correctness: empty() is OK as the schema name may not be "0"
+                    // correctness: empty() is OK as the schema name may not be "0"
+                    $schemaItem = (!empty($matchWithOffsets[1][0]) ? $matchWithOffsets[1][0] : null);
                     $schemaName = $this->unquoteString($schemaItem, $schemaNameQuoted);
-                    $typeItem = (!empty($matchWithOffsets[2][0]) ? $matchWithOffsets[2][0] : null); // correctness: empty() is OK as the type name may not be "0"
+                    // correctness: empty() is OK as the type name may not be "0"
+                    $typeItem = (!empty($matchWithOffsets[2][0]) ? $matchWithOffsets[2][0] : null);
                     $typeName = $this->unquoteString($typeItem, $typeNameQuoted);
                 }
 

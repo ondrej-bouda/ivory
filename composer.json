@@ -33,6 +33,7 @@
     },
     "require-dev": {
         "ext-gmp": "*",
+        "ext-pdo": "*",
         "ext-pdo_pgsql": "*",
         "phpunit/phpunit": "^7.0",
         "phpunit/dbunit": "^4.0",

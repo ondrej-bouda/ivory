@@ -2,12 +2,14 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-class TextSearchVectorTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class TextSearchVectorTest extends TestCase
 {
     public function testFromSet()
     {
         $v = TextSearchVector::fromSet(['a', 'fat', 'cat', 'sat', 'on', 'a', 'mat', 'and', 'ate', 'a', 'fat', 'rat']);
-        $this->assertSame(
+        self::assertSame(
             [
                 'a' => null,
                 'and' => null,
@@ -26,7 +28,7 @@ class TextSearchVectorTest extends \PHPUnit\Framework\TestCase
     public function testFromList()
     {
         $v = TextSearchVector::fromList(['a', 'fat', 'cat', 'sat', 'on', 'a', 'mat', 'and', 'ate', 'a', 'fat', 'rat']);
-        $this->assertSame(
+        self::assertSame(
             [
                 'a' => [[1, 'D'], [6, 'D'], [10, 'D']],
                 'and' => [[8, 'D']],
@@ -45,7 +47,7 @@ class TextSearchVectorTest extends \PHPUnit\Framework\TestCase
     public function testFromString()
     {
         $v = TextSearchVector::fromString('a fat cat sat on a mat and ate a fat rat');
-        $this->assertSame(
+        self::assertSame(
             [
                 'a' => null,
                 'and' => null,
@@ -61,7 +63,7 @@ class TextSearchVectorTest extends \PHPUnit\Framework\TestCase
         );
 
         $quotes = TextSearchVector::fromString("spaces\tand  quotes  '  '   'Joe''s' '' ''''''");
-        $this->assertSame(
+        self::assertSame(
             [
                 '  ' => null,
                 "''" => null,
@@ -77,7 +79,7 @@ class TextSearchVectorTest extends \PHPUnit\Framework\TestCase
     public function testFromOrderedString()
     {
         $v = TextSearchVector::fromOrderedString('a fat cat sat on a mat and ate a fat rat');
-        $this->assertSame(
+        self::assertSame(
             [
                 'a' => [[1, 'D'], [6, 'D'], [10, 'D']],
                 'and' => [[8, 'D']],

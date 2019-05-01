@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Ivory\Connection;
 
 use Ivory\IvoryTestCase;
+use PHPUnit\Framework\Error\Warning;
 
 class TransactionControlTest extends IvoryTestCase
 {
@@ -22,6 +23,7 @@ class TransactionControlTest extends IvoryTestCase
         {
             public $rollbackCalled = 0;
 
+            /** @noinspection PhpMissingParentCallCommonInspection */
             public function handleTransactionRollback(): void
             {
                 $this->rollbackCalled++;
@@ -30,16 +32,16 @@ class TransactionControlTest extends IvoryTestCase
         $this->conn->addTransactionControlObserver($observer);
 
         $tx = $this->conn->startTransaction();
-        $this->assertTrue($this->conn->inTransaction());
-        $this->assertEquals(0, $observer->rollbackCalled);
+        self::assertTrue($this->conn->inTransaction());
+        self::assertEquals(0, $observer->rollbackCalled);
 
         $tx->rollbackIfOpen();
-        $this->assertFalse($this->conn->inTransaction());
-        $this->assertEquals(1, $observer->rollbackCalled);
+        self::assertFalse($this->conn->inTransaction());
+        self::assertEquals(1, $observer->rollbackCalled);
 
         $tx->rollbackIfOpen();
-        $this->assertFalse($this->conn->inTransaction());
-        $this->assertEquals(1, $observer->rollbackCalled);
+        self::assertFalse($this->conn->inTransaction());
+        self::assertEquals(1, $observer->rollbackCalled);
     }
 
     public function testOrphanedOpen()
@@ -48,9 +50,9 @@ class TransactionControlTest extends IvoryTestCase
 
         try {
             unset($tx);
-            $this->fail('A warning was expected due to destroying an open transaction handle.');
-        } catch (\PHPUnit\Framework\Error\Warning $warning) {
-            $this->assertContains(
+            self::fail('A warning was expected due to destroying an open transaction handle.');
+        } catch (Warning $warning) {
+            self::assertContains(
                 'open', $warning->getMessage(),
                 'The warning message should mention the transaction handle stayed open', true
             );
@@ -72,19 +74,19 @@ class TransactionControlTest extends IvoryTestCase
         try {
             $tx1 = $conn1->startTransaction(TxConfig::ISOLATION_REPEATABLE_READ);
 
-            $this->assertSame(0, $conn1->querySingleValue('SELECT COUNT(*) FROM %ident', $tableName));
+            self::assertSame(0, $conn1->querySingleValue('SELECT COUNT(*) FROM %ident', $tableName));
 
             $this->conn->command('INSERT INTO %ident (i) VALUES (1)', $tableName);
 
-            $this->assertSame(0, $conn1->querySingleValue('SELECT COUNT(*) FROM %ident', $tableName));
-            $this->assertSame(1, $conn2->querySingleValue('SELECT COUNT(*) FROM %ident', $tableName));
+            self::assertSame(0, $conn1->querySingleValue('SELECT COUNT(*) FROM %ident', $tableName));
+            self::assertSame(1, $conn2->querySingleValue('SELECT COUNT(*) FROM %ident', $tableName));
 
             $snapshotId = $tx1->exportTransactionSnapshot();
 
             $tx2 = $conn2->startTransaction(TxConfig::ISOLATION_REPEATABLE_READ);
             $tx2->setTransactionSnapshot($snapshotId);
 
-            $this->assertSame(0, $conn2->querySingleValue('SELECT COUNT(*) FROM %ident', $tableName));
+            self::assertSame(0, $conn2->querySingleValue('SELECT COUNT(*) FROM %ident', $tableName));
         } finally {
             if ($tx1 !== null) {
                 $tx1->rollback();
@@ -109,22 +111,22 @@ class TransactionControlTest extends IvoryTestCase
                 TxConfig::ISOLATION_READ_UNCOMMITTED | TxConfig::ACCESS_READ_WRITE
             ));
             $newDefaultConfig = $conn1->getDefaultTxConfig();
-            $this->assertSame(TxConfig::ISOLATION_READ_UNCOMMITTED, $newDefaultConfig->getIsolationLevel());
-            $this->assertFalse($newDefaultConfig->isReadOnly());
+            self::assertSame(TxConfig::ISOLATION_READ_UNCOMMITTED, $newDefaultConfig->getIsolationLevel());
+            self::assertFalse($newDefaultConfig->isReadOnly());
 
             $tx = $conn1->startTransaction();
             $actualConfig = $tx->getTxConfig();
-            $this->assertSame(TxConfig::ISOLATION_READ_UNCOMMITTED, $actualConfig->getIsolationLevel());
-            $this->assertFalse($actualConfig->isReadOnly());
-            $this->assertFalse($actualConfig->isDeferrable());
+            self::assertSame(TxConfig::ISOLATION_READ_UNCOMMITTED, $actualConfig->getIsolationLevel());
+            self::assertFalse($actualConfig->isReadOnly());
+            self::assertFalse($actualConfig->isDeferrable());
             $tx->rollback();
 
             $tx = $conn1->startTransaction(TxConfig::ACCESS_READ_ONLY | TxConfig::NOT_DEFERRABLE);
             $tx->setupTransaction(TxConfig::create(TxConfig::ISOLATION_SERIALIZABLE));
             $actualConfig = $tx->getTxConfig();
-            $this->assertSame(TxConfig::ISOLATION_SERIALIZABLE, $actualConfig->getIsolationLevel());
-            $this->assertTrue($actualConfig->isReadOnly());
-            $this->assertFalse($actualConfig->isDeferrable());
+            self::assertSame(TxConfig::ISOLATION_SERIALIZABLE, $actualConfig->getIsolationLevel());
+            self::assertTrue($actualConfig->isReadOnly());
+            self::assertFalse($actualConfig->isDeferrable());
         } finally {
             if ($tx !== null) {
                 $tx->rollbackIfOpen();
@@ -140,15 +142,15 @@ class TransactionControlTest extends IvoryTestCase
         try {
             $tx = $conn1->startTransaction();
             $txName1 = $tx->prepareTransaction();
-            $this->assertTrue(strlen($txName1) >= 8);
+            self::assertTrue(strlen($txName1) >= 8);
             $conn1->rollbackPreparedTransaction($txName1);
 
             $tx = $conn1->startTransaction();
             $txName2 = $tx->prepareTransaction();
-            $this->assertTrue(strlen($txName2) >= 8);
+            self::assertTrue(strlen($txName2) >= 8);
             $conn1->rollbackPreparedTransaction($txName2);
 
-            $this->assertNotSame($txName1, $txName2);
+            self::assertNotSame($txName1, $txName2);
         } finally {
             if ($tx !== null) {
                 $tx->rollbackIfOpen();

@@ -132,7 +132,7 @@ CREATE UNLOGGED TABLE item_category (
 );
 CREATE UNIQUE INDEX ON item_category (item_id, category_id);
 CREATE INDEX ON item_category (category_id);
-COMMENT ON TABLE item_category IS 'Relation of which item belongs in which category (might fall under multiple categories).';
+COMMENT ON TABLE item_category IS 'Relation of which item belongs in which category.';
 
 CREATE UNLOGGED TABLE param (
     id SERIAL PRIMARY KEY,

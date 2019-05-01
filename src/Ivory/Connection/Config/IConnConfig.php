@@ -32,7 +32,7 @@ use Ivory\Value\Quantity;
  *
  * @todo provide a way to get all configuration options; maybe as Iterable?
  * @see https://www.postgresql.org/docs/current/config-setting.html Description of Configuration Settings
- * @see https://www.postgresql.org/docs/current/runtime-config-client.html List of Standard Client Configuration Settings
+ * @see https://www.postgresql.org/docs/current/runtime-config-client.html Standard Client Configuration Settings
  */
 interface IConnConfig
 {

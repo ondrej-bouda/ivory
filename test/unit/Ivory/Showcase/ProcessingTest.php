@@ -59,14 +59,38 @@ class ProcessingTest extends IvoryTestCase
         $this->rel = $conn->query(
             "WITH lesson (id, topic, scheduled_timerange, actual_timerange) AS (
                VALUES
-                 (1, '1+1',  tsrange('2015-09-01 08:00', '2015-09-01 08:45'), tsrange('2015-09-01 08:00', '2015-09-01 08:45')),
-                 (2, 'Ruby', tsrange('2015-09-01 08:55', '2015-09-01 09:40'), tsrange('2015-09-01 10:00', '2015-09-01 10:45')),
-                 (3, 'PHP',  tsrange('2015-09-01 08:55', '2015-09-01 09:40'), NULL),
-                 (4, '1+2',  tsrange('2015-09-01 10:55', '2015-09-01 11:40'), tsrange('2015-09-01 08:55', '2015-09-01 09:40')),
-                 (5, 'Perl', tsrange('2015-09-01 11:30', '2015-09-01 12:15'), tsrange('2015-09-01 11:30', '2015-09-01 12:15')),
-                 (6, '1+3',  tsrange('2015-09-02 08:00', '2015-09-02 08:45'), tsrange('2015-09-02 08:00', '2015-09-02 08:45')),
-                 (7, 'C',    tsrange('2015-09-02 08:55', '2015-09-02 09:40'), tsrange('2015-09-02 08:55', '2015-09-02 09:40')),
-                 (8, 'C++',  tsrange('2015-09-02 10:15', '2015-09-02 11:00'), tsrange('2015-09-02 10:15', '2015-09-02 11:00'))
+                 (
+                   1, '1+1',
+                   tsrange('2015-09-01 08:00', '2015-09-01 08:45'), tsrange('2015-09-01 08:00', '2015-09-01 08:45')
+                 ),
+                 (
+                   2, 'Ruby',
+                   tsrange('2015-09-01 08:55', '2015-09-01 09:40'), tsrange('2015-09-01 10:00', '2015-09-01 10:45')
+                 ),
+                 (
+                   3, 'PHP',
+                   tsrange('2015-09-01 08:55', '2015-09-01 09:40'), NULL
+                 ),
+                 (
+                   4, '1+2',
+                   tsrange('2015-09-01 10:55', '2015-09-01 11:40'), tsrange('2015-09-01 08:55', '2015-09-01 09:40')
+                 ),
+                 (
+                   5, 'Perl',
+                   tsrange('2015-09-01 11:30', '2015-09-01 12:15'), tsrange('2015-09-01 11:30', '2015-09-01 12:15')
+                 ),
+                 (
+                   6, '1+3',
+                   tsrange('2015-09-02 08:00', '2015-09-02 08:45'), tsrange('2015-09-02 08:00', '2015-09-02 08:45')
+                 ),
+                 (
+                   7, 'C',
+                   tsrange('2015-09-02 08:55', '2015-09-02 09:40'), tsrange('2015-09-02 08:55', '2015-09-02 09:40')
+                 ),
+                 (
+                   8, 'C++',
+                   tsrange('2015-09-02 10:15', '2015-09-02 11:00'), tsrange('2015-09-02 10:15', '2015-09-02 11:00'
+                 ))
              ),
              teacher (id, firstname, lastname, abbr) AS (
                %rel:teachersRel
@@ -100,7 +124,7 @@ class ProcessingTest extends IvoryTestCase
 
     public function testCount()
     {
-        $this->assertCount(6, $this->teachers);
+        self::assertCount(6, $this->teachers);
     }
 
     public function testTraversal()
@@ -108,17 +132,17 @@ class ProcessingTest extends IvoryTestCase
         $exp = ['Dtn', 'Tir', null, null, null, null];
         foreach ($this->teachers as $i => $tuple) {
             assert($tuple instanceof ITuple);
-            $this->assertSame($exp[$i], $tuple->abbr, "Tuple $i does not match");
+            self::assertSame($exp[$i], $tuple->abbr, "Tuple $i does not match");
         }
     }
 
     public function testValue()
     {
-        $this->assertSame(1, $this->teachers->value());
-        $this->assertSame('Angus', $this->teachers->value('firstname'));
-        $this->assertSame('Angus', $this->teachers->value(1));
-        $this->assertSame('Ada', $this->teachers->value(1, 5));
-        $this->assertSame('Ada Lovelace',
+        self::assertSame(1, $this->teachers->value());
+        self::assertSame('Angus', $this->teachers->value('firstname'));
+        self::assertSame('Angus', $this->teachers->value(1));
+        self::assertSame('Ada', $this->teachers->value(1, 5));
+        self::assertSame('Ada Lovelace',
             $this->teachers->value(function (ITuple $t) { return "{$t->firstname} {$t->lastname}"; }, 5)
         );
     }
@@ -128,17 +152,17 @@ class ProcessingTest extends IvoryTestCase
      */
     public function testTuple()
     {
-        $this->assertSame(1, $this->teachers->tuple()->id);
-        $this->assertSame('Ada', $this->teachers->tuple(5)->value('firstname'));
-        $this->assertSame('Ada Lovelace',
+        self::assertSame(1, $this->teachers->tuple()->id);
+        self::assertSame('Ada', $this->teachers->tuple(5)->value('firstname'));
+        self::assertSame('Ada Lovelace',
             $this->teachers->tuple(5)->value(function (ITuple $t) { return "{$t->firstname} {$t->lastname}"; })
         );
 
-        $this->assertSame(
+        self::assertSame(
             ['id' => 6, 'firstname' => 'Ada', 'lastname' => 'Lovelace', 'abbr' => null],
             $this->teachers->tuple(5)->toMap()
         );
-        $this->assertSame(
+        self::assertSame(
             [6, 'Ada', 'Lovelace', null],
             $this->teachers->tuple(5)->toList()
         );
@@ -159,15 +183,15 @@ class ProcessingTest extends IvoryTestCase
             'SELECT MIN(lastname), MAX(lastname) FROM (%rel) t',
             $this->teachers
         );
-        $this->assertSame(['Deaton', 'Tirole'], $tuple->toList());
+        self::assertSame(['Deaton', 'Tirole'], $tuple->toList());
     }
 
     public function testCol()
     {
         $firstNameCol = $this->teachers->col('firstname');
 
-        $this->assertSame('Angus', $firstNameCol->value(0));
-        $this->assertSame(
+        self::assertSame('Angus', $firstNameCol->value(0));
+        self::assertSame(
             ['Angus', 'Jean', 'Eugene F.', 'Lars Peter', 'Robert J.', 'Ada'],
             $firstNameCol->toArray()
         );
@@ -177,7 +201,7 @@ class ProcessingTest extends IvoryTestCase
         });
         $expected = ['Dtn', 'Tir', 'Fama', 'Hans', 'Shil', 'Love'];
         foreach ($abbrCol as $i => $v) {
-            $this->assertSame($expected[$i], $v, "Columns value at offset $i");
+            self::assertSame($expected[$i], $v, "Columns value at offset $i");
         }
     }
 
@@ -187,11 +211,11 @@ class ProcessingTest extends IvoryTestCase
             return ($t->firstname[0] == 'A');
         });
 
-        $this->assertCount(2, $res);
+        self::assertCount(2, $res);
         $exp = ['Angus', 'Ada'];
         foreach ($res as $i => $tuple) {
             assert($tuple instanceof ITuple);
-            $this->assertSame($exp[$i], $tuple->value('firstname'), "Tuple $i does not match");
+            self::assertSame($exp[$i], $tuple->value('firstname'), "Tuple $i does not match");
         }
     }
 
@@ -202,7 +226,7 @@ class ProcessingTest extends IvoryTestCase
             'initials' => function (ITuple $t) { return "{$t->firstname[0]}.{$t->lastname[0]}."; },
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             ['id' => 1, 'initials' => 'A.D.'],
             $res->tuple(0)->toMap()
         );
@@ -212,7 +236,7 @@ class ProcessingTest extends IvoryTestCase
     {
         $res = $this->rel->project(['lesson_id', 'stat' => 'scheduling_status', '*' => 'teacher_*']);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 'lesson_id' => 1,
                 'stat' => 'scheduled',
@@ -229,7 +253,7 @@ class ProcessingTest extends IvoryTestCase
     {
         $res = $this->rel->project(['\\1' => '/^(.+)_id$/', 'scheduling_status']);
 
-        $this->assertSame(
+        self::assertSame(
             ['lesson' => 1, 'teacher' => 1, 'scheduling_status' => 'scheduled'],
             $res->tuple(0)->toMap()
         );
@@ -241,22 +265,22 @@ class ProcessingTest extends IvoryTestCase
             return ($t->abbr ? : mb_substr($t->lastname, 0, 4));
         });
 
-        $this->assertCount(6, $res);
-        $this->assertSame('Dtn', $res[1]);
-        $this->assertSame('Love', $res[6]);
+        self::assertCount(6, $res);
+        self::assertSame('Dtn', $res[1]);
+        self::assertSame('Love', $res[6]);
     }
 
     public function testAssocMultiLevel()
     {
         $res = $this->rel->assoc('lesson_id', 'scheduling_status', 'teacher_id', 'teacher_abbr');
 
-        $this->assertSame('Tir', $res[4]['scheduled'][2]);
-        $this->assertTrue(!isset($res[4]['actual'][2]));
+        self::assertSame('Tir', $res[4]['scheduled'][2]);
+        self::assertTrue(!isset($res[4]['actual'][2]));
 
-        $this->assertCount(1, $res[4]['actual']);
+        self::assertCount(1, $res[4]['actual']);
         foreach ($res[4]['actual'] as $teacherId => $teacherAbbr) {
-            $this->assertSame(1, $teacherId);
-            $this->assertSame('Dtn', $teacherAbbr);
+            self::assertSame(1, $teacherId);
+            self::assertSame('Dtn', $teacherAbbr);
         }
     }
 
@@ -264,9 +288,9 @@ class ProcessingTest extends IvoryTestCase
     {
         $res = $this->teachers->map('id');
 
-        $this->assertCount(6, $res);
-        $this->assertSame('Ada', $res[6]->firstname);
-        $this->assertSame(
+        self::assertCount(6, $res);
+        self::assertSame('Ada', $res[6]->firstname);
+        self::assertSame(
             'Ada Lovelace',
             $res[6]->value(function (ITuple $t) {
                 return "{$t->firstname} {$t->lastname}";
@@ -278,22 +302,22 @@ class ProcessingTest extends IvoryTestCase
     {
         $res = $this->rel->map('teacher_id', 'scheduling_status', 'lesson_id');
 
-        $this->assertSame('Ruby', $res[6]['actual'][2]->lesson_topic);
-        $this->assertCount(2, $res[1]['actual']);
-        $this->assertCount(1, $res[1]['scheduled']);
-        $this->assertCount(1, $res[2]['scheduled']);
-        $this->assertTrue(!isset($res[2]['actual']));
+        self::assertSame('Ruby', $res[6]['actual'][2]->lesson_topic);
+        self::assertCount(2, $res[1]['actual']);
+        self::assertCount(1, $res[1]['scheduled']);
+        self::assertCount(1, $res[2]['scheduled']);
+        self::assertTrue(!isset($res[2]['actual']));
     }
 
     public function testMultimapSingleLevel()
     {
         $res = $this->teachers->multimap(function (ITuple $t) { return $t->firstname[0]; });
 
-        $this->assertInstanceOf(IRelation::class, $res['A']);
-        $this->assertCount(2, $res['A']);
+        self::assertInstanceOf(IRelation::class, $res['A']);
+        self::assertCount(2, $res['A']);
         $jRel = $res['J'];
         assert($jRel instanceof IRelation);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 ['id' => 2, 'firstname' => 'Jean', 'lastname' => 'Tirole', 'abbr' => 'Tir'],
             ],
@@ -304,15 +328,15 @@ class ProcessingTest extends IvoryTestCase
     public function testMultimapMultiLevel()
     {
         $res = $this->rel->multimap('teacher_id', 'scheduling_status');
-        $this->assertInstanceOf(IRelationMap::class, $res);
-        $this->assertInstanceOf(IRelationMap::class, $res[1]);
-        $this->assertInstanceOf(IRelation::class, $res[1]['actual']);
+        self::assertInstanceOf(IRelationMap::class, $res);
+        self::assertInstanceOf(IRelationMap::class, $res[1]);
+        self::assertInstanceOf(IRelation::class, $res[1]['actual']);
 
         $deatonActualLessonRel = $res[1]['actual'];
         assert($deatonActualLessonRel instanceof IRelation);
-        $this->assertInstanceOf(IRelation::class, $deatonActualLessonRel);
-        $this->assertSame('1+1', $deatonActualLessonRel->value('lesson_topic'));
-        $this->assertSame(['1+1', '1+2'], $deatonActualLessonRel->col('lesson_topic')->toArray());
+        self::assertInstanceOf(IRelation::class, $deatonActualLessonRel);
+        self::assertSame('1+1', $deatonActualLessonRel->value('lesson_topic'));
+        self::assertSame(['1+1', '1+2'], $deatonActualLessonRel->col('lesson_topic')->toArray());
 
         // Each multimap item is a relation, and as such offers IRelation::col() and other standard relation methods.
         $expectedMap = [
@@ -345,7 +369,7 @@ class ProcessingTest extends IvoryTestCase
             foreach ($lessonsByStatus as $status => $lessons) {
                 assert($lessons instanceof IRelation);
                 $lessonTopics = $lessons->col('lesson_topic');
-                $this->assertSame($expectedMap[$teacherId][$status], $lessonTopics->toArray());
+                self::assertSame($expectedMap[$teacherId][$status], $lessonTopics->toArray());
             }
         }
     }
@@ -354,17 +378,17 @@ class ProcessingTest extends IvoryTestCase
     {
         $idSet = $this->teachers->toSet('id');
 
-        $this->assertTrue($idSet->contains(6));
-        $this->assertFalse($idSet->contains(7));
+        self::assertTrue($idSet->contains(6));
+        self::assertFalse($idSet->contains(7));
 
         $abbrSet = $this->teachers->toSet(function (ITuple $t) {
             return ($t->abbr ? : mb_substr($t->lastname, 0, 4));
         });
 
-        $this->assertTrue($abbrSet->contains('Dtn'));
-        $this->assertTrue($abbrSet->contains('Love'));
-        $this->assertFalse($abbrSet->contains('Ada'));
-        $this->assertFalse($abbrSet->contains(null));
+        self::assertTrue($abbrSet->contains('Dtn'));
+        self::assertTrue($abbrSet->contains('Love'));
+        self::assertFalse($abbrSet->contains('Ada'));
+        self::assertFalse($abbrSet->contains(null));
     }
 
     public function testComposition()
@@ -375,8 +399,8 @@ class ProcessingTest extends IvoryTestCase
             ->rename(['firstname' => 'name'])
             ->assoc('name', 'id');
 
-        $this->assertCount(2, $res);
-        $this->assertSame(1, $res['Angus']);
-        $this->assertSame(6, $res['Ada']);
+        self::assertCount(2, $res);
+        self::assertSame(1, $res['Angus']);
+        self::assertSame(6, $res['Ada']);
     }
 }

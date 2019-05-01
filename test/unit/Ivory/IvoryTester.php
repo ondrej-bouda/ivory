@@ -6,8 +6,10 @@ use PHPUnit\DbUnit;
 
 class IvoryTester extends DbUnit\DefaultTester
 {
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function getSetUpOperation()
     {
-        return DbUnit\Operation\Factory::CLEAN_INSERT(true); // cascading is necessary for truncating tables referred to by foreign keys
+        // cascading is necessary for truncating tables referred to by foreign keys
+        return DbUnit\Operation\Factory::CLEAN_INSERT(true);
     }
 }

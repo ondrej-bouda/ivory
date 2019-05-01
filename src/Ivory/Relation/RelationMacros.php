@@ -31,7 +31,7 @@ trait RelationMacros
     {
         $thisRel = $this;
         assert($thisRel instanceof IRelation);
-        return $this->_colImpl($offsetOrNameOrEvaluator, $this->columns, $this->colNameMap, $thisRel);
+        return $this->colImpl($offsetOrNameOrEvaluator, $this->columns, $this->colNameMap, $thisRel);
     }
 
 
@@ -84,7 +84,15 @@ trait RelationMacros
         return $this->tuple($tupleOffset)->value($colOffsetOrNameOrEvaluator);
     }
 
-    final protected function _colImpl($offsetOrNameOrEvaluator, $columns, $colNameMap, IRelation $relation): IColumn
+    /**
+     * @param $offsetOrNameOrEvaluator
+     * @param $columns
+     * @param $colNameMap
+     * @param IRelation $relation
+     * @return IColumn
+     * @internal
+     */
+    final protected function colImpl($offsetOrNameOrEvaluator, $columns, $colNameMap, IRelation $relation): IColumn
     {
         if (is_scalar($offsetOrNameOrEvaluator)) {
             if (filter_var($offsetOrNameOrEvaluator, FILTER_VALIDATE_INT) !== false) {
@@ -116,7 +124,8 @@ trait RelationMacros
     {
         return $this->assocImpl(
             function () {
-                // FIXME: depending on the data type of the keys, either use an array-based implementation, or an object hashing implementation
+                // FIXME: Depending on the data type of the keys, either use an array-based implementation, or an object
+                //        hashing implementation.
                 return new ArrayValueMap();
             },
             true, array_merge([$col1, $col2], $moreCols)
@@ -127,7 +136,8 @@ trait RelationMacros
     {
         return $this->assocImpl(
             function () {
-                // FIXME: depending on the data type of the keys, either use an array-based implementation, or an object hashing implementation
+                // FIXME: Depending on the data type of the keys, either use an array-based implementation, or an object
+                //        hashing implementation.
                 return new ArrayTupleMap();
             },
             false, array_merge([$mappingCol], $moreMappingCols)
@@ -140,7 +150,8 @@ trait RelationMacros
         $multiDimKeyCols = array_slice($mappingCols, 0, -1);
         $lastKeyCol = $mappingCols[count($mappingCols) - 1];
 
-        // FIXME: depending on the data type of the keys, either use an array-based implementation, or an object hashing implementation
+        // FIXME: Depending on the data type of the keys, either use an array-based implementation, or an object hashing
+        //        implementation.
         $map = new ArrayRelationMap();
         $emptyMap = new ArrayRelationMap();
         foreach ($this as $tupleOffset => $tuple) {

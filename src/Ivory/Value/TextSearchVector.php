@@ -54,7 +54,7 @@ class TextSearchVector
     }
 
     /**
-     * @param $lexemes int[][][] map: lexeme => list of (position, weight) pairs, or <tt>null</tt> if position is
+     * @param int[][][] $lexemes map: lexeme => list of (position, weight) pairs, or <tt>null</tt> if position is
      *                             unspecified;
      *                           the positions are 1-based
      * @return TextSearchVector

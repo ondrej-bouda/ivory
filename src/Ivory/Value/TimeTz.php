@@ -237,6 +237,7 @@ class TimeTz extends TimeBase
         return ($this->toUnixTimestamp() > $other->toUnixTimestamp());
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     /**
      * @param string $timeFmt the format string as accepted by {@link date()}
      * @return string the time formatted according to <tt>$timeFmt</tt>
@@ -245,7 +246,8 @@ class TimeTz extends TimeBase
     {
         $str = $this->toString();
         try {
-            $ts = new \DateTime($str); // OPT: \DateTime::createFromFormat() is supposed to be twice as fast as new \DateTime()
+            $ts = new \DateTime($str);
+            // OPT: \DateTime::createFromFormat() is supposed to be twice as fast as new \DateTime()
         } catch (\Exception $e) {
             throw new \LogicException('Date/time error', 0, $e);
         }

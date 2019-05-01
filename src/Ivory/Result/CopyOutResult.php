@@ -20,7 +20,8 @@ class CopyOutResult extends Result implements ICopyOutResult
         $res = pg_end_copy($this->connHandler);
         if ($res === false) {
             throw new ConnectionException('Error ending copying data from the database server.');
-            // TODO: try to squeeze the client to get some useful information; maybe trap errors issued by pg_end_copy()?
+            // TODO: try to squeeze the client to get some useful information;
+            //       maybe trap errors issued by pg_end_copy()?
         }
     }
 }

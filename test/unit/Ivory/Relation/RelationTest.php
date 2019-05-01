@@ -28,10 +28,10 @@ class RelationTest extends IvoryTestCase
         );
         $tuples = [];
         foreach ($rel as $tuple) {
-            $this->assertInstanceOf(ITuple::class, $tuple);
+            self::assertInstanceOf(ITuple::class, $tuple);
             $tuples[] = $tuple;
         }
-        $this->assertSame(
+        self::assertSame(
             [
                 ['id' => 2, 'name' => 'Metallica', 'is_active' => false],
                 ['id' => 4, 'name' => 'Robbie Williams', 'is_active' => null],
@@ -64,74 +64,74 @@ class RelationTest extends IvoryTestCase
             ['artist_name' => 'Tommy Emmanuel', 'album_names' => [1 => 'Live One']],
         ];
 
-        $this->assertSame(count($expArray), count($rel));
-        $this->assertSame(count($expArray), count($tuples));
-        $this->assertSame(count($expArray), count($tuples));
+        self::assertSame(count($expArray), count($rel));
+        self::assertSame(count($expArray), count($tuples));
+        self::assertSame(count($expArray), count($tuples));
 
-        $this->assertSame($expArray[0], $tuples[0]->toMap());
-        $this->assertSame($expArray[1], $tuples[1]->toMap());
-        $this->assertSame($expArray[2], $tuples[2]->toMap());
+        self::assertSame($expArray[0], $tuples[0]->toMap());
+        self::assertSame($expArray[1], $tuples[1]->toMap());
+        self::assertSame($expArray[2], $tuples[2]->toMap());
 
-        $this->assertSame($expArray[0], $rel->tuple(0)->toMap());
-        $this->assertSame($expArray[0], $rel->tuple(-3)->toMap());
-        $this->assertSame($expArray[1], $rel->tuple(1)->toMap());
-        $this->assertSame($expArray[1], $rel->tuple(-2)->toMap());
-        $this->assertSame($expArray[2], $rel->tuple(2)->toMap());
-        $this->assertSame($expArray[2], $rel->tuple(-1)->toMap());
+        self::assertSame($expArray[0], $rel->tuple(0)->toMap());
+        self::assertSame($expArray[0], $rel->tuple(-3)->toMap());
+        self::assertSame($expArray[1], $rel->tuple(1)->toMap());
+        self::assertSame($expArray[1], $rel->tuple(-2)->toMap());
+        self::assertSame($expArray[2], $rel->tuple(2)->toMap());
+        self::assertSame($expArray[2], $rel->tuple(-1)->toMap());
         try {
             $rel->tuple(3);
-            $this->fail();
+            self::fail();
         } catch (\OutOfBoundsException $e) {
         }
         try {
             $rel->tuple(-4);
-            $this->fail();
+            self::fail();
         } catch (\OutOfBoundsException $e) {
         }
 
-        $this->assertSame($expArray, $rel->toArray());
+        self::assertSame($expArray, $rel->toArray());
 
-        $this->assertSame('S & M', $rel->value(1)[2]);
-        $this->assertSame('S & M', $rel->value('album_names')[2]);
-        $this->assertSame('The Piano Guys', $rel->value(0, 1));
-        $this->assertSame('The Piano Guys', $rel->value('artist_name', 1));
+        self::assertSame('S & M', $rel->value(1)[2]);
+        self::assertSame('S & M', $rel->value('album_names')[2]);
+        self::assertSame('The Piano Guys', $rel->value(0, 1));
+        self::assertSame('The Piano Guys', $rel->value('artist_name', 1));
 
         $evaluator = function (ITuple $tuple) {
             return sprintf('%s (%d)', $tuple->artist_name[0], count($tuple->album_names));
         };
-        $this->assertSame('T (1)', $rel->value($evaluator, 1));
+        self::assertSame('T (1)', $rel->value($evaluator, 1));
 
-        $this->assertSame(
+        self::assertSame(
             ['Metallica', 'The Piano Guys', 'Tommy Emmanuel'],
             $rel->col(0)->toArray()
         );
-        $this->assertSame(
+        self::assertSame(
             ['Metallica', 'The Piano Guys', 'Tommy Emmanuel'],
             $rel->col('artist_name')->toArray()
         );
-        $this->assertSame(
+        self::assertSame(
             ['M (2)', 'T (1)', 'T (1)'],
             $rel->col($evaluator)->toArray()
         );
 
-        $this->assertSame('Metallica', $rel->col(0)->value(0));
-        $this->assertSame('The Piano Guys', $rel->col(0)->value(1));
-        $this->assertSame('Tommy Emmanuel', $rel->col(0)->value(2));
-        $this->assertSame('Tommy Emmanuel', $rel->col(0)->value(-1));
-        $this->assertSame('The Piano Guys', $rel->col(0)->value(-2));
-        $this->assertSame('Metallica', $rel->col(0)->value(-3));
+        self::assertSame('Metallica', $rel->col(0)->value(0));
+        self::assertSame('The Piano Guys', $rel->col(0)->value(1));
+        self::assertSame('Tommy Emmanuel', $rel->col(0)->value(2));
+        self::assertSame('Tommy Emmanuel', $rel->col(0)->value(-1));
+        self::assertSame('The Piano Guys', $rel->col(0)->value(-2));
+        self::assertSame('Metallica', $rel->col(0)->value(-3));
         try {
             $rel->col(0)->value(3);
-            $this->fail();
+            self::fail();
         } catch (\OutOfBoundsException $e) {
         }
         try {
             $rel->col(0)->value(-4);
-            $this->fail();
+            self::fail();
         } catch (\OutOfBoundsException $e) {
         }
 
-        $this->assertSame(
+        self::assertSame(
             [[1 => 'Black Album', 'S & M'], [1 => 'The Piano Guys'], [1 => 'Live One']],
             iterator_to_array($rel->col(1))
         );
@@ -143,9 +143,9 @@ class RelationTest extends IvoryTestCase
             "SELECT 1 AS a, 'foo' AS b, 3 AS c, 4 AS d"
         );
         $cols = $rel->getColumns();
-        $this->assertEquals(4, count($cols));
-        $this->assertSame(['a', 'b', 'c', 'd'], array_map(function (IColumn $c) { return $c->getName(); }, $cols));
-        $this->assertSame([[1], ['foo'], [3], [4]], array_map(function (IColumn $c) { return $c->toArray(); }, $cols));
+        self::assertEquals(4, count($cols));
+        self::assertSame(['a', 'b', 'c', 'd'], array_map(function (IColumn $c) { return $c->getName(); }, $cols));
+        self::assertSame([[1], ['foo'], [3], [4]], array_map(function (IColumn $c) { return $c->toArray(); }, $cols));
     }
 
     public function testExtend()
@@ -175,27 +175,27 @@ class RelationTest extends IvoryTestCase
             },
         ]);
 
-        $this->assertSame(2, count($ext));
-        $this->assertSame(2, count($ext2));
+        self::assertSame(2, count($ext));
+        self::assertSame(2, count($ext2));
 
-        $this->assertSame(
+        self::assertSame(
             ['A', 'B', 'dist'],
             array_map(function (IColumn $c) { return $c->getName(); }, $ext->getColumns())
         );
-        $this->assertSame(
+        self::assertSame(
             ['A', 'B', 'dist', 'upleft'],
             array_map(function (IColumn $c) { return $c->getName(); }, $ext2->getColumns())
         );
 
-        $this->assertEquals(5, $ext->tuple(0)->dist, '', 1e-9);
-        $this->assertEquals(8.993886812719, $ext2->tuple(1)->dist, '', 1e-9);
+        self::assertEquals(5, $ext->tuple(0)->dist, '', 1e-9);
+        self::assertEquals(8.993886812719, $ext2->tuple(1)->dist, '', 1e-9);
 
-        $this->assertEquals(Point::fromCoords(0, 4), $ext2->tuple(0)->upleft);
-        $this->assertEquals(Point::fromCoords(1.3, 4), $ext2->tuple(1)->upleft);
+        self::assertEquals(Point::fromCoords(0, 4), $ext2->tuple(0)->upleft);
+        self::assertEquals(Point::fromCoords(1.3, 4), $ext2->tuple(1)->upleft);
 
         try {
             $c = $ext->col('upleft');
-            $this->fail("Column {$c->getName()} should not have been defined");
+            self::fail("Column {$c->getName()} should not have been defined");
         } catch (UndefinedColumnException $e) {
         }
     }
@@ -205,7 +205,7 @@ class RelationTest extends IvoryTestCase
         $rel = $this->conn->query(
             'SELECT 1 AS a, 2 AS b, 3 AS c, 4 AS d'
         );
-        $this->assertSame(
+        self::assertSame(
             [['n' => 2, 'z' => -3]],
             $rel->project(['x' => 'a', 'y' => 'b', 'z' => 'c'])
                 ->rename(['x' => 'm', 'y' => 'n'])
@@ -226,14 +226,14 @@ class RelationTest extends IvoryTestCase
         );
 
         $set = $rel->toSet('name');
-        $this->assertTrue($set->contains('B-Side Band'));
-        $this->assertFalse($set->contains('b-side band'));
-        $this->assertFalse($set->contains('b-SIDE band'));
+        self::assertTrue($set->contains('B-Side Band'));
+        self::assertFalse($set->contains('b-side band'));
+        self::assertFalse($set->contains('b-SIDE band'));
 
         $set = $rel->toSet('name', new CustomSet('strtolower'));
-        $this->assertTrue($set->contains('B-Side Band'));
-        $this->assertTrue($set->contains('b-side band'));
-        $this->assertTrue($set->contains('b-SIDE band'));
+        self::assertTrue($set->contains('B-Side Band'));
+        self::assertTrue($set->contains('b-side band'));
+        self::assertTrue($set->contains('b-SIDE band'));
     }
 
     public function testAmbiguousColumns()
@@ -242,22 +242,22 @@ class RelationTest extends IvoryTestCase
             'SELECT 1 AS a, 2 AS b, 3 AS b'
         );
 
-        $this->assertSame([1, 2, 3], $tuple->toList());
+        self::assertSame([1, 2, 3], $tuple->toList());
 
         try {
             /** @noinspection PhpUnusedLocalVariableInspection */
             $map = $tuple->toMap();
-            $this->fail(AmbiguousException::class . ' was expected');
+            self::fail(AmbiguousException::class . ' was expected');
         }
         catch (AmbiguousException $e) {
         }
 
-        $this->assertSame(1, $tuple->a);
+        self::assertSame(1, $tuple->a);
 
         try {
             /** @noinspection PhpUnusedLocalVariableInspection */
             $val = $tuple->b;
-            $this->fail(AmbiguousException::class . ' was expected');
+            self::fail(AmbiguousException::class . ' was expected');
         } catch (AmbiguousException $e) {
         }
     }

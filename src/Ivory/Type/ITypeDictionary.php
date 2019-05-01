@@ -48,7 +48,8 @@ interface ITypeDictionary
      * Searches the dictionary for a value serializer of the given name.
      *
      * @param string $name
-     * @return IValueSerializer|null value serializer of the given name, or <tt>null</tt> if no such serializer is defined
+     * @return IValueSerializer|null value serializer of the given name, or <tt>null</tt> if no such serializer is
+     *                                 defined
      */
     function getValueSerializer(string $name): ?IValueSerializer;
 

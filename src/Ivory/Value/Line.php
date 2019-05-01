@@ -29,9 +29,10 @@ class Line
             throw new \InvalidArgumentException('$a and $b cannot both be zero');
         }
 
+        // $a == 0: parallel with x-axis; $b == 0: parallel with y-axis
         $points = [
-            ($a != 0 ? Point::fromCoords(-$c / $a, 0) : Point::fromCoords(1, -$c / $b)), // $a == 0: parallel with x-axis
-            ($b != 0 ? Point::fromCoords(0, -$c / $b) : Point::fromCoords(-$c / $a, 1)), // $b == 0: parallel with y-axis
+            ($a != 0 ? Point::fromCoords(-$c / $a, 0) : Point::fromCoords(1, -$c / $b)),
+            ($b != 0 ? Point::fromCoords(0, -$c / $b) : Point::fromCoords(-$c / $a, 1)),
         ];
         return new Line($a, $b, $c, $points);
     }

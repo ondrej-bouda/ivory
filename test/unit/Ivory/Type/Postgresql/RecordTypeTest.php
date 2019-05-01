@@ -21,23 +21,24 @@ class RecordTypeTest extends IvoryTestCase
 
     protected function tearDown(): void
     {
+        parent::tearDown();
         $this->recordType->detachFromConnection();
     }
 
     public function testParseSimple()
     {
-        $this->assertSame([], $this->recordType->parseValue('()'));
-        $this->assertSame(['1'], $this->recordType->parseValue('(1)'));
-        $this->assertSame(['ab'], $this->recordType->parseValue('(ab)'));
-        $this->assertSame(['1', 'ab'], $this->recordType->parseValue('(1,ab)'));
-        $this->assertSame([null, '1.2'], $this->recordType->parseValue('(,1.2)'));
+        self::assertSame([], $this->recordType->parseValue('()'));
+        self::assertSame(['1'], $this->recordType->parseValue('(1)'));
+        self::assertSame(['ab'], $this->recordType->parseValue('(ab)'));
+        self::assertSame(['1', 'ab'], $this->recordType->parseValue('(1,ab)'));
+        self::assertSame([null, '1.2'], $this->recordType->parseValue('(,1.2)'));
     }
 
     public function testParseSpecialStrings()
     {
-        $this->assertSame([' '], $this->recordType->parseValue('( )'));
+        self::assertSame([' '], $this->recordType->parseValue('( )'));
 
-        $this->assertSame(
+        self::assertSame(
             [null, 'NULL', '', '()', ',', '1\\2', 'p q', '"r"', "'", '"', ' , a \\ " ( ) \' '],
             $this->recordType->parseValue(<<<'STR'
 (,NULL,"","()",",","1\\2","p q","\"r\"",',"""", \, \a \\ \" \( \) ' )
@@ -48,21 +49,21 @@ STR
 
     public function testSerializeSimple()
     {
-        $this->assertSame('NULL', $this->recordType->serializeValue(null, false));
-        $this->assertSame('NULL::pg_catalog.record', $this->recordType->serializeValue(null));
-        $this->assertSame('ROW()', $this->recordType->serializeValue([]));
-        $this->assertSame('ROW(NULL)', $this->recordType->serializeValue([null], false));
-        $this->assertSame('ROW(NULL::pg_catalog.text)', $this->recordType->serializeValue([null]));
-        $this->assertSame("ROW(1)", $this->recordType->serializeValue([1], false));
-        $this->assertSame("ROW('ab')", $this->recordType->serializeValue(['ab'], false));
-        $this->assertSame("(1,'ab')", $this->recordType->serializeValue([1, 'ab'], false));
-        $this->assertSame("(1,2)", $this->recordType->serializeValue([1, 2], false));
-        $this->assertSame("(NULL,1.2)", $this->recordType->serializeValue([null, 1.2], false));
+        self::assertSame('NULL', $this->recordType->serializeValue(null, false));
+        self::assertSame('NULL::pg_catalog.record', $this->recordType->serializeValue(null));
+        self::assertSame('ROW()', $this->recordType->serializeValue([]));
+        self::assertSame('ROW(NULL)', $this->recordType->serializeValue([null], false));
+        self::assertSame('ROW(NULL::pg_catalog.text)', $this->recordType->serializeValue([null]));
+        self::assertSame("ROW(1)", $this->recordType->serializeValue([1], false));
+        self::assertSame("ROW('ab')", $this->recordType->serializeValue(['ab'], false));
+        self::assertSame("(1,'ab')", $this->recordType->serializeValue([1, 'ab'], false));
+        self::assertSame("(1,2)", $this->recordType->serializeValue([1, 2], false));
+        self::assertSame("(NULL,1.2)", $this->recordType->serializeValue([null, 1.2], false));
     }
 
     public function testSerializeSpecialStrings()
     {
-        $this->assertSame(
+        self::assertSame(
             <<<'STR'
 (NULL,'NULL','','()',',','1\2','p q','"r"','''','"',' , \ " ''')
 STR

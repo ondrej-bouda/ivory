@@ -1,22 +1,26 @@
 <?php
 declare(strict_types=1);
 
+use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
+
 class DoctrinePerformanceTest implements IPerformanceTest
 {
-    /** @var \Doctrine\DBAL\Connection */
+    /** @var Connection */
     private $conn;
 
     public function connect(string $connString, string $searchPathSchema)
     {
-        $config = new \Doctrine\DBAL\Configuration();
+        $config = new Configuration();
         $params = ['driver' => 'pdo_pgsql'];
         foreach (explode(' ', $connString) as $pair) {
             list($k, $v) = explode('=', $pair);
             $params[$k] = $v;
         }
         /** @noinspection PhpUnhandledExceptionInspection */
-        $this->conn = \Doctrine\DBAL\DriverManager::getConnection($params, $config);
-        $this->conn->setFetchMode(\PDO::FETCH_ASSOC);
+        $this->conn = DriverManager::getConnection($params, $config);
+        $this->conn->setFetchMode(PDO::FETCH_ASSOC);
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->conn->exec("SET search_path = $searchPathSchema");
     }
@@ -76,7 +80,7 @@ class DoctrinePerformanceTest implements IPerformanceTest
                  WHERE item_id IN (?)
                  ORDER BY category_name, category_id",
                 [array_keys($items)],
-                [\Doctrine\DBAL\Connection::PARAM_INT_ARRAY]
+                [Connection::PARAM_INT_ARRAY]
             );
             while (($row = $res->fetch())) {
                 $items[$row['item_id']]['categories'][$row['category_id']] = $row['category_name'];

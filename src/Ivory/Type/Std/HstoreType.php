@@ -45,7 +45,7 @@ class HstoreType extends TypeBase
         if ($atom === null) {
             return 'NULL';
         } else {
-            // NOTE: for performance reasons, we quote the apostrophe right away, although this is required one level above
+            // for performance reasons, we quote the apostrophe right away, although this is required one level above
             return '"' . strtr((string)$atom, ['"' => '\\"', '\\' => '\\\\', "'" => "''"]) . '"';
         }
     }
@@ -248,7 +248,9 @@ class HstoreType extends TypeBase
         }
 
         if ($state != 9 && $state != 10) {
-            throw new \InvalidArgumentException("Invalid syntax of hstore value - unexpected character at offset $i (parser state $state)");
+            throw new \InvalidArgumentException(
+                "Invalid syntax of hstore value - unexpected character at offset $i (parser state $state)"
+            );
         }
 
         return $result;

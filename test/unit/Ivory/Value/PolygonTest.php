@@ -2,7 +2,9 @@
 declare(strict_types=1);
 namespace Ivory\Value;
 
-class PolygonTest extends \PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+class PolygonTest extends TestCase
 {
     public function testGetArea()
     {
@@ -12,13 +14,13 @@ class PolygonTest extends \PHPUnit\Framework\TestCase
             [11, 8],
             [2, 8],
         ]);
-        $this->assertEquals(36, $polygon->getArea(), '', 1e-12);
+        self::assertEquals(36, $polygon->getArea(), '', 1e-12);
 
         $polygon = Polygon::fromPoints([ // points declared counterclockwise
             [1, 1],
             [1, 5],
             [4, 3],
         ]);
-        $this->assertEquals(6, $polygon->getArea());
+        self::assertEquals(6, $polygon->getArea());
     }
 }

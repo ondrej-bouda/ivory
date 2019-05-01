@@ -1,11 +1,14 @@
 <?php
 declare(strict_types=1);
 
+use Ivory\Ivory;
+use Ivory\Showcase\IPCTest;
+
 require_once __DIR__ . '/../../../bootstrap.php';
 
 $connString = include __DIR__ . '/../../../conn_params.php';
 
-$conn = \Ivory\Ivory::setupNewConnection($connString);
+$conn = Ivory::setupNewConnection($connString);
 $conn->connect();
 
-\Ivory\Showcase\IPCTest::notifierProcess($conn);
+IPCTest::notifierProcess($conn);

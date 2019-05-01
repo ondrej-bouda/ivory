@@ -108,21 +108,25 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
     }
 
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function getColumns(): array
     {
         return $this->projectedColumns;
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function getColNameMap(): array
     {
         return $this->projectedColNameMap;
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function col($offsetOrNameOrEvaluator): IColumn
     {
-        return $this->_colImpl($offsetOrNameOrEvaluator, $this->projectedColumns, $this->projectedColNameMap, $this);
+        return $this->colImpl($offsetOrNameOrEvaluator, $this->projectedColumns, $this->projectedColNameMap, $this);
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function getIterator()
     {
         $cnt = $this->count();

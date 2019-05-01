@@ -160,7 +160,8 @@ abstract class TimeBase implements IComparable
         // microseconds are not supported by gmdate(), and constructing a new \DateTime object would be overkill
         if (strpos($timeFmt, 'u') !== false) {
             $frac = round($ts - (int)$ts, self::PRECISION);
-            $fracPart = ($frac ? substr((string)$frac, 2) : '0'); // cut off the leading "0." for non-zero fractional seconds
+            // cut off the leading "0." for non-zero fractional seconds
+            $fracPart = ($frac ? substr((string)$frac, 2) : '0');
             $fracStr = str_pad($fracPart, 6, '0', STR_PAD_RIGHT);
 
             $re = '~

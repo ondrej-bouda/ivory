@@ -41,6 +41,7 @@ class ArrayDataSet extends AbstractDataSet
         return new DefaultTableIterator($this->tables, $reverse);
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function getTable($tableName)
     {
         if (!isset($this->tables[$tableName])) {

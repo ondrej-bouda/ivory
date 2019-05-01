@@ -30,7 +30,7 @@ class RelationSerializerTest extends IvoryTestCase
         $relDef = SqlRelationDefinition::fromSql(
             "VALUES (1, 'a'), (3, 'b'), (2, 'c')"
         );
-        $this->assertSame(
+        self::assertSame(
             "VALUES (1, 'a'), (3, 'b'), (2, 'c')",
             $this->relationSerializer->serializeValue($relDef)
         );
@@ -64,15 +64,15 @@ SELECT 2, 'c'
 ORDER BY char
 SQL
         );
-        $this->assertSame(3, $checkRel->count());
-        $this->assertSame(2, count($checkRel->getColumns()));
+        self::assertSame(3, $checkRel->count());
+        self::assertSame(2, count($checkRel->getColumns()));
         if (PHP_INT_SIZE >= 8) {
-            $this->assertInstanceOf(IntegerType::class, $checkRel->col('Num')->getType());
+            self::assertInstanceOf(IntegerType::class, $checkRel->col('Num')->getType());
         } else {
-            $this->assertInstanceOf(BigIntSafeType::class, $checkRel->col('Num')->getType());
+            self::assertInstanceOf(BigIntSafeType::class, $checkRel->col('Num')->getType());
         }
-        $this->assertInstanceOf(StringType::class, $checkRel->col('char')->getType());
-        $this->assertSame(
+        self::assertInstanceOf(StringType::class, $checkRel->col('char')->getType());
+        self::assertSame(
             [
                 ['Num' => 1, 'char' => 'a'],
                 ['Num' => 3, 'char' => 'b'],
@@ -85,25 +85,25 @@ SQL
     public function testSerializeRelationWithNoRows()
     {
         $checkRel = $this->queryUsingSerializedRelation("SELECT 1 AS num, 'a' AS char WHERE FALSE");
-        $this->assertSame(0, $checkRel->count());
-        $this->assertSame(2, count($checkRel->getColumns()));
-        $this->assertInstanceOf(IntegerType::class, $checkRel->col('num')->getType());
-        $this->assertInstanceOf(StringType::class, $checkRel->col('char')->getType());
+        self::assertSame(0, $checkRel->count());
+        self::assertSame(2, count($checkRel->getColumns()));
+        self::assertInstanceOf(IntegerType::class, $checkRel->col('num')->getType());
+        self::assertInstanceOf(StringType::class, $checkRel->col('char')->getType());
     }
 
     public function testSerializeRelationWithNoColumns()
     {
         $checkRel = $this->queryUsingSerializedRelation('SELECT');
-        $this->assertSame(1, $checkRel->count());
-        $this->assertEmpty($checkRel->getColumns());
+        self::assertSame(1, $checkRel->count());
+        self::assertEmpty($checkRel->getColumns());
 
         $checkRel = $this->queryUsingSerializedRelation('SELECT WHERE FALSE');
-        $this->assertSame(0, $checkRel->count());
-        $this->assertEmpty($checkRel->getColumns());
+        self::assertSame(0, $checkRel->count());
+        self::assertEmpty($checkRel->getColumns());
 
         $checkRel = $this->queryUsingSerializedRelation('SELECT UNION ALL SELECT UNION ALL SELECT');
-        $this->assertSame(3, $checkRel->count());
-        $this->assertEmpty($checkRel->getColumns());
+        self::assertSame(3, $checkRel->count());
+        self::assertEmpty($checkRel->getColumns());
     }
 
     public function testSerializeNull()
