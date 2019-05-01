@@ -1,46 +1,46 @@
 filter:
-    excluded_paths:
-        - 'dev/*'
-        - 'showcase/*'
-        - 'test/*'
+	excluded_paths:
+		- 'dev/*'
+		- 'showcase/*'
+		- 'test/*'
 checks:
-    php:
-        uppercase_constants: true
-        simplify_boolean_return: true
-        return_doc_comments: true
-        properties_in_camelcaps: true
-        parameters_in_camelcaps: true
-        parameter_doc_comments: true
-        overriding_parameter: false
-        optional_parameters_at_the_end: true
-        newline_at_end_of_file: true
-        function_in_camel_caps: true
-        classes_in_camel_caps: true
-        check_method_contracts:
-            verify_interface_like_constraints: true
-            verify_documented_constraints: true
-            verify_parent_constraints: true
-        avoid_perl_style_comments: true
-        avoid_multiple_statements_on_same_line: true
+	php:
+		uppercase_constants: true
+		simplify_boolean_return: true
+		return_doc_comments: true
+		properties_in_camelcaps: true
+		parameters_in_camelcaps: true
+		parameter_doc_comments: true
+		overriding_parameter: false
+		optional_parameters_at_the_end: true
+		newline_at_end_of_file: true
+		function_in_camel_caps: true
+		classes_in_camel_caps: true
+		check_method_contracts:
+			verify_interface_like_constraints: true
+			verify_documented_constraints: true
+			verify_parent_constraints: true
+		avoid_perl_style_comments: true
+		avoid_multiple_statements_on_same_line: true
 
 coding_style:
-    php:
-        spaces:
-            around_operators:
-                concatenation: true
-            before_parentheses:
-                closure_definition: true
-            other:
-                after_type_cast: false
+	php:
+		spaces:
+			around_operators:
+				concatenation: true
+			before_parentheses:
+				closure_definition: true
+			other:
+				after_type_cast: false
 
 build:
-    environment:
-        php:
-            version: 7.2
-    nodes:
-        analysis:
-            project_setup:
-                override: true
-            tests:
-                override:
-                    - php-scrutinizer-run --enable-security-analysis
+	environment:
+		php:
+			version: 7.2
+	nodes:
+		analysis:
+			project_setup:
+				override: true
+			tests:
+				override:
+					- php-scrutinizer-run --enable-security-analysis

@@ -1,42 +1,42 @@
 language: php
 
 php:
-  - '7.1'
-  - '7.2'
-  - '7.3'
+	- '7.1'
+	- '7.2'
+	- '7.3'
 
 env:
-  - POSTGRESQL_VERSION=9.4
-  - POSTGRESQL_VERSION=9.5
-  - POSTGRESQL_VERSION=9.6
-  - POSTGRESQL_VERSION=10
-  - POSTGRESQL_VERSION=11
+	- POSTGRESQL_VERSION=9.4
+	- POSTGRESQL_VERSION=9.5
+	- POSTGRESQL_VERSION=9.6
+	- POSTGRESQL_VERSION=10
+	- POSTGRESQL_VERSION=11
 
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install -q language-pack-cs language-pack-ja
-  - sudo service postgresql stop
-  # PostgreSQL 10 is not supported on Travis yet; workaround taken from https://github.com/travis-ci/travis-ci/issues/8537#issuecomment-354020356
-  - if [ "$POSTGRESQL_VERSION" -ge 10 ]; then sudo apt-get remove -q 'postgresql-*' && sudo apt-get install -q "postgresql-$POSTGRESQL_VERSION" "postgresql-client-$POSTGRESQL_VERSION" && sudo cp /etc/postgresql/{9.6,$POSTGRESQL_VERSION}/main/pg_hba.conf; fi
-  - sudo sed -e 's~#\?max_prepared_transactions = 0~max_prepared_transactions = 1~' --in-place "/etc/postgresql/$POSTGRESQL_VERSION/main/postgresql.conf"
-  - if [ "$POSTGRESQL_VERSION" -ge 10 ]; then sudo service postgresql restart; else sudo service postgresql start "$POSTGRESQL_VERSION"; fi
-  - psql -U postgres -c "SELECT version()"
-  - composer self-update
+	- sudo apt-get update
+	- sudo apt-get install -q language-pack-cs language-pack-ja
+	- sudo service postgresql stop
+	# PostgreSQL 10 is not supported on Travis yet; workaround taken from https://github.com/travis-ci/travis-ci/issues/8537#issuecomment-354020356
+	- if [ "$POSTGRESQL_VERSION" -ge 10 ]; then sudo apt-get remove -q 'postgresql-*' && sudo apt-get install -q "postgresql-$POSTGRESQL_VERSION" "postgresql-client-$POSTGRESQL_VERSION" && sudo cp /etc/postgresql/{9.6,$POSTGRESQL_VERSION}/main/pg_hba.conf; fi
+	- sudo sed -e 's~#\?max_prepared_transactions = 0~max_prepared_transactions = 1~' --in-place "/etc/postgresql/$POSTGRESQL_VERSION/main/postgresql.conf"
+	- if [ "$POSTGRESQL_VERSION" -ge 10 ]; then sudo service postgresql restart; else sudo service postgresql start "$POSTGRESQL_VERSION"; fi
+	- psql -U postgres -c "SELECT version()"
+	- composer self-update
 
 install:
-  - composer install
+	- composer install
 
 before_script:
-  - psql -U postgres -c "CREATE USER ivory PASSWORD 'ivoryivory' SUPERUSER NOCREATEDB NOCREATEROLE"
-  - psql -U postgres -c "CREATE DATABASE ivory_test OWNER ivory"
-  - psql -U postgres -d ivory_test -c "CREATE EXTENSION IF NOT EXISTS hstore"
-  - cp test/phpunit.template.xml test/phpunit.xml
-  - sed -e 's~\(name="DB_HOST" value="\).*\("\)~\1\2~' --in-place test/phpunit.xml
-  - sed -e 's~\(name="DB_PORT" value="\).*\("\)~\1\2~' --in-place test/phpunit.xml
-  - sed -e 's~\(name="DB_USER" value="\).*\("\)~\1ivory\2~' --in-place test/phpunit.xml
-  - sed -e 's~\(name="DB_PASSWD" value="\).*\("\)~\1ivoryivory\2~' --in-place test/phpunit.xml
-  - sed -e 's~\(name="DB_DBNAME" value="\).*\("\)~\1ivory_test\2~' --in-place test/phpunit.xml
+	- psql -U postgres -c "CREATE USER ivory PASSWORD 'ivoryivory' SUPERUSER NOCREATEDB NOCREATEROLE"
+	- psql -U postgres -c "CREATE DATABASE ivory_test OWNER ivory"
+	- psql -U postgres -d ivory_test -c "CREATE EXTENSION IF NOT EXISTS hstore"
+	- cp test/phpunit.template.xml test/phpunit.xml
+	- sed -e 's~\(name="DB_HOST" value="\).*\("\)~\1\2~' --in-place test/phpunit.xml
+	- sed -e 's~\(name="DB_PORT" value="\).*\("\)~\1\2~' --in-place test/phpunit.xml
+	- sed -e 's~\(name="DB_USER" value="\).*\("\)~\1ivory\2~' --in-place test/phpunit.xml
+	- sed -e 's~\(name="DB_PASSWD" value="\).*\("\)~\1ivoryivory\2~' --in-place test/phpunit.xml
+	- sed -e 's~\(name="DB_DBNAME" value="\).*\("\)~\1ivory_test\2~' --in-place test/phpunit.xml
 
 script:
-  - vendor/bin/phpunit --bootstrap test/bootstrap.php --configuration test/phpunit.xml test/unit
+	- vendor/bin/phpunit --bootstrap test/bootstrap.php --configuration test/phpunit.xml test/unit
 

@@ -29,11 +29,11 @@ abstract class RowTypeBase extends TypeBase implements ITotallyOrderedType
         $strOffset = 1;
 
         $attRegex = '~
-		              "(?:[^"\\\\]|""|\\\\.)*"      # either a double-quoted string (backslashes used for escaping, or
-		                                            # double quotes doubled for a single double-quote character),
+                      "(?:[^"\\\\]|""|\\\\.)*"      # either a double-quoted string (backslashes used for escaping, or
+                                                    # double quotes doubled for a single double-quote character),
                       |                             # or an unquoted string of characters which do not confuse the
                       (?:[^"()\\\\,]|\\\\.)+        # parser or are backslash-escaped
-		             ~x';
+                     ~x';
         preg_match_all($attRegex, $extRepr, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE, $strOffset);
 
         $atts = [];
