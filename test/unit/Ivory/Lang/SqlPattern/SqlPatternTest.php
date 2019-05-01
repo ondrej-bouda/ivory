@@ -36,11 +36,11 @@ class SqlPatternTest extends IvoryTestCase
             } elseif ($plcHdr->getNameOrPosition() == 'tbl' && $plcHdr->getTypeName() == 's') {
                 $gen->send("'person'");
             } else {
-                $this->fail('Unexpected parameter to give value for.');
+                self::fail('Unexpected parameter to give value for.');
             }
         }
 
-        $this->assertEquals(
+        self::assertEquals(
             "SELECT id FROM person UNION SELECT object_id FROM log WHERE table = 'person'",
             $gen->getReturn()
         );

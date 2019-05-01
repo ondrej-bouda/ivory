@@ -23,16 +23,16 @@ class UniqueColumnTest extends IvoryTestCase
 
     public function testCount()
     {
-        $this->assertSame(6, $this->baseCol->count());
-        $this->assertSame(3, $this->baseCol->uniq()->count());
-        $this->assertSame(3, $this->baseCol->uniq(1)->count());
+        self::assertSame(6, $this->baseCol->count());
+        self::assertSame(3, $this->baseCol->uniq()->count());
+        self::assertSame(3, $this->baseCol->uniq(1)->count());
 
         $parity = function ($value) { return $value % 2; };
-        $this->assertSame(3, $this->baseCol->uniq($parity)->count());
+        self::assertSame(3, $this->baseCol->uniq($parity)->count());
 
         $parityComp = function ($a, $b) { return $a % 2 == $b % 2; };
-        $this->assertSame(2, $this->baseCol->uniq($parity, $parityComp)->count());
-        $this->assertSame(2, $this->baseCol->uniq(1, $parityComp)->count());
+        self::assertSame(2, $this->baseCol->uniq($parity, $parityComp)->count());
+        self::assertSame(2, $this->baseCol->uniq(1, $parityComp)->count());
     }
 
     public function testRename()
@@ -40,38 +40,38 @@ class UniqueColumnTest extends IvoryTestCase
         $uniq = $this->baseCol->uniq();
         $renamed = $uniq->renameTo('x');
 
-        $this->assertSame('a', $uniq->getName());
-        $this->assertSame('x', $renamed->getName());
-        $this->assertSame(3, $renamed->count());
+        self::assertSame('a', $uniq->getName());
+        self::assertSame('x', $renamed->getName());
+        self::assertSame(3, $renamed->count());
     }
 
     public function testValues()
     {
-        $this->assertSame([4, 1, 5], $this->baseCol->uniq()->toArray());
+        self::assertSame([4, 1, 5], $this->baseCol->uniq()->toArray());
 
         $parity = function ($value) { return $value % 2; };
-        $this->assertSame([4, 1, 5], $this->baseCol->uniq($parity)->toArray());
+        self::assertSame([4, 1, 5], $this->baseCol->uniq($parity)->toArray());
 
         $parityComp = function ($a, $b) { return $a % 2 == $b % 2; };
-        $this->assertSame([4, 1], $this->baseCol->uniq(1, $parityComp)->toArray());
+        self::assertSame([4, 1], $this->baseCol->uniq(1, $parityComp)->toArray());
 
         $parityUniqued = $this->baseCol->uniq($parity, $parityComp);
-        $this->assertSame([4, 1], $parityUniqued->toArray());
-        $this->assertSame([4, 1], iterator_to_array($parityUniqued));
-        $this->assertSame(4, $parityUniqued->value(0));
-        $this->assertSame(1, $parityUniqued->value(1));
-        $this->assertSame(1, $parityUniqued->value(-1));
-        $this->assertSame(4, $parityUniqued->value(-2));
+        self::assertSame([4, 1], $parityUniqued->toArray());
+        self::assertSame([4, 1], iterator_to_array($parityUniqued));
+        self::assertSame(4, $parityUniqued->value(0));
+        self::assertSame(1, $parityUniqued->value(1));
+        self::assertSame(1, $parityUniqued->value(-1));
+        self::assertSame(4, $parityUniqued->value(-2));
 
         try {
             $parityUniqued->value(2);
-            $this->fail();
+            self::fail();
         } catch (\OutOfBoundsException $e) {
         }
 
         try {
             $parityUniqued->value(-3);
-            $this->fail();
+            self::fail();
         } catch (\OutOfBoundsException $e) {
         }
     }

@@ -8,63 +8,63 @@ class TimeIntervalTest extends TestCase
 {
     public function testFromParts()
     {
-        $this->assertSame(
+        self::assertSame(
             [TimeInterval::SECOND => 0],
             TimeInterval::fromParts([])->toParts()
         );
-        $this->assertSame(
+        self::assertSame(
             [TimeInterval::SECOND => 0],
             TimeInterval::fromParts([TimeInterval::YEAR => 0])->toParts()
         );
-        $this->assertSame(
+        self::assertSame(
             [TimeInterval::SECOND => 0],
             TimeInterval::fromParts([TimeInterval::DAY => 14, TimeInterval::WEEK => -2])->toParts()
         );
-        $this->assertSame(
+        self::assertSame(
             [TimeInterval::HOUR => 24],
             TimeInterval::fromParts([TimeInterval::WEEK => 1, TimeInterval::DAY => -7, TimeInterval::HOUR => 24])
                 ->toParts()
         );
-        $this->assertSame(
+        self::assertSame(
             [TimeInterval::YEAR => 1999, TimeInterval::DAY => 700],
             TimeInterval::fromParts([TimeInterval::MILLENNIUM => 2, TimeInterval::YEAR => -1, TimeInterval::DAY => 700])
                 ->toParts()
         );
-        $this->assertSame(
+        self::assertSame(
             [TimeInterval::HOUR => 12, TimeInterval::SECOND => .5],
             TimeInterval::fromParts([TimeInterval::DAY => .5, TimeInterval::SECOND => .5])->toParts()
         );
-        $this->assertSame(
+        self::assertSame(
             [TimeInterval::YEAR => 2, TimeInterval::DAY => 10, TimeInterval::HOUR => 12],
             TimeInterval::fromParts([TimeInterval::YEAR => 1, TimeInterval::MONTH => 12.35])->toParts()
         );
 
         $parts = TimeInterval::fromParts([TimeInterval::WEEK => 3.987])->toParts();
-        $this->assertSame(
+        self::assertSame(
             [TimeInterval::DAY => 27, TimeInterval::HOUR => 21, TimeInterval::MINUTE => 48],
             array_slice($parts, 0, -1)
         );
-        $this->assertEquals(57.6, $parts[TimeInterval::SECOND], '', 1e-9);
+        self::assertEquals(57.6, $parts[TimeInterval::SECOND], '', 1e-9);
     }
 
     public function testFromString()
     {
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::SECOND => 0]),
             TimeInterval::fromString('P0Y'),
             'empty'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::DAY => 9]),
             TimeInterval::fromString('P9D'),
             'nine days'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::DAY => 9]),
             TimeInterval::fromString('P1W2D'),
             'nine days using week'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::YEAR => 1, TimeInterval::MONTH => 2, TimeInterval::WEEK => 3, TimeInterval::DAY => 3,
                 TimeInterval::HOUR => 4, TimeInterval::MINUTE => 5, TimeInterval::SECOND => 6.789012,
@@ -72,7 +72,7 @@ class TimeIntervalTest extends TestCase
             TimeInterval::fromString('P1Y2M3W3DT4H5M6.789012S'),
             'iso full'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::YEAR => -1, TimeInterval::MONTH => -2, TimeInterval::WEEK => -3, TimeInterval::DAY => -3,
                 TimeInterval::HOUR => -4, TimeInterval::MINUTE => -5, TimeInterval::SECOND => -6.789012,
@@ -80,7 +80,7 @@ class TimeIntervalTest extends TestCase
             TimeInterval::fromString('P-1Y-2M-3W-3DT-4H-5M-6.789012S'),
             'iso_neg'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::YEAR => 1, TimeInterval::MONTH => 2, TimeInterval::DAY => 3,
                 TimeInterval::HOUR => 4, TimeInterval::MINUTE => 5, TimeInterval::SECOND => 6.789012,
@@ -88,17 +88,17 @@ class TimeIntervalTest extends TestCase
             TimeInterval::fromString('P0001-02-03T04:05:06.789012'),
             'iso alt datetime'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::YEAR => 1, TimeInterval::MONTH => 2, TimeInterval::DAY => 3]),
             TimeInterval::fromString('P0001-02-03'),
             'iso alt date'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::HOUR => 4, TimeInterval::MINUTE => 5, TimeInterval::SECOND => 6]),
             TimeInterval::fromString('PT04:05:06'),
             'iso alt time'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::YEAR => -1, TimeInterval::MONTH => -2, TimeInterval::DAY => -3,
                 TimeInterval::HOUR => -4, TimeInterval::MINUTE => -5, TimeInterval::SECOND => -6.789012,
@@ -106,7 +106,7 @@ class TimeIntervalTest extends TestCase
             TimeInterval::fromString('P-0001--02--03T-04:-05:-06.789012'),
             'iso alt neg'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::YEAR => -1, TimeInterval::MONTH => -2, TimeInterval::DAY => 3,
                 TimeInterval::HOUR => -4, TimeInterval::MINUTE => 5, TimeInterval::SECOND => 6,
@@ -114,17 +114,17 @@ class TimeIntervalTest extends TestCase
             TimeInterval::fromString('P-0001--02-03T-04:05:06'),
             'iso alt neg some'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::YEAR => 1, TimeInterval::MONTH => 2]),
             TimeInterval::fromString('1-2'),
             'sql year mon'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::YEAR => 1, TimeInterval::MONTH => 2, TimeInterval::SECOND => 3]),
             TimeInterval::fromString('1-2 3'),
             'sql year mon sec'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::YEAR => 1, TimeInterval::MONTH => 2,
                 TimeInterval::HOUR => 12, TimeInterval::MINUTE => 34,
@@ -132,7 +132,7 @@ class TimeIntervalTest extends TestCase
             TimeInterval::fromString('1-2 12:34'),
             'sql year mon time'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::YEAR => 1, TimeInterval::MONTH => 2, TimeInterval::DAY => 3,
                 TimeInterval::HOUR => 12, TimeInterval::MINUTE => 34,
@@ -140,7 +140,7 @@ class TimeIntervalTest extends TestCase
             TimeInterval::fromString('1-2 3 12:34'),
             'sql datetime'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::DAY => 3,
                 TimeInterval::HOUR => 12, TimeInterval::MINUTE => 34, TimeInterval::SECOND => 56.78
@@ -148,19 +148,19 @@ class TimeIntervalTest extends TestCase
             TimeInterval::fromString('3 12:34:56.78'),
             'sql day time'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::HOUR => 12, TimeInterval::MINUTE => 34, TimeInterval::SECOND => 56.78
             ]),
             TimeInterval::fromString('12:34:56.78'),
             'sql time'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::SECOND => 42]),
             TimeInterval::fromString('42'),
             'sql sec'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::YEAR => -1, TimeInterval::MONTH => -2, TimeInterval::DAY => -3,
                 TimeInterval::HOUR => -12, TimeInterval::MINUTE => -34, TimeInterval::SECOND => -56.78,
@@ -168,22 +168,22 @@ class TimeIntervalTest extends TestCase
             TimeInterval::fromString('-1-2 -3 -12:34:56.78'),
             'sql neg'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::YEAR => 1]),
             TimeInterval::fromString('@ 1 year'),
             'pg verbose'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::YEAR => 2, TimeInterval::MONTH => 3]),
             TimeInterval::fromString('2 years 3 mon'),
             'pg year mon'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::DAY => -4]),
             TimeInterval::fromString('4 days ago'),
             'pg ago'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::MILLENNIUM => 1, TimeInterval::CENTURY => 2, TimeInterval::DECADE => 3,
                 TimeInterval::YEAR => 4, TimeInterval::MONTH => 5, TimeInterval::WEEK => 6, TimeInterval::DAY => 7,
@@ -196,7 +196,7 @@ class TimeIntervalTest extends TestCase
             ),
             'pg full'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::MILLENNIUM => 1, TimeInterval::CENTURY => 2, TimeInterval::DECADE => 3,
                 TimeInterval::YEAR => 4, TimeInterval::MONTH => 5, TimeInterval::WEEK => 6, TimeInterval::DAY => 7,
@@ -209,7 +209,7 @@ class TimeIntervalTest extends TestCase
             ),
             'pg full plural'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::MILLENNIUM => 1, TimeInterval::CENTURY => 2, TimeInterval::DECADE => 3,
                 TimeInterval::YEAR => 4, TimeInterval::MONTH => 5, TimeInterval::WEEK => 6, TimeInterval::DAY => 7,
@@ -221,7 +221,7 @@ class TimeIntervalTest extends TestCase
             ),
             'pg abbr'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::MILLENNIUM => 1, TimeInterval::CENTURY => 2, TimeInterval::DECADE => 3,
                 TimeInterval::YEAR => 4, TimeInterval::MONTH => 5, TimeInterval::WEEK => 6, TimeInterval::DAY => 7,
@@ -234,7 +234,7 @@ class TimeIntervalTest extends TestCase
             ),
             'pg_abbr_plural'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::MILLENNIUM => 1, TimeInterval::CENTURY => 2, TimeInterval::DECADE => 3,
                 TimeInterval::YEAR => 4, TimeInterval::MONTH => 5, TimeInterval::WEEK => 6, TimeInterval::DAY => 7,
@@ -244,7 +244,7 @@ class TimeIntervalTest extends TestCase
             TimeInterval::fromString('1 mil 2 cent 3 dec 4 y 5 mon 6 w 7 d 8 h 9 m 10 s 11 millisecond 12 microsecond'),
             'pg abbr2'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::DAY => 1, TimeInterval::WEEK => 4, TimeInterval::MONTH => 8,
                 TimeInterval::MICROSECOND => 1
@@ -252,17 +252,17 @@ class TimeIntervalTest extends TestCase
             TimeInterval::fromString('1 day 4 weeks 1 microsecond 8 months'),
             'pg unsorted units'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::DAY => 1, TimeInterval::HOUR => -3, TimeInterval::SECOND => 6]),
             TimeInterval::fromString('-1 day 3 hours -6 seconds ago'),
             'pg mixed'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::DAY => 1, TimeInterval::MINUTE => 14]),
             TimeInterval::fromString('1 day 00:14:00'),
             'pg with ISO time'
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::YEAR => 1, TimeInterval::MONTH => 6, TimeInterval::DAY => 4,
                 TimeInterval::HOUR => 4, TimeInterval::MINUTE => 48,
@@ -274,14 +274,14 @@ class TimeIntervalTest extends TestCase
 
     public function testToIsoString()
     {
-        $this->assertSame(
+        self::assertSame(
             'P1Y5DT59M',
             TimeInterval::fromParts([
                 TimeInterval::MONTH => 12, TimeInterval::DAY => 5, TimeInterval::HOUR => 1, TimeInterval::SECOND => -60
             ])->toIsoString()
         );
 
-        $this->assertSame(
+        self::assertSame(
             'PT0S',
             TimeInterval::fromParts([TimeInterval::CENTURY => 1.5, TimeInterval::YEAR => -150])->toIsoString()
         );

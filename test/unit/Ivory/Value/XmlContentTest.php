@@ -9,15 +9,15 @@ class XmlContentTest extends TestCase
     public function testFromValue()
     {
         $xml = XmlContent::fromValue('<root><a/><b><c/></b><a/></root>');
-        $this->assertTrue($xml instanceof XmlDocument);
+        self::assertTrue($xml instanceof XmlDocument);
 
         $xml = XmlContent::fromValue('<a/><b><c/></b><a/>');
-        $this->assertFalse($xml instanceof XmlDocument);
+        self::assertFalse($xml instanceof XmlDocument);
 
         $xml = XmlContent::fromValue('<?xml version="1.1" encoding="utf-8"?><root><a/><b><c/></b><a/></root>');
-        $this->assertTrue($xml instanceof XmlDocument);
+        self::assertTrue($xml instanceof XmlDocument);
 
         $xml = XmlContent::fromValue('<?xml version="1.1" encoding="utf-8"?><a/><b><c/></b><a/>');
-        $this->assertFalse($xml instanceof XmlDocument);
+        self::assertFalse($xml instanceof XmlDocument);
     }
 }

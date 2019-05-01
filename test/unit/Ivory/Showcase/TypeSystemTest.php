@@ -33,14 +33,14 @@ class TypeSystemTest extends IvoryTestCase
     public function testArrayType()
     {
         $arr = $this->conn->querySingleValue('SELECT %', ['a', 'b', 'c']);
-        $this->assertSame(['a', 'b', 'c'], $arr);
+        self::assertSame(['a', 'b', 'c'], $arr);
 
         $arr = $this->conn->querySingleValue('SELECT %', [4 => 'a', 6 => 'c', 5 => 'b']);
-        $this->assertSame([4 => 'a', 5 => 'b', 6 => 'c'], $arr);
+        self::assertSame([4 => 'a', 5 => 'b', 6 => 'c'], $arr);
 
         $pattern = SqlRelationDefinition::fromPattern('INSERT INTO t (a) VALUES (%)', ['a', 'b', 'c']);
         $sql = $pattern->toSql($this->conn->getTypeDictionary());
-        $this->assertSame("INSERT INTO t (a) VALUES ('[0:2]={a,b,c}'::pg_catalog.text[])", $sql);
+        self::assertSame("INSERT INTO t (a) VALUES ('[0:2]={a,b,c}'::pg_catalog.text[])", $sql);
 
 
         $stringArraySerializer = $this->conn->getTypeDictionary()->requireTypeByValue(['a']);
@@ -48,11 +48,11 @@ class TypeSystemTest extends IvoryTestCase
         $stringArraySerializer->switchToPlainMode();
         try {
             $plainArr = $this->conn->querySingleValue("SELECT ARRAY['a', 'b', 'c']");
-            $this->assertSame(['a', 'b', 'c'], $plainArr);
+            self::assertSame(['a', 'b', 'c'], $plainArr);
 
             $plainPattern = SqlRelationDefinition::fromPattern('INSERT INTO t (a) VALUES (%)', ['a', 'b', 'c']);
             $plainSql = $plainPattern->toSql($this->conn->getTypeDictionary());
-            $this->assertSame("INSERT INTO t (a) VALUES (ARRAY['a','b','c']::pg_catalog.text[])", $plainSql);
+            self::assertSame("INSERT INTO t (a) VALUES (ARRAY['a','b','c']::pg_catalog.text[])", $plainSql);
         } finally {
             $stringArraySerializer->switchToStrictMode();
         }
@@ -81,26 +81,26 @@ SQL
         assert($rangeArray[1] instanceof Range);
         assert($rangeArray[2] instanceof Range);
         assert($rangeArray[3] instanceof Range);
-        $this->assertInstanceOf(Range::class, $rangeArray[2]);
-        $this->assertSame('19.2.2017', $rangeArray[2]->getUpper()->format('j.n.Y'));
-        $this->assertFalse($rangeArray[3]->isFinite());
+        self::assertInstanceOf(Range::class, $rangeArray[2]);
+        self::assertSame('19.2.2017', $rangeArray[2]->getUpper()->format('j.n.Y'));
+        self::assertFalse($rangeArray[3]->isFinite());
 
         $json = $tuple->json;
         assert($json instanceof Json);
-        $this->assertInstanceOf(Json::class, $json);
-        $this->assertEquals((object)['k1' => 42, 'k2' => false], $json->getValue());
+        self::assertInstanceOf(Json::class, $json);
+        self::assertEquals((object)['k1' => 42, 'k2' => false], $json->getValue());
 
         $xml = $tuple->xml;
         assert($xml instanceof XmlDocument);
-        $this->assertInstanceOf(XmlContent::class, $xml);
-        $this->assertEquals(['Manual'], $xml->toSimpleXMLElement()->xpath('//title/text()'));
+        self::assertInstanceOf(XmlContent::class, $xml);
+        self::assertEquals(['Manual'], $xml->toSimpleXMLElement()->xpath('//title/text()'));
 
         $polygon = $tuple->polygon;
         assert($polygon instanceof Polygon);
-        $this->assertInstanceOf(Polygon::class, $polygon);
-        $this->assertEquals(6, $polygon->getArea(), '', 1e-12);
+        self::assertInstanceOf(Polygon::class, $polygon);
+        self::assertEquals(6, $polygon->getArea(), '', 1e-12);
 
-        $this->assertSame(['1', '2', 'foo'], $tuple->row);
+        self::assertSame(['1', '2', 'foo'], $tuple->row);
     }
 
     /**
@@ -121,7 +121,7 @@ SQL
 
             // Use it in a query.
             $composite = $this->conn->querySingleValue("SELECT (1, 'a')::__ivory_test_composite_type");
-            $this->assertSame('a', $composite->chr);
+            self::assertSame('a', $composite->chr);
         } finally {
             $tx->rollback();
         }
@@ -164,7 +164,7 @@ SQL
         $this->conn->getTypeRegister()->registerValueSerializer('strlist', $strListSerializer);
 
         $result = $this->conn->querySingleValue('SELECT %s IN %strlist', 'foo', ['a', 'b', 'c']);
-        $this->assertSame(false, $result);
+        self::assertSame(false, $result);
     }
 
     /**
@@ -207,10 +207,10 @@ SQL
         $this->conn->getTypeRegister()->registerType($customTimeType);
 
         $val = $this->conn->querySingleValue("SELECT TIME '16:42'");
-        $this->assertEquals(new \DateTime('16:42:00'), $val);
+        self::assertEquals(new \DateTime('16:42:00'), $val);
 
         $eq = $this->conn->querySingleValue("SELECT TIME '13:30' = %time", new \DateTime('13:30:00'));
-        $this->assertTrue($eq);
+        self::assertTrue($eq);
     }
 
     /**
@@ -219,7 +219,7 @@ SQL
     public function testRedefineType()
     {
         $dateVal = $this->conn->querySingleValue('SELECT %date::DATE', Date::fromParts(2017, 9, 23));
-        $this->assertInstanceOf(Date::class, $dateVal);
+        self::assertInstanceOf(Date::class, $dateVal);
 
         // Prefer standard \DateTime over the custom Date class:
         $myDateType = new class('pg_catalog', 'date') extends TypeBase
@@ -244,8 +244,8 @@ SQL
         $this->conn->flushTypeDictionary();
 
         $dateTimeVal = $this->conn->querySingleValue('SELECT %date::DATE', new \DateTime('2017-09-30'));
-        $this->assertInstanceOf(\DateTime::class, $dateTimeVal);
-        $this->assertEquals(new \DateTime('2017-09-30'), $dateTimeVal);
+        self::assertInstanceOf(\DateTime::class, $dateTimeVal);
+        self::assertEquals(new \DateTime('2017-09-30'), $dateTimeVal);
 
         // Note, however, that the original DateType class represents a discrete type, enabling the type to be used in
         // ranges, that it reacts to the PostgreSQL date style setting, that it recognizes `-infinity` and `infinity`

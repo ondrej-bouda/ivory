@@ -58,29 +58,29 @@ class EnumTypeTest extends IvoryTestCase
         assert($tuple->planet3 instanceof EnumItem);
         assert($tuple->planet_rng instanceof Range);
 
-        $this->assertSame('Twix', $tuple->bar2->getValue());
+        self::assertSame('Twix', $tuple->bar2->getValue());
 
-        $this->assertTrue($tuple->planet1->equals($tuple->planet2));
-        $this->assertFalse($tuple->planet1->equals($tuple->planet3));
-        $this->assertFalse($tuple->bar1->equals($tuple->planet1));
-        $this->assertFalse($tuple->bar2->equals($tuple->planet3));
+        self::assertTrue($tuple->planet1->equals($tuple->planet2));
+        self::assertFalse($tuple->planet1->equals($tuple->planet3));
+        self::assertFalse($tuple->bar1->equals($tuple->planet1));
+        self::assertFalse($tuple->bar2->equals($tuple->planet3));
 
-        $this->assertEquals(0, $tuple->planet1->compareTo($tuple->planet2));
-        $this->assertLessThan(0, $tuple->planet1->compareTo($tuple->planet3));
+        self::assertEquals(0, $tuple->planet1->compareTo($tuple->planet2));
+        self::assertLessThan(0, $tuple->planet1->compareTo($tuple->planet3));
         try {
             $tuple->planet1->compareTo($tuple->bar1);
-            $this->fail(IncomparableException::class . ' was expected');
+            self::fail(IncomparableException::class . ' was expected');
         } catch (IncomparableException $e) {
         }
 
-        $this->assertSame('Jupiter', $tuple->planet_rng->getLower()->getValue());
-        $this->assertSame('Neptune', $tuple->planet_rng->getUpper()->getValue());
+        self::assertSame('Jupiter', $tuple->planet_rng->getLower()->getValue());
+        self::assertSame('Neptune', $tuple->planet_rng->getUpper()->getValue());
     }
 
     public function testSerializing()
     {
         $conn = $this->getIvoryConnection();
-        $this->assertTrue(
+        self::assertTrue(
             $conn->querySingleValue(
                 'SELECT %planet < %planet',
                 'Venus',
@@ -90,7 +90,7 @@ class EnumTypeTest extends IvoryTestCase
 
         try {
             $conn->querySingleValue('SELECT %planet', 'Pluto');
-            $this->fail('A warning was expected');
+            self::fail('A warning was expected');
         } catch (Warning $e) {
         }
     }

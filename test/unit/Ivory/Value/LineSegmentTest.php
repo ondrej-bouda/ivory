@@ -9,6 +9,6 @@ class LineSegmentTest extends TestCase
     public function testGetLength()
     {
         $seg = LineSegment::fromEndpoints(Point::fromCoords(1, 3), Point::fromCoords(-3, 0));
-        $this->assertEquals(5, $seg->getLength(), '', 1e-9);
+        self::assertEquals(5, $seg->getLength(), '', 1e-9);
     }
 }

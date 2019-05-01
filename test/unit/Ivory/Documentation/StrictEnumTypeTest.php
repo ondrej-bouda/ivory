@@ -64,30 +64,30 @@ class StrictEnumTypeTest extends IvoryTestCase
         assert($tuple->planet3 instanceof Planet);
         assert($tuple->planet_rng instanceof Range);
 
-        $this->assertTrue($tuple->bar2 == ChocolateBar::Twix());
-        $this->assertTrue($tuple->bar2->equals(ChocolateBar::Twix()));
+        self::assertTrue($tuple->bar2 == ChocolateBar::Twix());
+        self::assertTrue($tuple->bar2->equals(ChocolateBar::Twix()));
 
-        $this->assertTrue($tuple->planet1 == $tuple->planet2);
-        $this->assertTrue($tuple->planet1 != $tuple->planet3);
-        $this->assertTrue($tuple->bar1 != $tuple->planet1);
-        $this->assertTrue($tuple->bar2 != $tuple->planet3);
+        self::assertTrue($tuple->planet1 == $tuple->planet2);
+        self::assertTrue($tuple->planet1 != $tuple->planet3);
+        self::assertTrue($tuple->bar1 != $tuple->planet1);
+        self::assertTrue($tuple->bar2 != $tuple->planet3);
 
-        $this->assertEquals(0, $tuple->planet1->compareTo($tuple->planet2));
-        $this->assertLessThan(0, $tuple->planet1->compareTo($tuple->planet3));
+        self::assertEquals(0, $tuple->planet1->compareTo($tuple->planet2));
+        self::assertLessThan(0, $tuple->planet1->compareTo($tuple->planet3));
         try {
             $tuple->planet1->compareTo($tuple->bar1);
-            $this->fail(IncomparableException::class . ' was expected');
+            self::fail(IncomparableException::class . ' was expected');
         } catch (IncomparableException $e) {
         }
 
-        $this->assertTrue(Planet::Jupiter()->equals($tuple->planet_rng->getLower()));
-        $this->assertTrue(Planet::Neptune()->equals($tuple->planet_rng->getUpper()));
+        self::assertTrue(Planet::Jupiter()->equals($tuple->planet_rng->getLower()));
+        self::assertTrue(Planet::Neptune()->equals($tuple->planet_rng->getUpper()));
     }
 
     public function testSerializing()
     {
         $conn = $this->getIvoryConnection();
-        $this->assertTrue(
+        self::assertTrue(
             $conn->querySingleValue(
                 'SELECT %planet < %planet',
                 Planet::Venus(),
@@ -97,31 +97,31 @@ class StrictEnumTypeTest extends IvoryTestCase
 
         try {
             $conn->querySingleValue('SELECT %planet', 'Mars');
-            $this->fail(\InvalidArgumentException::class . ' was expected');
+            self::fail(\InvalidArgumentException::class . ' was expected');
         } catch (\InvalidArgumentException $e) {
         }
 
         try {
             $conn->querySingleValue('SELECT %planet', ChocolateBar::Mars());
-            $this->fail(\InvalidArgumentException::class . ' was expected');
+            self::fail(\InvalidArgumentException::class . ' was expected');
         } catch (\InvalidArgumentException $e) {
         }
     }
 
     public function testEquals()
     {
-        $this->assertTrue($this->isGiantPlanet(Planet::Uranus()));
-        $this->assertFalse($this->isGiantPlanet(Planet::Earth()));
+        self::assertTrue($this->isGiantPlanet(Planet::Uranus()));
+        self::assertFalse($this->isGiantPlanet(Planet::Earth()));
     }
 
     public function testConstruction()
     {
         /** @noinspection PhpNonStrictObjectEqualityInspection intentional - we want to test the comparison */
-        $this->assertTrue(Planet::Mars() == new Planet('Mars'));
+        self::assertTrue(Planet::Mars() == new Planet('Mars'));
 
         try {
             new Planet('mars');
-            $this->fail(\InvalidArgumentException::class . ' expected');
+            self::fail(\InvalidArgumentException::class . ' expected');
         } catch (\InvalidArgumentException $e) {
         }
     }

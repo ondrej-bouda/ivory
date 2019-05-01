@@ -10,7 +10,7 @@ class CustomSetTest extends TestCase
     {
         $set = new CustomSet(function ($val) { return strtolower($val); });
         $set->add('Google');
-        $this->assertTrue($set->contains('Google'));
-        $this->assertTrue($set->contains('google'));
+        self::assertTrue($set->contains('Google'));
+        self::assertTrue($set->contains('google'));
     }
 }

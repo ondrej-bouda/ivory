@@ -46,17 +46,17 @@ class QueryingTest extends IvoryTestCase
         // defined on the database connection are used. See \Ivory\Lang\SqlPattern\SqlPattern class docs for details.
         $relDef = SqlRelationDefinition::fromPattern('SELECT %s, %num, %bool', "Ivory's escaping", '3.14', false);
         $sql = $relDef->toSql($this->typeDict);
-        $this->assertSame("SELECT pg_catalog.text 'Ivory''s escaping', 3.14::pg_catalog.numeric, FALSE", $sql);
+        self::assertSame("SELECT pg_catalog.text 'Ivory''s escaping', 3.14::pg_catalog.numeric, FALSE", $sql);
 
         // Moreover, the types need not be specified explicitly. There are rules for inferring the type from the actual
         // value.
         $relDef = SqlRelationDefinition::fromPattern('SELECT %, %, %', "Automatic type inference", 3.14, false);
         $sql = $relDef->toSql($this->typeDict);
-        $this->assertSame("SELECT pg_catalog.text 'Automatic type inference', 3.14::pg_catalog.float8, FALSE", $sql);
+        self::assertSame("SELECT pg_catalog.text 'Automatic type inference', 3.14::pg_catalog.float8, FALSE", $sql);
 
         // All the standard PostgreSQL types are already set up in Ivory by default. Besides, there are special value
         // serializers for specific usage, e.g., LIKE operands.
-        $this->assertTrue($this->conn->querySingleValue("SELECT 'foobar' LIKE %_like_", 'oo')); // yields LIKE '%oo%'
+        self::assertTrue($this->conn->querySingleValue("SELECT 'foobar' LIKE %_like_", 'oo')); // yields LIKE '%oo%'
 
         // As usual, both the types of placeholders and the rules for infering types from values are configurable.
         $this->conn->getTypeRegister()->registerTypeAbbreviation('js', 'pg_catalog', 'json');
@@ -65,7 +65,7 @@ class QueryingTest extends IvoryTestCase
 
         $relDef = SqlRelationDefinition::fromPattern('SELECT %js, %', Json::null(), (object)['a' => 42]);
         $sql = $relDef->toSql($this->conn->getTypeDictionary());
-        $this->assertSame("SELECT pg_catalog.json 'null', pg_catalog.json '{\"a\":42}'", $sql);
+        self::assertSame("SELECT pg_catalog.json 'null', pg_catalog.json '{\"a\":42}'", $sql);
 
         // Also, brand new types may be introduced. See \Ivory\Showcase\TypeSystemTest::testCustomType().
     }
@@ -78,7 +78,7 @@ class QueryingTest extends IvoryTestCase
 
         // The definition may directly be used for querying the database...
         $tuple = $this->conn->querySingleTuple($relDef);
-        $this->assertEquals([true, 'str', Decimal::fromNumber('3.14')], $tuple->toList());
+        self::assertEquals([true, 'str', Decimal::fromNumber('3.14')], $tuple->toList());
 
         // ...or as a base for another definition. Note the construction from "fragments" - parts of the SQL pattern put
         // together. Also note we specify data type explicitly for the date column so that a null may be matched with
@@ -91,10 +91,10 @@ class QueryingTest extends IvoryTestCase
             'SELECT * FROM (%rel) AS t (id, creat)',
             $valsDef
         );
-        $this->assertCount(2, $this->conn->query($relDef));
+        self::assertCount(2, $this->conn->query($relDef));
 
         // Since the definition is not tied to a connection, it may be cached and retrieved later.
         $serialized = serialize($relDef);
-        $this->assertCount(2, $this->conn->query(unserialize($serialized)));
+        self::assertCount(2, $this->conn->query(unserialize($serialized)));
     }
 }

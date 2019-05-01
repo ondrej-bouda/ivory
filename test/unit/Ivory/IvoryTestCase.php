@@ -130,7 +130,7 @@ abstract class IvoryTestCase extends TestCase
             if (strlen($message) > 0) {
                 $failMsg = "$message ($failMsg)";
             }
-            $this->fail($failMsg);
+            self::fail($failMsg);
         }
 
         $err = array_shift($this->triggeredErrors);
@@ -144,10 +144,10 @@ abstract class IvoryTestCase extends TestCase
             if (strlen($message) > 0) {
                 $failMsg = "$message ($failMsg)";
             }
-            $this->fail($failMsg);
+            self::fail($failMsg);
         }
 
-        $this->assertRegExp($expectedErrMsgRegex, $err['msg'], $message);
+        self::assertRegExp($expectedErrMsgRegex, $err['msg'], $message);
     }
 
     protected function assertErrorsTriggered($count, $expectedErrMsgRegex, $expectedErrType = E_ALL, $message = '')
@@ -229,10 +229,10 @@ abstract class IvoryTestCase extends TestCase
             if (strlen($message) > 0) {
                 $failMsg = "$message ($failMsg)";
             }
-            $this->fail($failMsg);
+            self::fail($failMsg);
         }
 
-        $this->assertEmpty($this->triggeredErrors, $message);
+        self::assertEmpty($this->triggeredErrors, $message);
     }
 
 

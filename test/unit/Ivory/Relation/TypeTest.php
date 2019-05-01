@@ -65,7 +65,7 @@ class TypeTest extends IvoryTestCase
             }
             $results[$tuple->artist_name] = $albums;
         }
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'Metallica' => [
                     [
@@ -103,11 +103,11 @@ class TypeTest extends IvoryTestCase
 
         $album = $rel->value('albums', 2)[1];
         assert($album instanceof Composite);
-        $this->assertEquals(
+        self::assertEquals(
             ['id' => 4, 'name' => 'Live One', 'year' => 2005, 'released' => Date::fromISOString('2005-01-01')],
             $album->toMap()
         );
-        $this->assertSame('Live One', $rel->value('albums', 2)[1]->name);
+        self::assertSame('Live One', $rel->value('albums', 2)[1]->name);
     }
 
     public function testAnonymousComposite()
@@ -117,7 +117,7 @@ class TypeTest extends IvoryTestCase
              SELECT a FROM a"
         );
         // there does not seem to be a way to get associative array, as well as the types of components
-        $this->assertSame(['1', 'a', 't'], $rel->value());
+        self::assertSame(['1', 'a', 't'], $rel->value());
     }
 
     public function testRange()
@@ -138,12 +138,12 @@ class TypeTest extends IvoryTestCase
         );
         $map = $rel->assoc('artist_name', 'active_years');
 
-        $this->assertSame(['Metallica', 'Robbie Williams', 'The Piano Guys', 'Tommy Emmanuel'], $map->getKeys());
+        self::assertSame(['Metallica', 'Robbie Williams', 'The Piano Guys', 'Tommy Emmanuel'], $map->getKeys());
 
-        $this->assertSame([1991, 1999], $map['Metallica']->toBounds('[]'));
-        $this->assertTrue($map['Robbie Williams']->isEmpty());
-        $this->assertSame([2012, 2012], $map['The Piano Guys']->toBounds('[]'));
-        $this->assertSame([2005, 2005], $map['Tommy Emmanuel']->toBounds('[]'));
+        self::assertSame([1991, 1999], $map['Metallica']->toBounds('[]'));
+        self::assertTrue($map['Robbie Williams']->isEmpty());
+        self::assertSame([2012, 2012], $map['The Piano Guys']->toBounds('[]'));
+        self::assertSame([2005, 2005], $map['Tommy Emmanuel']->toBounds('[]'));
     }
 
     public function testBoxArray()
@@ -156,7 +156,7 @@ class TypeTest extends IvoryTestCase
             assert($box instanceof Box);
             $areaSum += $box->getArea();
         }
-        $this->assertEquals(112, $areaSum, '', 1e-9);
+        self::assertEquals(112, $areaSum, '', 1e-9);
     }
 
     public function testDate()
@@ -168,10 +168,10 @@ class TypeTest extends IvoryTestCase
         );
 
         $list = $rel->toArray();
-        $this->assertEquals(['name' => 'Black Album', 'released' => Date::fromParts(1991, 8, 12)], $list[0]);
-        $this->assertEquals(['name' => 'S & M', 'released' => Date::fromParts(1999, 11, 23)], $list[1]);
-        $this->assertEquals(['name' => 'Live One', 'released' => Date::fromParts(2005, 1, 1)], $list[2]);
-        $this->assertEquals(['name' => 'The Piano Guys', 'released' => Date::fromParts(2012, 10, 2)], $list[3]);
+        self::assertEquals(['name' => 'Black Album', 'released' => Date::fromParts(1991, 8, 12)], $list[0]);
+        self::assertEquals(['name' => 'S & M', 'released' => Date::fromParts(1999, 11, 23)], $list[1]);
+        self::assertEquals(['name' => 'Live One', 'released' => Date::fromParts(2005, 1, 1)], $list[2]);
+        self::assertEquals(['name' => 'The Piano Guys', 'released' => Date::fromParts(2012, 10, 2)], $list[3]);
 
         $tx = $this->conn->startTransaction();
 
@@ -188,12 +188,12 @@ class TypeTest extends IvoryTestCase
                             '4713-01-01 BC'::DATE AS mn"
                 );
                 $tuple = $rel->tuple();
-                $this->assertEquals(Date::fromParts(2016, 4, 17), $tuple->d, $dateStyle);
-                $this->assertEquals(Date::fromParts(-1987, 8, 17), $tuple->bc, $dateStyle);
-                $this->assertEquals(Date::infinity(), $tuple->inf, $dateStyle);
-                $this->assertEquals(Date::minusInfinity(), $tuple->minus_inf, $dateStyle);
-                $this->assertEquals(Date::fromParts(5874897, 12, 31), $tuple->mx, $dateStyle);
-                $this->assertEquals(Date::fromParts(-4713, 1, 1), $tuple->mn, $dateStyle);
+                self::assertEquals(Date::fromParts(2016, 4, 17), $tuple->d, $dateStyle);
+                self::assertEquals(Date::fromParts(-1987, 8, 17), $tuple->bc, $dateStyle);
+                self::assertEquals(Date::infinity(), $tuple->inf, $dateStyle);
+                self::assertEquals(Date::minusInfinity(), $tuple->minus_inf, $dateStyle);
+                self::assertEquals(Date::fromParts(5874897, 12, 31), $tuple->mx, $dateStyle);
+                self::assertEquals(Date::fromParts(-4713, 1, 1), $tuple->mn, $dateStyle);
             }
         } finally {
             $tx->rollback();
@@ -212,19 +212,19 @@ class TypeTest extends IvoryTestCase
              ORDER BY artist.name"
         );
 
-        $this->assertSame(['Metallica', 'The Piano Guys', 'Tommy Emmanuel'], $rel->col('name')->toArray());
+        self::assertSame(['Metallica', 'The Piano Guys', 'Tommy Emmanuel'], $rel->col('name')->toArray());
 
-        $this->assertEquals(
+        self::assertEquals(
             [Date::fromParts(1991, 8, 12), Date::fromParts(1999, 11, 23)],
             $rel->value('activerng', 0)->toBounds('[]')
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [Date::fromParts(2012, 10, 2), Date::fromParts(2012, 10, 2)],
             $rel->value('activerng', 1)->toBounds('[]')
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [Date::fromParts(2005, 1, 1), Date::fromParts(2005, 1, 1)],
             $rel->value('activerng', 2)->toBounds('[]')
         );
@@ -240,10 +240,10 @@ class TypeTest extends IvoryTestCase
         );
 
         $tuple = $rel->tuple();
-        $this->assertEquals(Time::fromPartsStrict(0, 0, 0), $tuple->midnight);
-        $this->assertEquals(Time::fromPartsStrict(8, 0, .123456), $tuple->leap_sec);
-        $this->assertEquals(Time::fromPartsStrict(15, 42, 54), $tuple->pm);
-        $this->assertEquals(Time::fromPartsStrict(24, 0, 0), $tuple->next_midnight);
+        self::assertEquals(Time::fromPartsStrict(0, 0, 0), $tuple->midnight);
+        self::assertEquals(Time::fromPartsStrict(8, 0, .123456), $tuple->leap_sec);
+        self::assertEquals(Time::fromPartsStrict(15, 42, 54), $tuple->pm);
+        self::assertEquals(Time::fromPartsStrict(24, 0, 0), $tuple->next_midnight);
     }
 
     public function testTimeTz()
@@ -256,10 +256,10 @@ class TypeTest extends IvoryTestCase
         );
 
         $tuple = $rel->tuple();
-        $this->assertEquals(TimeTz::fromPartsStrict(0, 0, 0, 0), $tuple->midnight);
-        $this->assertEquals(TimeTz::fromPartsStrict(8, 0, .123456, 48600), $tuple->leap_sec);
-        $this->assertEquals(TimeTz::fromPartsStrict(15, 42, 54, -28800), $tuple->pm);
-        $this->assertEquals(TimeTz::fromPartsStrict(24, 0, 0, 21600), $tuple->next_midnight);
+        self::assertEquals(TimeTz::fromPartsStrict(0, 0, 0, 0), $tuple->midnight);
+        self::assertEquals(TimeTz::fromPartsStrict(8, 0, .123456, 48600), $tuple->leap_sec);
+        self::assertEquals(TimeTz::fromPartsStrict(15, 42, 54, -28800), $tuple->pm);
+        self::assertEquals(TimeTz::fromPartsStrict(24, 0, 0, 21600), $tuple->next_midnight);
     }
 
     public function testTimestamp()
@@ -282,15 +282,15 @@ class TypeTest extends IvoryTestCase
                             '4713-01-01 00:00:00 BC'::TIMESTAMP AS mn"
                 );
                 $tuple = $rel->tuple();
-                $this->assertEquals(Timestamp::fromParts(2016, 4, 17, 0, 0, 0), $tuple->midnight, $dateStyle);
-                $this->assertEquals(Timestamp::fromParts(2016, 5, 17, 8, 0, 0.123456), $tuple->leap_sec, $dateStyle);
-                $this->assertEquals(Timestamp::fromParts(2016, 6, 17, 15, 42, 54), $tuple->pm, $dateStyle);
-                $this->assertEquals(Timestamp::fromParts(2016, 7, 18, 0, 0, 0), $tuple->next_midnight, $dateStyle);
-                $this->assertEquals(Timestamp::fromParts(-1987, 8, 17, 13, 1, 2.5), $tuple->bc, $dateStyle);
-                $this->assertEquals(Timestamp::infinity(), $tuple->inf, $dateStyle);
-                $this->assertEquals(Timestamp::minusInfinity(), $tuple->minus_inf, $dateStyle);
-                $this->assertEquals(Timestamp::fromParts(294276, 12, 31, 23, 59, 59.999999), $tuple->mx, $dateStyle);
-                $this->assertEquals(Timestamp::fromParts(-4713, 1, 1, 0, 0, 0), $tuple->mn, $dateStyle);
+                self::assertEquals(Timestamp::fromParts(2016, 4, 17, 0, 0, 0), $tuple->midnight, $dateStyle);
+                self::assertEquals(Timestamp::fromParts(2016, 5, 17, 8, 0, 0.123456), $tuple->leap_sec, $dateStyle);
+                self::assertEquals(Timestamp::fromParts(2016, 6, 17, 15, 42, 54), $tuple->pm, $dateStyle);
+                self::assertEquals(Timestamp::fromParts(2016, 7, 18, 0, 0, 0), $tuple->next_midnight, $dateStyle);
+                self::assertEquals(Timestamp::fromParts(-1987, 8, 17, 13, 1, 2.5), $tuple->bc, $dateStyle);
+                self::assertEquals(Timestamp::infinity(), $tuple->inf, $dateStyle);
+                self::assertEquals(Timestamp::minusInfinity(), $tuple->minus_inf, $dateStyle);
+                self::assertEquals(Timestamp::fromParts(294276, 12, 31, 23, 59, 59.999999), $tuple->mx, $dateStyle);
+                self::assertEquals(Timestamp::fromParts(-4713, 1, 1, 0, 0, 0), $tuple->mn, $dateStyle);
             }
         } finally {
             $tx->rollback();
@@ -335,18 +335,18 @@ class TypeTest extends IvoryTestCase
                     }
                     $this->assertNoMoreErrors($msg);
 
-                    $this->assertEquals(TimestampTz::fromParts(2016, 1, 17, 0, 0, 0, $tzStd), $tuple->midnight, $msg);
-                    $this->assertEquals(TimestampTz::fromParts(2016, 6, 17, 15, 42, 54, $tzSmr), $tuple->pm, $msg);
-                    $this->assertEquals(TimestampTz::fromParts(2016, 7, 18, 0, 0, 0, $tzSmr), $tuple->next_midnight,
+                    self::assertEquals(TimestampTz::fromParts(2016, 1, 17, 0, 0, 0, $tzStd), $tuple->midnight, $msg);
+                    self::assertEquals(TimestampTz::fromParts(2016, 6, 17, 15, 42, 54, $tzSmr), $tuple->pm, $msg);
+                    self::assertEquals(TimestampTz::fromParts(2016, 7, 18, 0, 0, 0, $tzSmr), $tuple->next_midnight,
                         $msg);
-                    $this->assertEquals(TimestampTz::fromParts(2016, 5, 17, 8, 0, 0.123456, $tzSmr), $tuple->leap_sec,
+                    self::assertEquals(TimestampTz::fromParts(2016, 5, 17, 8, 0, 0.123456, $tzSmr), $tuple->leap_sec,
                         $msg);
-                    $this->assertEquals(TimestampTz::infinity(), $tuple->inf, $msg);
-                    $this->assertEquals(TimestampTz::minusInfinity(), $tuple->minus_inf, $msg);
-                    $this->assertEquals(TimestampTz::fromParts(-1987, 8, 17, 13, 1, 2.5, $lmtOffset), $tuple->bc,
+                    self::assertEquals(TimestampTz::infinity(), $tuple->inf, $msg);
+                    self::assertEquals(TimestampTz::minusInfinity(), $tuple->minus_inf, $msg);
+                    self::assertEquals(TimestampTz::fromParts(-1987, 8, 17, 13, 1, 2.5, $lmtOffset), $tuple->bc,
                         $msg);
-                    $this->assertEquals(TimestampTz::fromParts(294276, 12, 31, 23, 59, 59.999999, $tzStd), $tuple->mx, $msg);
-                    $this->assertEquals(TimestampTz::fromParts(-4713, 1, 1, 0, 0, 0, $lmtOffset), $tuple->mn, $msg);
+                    self::assertEquals(TimestampTz::fromParts(294276, 12, 31, 23, 59, 59.999999, $tzStd), $tuple->mx, $msg);
+                    self::assertEquals(TimestampTz::fromParts(-4713, 1, 1, 0, 0, 0, $lmtOffset), $tuple->mn, $msg);
                 }
             }
         } finally {
@@ -360,10 +360,10 @@ class TypeTest extends IvoryTestCase
             'SELECT *
              FROM (VALUES (point(0, 0), point(3, 4)), (point(1.3, 4), point(8, -2))) v ("A", "B")'
         );
-        $this->assertSame(2, count($rel));
-        $this->assertEquals(Point::fromCoords(0, 0), $rel->tuple(0)->A);
-        $this->assertEquals(Point::fromCoords(0, 0), $rel->value('A', 0));
-        $this->assertEquals(
+        self::assertSame(2, count($rel));
+        self::assertEquals(Point::fromCoords(0, 0), $rel->tuple(0)->A);
+        self::assertEquals(Point::fromCoords(0, 0), $rel->value('A', 0));
+        self::assertEquals(
             [
                 ['A' => Point::fromCoords(0, 0), 'B' => Point::fromCoords(3, 4)],
                 ['A' => Point::fromCoords(1.3, 4), 'B' => Point::fromCoords(8, -2)],
@@ -381,9 +381,9 @@ class TypeTest extends IvoryTestCase
         );
 
         $tuple = $rel->tuple();
-        $this->assertEquals(PgLogSequenceNumber::fromString('16/B374D848'), $tuple[0]);
-        $this->assertEquals(PgLogSequenceNumber::fromString('0/0'), $tuple[1]);
-        $this->assertEquals(PgLogSequenceNumber::fromString('FFFFFFFF/FFFFFFFF'), $tuple[2]);
+        self::assertEquals(PgLogSequenceNumber::fromString('16/B374D848'), $tuple[0]);
+        self::assertEquals(PgLogSequenceNumber::fromString('0/0'), $tuple[1]);
+        self::assertEquals(PgLogSequenceNumber::fromString('FFFFFFFF/FFFFFFFF'), $tuple[2]);
     }
 
     public function testTxidSnapshot()
@@ -396,10 +396,10 @@ class TypeTest extends IvoryTestCase
         );
 
         $tuple = $rel->tuple();
-        $this->assertEquals(TxIdSnapshot::fromParts(10, 20, [10, 14, 15]), $tuple[0]);
-        $this->assertEquals(TxIdSnapshot::fromParts(10, 20, [19]), $tuple[1]);
-        $this->assertEquals(TxIdSnapshot::fromParts(10, 20, []), $tuple[2]);
-        $this->assertEquals(TxIdSnapshot::fromParts(10, 10, []), $tuple[3]);
+        self::assertEquals(TxIdSnapshot::fromParts(10, 20, [10, 14, 15]), $tuple[0]);
+        self::assertEquals(TxIdSnapshot::fromParts(10, 20, [19]), $tuple[1]);
+        self::assertEquals(TxIdSnapshot::fromParts(10, 20, []), $tuple[2]);
+        self::assertEquals(TxIdSnapshot::fromParts(10, 10, []), $tuple[3]);
     }
 
     public function testTsVector()
@@ -414,27 +414,27 @@ class TypeTest extends IvoryTestCase
 
         $tuple = $rel->tuple();
 
-        $this->assertEquals(
+        self::assertEquals(
             TextSearchVector::fromSet(['a', 'and', 'ate', 'cat', 'fat', 'mat', 'on', 'rat', 'sat']),
             $tuple->list
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             TextSearchVector::fromSet(['    ', 'contains', 'lexeme', 'spaces', 'the']),
             $tuple->whitespace
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             TextSearchVector::fromSet(['a', 'contains', "Joe's", 'lexeme', 'quote', 'the']),
             $tuple->quotes
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             TextSearchVector::fromList(['a', 'fat', 'cat', 'sat', 'on', 'a', 'mat', 'and', 'ate', 'a', 'fat', 'rat']),
             $tuple->positioned
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             TextSearchVector::fromMap(['a' => [['1', 'A']], 'fat' => [[2, 'B'], [4, 'C']], 'cat' => [[5, 'D']]]),
             $tuple->weighted
         );
@@ -449,9 +449,9 @@ class TypeTest extends IvoryTestCase
         );
 
         $tuple = $rel->tuple();
-        $this->assertEquals(TextSearchQuery::fromString("!'fat' & ( 'rat':AB | 'cat' )"), $tuple->ops);
-        $this->assertEquals(TextSearchQuery::fromString("'super':*"), $tuple->star);
-        $this->assertEquals(TextSearchQuery::fromString("'Jo  e''s'''"), $tuple->quotes);
+        self::assertEquals(TextSearchQuery::fromString("!'fat' & ( 'rat':AB | 'cat' )"), $tuple->ops);
+        self::assertEquals(TextSearchQuery::fromString("'super':*"), $tuple->star);
+        self::assertEquals(TextSearchQuery::fromString("'Jo  e''s'''"), $tuple->quotes);
     }
 
     public function testInterval()
@@ -465,32 +465,32 @@ class TypeTest extends IvoryTestCase
         );
 
         $tuple = $rel->tuple();
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::YEAR => 1, TimeInterval::MONTH => 2, TimeInterval::WEEK => 3, TimeInterval::DAY => 3,
                 TimeInterval::HOUR => 4, TimeInterval::MINUTE => 5, TimeInterval::SECOND => 6,
             ]),
             $tuple->iso
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::YEAR => 1, TimeInterval::MONTH => 2, TimeInterval::DAY => 3,
                 TimeInterval::HOUR => 4, TimeInterval::MINUTE => 5, TimeInterval::SECOND => 6,
             ]),
             $tuple->iso_alt
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::YEAR => 1, TimeInterval::MONTH => 2]),
             $tuple->sql_year_mon
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([
                 TimeInterval::DAY => 3,
                 TimeInterval::HOUR => 12, TimeInterval::MINUTE => 34, TimeInterval::SECOND => 56,
             ]),
             $tuple->sql_day_time
         );
-        $this->assertEquals(
+        self::assertEquals(
             TimeInterval::fromParts([TimeInterval::DAY => -4]),
             $tuple->pg
         );
@@ -505,11 +505,11 @@ class TypeTest extends IvoryTestCase
                     hstore('k', '2') AS int_value,
                     hstore(ARRAY['a', 'X', 'b', 'Y']) AS multi_value"
         );
-        $this->assertSame([], $tuple->empty);
-        $this->assertSame(['k' => 'v'], $tuple->singleton);
-        $this->assertSame(['k' => null], $tuple->null_value);
-        $this->assertSame(['k' => '2'], $tuple->int_value);
-        $this->assertSame(['a' => 'X', 'b' => 'Y'], $tuple->multi_value);
+        self::assertSame([], $tuple->empty);
+        self::assertSame(['k' => 'v'], $tuple->singleton);
+        self::assertSame(['k' => null], $tuple->null_value);
+        self::assertSame(['k' => '2'], $tuple->int_value);
+        self::assertSame(['a' => 'X', 'b' => 'Y'], $tuple->multi_value);
     }
 
     public function testMacAddr()
@@ -520,8 +520,8 @@ class TypeTest extends IvoryTestCase
             MacAddr::fromString('08:00:2b:01:02:03'),
             MacAddr::fromString('08:00:2b:01:02:03')
         );
-        $this->assertEquals(MacAddr::fromString('08:00:2b:01:02:03'), $a6tuple->a6);
-        $this->assertEquals(MacAddr::fromString('08:00:2b:01:02:03'), $a6tuple->a6auto);
+        self::assertEquals(MacAddr::fromString('08:00:2b:01:02:03'), $a6tuple->a6);
+        self::assertEquals(MacAddr::fromString('08:00:2b:01:02:03'), $a6tuple->a6auto);
 
         if ($this->conn->getConfig()->getServerMajorVersionNumber() >= 10) { // macaddr8 only since PostgreSQL 10
             $tuple = $this->conn->querySingleTuple(
@@ -532,9 +532,9 @@ class TypeTest extends IvoryTestCase
                 MacAddr8::fromString('08:00:2b:01:02:03:04:05'),
                 MacAddr8::fromString('08:00:2b:01:02:03:04:05')
             );
-            $this->assertEquals(MacAddr8::fromString('0a:00:2b:ff:fe:01:02:03'), $tuple->bit7set);
-            $this->assertEquals(MacAddr8::fromString('08:00:2b:01:02:03:04:05'), $tuple->a8);
-            $this->assertEquals(MacAddr8::fromString('08:00:2b:01:02:03:04:05'), $tuple->a8auto);
+            self::assertEquals(MacAddr8::fromString('0a:00:2b:ff:fe:01:02:03'), $tuple->bit7set);
+            self::assertEquals(MacAddr8::fromString('08:00:2b:01:02:03:04:05'), $tuple->a8);
+            self::assertEquals(MacAddr8::fromString('08:00:2b:01:02:03:04:05'), $tuple->a8auto);
         }
     }
 
@@ -543,22 +543,22 @@ class TypeTest extends IvoryTestCase
         $typeDict = $this->conn->getTypeDictionary();
 
         $a = SqlRelationDefinition::fromPattern('SELECT * FROM %ident', 't');
-        $this->assertSame('SELECT * FROM t', $a->toSql($typeDict));
+        self::assertSame('SELECT * FROM t', $a->toSql($typeDict));
 
         $b = SqlRelationDefinition::fromPattern('SELECT * FROM %ident', 'T');
-        $this->assertSame('SELECT * FROM "T"', $b->toSql($typeDict));
+        self::assertSame('SELECT * FROM "T"', $b->toSql($typeDict));
 
         $c = SqlRelationDefinition::fromPattern('SELECT * FROM %ident', 'a.b');
-        $this->assertSame('SELECT * FROM "a.b"', $c->toSql($typeDict));
+        self::assertSame('SELECT * FROM "a.b"', $c->toSql($typeDict));
 
         $d = SqlRelationDefinition::fromPattern('SELECT * FROM %ident?', 't');
-        $this->assertSame('SELECT * FROM t', $d->toSql($typeDict));
+        self::assertSame('SELECT * FROM t', $d->toSql($typeDict));
 
         $e = SqlRelationDefinition::fromPattern('SELECT * FROM %ident?', 'T');
-        $this->assertSame('SELECT * FROM "T"', $e->toSql($typeDict));
+        self::assertSame('SELECT * FROM "T"', $e->toSql($typeDict));
 
         $f = SqlRelationDefinition::fromPattern('SELECT * FROM %ident?', 'a.b');
-        $this->assertSame('SELECT * FROM "a.b"', $f->toSql($typeDict));
+        self::assertSame('SELECT * FROM "a.b"', $f->toSql($typeDict));
     }
 
     public function testExceptionHintsOnUndefinedType()
@@ -569,12 +569,12 @@ class TypeTest extends IvoryTestCase
                 'pg_catalog'
             );
         } catch (UndefinedTypeException $e) {
-            $this->assertStringContainsStringIgnoringCase('did you mean', $e->getMessage());
-            $this->assertContains('%{ident}.pg_class', $e->getMessage());
+            self::assertStringContainsStringIgnoringCase('did you mean', $e->getMessage());
+            self::assertContains('%{ident}.pg_class', $e->getMessage());
         }
 
         $res = $this->conn->querySingleValue('SELECT 1 FROM %{ident}.pg_class LIMIT 1', 'pg_catalog');
-        $this->assertSame(1, $res);
+        self::assertSame(1, $res);
     }
 
     public function testSerializeObjectIdentifierTypes()
@@ -582,7 +582,7 @@ class TypeTest extends IvoryTestCase
         $typeDict = $this->conn->getTypeDictionary();
 
         $oidRel = SqlRelationDefinition::fromPattern('SELECT %oid, %oid', 987, null);
-        $this->assertSame(
+        self::assertSame(
             'SELECT 987::pg_catalog.oid, NULL::pg_catalog.oid',
             $oidRel->toSql($typeDict)
         );
@@ -592,7 +592,7 @@ class TypeTest extends IvoryTestCase
             PgProcedureNameRef::fromQualifiedName('pg_catalog', 'pg_typeof'),
             null
         );
-        $this->assertSame(
+        self::assertSame(
             "SELECT pg_catalog.regproc 'pg_catalog.pg_typeof', NULL::pg_catalog.regproc",
             $regProcRel->toSql($typeDict)
         );
@@ -603,7 +603,7 @@ class TypeTest extends IvoryTestCase
             PgProcedureRef::fromUnqualifiedName('abbrev', PgTypeRef::fromQualifiedName('pg_catalog', 'cidr')),
             null
         );
-        $this->assertSame(
+        self::assertSame(
             "SELECT pg_catalog.regprocedure 'abs(integer)', pg_catalog.regprocedure 'abbrev(pg_catalog.cidr)', " .
             "NULL::pg_catalog.regprocedure",
             $regProcedureRel->toSql($typeDict)
@@ -614,7 +614,7 @@ class TypeTest extends IvoryTestCase
             PgOperatorNameRef::fromUnqualifiedName('!'),
             null
         );
-        $this->assertSame(
+        self::assertSame(
             "SELECT pg_catalog.regoper '\"!\"', NULL::pg_catalog.regoper",
             $regOperRel->toSql($typeDict)
         );
@@ -628,7 +628,7 @@ class TypeTest extends IvoryTestCase
             ),
             null
         );
-        $this->assertSame(
+        self::assertSame(
             "SELECT pg_catalog.regoperator '\"+\"(integer, integer)', NULL::pg_catalog.regoperator",
             $regOperatorRel->toSql($typeDict)
         );
@@ -639,7 +639,7 @@ class TypeTest extends IvoryTestCase
             PgRelationRef::fromQualifiedName('some."schema"', '"tbl"'),
             null
         );
-        $this->assertSame(
+        self::assertSame(
             <<<'SQL'
 SELECT pg_catalog.regclass 'pg_class', pg_catalog.regclass '"some.""schema"""."""tbl"""', NULL::pg_catalog.regclass
 SQL
@@ -652,7 +652,7 @@ SQL
             PgTypeRef::fromQualifiedName('pg_catalog', 'bool'),
             null
         );
-        $this->assertSame(
+        self::assertSame(
             "SELECT pg_catalog.regtype 'pg_catalog.bool', NULL::pg_catalog.regtype",
             $regTypeRel->toSql($typeDict)
         );
@@ -660,7 +660,7 @@ SQL
         // NOTE: regrole and regnamespace have been introduced in PostgreSQL 9.5
         if ($this->conn->getConfig()->getServerVersionNumber() >= 90500) {
             $regRoleRel = SqlRelationDefinition::fromPattern('SELECT %regrole, %regrole', 'postgres', null);
-            $this->assertSame(
+            self::assertSame(
                 "SELECT pg_catalog.regrole 'postgres', NULL::pg_catalog.regrole",
                 $regRoleRel->toSql($typeDict)
             );
@@ -670,7 +670,7 @@ SQL
                 'some."schema"',
                 null
             );
-            $this->assertSame(
+            self::assertSame(
                 <<<'SQL'
 SELECT pg_catalog.regnamespace '"some.""schema"""', NULL::pg_catalog.regnamespace
 SQL
@@ -684,7 +684,7 @@ SQL
             PgTextSearchConfigRef::fromQualifiedName('some."schema"', 'fts_config'),
             null
         );
-        $this->assertSame(
+        self::assertSame(
             <<<'SQL'
 SELECT pg_catalog.regconfig '"some.""schema""".fts_config', NULL::pg_catalog.regconfig
 SQL
@@ -697,7 +697,7 @@ SQL
             PgTextSearchDictionaryRef::fromQualifiedName('some."schema"', 'fts_dict'),
             null
         );
-        $this->assertSame(
+        self::assertSame(
             <<<'SQL'
 SELECT pg_catalog.regdictionary '"some.""schema""".fts_dict', NULL::pg_catalog.regdictionary
 SQL
@@ -710,13 +710,13 @@ SQL
             TupleId::fromCoordinates(4013, 824928),
             null
         );
-        $this->assertSame(
+        self::assertSame(
             "SELECT pg_catalog.tid '(4013,824928)', NULL::pg_catalog.tid",
             $tupleIdRel->toSql($typeDict)
         );
 
         $otherRel = SqlRelationDefinition::fromPattern('SELECT %xid, %cid', 123, 456);
-        $this->assertSame(
+        self::assertSame(
             "SELECT pg_catalog.xid '123', pg_catalog.cid '456'",
             $otherRel->toSql($typeDict)
         );
@@ -749,14 +749,14 @@ SQL
                     '(7,8)'::tid AS tid
 SQL
             );
-            $this->assertSame(987, $tuple->oid);
-            $this->assertEquals(PgProcedureNameRef::fromUnqualifiedName('pg_typeof'), $tuple->regproc);
-            $this->assertEquals(
+            self::assertSame(987, $tuple->oid);
+            self::assertEquals(PgProcedureNameRef::fromUnqualifiedName('pg_typeof'), $tuple->regproc);
+            self::assertEquals(
                 PgProcedureRef::fromUnqualifiedName('abs', PgTypeRef::fromUnqualifiedName('integer')),
                 $tuple->regprocedure
             );
-            $this->assertEquals(PgOperatorNameRef::fromUnqualifiedName('!'), $tuple->regoper);
-            $this->assertEquals(
+            self::assertEquals(PgOperatorNameRef::fromUnqualifiedName('!'), $tuple->regoper);
+            self::assertEquals(
                 PgOperatorRef::fromUnqualifiedName(
                     '+',
                     PgTypeRef::fromUnqualifiedName('integer'),
@@ -764,20 +764,20 @@ SQL
                 ),
                 $tuple->regoperator
             );
-            $this->assertEquals(PgRelationRef::fromUnqualifiedName('pg_class'), $tuple->regclass);
-            $this->assertEquals(PgRelationRef::fromQualifiedName('some."schema"', '"tbl"'), $tuple->regclass_tbl);
-            $this->assertEquals(PgTypeRef::fromUnqualifiedName('boolean'), $tuple->regtype);
-            $this->assertEquals(
+            self::assertEquals(PgRelationRef::fromUnqualifiedName('pg_class'), $tuple->regclass);
+            self::assertEquals(PgRelationRef::fromQualifiedName('some."schema"', '"tbl"'), $tuple->regclass_tbl);
+            self::assertEquals(PgTypeRef::fromUnqualifiedName('boolean'), $tuple->regtype);
+            self::assertEquals(
                 PgTextSearchConfigRef::fromQualifiedName('some."schema"', 'fts_config'),
                 $tuple->regconfig
             );
-            $this->assertEquals(
+            self::assertEquals(
                 PgTextSearchDictionaryRef::fromQualifiedName('some."schema"', 'fts_dict'),
                 $tuple->regdictionary
             );
-            $this->assertSame(123, $tuple->xid);
-            $this->assertSame(456, $tuple->cid);
-            $this->assertEquals(TupleId::fromCoordinates(7, 8), $tuple->tid);
+            self::assertSame(123, $tuple->xid);
+            self::assertSame(456, $tuple->cid);
+            self::assertEquals(TupleId::fromCoordinates(7, 8), $tuple->tid);
 
             // NOTE: regrole and regnamespace have been introduced in PostgreSQL 9.5
             if ($this->conn->getConfig()->getServerVersionNumber() >= 90500) {
@@ -789,9 +789,9 @@ SQL
                         '"some.""schema"""'::regnamespace AS regnamespace_some_schema
 SQL
                 );
-                $this->assertSame('postgres', $tuple->regrole);
-                $this->assertSame('pg_catalog', $tuple->regnamespace);
-                $this->assertSame('some."schema"', $tuple->regnamespace_some_schema);
+                self::assertSame('postgres', $tuple->regrole);
+                self::assertSame('pg_catalog', $tuple->regnamespace);
+                self::assertSame('some."schema"', $tuple->regnamespace_some_schema);
             }
         } finally {
             $tx->rollback();
@@ -807,8 +807,8 @@ SQL
             1.2,
             1.2
         );
-        $this->assertSame('numeric', $tuple->double_implicit);
-        $this->assertSame('double precision', $tuple->double_explicit);
+        self::assertSame('numeric', $tuple->double_implicit);
+        self::assertSame('double precision', $tuple->double_explicit);
     }
 
 }

@@ -35,12 +35,12 @@ class TypeRegisterTest extends IvoryTestCase
             TimestampTz::fromParts(2017, 9, 23, 17, 14, 1, new \DateTimeZone('Europe/Prague'))
         );
 
-        $this->assertSame('foo', $tuple[0]);
-        $this->assertSame(42, $tuple[1]);
-        $this->assertEquals(Decimal::fromNumber(3.14), $tuple[2]);
-        $this->assertSame(1.81, $tuple[3]);
-        $this->assertEquals(Timestamp::fromParts(2017, 9, 23, 17, 14, 0), $tuple[4]);
-        $this->assertEquals(
+        self::assertSame('foo', $tuple[0]);
+        self::assertSame(42, $tuple[1]);
+        self::assertEquals(Decimal::fromNumber(3.14), $tuple[2]);
+        self::assertSame(1.81, $tuple[3]);
+        self::assertEquals(Timestamp::fromParts(2017, 9, 23, 17, 14, 0), $tuple[4]);
+        self::assertEquals(
             TimestampTz::fromParts(2017, 9, 23, 17, 14, 1, new \DateTimeZone('Europe/Prague')),
             $tuple[5]
         );
@@ -50,7 +50,7 @@ class TypeRegisterTest extends IvoryTestCase
     {
         try {
             $this->conn->querySingleValue('SELECT %b', true);
-            $this->fail(UndefinedTypeException::class . ' was expected');
+            self::fail(UndefinedTypeException::class . ' was expected');
         } catch (UndefinedTypeException $e) {
         }
 
@@ -58,6 +58,6 @@ class TypeRegisterTest extends IvoryTestCase
         $this->conn->flushTypeDictionary();
 
         $val = $this->conn->querySingleValue('SELECT %b', true);
-        $this->assertSame(true, $val);
+        self::assertSame(true, $val);
     }
 }

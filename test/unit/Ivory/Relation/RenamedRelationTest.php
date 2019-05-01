@@ -25,7 +25,7 @@ class RenamedRelationTest extends IvoryTestCase
             "SELECT 'abc' AS foo"
         );
         $renamed = $rel->rename(['foo' => 'bar']);
-        $this->assertSame(['bar' => 'abc'], $renamed->tuple()->toMap());
+        self::assertSame(['bar' => 'abc'], $renamed->tuple()->toMap());
     }
 
     public function testComplex()
@@ -34,7 +34,7 @@ class RenamedRelationTest extends IvoryTestCase
             "SELECT 1, 'abc', false AS b, true AS c, NULL::JSON AS d"
         );
         $renamed = $rel->rename([1 => 'str', 2 => 'bool', 'd' => 'json']);
-        $this->assertSame(
+        self::assertSame(
             ['str' => 'abc', 'bool' => false, 'c' => true, 'json' => null],
             $renamed->tuple()->toMap()
         );
@@ -46,10 +46,10 @@ class RenamedRelationTest extends IvoryTestCase
             "SELECT 'abc' AS foo"
         );
         $renamed = $rel->rename(['foo' => 'bar']);
-        $this->assertSame(['bar' => 'abc'], $renamed->tuple()->toMap());
-        $this->assertSame(['foo' => 'abc'], $rel->tuple()->toMap());
+        self::assertSame(['bar' => 'abc'], $renamed->tuple()->toMap());
+        self::assertSame(['foo' => 'abc'], $rel->tuple()->toMap());
         $other = $rel->rename([0 => 'baz']);
-        $this->assertSame(['baz' => 'abc'], $other->tuple()->toMap());
+        self::assertSame(['baz' => 'abc'], $other->tuple()->toMap());
 
         $relSimult = $this->conn->query(
             'VALUES (1), (2)'
@@ -58,10 +58,10 @@ class RenamedRelationTest extends IvoryTestCase
         $renTwo = $relSimult->rename(['b']);
         foreach ($renOne as $i => $outer) {
             assert($outer instanceof ITuple);
-            $this->assertSame(['a' => $i + 1], $outer->toMap(), "row $i");
+            self::assertSame(['a' => $i + 1], $outer->toMap(), "row $i");
             foreach ($renTwo as $j => $inner) {
                 assert($inner instanceof ITuple);
-                $this->assertSame(['b' => $j + 1], $inner->toMap(), "row $i|$j");
+                self::assertSame(['b' => $j + 1], $inner->toMap(), "row $i|$j");
             }
         }
     }
@@ -78,7 +78,7 @@ class RenamedRelationTest extends IvoryTestCase
         };
         $gen = $fn();
         $renamed = $rel->rename($gen);
-        $this->assertSame(['F' => 'abc', 'bar' => 4, 'BZ' => 5], $renamed->tuple()->toMap());
+        self::assertSame(['F' => 'abc', 'bar' => 4, 'BZ' => 5], $renamed->tuple()->toMap());
     }
 
     public function testSimpleMacros()
@@ -86,27 +86,27 @@ class RenamedRelationTest extends IvoryTestCase
         $rel = $this->conn->query(
             'SELECT 1 AS a, 2 AS ab, 3 AS b, 4 AS xyxz'
         );
-        $this->assertSame(
+        self::assertSame(
             ['c ' => 1, 'c b' => 2, 'b' => 3, 'xyxz' => 4],
             $rel->rename(['a*' => 'c *'])->tuple()->toMap()
         );
-        $this->assertSame(
+        self::assertSame(
             ['a' => 1, 'ab' => 2, 'c' => 3, 'xyxz' => 4],
             $rel->rename(['b*' => 'c'])->tuple()->toMap()
         );
-        $this->assertSame(
+        self::assertSame(
             ['c a' => 1, 'c ab' => 2, 'c b' => 3, 'c xyxz' => 4],
             $rel->rename(['*' => 'c *'])->tuple()->toMap()
         );
-        $this->assertSame(
+        self::assertSame(
             ['c \\ * ' => 1, 'c \\ * b' => 2, 'b' => 3, 'xyxz' => 4],
             $rel->rename(['a*' => 'c \\\\ \\* *'])->tuple()->toMap()
         );
-        $this->assertSame(
+        self::assertSame(
             ['d' => 1, 'ac' => 2, 'c' => 3, 'xyxz' => 4],
             $rel->rename(['*b' => '*c', 'a*' => 'd'])->tuple()->toMap()
         );
-        $this->assertSame(
+        self::assertSame(
             ['a' => 1, 'ab' => 2, 'b' => 3, 'XyYzZ' => 4],
             $rel->rename(['x*x**' => 'X*Y*Z*'])->tuple()->toMap()
         );
@@ -117,8 +117,8 @@ class RenamedRelationTest extends IvoryTestCase
         $rel = $this->conn->query(
             'SELECT 1 AS a, 2 AS ab, 3 AS b'
         );
-        $this->assertSame(['c' => 1, 'cb' => 2, 'b' => 3], $rel->rename(['/A(.*)/i' => 'c$1'])->tuple()->toMap());
-        $this->assertSame(['a' => 1, 'ba' => 2, 'b' => 3], $rel->rename(['/(.)(.)/' => '$2$1'])->tuple()->toMap());
+        self::assertSame(['c' => 1, 'cb' => 2, 'b' => 3], $rel->rename(['/A(.*)/i' => 'c$1'])->tuple()->toMap());
+        self::assertSame(['a' => 1, 'ba' => 2, 'b' => 3], $rel->rename(['/(.)(.)/' => '$2$1'])->tuple()->toMap());
     }
 
     public function testMultipleMatchingColumns()
@@ -129,14 +129,14 @@ class RenamedRelationTest extends IvoryTestCase
         $renamed = $rel->rename(['a' => 'c']);
         $expectedColNames = ['c', 'c', 'ab'];
         foreach ($renamed->getColumns() as $i => $column) {
-            $this->assertSame($expectedColNames[$i], $column->getName(), "iteration $i");
+            self::assertSame($expectedColNames[$i], $column->getName(), "iteration $i");
         }
 
         $renTuple = $renamed->tuple();
-        $this->assertSame([1, 2, 3], $renTuple->toList());
-        $this->assertSame(3, $renTuple->ab);
-        $this->assertTrue(isset($renTuple->c));
-        $this->assertFalse(isset($renTuple->a));
+        self::assertSame([1, 2, 3], $renTuple->toList());
+        self::assertSame(3, $renTuple->ab);
+        self::assertTrue(isset($renTuple->c));
+        self::assertFalse(isset($renTuple->a));
     }
 
     public function testMultipleMatchingColumnsWildcard()
@@ -147,12 +147,12 @@ class RenamedRelationTest extends IvoryTestCase
         $renamed = $rel->rename(['a*' => 'c*']);
         $expectedColNames = ['c', 'c', 'cb'];
         foreach ($renamed->getColumns() as $i => $column) {
-            $this->assertSame($expectedColNames[$i], $column->getName(), "iteration $i");
+            self::assertSame($expectedColNames[$i], $column->getName(), "iteration $i");
         }
 
         $renTuple = $renamed->tuple();
-        $this->assertSame([1, 2, 3], $renTuple->toList());
-        $this->assertSame(3, $renTuple->cb);
+        self::assertSame([1, 2, 3], $renTuple->toList());
+        self::assertSame(3, $renTuple->cb);
     }
 
     public function testCol()
@@ -163,19 +163,19 @@ class RenamedRelationTest extends IvoryTestCase
         );
         $renamed = $rel->rename(['a' => 'c']);
 
-        $this->assertSame([1, 3, 5], $renamed->col('c')->toArray());
-        $this->assertSame([2, 4, 6], $renamed->col('b')->toArray());
+        self::assertSame([1, 3, 5], $renamed->col('c')->toArray());
+        self::assertSame([2, 4, 6], $renamed->col('b')->toArray());
         try {
             $renamed->col('a');
-            $this->fail(UndefinedColumnException::class . ' expected');
+            self::fail(UndefinedColumnException::class . ' expected');
         } catch (UndefinedColumnException $e) {
         }
 
-        $this->assertSame(
+        self::assertSame(
             [2, 12, 30],
             $renamed->col(function (ITuple $tuple) { return $tuple->b * $tuple->c; })->toArray()
         );
 
-        $this->assertSame('c', $renamed->col(0)->getName());
+        self::assertSame('c', $renamed->col(0)->getName());
     }
 }

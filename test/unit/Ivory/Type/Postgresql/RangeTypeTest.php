@@ -22,66 +22,66 @@ class RangeTypeTest extends TestCase
     public function testParseValue()
     {
         $rng1 = $this->intRangeType->parseValue('[1,4)');
-        $this->assertSame(1, $rng1->getLower());
-        $this->assertSame(4, $rng1->getUpper());
-        $this->assertSame('[)', $rng1->getBoundsSpec());
+        self::assertSame(1, $rng1->getLower());
+        self::assertSame(4, $rng1->getUpper());
+        self::assertSame('[)', $rng1->getBoundsSpec());
 
         $rng2 = $this->intRangeType->parseValue('[1,3]');
-        $this->assertSame('[]', $rng2->getBoundsSpec());
+        self::assertSame('[]', $rng2->getBoundsSpec());
 
         $rng3 = $this->intRangeType->parseValue('(0,4)');
-        $this->assertSame('()', $rng3->getBoundsSpec());
+        self::assertSame('()', $rng3->getBoundsSpec());
 
         $rng4 = $this->intRangeType->parseValue('[1,1)');
-        $this->assertTrue($rng4->isEmpty());
+        self::assertTrue($rng4->isEmpty());
 
         $rng5 = $this->intRangeType->parseValue('[,4)');
-        $this->assertSame(null, $rng5->getLower());
-        $this->assertSame(4, $rng5->getUpper());
-        $this->assertSame('()', $rng5->getBoundsSpec());
+        self::assertSame(null, $rng5->getLower());
+        self::assertSame(4, $rng5->getUpper());
+        self::assertSame('()', $rng5->getBoundsSpec());
 
         $rng6 = $this->intRangeType->parseValue('[,)');
-        $this->assertSame(null, $rng6->getLower());
-        $this->assertSame(null, $rng6->getUpper());
-        $this->assertSame('()', $rng6->getBoundsSpec());
+        self::assertSame(null, $rng6->getLower());
+        self::assertSame(null, $rng6->getUpper());
+        self::assertSame('()', $rng6->getBoundsSpec());
 
         $rng7 = $this->intRangeType->parseValue('[5,4)');
-        $this->assertTrue($rng7->isEmpty());
+        self::assertTrue($rng7->isEmpty());
     }
 
     public function testSerializeValue()
     {
-        $this->assertSame(
+        self::assertSame(
             'NULL',
             $this->intRangeType->serializeValue(null, false)
         );
 
-        $this->assertSame(
+        self::assertSame(
             "'empty'",
             $this->intRangeType->serializeValue(Range::empty(), false)
         );
-        $this->assertSame(
+        self::assertSame(
             "pg_catalog.int4range 'empty'",
             $this->intRangeType->serializeValue(Range::empty())
         );
-        $this->assertSame(
+        self::assertSame(
             "'empty'",
             $this->intRangeType->serializeValue([1, 0], false)
         );
 
-        $this->assertSame(
+        self::assertSame(
             "pg_catalog.int4range(1,4)",
             $this->intRangeType->serializeValue(Range::fromBounds(1, 4))
         );
-        $this->assertSame(
+        self::assertSame(
             "pg_catalog.int4range(1,NULL)",
             $this->intRangeType->serializeValue(Range::fromBounds(1, null), false)
         );
-        $this->assertSame(
+        self::assertSame(
             "pg_catalog.int4range(NULL,4)",
             $this->intRangeType->serializeValue(Range::fromBounds(null, 4))
         );
-        $this->assertSame(
+        self::assertSame(
             "pg_catalog.int4range(NULL,NULL)",
             $this->intRangeType->serializeValue(Range::fromBounds(null, null))
         );

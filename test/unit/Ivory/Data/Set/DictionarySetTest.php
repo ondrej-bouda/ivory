@@ -9,40 +9,40 @@ class DictionarySetTest extends TestCase
     public function testBasic()
     {
         $set = new DictionarySet();
-        $this->assertSame(0, $set->count());
-        $this->assertFalse($set->contains(3));
+        self::assertSame(0, $set->count());
+        self::assertFalse($set->contains(3));
 
         $set->add(1);
         $set->add(3);
-        $this->assertSame(2, $set->count());
-        $this->assertTrue($set->contains(3));
-        $this->assertFalse($set->contains(2));
+        self::assertSame(2, $set->count());
+        self::assertTrue($set->contains(3));
+        self::assertFalse($set->contains(2));
 
         $set->add(3);
-        $this->assertSame(2, $set->count());
-        $this->assertTrue($set->contains(3));
+        self::assertSame(2, $set->count());
+        self::assertTrue($set->contains(3));
 
         $set->remove(3);
-        $this->assertSame(1, $set->count());
-        $this->assertFalse($set->contains(3));
+        self::assertSame(1, $set->count());
+        self::assertFalse($set->contains(3));
 
         $set->add(true);
-        $this->assertTrue($set->contains(true));
-        $this->assertFalse($set->contains(false));
+        self::assertTrue($set->contains(true));
+        self::assertFalse($set->contains(false));
 
         $obj = new \stdClass();
         $obj->a = 'abc';
         $set->add($obj);
         $another = new \stdClass();
-        $this->assertFalse($set->contains($another));
+        self::assertFalse($set->contains($another));
         $another->a = 'abc';
-        $this->assertTrue($set->contains($another)); // objects are compared as values, not as references
+        self::assertTrue($set->contains($another)); // objects are compared as values, not as references
 
-        $this->assertSame(3, count($set));
-        $this->assertTrue($set->contains(1));
+        self::assertSame(3, count($set));
+        self::assertTrue($set->contains(1));
         $set->clear();
-        $this->assertSame(0, count($set));
-        $this->assertFalse($set->contains(1));
+        self::assertSame(0, count($set));
+        self::assertFalse($set->contains(1));
     }
 
     public function testToArray()
@@ -53,7 +53,7 @@ class DictionarySetTest extends TestCase
 
         $arr = $set->toArray();
         sort($arr); // sets do not guarantee any specific order; sort the output to compare it with the expected value
-        $this->assertSame([1, 3], $arr);
+        self::assertSame([1, 3], $arr);
     }
 
     public function testGenerateItems()
@@ -68,6 +68,6 @@ class DictionarySetTest extends TestCase
         }
 
         sort($arr); // sets do not guarantee any specific order; sort the output to compare it with the expected value
-        $this->assertSame([1, 3], $arr);
+        self::assertSame([1, 3], $arr);
     }
 }

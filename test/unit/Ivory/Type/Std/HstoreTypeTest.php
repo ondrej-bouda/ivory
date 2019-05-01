@@ -18,10 +18,10 @@ class HstoreTypeTest extends TestCase
 
     public function testSerializeValue()
     {
-        $this->assertSame('NULL', $this->hstoreType->serializeValue(null, false));
-        $this->assertSame("public.hstore ''", $this->hstoreType->serializeValue([]));
-        $this->assertSame('public.hstore \'"1"=>"2"\'', $this->hstoreType->serializeValue([1 => 2]));
-        $this->assertSame(
+        self::assertSame('NULL', $this->hstoreType->serializeValue(null, false));
+        self::assertSame("public.hstore ''", $this->hstoreType->serializeValue([]));
+        self::assertSame('public.hstore \'"1"=>"2"\'', $this->hstoreType->serializeValue([1 => 2]));
+        self::assertSame(
             '\'"a"=>"1","-32"=>NULL,"null str"=>"NULL"," space "=>"a \\"quoted str\\"",""=>"","\\\\"=>"\\\\\\\\\\""\'',
             $this->hstoreType->serializeValue(
                 ['a' => 1, -32 => null, 'null str' => 'NULL', ' space ' => 'a "quoted str"', '' => '', '\\' => '\\\\"'],
@@ -33,43 +33,43 @@ class HstoreTypeTest extends TestCase
         $obj->att = 'val';
         $obj->nul = null;
         $obj->other = 1;
-        $this->assertSame(
+        self::assertSame(
             '\'"att"=>"val","nul"=>NULL,"other"=>"1"\'',
             $this->hstoreType->serializeValue($obj, false)
         );
 
         $arrObj = new \ArrayObject([1, 2, 3]);
-        $this->assertSame(
+        self::assertSame(
             'public.hstore \'"0"=>"1","1"=>"2","2"=>"3"\'',
             $this->hstoreType->serializeValue($arrObj)
         );
 
         try {
             $this->hstoreType->serializeValue('wheee');
-            $this->fail('Exception was expected due to invalid value to be serialized to hstore.');
+            self::fail('Exception was expected due to invalid value to be serialized to hstore.');
         } catch (\InvalidArgumentException $e) {
         }
     }
 
     public function testParseValue()
     {
-        $this->assertSame([], $this->hstoreType->parseValue(''));
-        $this->assertSame(['a' => 'b'], $this->hstoreType->parseValue('"a"=>"b"'));
-        $this->assertSame(
+        self::assertSame([], $this->hstoreType->parseValue(''));
+        self::assertSame(['a' => 'b'], $this->hstoreType->parseValue('"a"=>"b"'));
+        self::assertSame(
             ['a' => '1', -32 => null, 'null str' => 'NULL', ' space ' => 'a "quoted str"', '' => '', '\\' => '\\\\"'],
             $this->hstoreType->parseValue(
                 '"a" => "1", "-32"=>NULL,"null str"   => "NULL"," space "' . "\t" . '=>"a \\"quoted str\\""  ,   ' .
                 '""=>"", "\\\\" => "\\\\\\\\\\""'
             )
         );
-        $this->assertSame(
+        self::assertSame(
             ['a' => 'b', 1 => '2', '' => ''],
             $this->hstoreType->parseValue('a=>b,  1  =>   2,""=>""')
         );
 
         try {
             $this->hstoreType->parseValue('wheee');
-            $this->fail('Exception was expected due to invalid hstore value.');
+            self::fail('Exception was expected due to invalid hstore value.');
         } catch (\InvalidArgumentException $e) {
         }
     }
@@ -82,7 +82,7 @@ class HstoreTypeTest extends TestCase
         // Some strings are too long for being processed by PCRE with JIT enabled. E.g., on Windows PHP 7.0.4, more than
         // 2725 in the str_repeat below results in an error.
         $str = '"a"=>"' . str_repeat('a', 10000) . '"';
-        $this->assertSame(
+        self::assertSame(
             ['a' => str_repeat('a', 10000)],
             $this->hstoreType->parseValue($str)
         );

@@ -31,46 +31,46 @@ class StatementExecutionTest extends IvoryTestCase
     public function testQuery()
     {
         $result = $this->conn->query('SELECT 42');
-        $this->assertSame(1, $result->count());
-        $this->assertSame(1, count($result->getColumns()));
-        $this->assertSame(42, $result->value());
+        self::assertSame(1, $result->count());
+        self::assertSame(1, count($result->getColumns()));
+        self::assertSame(42, $result->value());
 
         $result = $this->conn->query('SELECT %int', 42);
-        $this->assertSame(1, $result->count());
-        $this->assertSame(1, count($result->getColumns()));
-        $this->assertSame(42, $result->value());
+        self::assertSame(1, $result->count());
+        self::assertSame(1, count($result->getColumns()));
+        self::assertSame(42, $result->value());
 
         $result = $this->conn->query(
             "SELECT * FROM (VALUES (1, 'Ivory'), (42, 'wheee')) %ident (a, b)", 'tbl',
             'WHERE a = %int AND b = %s', 42, 'wheee'
         );
-        $this->assertSame(1, $result->count());
-        $this->assertSame(['a' => 42, 'b' => 'wheee'], $result->tuple()->toMap());
+        self::assertSame(1, $result->count());
+        self::assertSame(['a' => 42, 'b' => 'wheee'], $result->tuple()->toMap());
 
         $result = $this->conn->query(
             "SELECT * FROM (VALUES (1, 'Ivory'), (42, 'wheee')) %ident (a, b) WHERE a = %int:a AND b = %s:b",
             't',
             ['a' => 42, 'b' => 'wheee']
         );
-        $this->assertSame(1, $result->count());
-        $this->assertSame(['a' => 42, 'b' => 'wheee'], $result->tuple()->toMap());
+        self::assertSame(1, $result->count());
+        self::assertSame(['a' => 42, 'b' => 'wheee'], $result->tuple()->toMap());
 
         $patternParser = new SqlPatternParser();
 
         $pattern = $patternParser->parse('SELECT 42, %s');
         $result = $this->conn->query($pattern, 'wheee');
-        $this->assertSame(1, $result->count());
-        $this->assertSame([42, 'wheee'], $result->tuple()->toList());
+        self::assertSame(1, $result->count());
+        self::assertSame([42, 'wheee'], $result->tuple()->toList());
 
         $pattern = $patternParser->parse('SELECT 42, %s:motto');
         $result = $this->conn->query($pattern, ['motto' => 'wheee']);
-        $this->assertSame(1, $result->count());
-        $this->assertSame([42, 'wheee'], $result->tuple()->toList());
+        self::assertSame(1, $result->count());
+        self::assertSame([42, 'wheee'], $result->tuple()->toList());
 
         $relDef = SqlRelationDefinition::fromPattern('SELECT 42, %s:motto');
         $result = $this->conn->query($relDef, ['motto' => 'wheee']);
-        $this->assertSame(1, $result->count());
-        $this->assertSame([42, 'wheee'], $result->tuple()->toList());
+        self::assertSame(1, $result->count());
+        self::assertSame([42, 'wheee'], $result->tuple()->toList());
 
         $this->assertException(
             UsageException::class,
@@ -86,7 +86,7 @@ class StatementExecutionTest extends IvoryTestCase
         $tuple = $this->conn->querySingleTuple(
             'SELECT MIN(num), MAX(num) FROM (VALUES (4), (-3), (3)) t (num)'
         );
-        $this->assertSame([-3, 4], $tuple->toList());
+        self::assertSame([-3, 4], $tuple->toList());
 
         $this->assertException(
             ResultDimensionException::class,
@@ -118,7 +118,7 @@ class StatementExecutionTest extends IvoryTestCase
         $col = $this->conn->querySingleColumn(
             'SELECT num FROM (VALUES (4), (-3), (3)) t (num)'
         );
-        $this->assertSame([4, -3, 3], $col->toArray());
+        self::assertSame([4, -3, 3], $col->toArray());
 
         $this->assertException(
             ResultDimensionException::class,
@@ -148,7 +148,7 @@ class StatementExecutionTest extends IvoryTestCase
     public function testQuerySingleValue()
     {
         $value = $this->conn->querySingleValue('SELECT 1');
-        $this->assertSame(1, $value);
+        self::assertSame(1, $value);
         
         $this->assertException(
             ResultDimensionException::class,
@@ -194,8 +194,8 @@ class StatementExecutionTest extends IvoryTestCase
     public function testCommand()
     {
         $result = $this->conn->command("DO LANGUAGE plpgsql 'BEGIN END'");
-        $this->assertSame(0, $result->getAffectedRows());
-        $this->assertSame('DO', $result->getCommandTag());
+        self::assertSame(0, $result->getAffectedRows());
+        self::assertSame('DO', $result->getCommandTag());
 
         $this->assertException(
             UsageException::class,
@@ -210,9 +210,9 @@ class StatementExecutionTest extends IvoryTestCase
     {
         try {
             $this->conn->query('SELECT log(-10)');
-            $this->fail(StatementException::class . ' expected');
+            self::fail(StatementException::class . ' expected');
         } catch (StatementException $e) {
-            $this->assertSame(SqlState::INVALID_ARGUMENT_FOR_LOGARITHM, $e->getSqlStateCode());
+            self::assertSame(SqlState::INVALID_ARGUMENT_FOR_LOGARITHM, $e->getSqlStateCode());
         }
     }
 
@@ -274,9 +274,9 @@ class StatementExecutionTest extends IvoryTestCase
         $relDef = SqlRelationDefinition::fromPattern('SELECT %:a + %:b + %:c');
         $relDef->setParams(['a' => 1, 'b' => 2]);
 
-        $this->assertSame(10, $this->conn->querySingleValue($relDef, ['b' => 3, 'c' => 6]));
+        self::assertSame(10, $this->conn->querySingleValue($relDef, ['b' => 3, 'c' => 6]));
 
-        $this->assertSame(9, $this->conn->querySingleValue($relDef, ['c' => 6]));
+        self::assertSame(9, $this->conn->querySingleValue($relDef, ['c' => 6]));
     }
 
     public function testCommandArgumentPrecedence()
@@ -290,12 +290,12 @@ class StatementExecutionTest extends IvoryTestCase
             $cmd->setParams(['a' => 1, 'b' => 2]);
 
             $this->conn->command($cmd, ['b' => 3, 'c' => 6]);
-            $this->assertSame(10, $this->conn->querySingleValue('SELECT SUM(x) FROM t'));
+            self::assertSame(10, $this->conn->querySingleValue('SELECT SUM(x) FROM t'));
 
             $this->conn->command('TRUNCATE t');
 
             $this->conn->command($cmd, ['c' => 6]);
-            $this->assertSame(9, $this->conn->querySingleValue('SELECT SUM(x) FROM t'));
+            self::assertSame(9, $this->conn->querySingleValue('SELECT SUM(x) FROM t'));
         } finally {
             $tx->rollback();
         }
@@ -307,15 +307,15 @@ class StatementExecutionTest extends IvoryTestCase
 
         try {
             $result = $this->conn->executeStatement('CREATE TABLE t (a INT)');
-            $this->assertInstanceOf(ICommandResult::class, $result);
+            self::assertInstanceOf(ICommandResult::class, $result);
             assert($result instanceof ICommandResult);
-            $this->assertSame('CREATE TABLE', $result->getCommandTag());
+            self::assertSame('CREATE TABLE', $result->getCommandTag());
 
             $relDef = SqlRelationDefinition::fromSql('SELECT 1');
             $result2 = $this->conn->executeStatement($relDef);
-            $this->assertInstanceOf(IQueryResult::class, $result2);
+            self::assertInstanceOf(IQueryResult::class, $result2);
             assert($result2 instanceof IQueryResult);
-            $this->assertSame(1, $result2->value());
+            self::assertSame(1, $result2->value());
         } finally {
             $tx->rollback();
         }
@@ -331,22 +331,22 @@ class StatementExecutionTest extends IvoryTestCase
                  INSERT INTO t (a) VALUES (1), (2);
                  SELECT * FROM t'
             );
-            $this->assertEquals(3, count($results));
+            self::assertEquals(3, count($results));
 
-            $this->assertInstanceOf(ICommandResult::class, $results[0]);
-            $this->assertSame('CREATE TABLE', $results[0]->getCommandTag());
+            self::assertInstanceOf(ICommandResult::class, $results[0]);
+            self::assertSame('CREATE TABLE', $results[0]->getCommandTag());
             assert($results[0] instanceof ICommandResult);
-            $this->assertSame(0, $results[0]->getAffectedRows());
+            self::assertSame(0, $results[0]->getAffectedRows());
 
-            $this->assertInstanceOf(ICommandResult::class, $results[1]);
-            $this->assertSame('INSERT 0 2', $results[1]->getCommandTag());
+            self::assertInstanceOf(ICommandResult::class, $results[1]);
+            self::assertSame('INSERT 0 2', $results[1]->getCommandTag());
             assert($results[1] instanceof ICommandResult);
-            $this->assertSame(2, $results[1]->getAffectedRows());
+            self::assertSame(2, $results[1]->getAffectedRows());
 
-            $this->assertInstanceOf(IQueryResult::class, $results[2]);
-            $this->assertSame('SELECT 2', $results[2]->getCommandTag());
+            self::assertInstanceOf(IQueryResult::class, $results[2]);
+            self::assertSame('SELECT 2', $results[2]->getCommandTag());
             assert($results[2] instanceof IQueryResult);
-            $this->assertSame([1, 2], $results[2]->col('a')->toArray());
+            self::assertSame([1, 2], $results[2]->col('a')->toArray());
         } finally {
             $tx->rollback();
         }
@@ -356,21 +356,21 @@ class StatementExecutionTest extends IvoryTestCase
     {
         try {
             $this->conn->query("SELECT\nfoo");
-            $this->fail(StatementException::class . ' expected');
+            self::fail(StatementException::class . ' expected');
         } catch (StatementException $e) {
-            $this->assertSame("SELECT\nfoo", $e->getQuery());
-            $this->assertEquals(SqlState::fromCode(SqlState::UNDEFINED_COLUMN), $e->getSqlState());
-            $this->assertSame(SqlState::UNDEFINED_COLUMN, $e->getSqlStateCode());
-            $this->assertSame(8, $e->getStatementPosition());
-            $this->assertNull($e->getContext());
-            $this->assertNull($e->getInternalPosition());
-            $this->assertNull($e->getInternalQuery());
+            self::assertSame("SELECT\nfoo", $e->getQuery());
+            self::assertEquals(SqlState::fromCode(SqlState::UNDEFINED_COLUMN), $e->getSqlState());
+            self::assertSame(SqlState::UNDEFINED_COLUMN, $e->getSqlStateCode());
+            self::assertSame(8, $e->getStatementPosition());
+            self::assertNull($e->getContext());
+            self::assertNull($e->getInternalPosition());
+            self::assertNull($e->getInternalQuery());
             if (PHP_VERSION_ID >= 70300 && $this->conn->getConfig()->getServerVersionNumber() >= 90600) {
-                $this->assertSame('ERROR', $e->getNonlocalizedSeverity());
+                self::assertSame('ERROR', $e->getNonlocalizedSeverity());
             } else {
                 try {
                     $e->getNonlocalizedSeverity();
-                    $this->fail(UnsupportedException::class . ' expected');
+                    self::fail(UnsupportedException::class . ' expected');
                 } catch (UnsupportedException $e) {
                 }
             }
@@ -390,19 +390,19 @@ SQL
 );
             try {
                 $this->conn->query('SELECT foo()');
-                $this->fail(StatementException::class . ' expected');
+                self::fail(StatementException::class . ' expected');
             } catch (StatementException $e) {
                 $tx->rollback();
-                $this->assertSame('column "bar" does not exist', $e->getMessage());
-                $this->assertSame('SELECT foo()', $e->getQuery());
-                $this->assertEquals(SqlState::fromCode(SqlState::UNDEFINED_COLUMN), $e->getSqlState());
-                $this->assertSame(SqlState::UNDEFINED_COLUMN, $e->getSqlStateCode());
-                $this->assertNull($e->getStatementPosition());
-                $this->assertSame('PL/pgSQL function foo() line 3 at RETURN', $e->getContext());
-                $this->assertSame(8, $e->getInternalPosition());
-                $this->assertSame('SELECT bar', $e->getInternalQuery());
+                self::assertSame('column "bar" does not exist', $e->getMessage());
+                self::assertSame('SELECT foo()', $e->getQuery());
+                self::assertEquals(SqlState::fromCode(SqlState::UNDEFINED_COLUMN), $e->getSqlState());
+                self::assertSame(SqlState::UNDEFINED_COLUMN, $e->getSqlStateCode());
+                self::assertNull($e->getStatementPosition());
+                self::assertSame('PL/pgSQL function foo() line 3 at RETURN', $e->getContext());
+                self::assertSame(8, $e->getInternalPosition());
+                self::assertSame('SELECT bar', $e->getInternalQuery());
                 if (PHP_VERSION_ID >= 70300 && $this->conn->getConfig()->getServerVersionNumber() >= 90600) {
-                    $this->assertSame('ERROR', $e->getNonlocalizedSeverity());
+                    self::assertSame('ERROR', $e->getNonlocalizedSeverity());
                 }
             }
         } finally {

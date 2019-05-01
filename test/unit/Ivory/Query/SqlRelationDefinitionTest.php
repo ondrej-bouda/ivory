@@ -42,14 +42,14 @@ class SqlRelationDefinitionTest extends IvoryTestCase
     {
         $recip = SqlRelationDefinition::fromPattern('SELECT %s, %num', "Ivory's escaping", 3.14);
         $sql = $recip->toSql($this->typeDict);
-        $this->assertSame("SELECT pg_catalog.text 'Ivory''s escaping', 3.14::pg_catalog.numeric", $sql);
+        self::assertSame("SELECT pg_catalog.text 'Ivory''s escaping', 3.14::pg_catalog.numeric", $sql);
     }
 
     public function testAliasedTypes()
     {
         $recip = SqlRelationDefinition::fromPattern('SELECT %integer', 42);
         $sql = $recip->toSql($this->typeDict);
-        $this->assertSame("SELECT 42::pg_catalog.int4", $sql);
+        self::assertSame("SELECT 42::pg_catalog.int4", $sql);
     }
 
     public function testTypeQualifiedNames()
@@ -59,14 +59,14 @@ class SqlRelationDefinitionTest extends IvoryTestCase
             "Ivory's escaping", 3.14
         );
         $sql = $recip->toSql($this->typeDict);
-        $this->assertSame("SELECT pg_catalog.text 'Ivory''s escaping', 3.14::pg_catalog.numeric", $sql);
+        self::assertSame("SELECT pg_catalog.text 'Ivory''s escaping', 3.14::pg_catalog.numeric", $sql);
     }
 
     public function testTypeUnqualifiedNames()
     {
         $recip = SqlRelationDefinition::fromPattern('SELECT %text, %numeric', "Ivory's escaping", 3.14);
         $sql = $recip->toSql($this->typeDict);
-        $this->assertSame("SELECT pg_catalog.text 'Ivory''s escaping', 3.14::pg_catalog.numeric", $sql);
+        self::assertSame("SELECT pg_catalog.text 'Ivory''s escaping', 3.14::pg_catalog.numeric", $sql);
     }
 
     public function testArrayTypes()
@@ -76,30 +76,30 @@ class SqlRelationDefinitionTest extends IvoryTestCase
             ["Ivory's escaping"],
             [1 => 4, 5, 2, 3]
         );
-        $this->assertSame(
+        self::assertSame(
             "SELECT '[0:0]={\"Ivory''s escaping\"}'::pg_catalog.text[], '{4,5,2,3}'::pg_catalog.int4[]",
             $recip->toSql($this->typeDict)
         );
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %int[][][]', [1 => 42]);
-        $this->assertSame("SELECT '{42}'::pg_catalog.int4[]", $recip->toSql($this->typeDict));
+        self::assertSame("SELECT '{42}'::pg_catalog.int4[]", $recip->toSql($this->typeDict));
     }
 
     public function testQuotedTypeNames()
     {
         $this->conn->rawCommand('CREATE DOMAIN public."name with "" and ." AS TEXT');
         $recip = SqlRelationDefinition::fromPattern('SELECT %public."name with "" and ."', 'Ivory');
-        $this->assertSame("SELECT 'Ivory'::public.\"name with \"\" and .\"", $recip->toSql($this->typeDict));
+        self::assertSame("SELECT 'Ivory'::public.\"name with \"\" and .\"", $recip->toSql($this->typeDict));
 
         $this->conn->rawCommand('CREATE DOMAIN public."int" AS TEXT');
         $recip = SqlRelationDefinition::fromPattern('SELECT %public."int"', '42');
-        $this->assertSame("SELECT '42'::public.int", $recip->toSql($this->typeDict));
+        self::assertSame("SELECT '42'::public.int", $recip->toSql($this->typeDict));
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %"int"', '42');
-        $this->assertSame("SELECT '42'::public.int", $recip->toSql($this->typeDict));
+        self::assertSame("SELECT '42'::public.int", $recip->toSql($this->typeDict));
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %int', '42');
-        $this->assertSame('SELECT 42::pg_catalog.int4', $recip->toSql($this->typeDict));
+        self::assertSame('SELECT 42::pg_catalog.int4', $recip->toSql($this->typeDict));
     }
 
     public function testQuotedSchemaNames()
@@ -108,19 +108,19 @@ class SqlRelationDefinitionTest extends IvoryTestCase
         $this->conn->rawCommand('CREATE DOMAIN "__Ivory_test".d AS INT');
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %"__Ivory_test".d', 42);
-        $this->assertSame('SELECT 42::"__Ivory_test".d', $recip->toSql($this->typeDict));
+        self::assertSame('SELECT 42::"__Ivory_test".d', $recip->toSql($this->typeDict));
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %__ivory_test.d', 42);
         try {
             $recip->toSql($this->typeDict);
-            $this->fail('%__ivory_test only matches "__ivory_test" schema, no other case variants');
+            self::fail('%__ivory_test only matches "__ivory_test" schema, no other case variants');
         } catch (UndefinedTypeException $e) {
         }
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %__Ivory_test.d', 42);
         try {
             $recip->toSql($this->typeDict);
-            $this->fail('Even %__Ivory_test only matches "__ivory_test" schema - when unquoted, it gets lower-cased');
+            self::fail('Even %__Ivory_test only matches "__ivory_test" schema - when unquoted, it gets lower-cased');
         } catch (UndefinedTypeException $e) {
         }
 
@@ -129,7 +129,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
         $this->conn->rawCommand('CREATE DOMAIN "__ivory_test".d AS TEXT');
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %__ivory_test.d', 42);
-        $this->assertSame("SELECT '42'::__ivory_test.d", $recip->toSql($this->typeDict));
+        self::assertSame("SELECT '42'::__ivory_test.d", $recip->toSql($this->typeDict));
     }
 
     public function testBraceEnclosedTypeNames()
@@ -137,15 +137,15 @@ class SqlRelationDefinitionTest extends IvoryTestCase
         $this->conn->rawCommand('CREATE DOMAIN public."double precision" AS TEXT');
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %"double precision"', 42);
-        $this->assertSame("SELECT '42'::public.\"double precision\"", $recip->toSql($this->typeDict));
+        self::assertSame("SELECT '42'::public.\"double precision\"", $recip->toSql($this->typeDict));
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %{double precision}', 42);
-        $this->assertSame('SELECT 42::pg_catalog.float8', $recip->toSql($this->typeDict));
+        self::assertSame('SELECT 42::pg_catalog.float8', $recip->toSql($this->typeDict));
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %{"double precision"}', 42);
         try {
             $recip->toSql($this->typeDict);
-            $this->fail(
+            self::fail(
                 'Type "double precision" (name including the quotes) should have not been recognized as defined.'
             );
         } catch (UndefinedTypeException $e) {
@@ -160,10 +160,10 @@ class SqlRelationDefinitionTest extends IvoryTestCase
 
         $recip = SqlRelationDefinition::fromPattern('SELECT %tp', 42);
 
-        $this->assertSame('SELECT 42::public.tp', $recip->toSql($this->typeDict));
+        self::assertSame('SELECT 42::public.tp', $recip->toSql($this->typeDict));
 
         $this->conn->getConfig()->setForSession(ConfigParam::SEARCH_PATH, 's, public');
-        $this->assertSame("SELECT '42'::s.tp", $recip->toSql($this->typeDict));
+        self::assertSame("SELECT '42'::s.tp", $recip->toSql($this->typeDict));
     }
 
     public function testFromFragments()
@@ -173,7 +173,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
             'FROM tbl',
             'WHERE cond'
         );
-        $this->assertSame(
+        self::assertSame(
             'SELECT 1 FROM tbl WHERE cond',
             $recipJoinWithSpace->getSqlPattern()->getSqlTorso(),
             'Joining using a space between fragments to prevent syntax error.'
@@ -186,7 +186,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
             'WHERE cond',
             "\nORDER BY 1"
         );
-        $this->assertSame(
+        self::assertSame(
             "SELECT 1 FROM tbl\nWHERE cond\nORDER BY 1",
             $recipJoinWithoutSpace->getSqlPattern()->getSqlTorso(),
             'Joining straight, with no extra space - which is unnecessary due to whitespace at the fragment bounds.'
@@ -196,8 +196,8 @@ class SqlRelationDefinitionTest extends IvoryTestCase
         $recipWithArgs = SqlRelationDefinition::fromFragments(
             'SELECT %int?, %char?', 42, 'C', 'UNION SELECT', "%integer? , 'D'", 53
         );
-        $this->assertSame("SELECT ,  UNION SELECT  , 'D'", $recipWithArgs->getSqlPattern()->getSqlTorso());
-        $this->assertSame("SELECT 42, 'C' UNION SELECT 53 , 'D'", $recipWithArgs->toSql($this->typeDict));
+        self::assertSame("SELECT ,  UNION SELECT  , 'D'", $recipWithArgs->getSqlPattern()->getSqlTorso());
+        self::assertSame("SELECT 42, 'C' UNION SELECT 53 , 'D'", $recipWithArgs->toSql($this->typeDict));
     }
 
     /**
@@ -216,7 +216,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
              SELECT * FROM inserted %sql', 'ORDER BY 1, 2'
         );
 
-        $this->assertSame(
+        self::assertSame(
             'WITH data AS (
                  SELECT x FROM r
              ),
@@ -236,7 +236,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
             ['tbl' => 't']
         );
 
-        $this->assertSame(
+        self::assertSame(
             'SELECT t.col + 1 FROM t',
             $recip->toSql($this->typeDict)
         );
@@ -249,7 +249,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
             true, 42, 3.14, 'wheee', null
         );
 
-        $this->assertSame(
+        self::assertSame(
             "SELECT TRUE, 42::pg_catalog.int8, 3.14::pg_catalog.float8, pg_catalog.text 'wheee', NULL::pg_catalog.text",
             $recip->toSql($this->typeDict)
         );
@@ -264,7 +264,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
             Time::fromString('13:49')
         );
 
-        $this->assertSame(
+        self::assertSame(
             "SELECT 2.81::pg_catalog.numeric, box(point(9,14),point(3,5)), pg_catalog.time '13:49:00'",
             $recip->toSql($this->typeDict)
         );
@@ -284,7 +284,7 @@ class SqlRelationDefinitionTest extends IvoryTestCase
             'decArr' => [1 => Decimal::fromNumber(1.6), Decimal::fromNumber(8)]
         ]);
 
-        $this->assertSame(
+        self::assertSame(
             "SELECT " .
             "'{1,2,3}'::pg_catalog.int8[], " .
             "'{}'::pg_catalog.text[], " .

@@ -29,27 +29,27 @@ class FilteredRelationTest extends IvoryTestCase
             return ($tuple->a < $tuple->b);
         });
 
-        $this->assertSame(2, $filtered->count());
+        self::assertSame(2, $filtered->count());
 
-        $this->assertSame([1, 2], $filtered->tuple(0)->toList());
-        $this->assertSame([5, 6], $filtered->tuple(1)->toList());
+        self::assertSame([1, 2], $filtered->tuple(0)->toList());
+        self::assertSame([5, 6], $filtered->tuple(1)->toList());
 
-        $this->assertSame([1, 2], $filtered->tuple(-2)->toList());
-        $this->assertSame([5, 6], $filtered->tuple(-1)->toList());
+        self::assertSame([1, 2], $filtered->tuple(-2)->toList());
+        self::assertSame([5, 6], $filtered->tuple(-1)->toList());
 
         $i = 0;
         $expected = [[1, 2], [5, 6]];
         foreach ($filtered as $k => $tuple) {
             assert($tuple instanceof ITuple);
-            $this->assertSame($i, $k, "tuple $i");
-            $this->assertSame($expected[$i], $tuple->toList(), "tuple $i");
+            self::assertSame($i, $k, "tuple $i");
+            self::assertSame($expected[$i], $tuple->toList(), "tuple $i");
             $i++;
         }
-        $this->assertSame(2, $i);
+        self::assertSame(2, $i);
 
         $col = $filtered->col('a');
-        $this->assertSame(5, $col->value(1));
-        $this->assertSame([1, 5], $col->toArray());
+        self::assertSame(5, $col->value(1));
+        self::assertSame([1, 5], $col->toArray());
     }
 
     public function testTupleFilter()
@@ -66,7 +66,7 @@ class FilteredRelationTest extends IvoryTestCase
             }
         };
         $filtered = $rel->filter($filterMod3);
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 4, 'b' => 3],
                 ['a' => 5, 'b' => 6],

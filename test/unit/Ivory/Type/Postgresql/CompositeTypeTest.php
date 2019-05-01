@@ -32,40 +32,40 @@ class CompositeTypeTest extends TestCase
 
     public function testParseSimple()
     {
-        $this->assertSame([], $this->zeroType->parseValue('()')->toMap());
+        self::assertSame([], $this->zeroType->parseValue('()')->toMap());
 
-        $this->assertSame(['a' => 1], $this->intSingletonType->parseValue('(1)')->toMap());
-        $this->assertSame(['a' => null], $this->intSingletonType->parseValue('()')->toMap());
+        self::assertSame(['a' => 1], $this->intSingletonType->parseValue('(1)')->toMap());
+        self::assertSame(['a' => null], $this->intSingletonType->parseValue('()')->toMap());
 
-        $this->assertSame(['a' => 1, 'b' => 'ab'], $this->intTextPairType->parseValue('(1,ab)')->toMap());
-        $this->assertSame(['a' => null, 'b' => ''], $this->intTextPairType->parseValue('(,"")')->toMap());
-        $this->assertSame(['a' => 0, 'b' => null], $this->intTextPairType->parseValue('(0,)')->toMap());
+        self::assertSame(['a' => 1, 'b' => 'ab'], $this->intTextPairType->parseValue('(1,ab)')->toMap());
+        self::assertSame(['a' => null, 'b' => ''], $this->intTextPairType->parseValue('(,"")')->toMap());
+        self::assertSame(['a' => 0, 'b' => null], $this->intTextPairType->parseValue('(0,)')->toMap());
     }
 
     public function testSerializeSimple()
     {
-        $this->assertSame('NULL::s.t1', $this->intSingletonType->serializeValue(null));
+        self::assertSame('NULL::s.t1', $this->intSingletonType->serializeValue(null));
 
-        $this->assertSame('ROW()::s.t0', $this->zeroType->serializeValue(Composite::fromMap([])));
+        self::assertSame('ROW()::s.t0', $this->zeroType->serializeValue(Composite::fromMap([])));
 
-        $this->assertSame('ROW(1)', $this->intSingletonType->serializeValue(Composite::fromMap(['a' => 1]), false));
-        $this->assertSame(
+        self::assertSame('ROW(1)', $this->intSingletonType->serializeValue(Composite::fromMap(['a' => 1]), false));
+        self::assertSame(
             'ROW(NULL::pg_catalog.int4)::s.t1',
             $this->intSingletonType->serializeValue(Composite::fromMap(['a' => null]))
         );
-        $this->assertSame(
+        self::assertSame(
             "(1::pg_catalog.int4,pg_catalog.text 'ab')::s.t2",
             $this->intTextPairType->serializeValue($this->intText(1, 'ab'))
         );
-        $this->assertSame(
+        self::assertSame(
             "(1::pg_catalog.int4,pg_catalog.text '2')::s.t2",
             $this->intTextPairType->serializeValue($this->intText(1, 2))
         );
-        $this->assertSame(
+        self::assertSame(
             "(NULL::pg_catalog.int4,pg_catalog.text '')::s.t2",
             $this->intTextPairType->serializeValue($this->intText(null, ''))
         );
-        $this->assertSame(
+        self::assertSame(
             '(0::pg_catalog.int4,NULL::pg_catalog.text)::s.t2',
             $this->intTextPairType->serializeValue($this->intText(0, null))
         );

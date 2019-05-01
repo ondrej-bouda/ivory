@@ -31,7 +31,7 @@ class SortedRelationDefinitionTest extends IvoryTestCase
         $sorted = $this->relDef->sort('a %% % = 1 DESC', 2);
         $rel = $this->conn->query($sorted);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 1, 'b' => 2],
                 ['a' => 7, 'b' => 8],
@@ -49,7 +49,7 @@ class SortedRelationDefinitionTest extends IvoryTestCase
         $sorted = $this->relDef->sort($pattern, 2);
         $rel = $this->conn->query($sorted);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 1, 'b' => 2],
                 ['a' => 7, 'b' => 8],
@@ -81,7 +81,7 @@ class SortedRelationDefinitionTest extends IvoryTestCase
         $sorted = $this->relDef->sort($sortExpr);
         $rel = $this->conn->query($sorted);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 4, 'b' => 3],
                 ['a' => 6, 'b' => 6],
@@ -100,7 +100,7 @@ class SortedRelationDefinitionTest extends IvoryTestCase
         ]);
         $rel = $this->conn->query($sorted);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 7, 'b' => 8],
                 ['a' => 1, 'b' => 2],
@@ -118,7 +118,7 @@ class SortedRelationDefinitionTest extends IvoryTestCase
             ->sort('a != b');
         $rel = $this->conn->query($sorted);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 6, 'b' => 6],
                 ['a' => 1, 'b' => 2],

@@ -27,23 +27,23 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $limited = $relDef->limit(1);
         $rel = $this->conn->query($limited);
 
-        $this->assertSame(1, $rel->count());
+        self::assertSame(1, $rel->count());
 
-        $this->assertSame([1, 2], $rel->tuple(0)->toList());
+        self::assertSame([1, 2], $rel->tuple(0)->toList());
         try {
             $rel->tuple(1);
-            $this->fail();
+            self::fail();
         } catch (\OutOfBoundsException $e) {
         }
 
         $i = 0;
         foreach ($rel as $k => $tuple) {
             assert($tuple instanceof ITuple);
-            $this->assertSame($i, $k, "tuple $i");
-            $this->assertSame([1, 2], $tuple->toList(), "tuple $i");
+            self::assertSame($i, $k, "tuple $i");
+            self::assertSame([1, 2], $tuple->toList(), "tuple $i");
             $i++;
         }
-        $this->assertSame(1, $i);
+        self::assertSame(1, $i);
     }
 
     public function testLimitFirstThree()
@@ -54,14 +54,14 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $limited = $relDef->limit(3);
         $rel = $this->conn->query($limited);
 
-        $this->assertSame(3, $rel->count());
+        self::assertSame(3, $rel->count());
 
-        $this->assertSame([1, 2], $rel->tuple(0)->toList());
-        $this->assertSame([3, 4], $rel->tuple(1)->toList());
-        $this->assertSame([5, 6], $rel->tuple(2)->toList());
+        self::assertSame([1, 2], $rel->tuple(0)->toList());
+        self::assertSame([3, 4], $rel->tuple(1)->toList());
+        self::assertSame([5, 6], $rel->tuple(2)->toList());
         try {
             $rel->tuple(3);
-            $this->fail();
+            self::fail();
         } catch (\OutOfBoundsException $e) {
         }
 
@@ -69,11 +69,11 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $expected = [[1, 2], [3, 4], [5, 6]];
         foreach ($rel as $k => $tuple) {
             assert($tuple instanceof ITuple);
-            $this->assertSame($i, $k, "tuple $i");
-            $this->assertSame($expected[$i], $tuple->toList(), "tuple $i");
+            self::assertSame($i, $k, "tuple $i");
+            self::assertSame($expected[$i], $tuple->toList(), "tuple $i");
             $i++;
         }
-        $this->assertSame(3, $i);
+        self::assertSame(3, $i);
     }
 
     public function testLimitTwoOffsetOne()
@@ -84,13 +84,13 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $limited = $relDef->limit(2, 1);
         $rel = $this->conn->query($limited);
 
-        $this->assertSame(2, $rel->count());
+        self::assertSame(2, $rel->count());
 
-        $this->assertSame([3, 4], $rel->tuple(0)->toList());
-        $this->assertSame([5, 6], $rel->tuple(1)->toList());
+        self::assertSame([3, 4], $rel->tuple(0)->toList());
+        self::assertSame([5, 6], $rel->tuple(1)->toList());
         try {
             $rel->tuple(2);
-            $this->fail();
+            self::fail();
         } catch (\OutOfBoundsException $e) {
         }
 
@@ -98,11 +98,11 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $expected = [[3, 4], [5, 6]];
         foreach ($rel as $k => $tuple) {
             assert($tuple instanceof ITuple);
-            $this->assertSame($i, $k, "tuple $i");
-            $this->assertSame($expected[$i], $tuple->toList(), "tuple $i");
+            self::assertSame($i, $k, "tuple $i");
+            self::assertSame($expected[$i], $tuple->toList(), "tuple $i");
             $i++;
         }
-        $this->assertSame(2, $i);
+        self::assertSame(2, $i);
     }
 
     public function testLimitTwoOffsetOneNotEnough()
@@ -113,12 +113,12 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $limited = $relDef->limit(2, 1);
         $rel = $this->conn->query($limited);
 
-        $this->assertSame(1, $rel->count());
+        self::assertSame(1, $rel->count());
 
-        $this->assertSame([3, 4], $rel->tuple(0)->toList());
+        self::assertSame([3, 4], $rel->tuple(0)->toList());
         try {
             $rel->tuple(1);
-            $this->fail();
+            self::fail();
         } catch (\OutOfBoundsException $e) {
         }
 
@@ -126,11 +126,11 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $expected = [[3, 4]];
         foreach ($rel as $k => $tuple) {
             assert($tuple instanceof ITuple);
-            $this->assertSame($i, $k, "tuple $i");
-            $this->assertSame($expected[$i], $tuple->toList(), "tuple $i");
+            self::assertSame($i, $k, "tuple $i");
+            self::assertSame($expected[$i], $tuple->toList(), "tuple $i");
             $i++;
         }
-        $this->assertSame(1, $i);
+        self::assertSame(1, $i);
     }
 
     public function testOffsetOneUnlimited()
@@ -141,14 +141,14 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $limited = $relDef->limit(null, 1);
         $rel = $this->conn->query($limited);
 
-        $this->assertSame(3, $rel->count());
+        self::assertSame(3, $rel->count());
 
-        $this->assertSame([3, 4], $rel->tuple(0)->toList());
-        $this->assertSame([5, 6], $rel->tuple(1)->toList());
-        $this->assertSame([7, 8], $rel->tuple(2)->toList());
+        self::assertSame([3, 4], $rel->tuple(0)->toList());
+        self::assertSame([5, 6], $rel->tuple(1)->toList());
+        self::assertSame([7, 8], $rel->tuple(2)->toList());
         try {
             $rel->tuple(3);
-            $this->fail();
+            self::fail();
         } catch (\OutOfBoundsException $e) {
         }
 
@@ -156,11 +156,11 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $expected = [[3, 4], [5, 6], [7, 8]];
         foreach ($rel as $k => $tuple) {
             assert($tuple instanceof ITuple);
-            $this->assertSame($i, $k, "tuple $i");
-            $this->assertSame($expected[$i], $tuple->toList(), "tuple $i");
+            self::assertSame($i, $k, "tuple $i");
+            self::assertSame($expected[$i], $tuple->toList(), "tuple $i");
             $i++;
         }
-        $this->assertSame(3, $i);
+        self::assertSame(3, $i);
     }
 
     public function testLimitLimited()
@@ -178,26 +178,26 @@ class LimitedRelationDefinitionTest extends IvoryTestCase
         $otherRel = $this->conn->query($otherLimited);
         $otherRel2 = $this->conn->query($otherLimited2);
 
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 3, 'b' => 4],
                 ['a' => 5, 'b' => 6],
             ],
             $rel->toArray()
         );
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 3, 'b' => 4],
             ],
             $rel2->toArray()
         );
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 7, 'b' => 8],
             ],
             $otherRel->toArray()
         );
-        $this->assertSame(
+        self::assertSame(
             [
                 ['a' => 7, 'b' => 8],
             ],
