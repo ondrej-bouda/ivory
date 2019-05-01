@@ -74,7 +74,9 @@ class DateType extends ConnectionDependentBaseType implements ITotallyOrderedTyp
                             case DateStyle::ORDER_YMD:
                                 return self::MODE_PG_YMD;
                             default:
-                                throw new \UnexpectedValueException('Unknown DateStyle order: ' . $dateStyle->getOrder());
+                                throw new \UnexpectedValueException(
+                                    'Unknown DateStyle order: ' . $dateStyle->getOrder()
+                                );
                         }
 
                     case DateStyle::FORMAT_GERMAN:
@@ -87,7 +89,9 @@ class DateType extends ConnectionDependentBaseType implements ITotallyOrderedTyp
                             case DateStyle::ORDER_MDY:
                                 return self::MODE_SQL_MDY;
                             default:
-                                throw new \UnexpectedValueException('Unknown DateStyle order: ' . $dateStyle->getOrder());
+                                throw new \UnexpectedValueException(
+                                    'Unknown DateStyle order: ' . $dateStyle->getOrder()
+                                );
                         }
 
                     default:

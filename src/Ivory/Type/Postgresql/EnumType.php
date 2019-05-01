@@ -52,14 +52,18 @@ class EnumType extends TypeBase implements ITotallyOrderedType
         }
 
         if ($val instanceof EnumItem) {
-            if ($val->getTypeSchema() != $this->getSchemaName() || $val->getTypeName() != $this->getName()) {
-                $msg = "Serializing enum item for a different type {$this->getSchemaName()}.{$this->getName()}";
+            $schemaName = $this->getSchemaName();
+            $enumName = $this->getName();
+            if ($val->getTypeSchema() != $schemaName || $val->getTypeName() != $enumName) {
+                $msg = "Serializing enum item for a different type $schemaName.$enumName";
                 trigger_error($msg, E_USER_WARNING);
             }
             $v = $val->getValue();
         } else {
             if (!isset($this->labelSet[$val])) {
-                $msg = "Value '$val' is not among defined labels of enumeration type {$this->getSchemaName()}.{$this->getName()}";
+                $schemaName = $this->getSchemaName();
+                $enumName = $this->getName();
+                $msg = "Value '$val' is not among defined labels of enumeration type $schemaName.$enumName";
                 trigger_error($msg, E_USER_WARNING);
             }
             $v = $val;

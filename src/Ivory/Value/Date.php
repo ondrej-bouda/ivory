@@ -105,7 +105,8 @@ class Date extends DateBase implements IDiscreteStepper
             }
         }
 
-        $dt = date_create_immutable($dateCreateInput, self::getUTCTimeZone()); // using the procedural style as it does not throw the generic Exception
+        // using the procedural style as it does not throw the generic Exception
+        $dt = date_create_immutable($dateCreateInput, self::getUTCTimeZone());
         if ($dt === false) {
             throw new \InvalidArgumentException('$isoDateString');
         }

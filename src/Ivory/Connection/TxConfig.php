@@ -83,10 +83,14 @@ class TxConfig
         }
 
         $this->setReadOnly(
-            self::initBool($options, self::ACCESS_READ_ONLY, self::ACCESS_READ_WRITE, 'read/write and read-only access mode')
+            self::initBool(
+                $options, self::ACCESS_READ_ONLY, self::ACCESS_READ_WRITE, 'read/write and read-only access mode'
+            )
         );
         $this->setDeferrable(
-            self::initBool($options, self::DEFERRABLE, self::NOT_DEFERRABLE, 'deferrable and non-deferrable mode')
+            self::initBool(
+                $options, self::DEFERRABLE, self::NOT_DEFERRABLE, 'deferrable and non-deferrable mode'
+            )
         );
     }
 

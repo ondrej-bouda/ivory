@@ -16,11 +16,11 @@ class LineSegmentType extends CompoundGeometricType
     public function parseValue(string $extRepr)
     {
         $re = '~^ \s*
-                ((\()|(\[))? \s*                    # optional opening parenthesis or bracket
-                ((?(1)\()[^,]+,[^,]+(?(1)\))) \s*   # the first endpoint; parenthesized if the whole segment is parenthesized
+                ((\()|(\[))? \s*                  # optional opening parenthesis or bracket
+                ((?(1)\()[^,]+,[^,]+(?(1)\))) \s* # first endpoint; parenthesized if the whole segment is parenthesized
                 , \s*
-                ((?(1)\().+(?(1)\))) \s*            # the second endpoint; parenthesized if the whole segment is parenthesized
-                (?(2)\)|(?(3)\])) \s*               # pairing closing parenthesis or bracket
+                ((?(1)\().+(?(1)\))) \s*          # second endpoint; parenthesized if the whole segment is parenthesized
+                (?(2)\)|(?(3)\])) \s*             # pairing closing parenthesis or bracket
                 $~x';
 
         if (preg_match($re, $extRepr, $m)) {

@@ -20,7 +20,8 @@ class CopyInResult extends Result implements ICopyInResult
         $res = pg_put_line($this->connHandler, $line);
         if ($res === false) {
             throw new ConnectionException('Error sending data to the database server.');
-            // TODO: try to squeeze the client to get some useful information; maybe trap errors issued by pg_end_copy()?
+            // TODO: try to squeeze the client to get some useful information;
+            //       maybe trap errors issued by pg_end_copy()?
         }
     }
 
@@ -31,7 +32,8 @@ class CopyInResult extends Result implements ICopyInResult
         $res = pg_end_copy($this->connHandler);
         if ($res === false) {
             throw new ConnectionException('Error ending copying data to the database server.');
-            // TODO: try to squeeze the client to get some useful information; maybe trap errors issued by pg_end_copy()?
+            // TODO: try to squeeze the client to get some useful information;
+            //       maybe trap errors issued by pg_end_copy()?
         }
     }
 }

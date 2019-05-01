@@ -44,7 +44,7 @@ class Types
             'character varying' => ['pg_catalog', 'varchar'],
             // NOTE: date is not reserved, despite being mentioned by the documentation. Try
             //       "CREATE DOMAIN public.date AS text; SET search_path TO public, pg_catalog; SELECT 1::date".
-            'decimal' => ['pg_catalog', 'numeric'], // equivalent to numeric: see https://www.postgresql.org/docs/9.6/static/datatype-numeric.html
+            'decimal' => ['pg_catalog', 'numeric'], // equivalent to numeric
             'double precision' => ['pg_catalog', 'float8'],
             'int' => ['pg_catalog', 'int4'],
             'integer' => ['pg_catalog', 'int4'],

@@ -74,7 +74,8 @@ class QueryResult extends Result implements IQueryResult
                 $name = null;
             }
             $typeOid = pg_field_type_oid($this->handler, $i);
-            if ($typeOid === false || $typeOid === null) { // NOTE: besides false, pg_field_type_oid() might return NULL on error
+            // NOTE: besides false, pg_field_type_oid() might return NULL on error
+            if ($typeOid === false || $typeOid === null) {
                 throw new InvalidResultException("Error retrieving type OID of result column $i.");
             }
             // NOTE: the type dictionary may change during the iterations, so take a fresh one every time

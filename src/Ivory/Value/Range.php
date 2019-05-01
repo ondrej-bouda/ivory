@@ -185,7 +185,10 @@ class Range implements IComparable
     {
         if (is_string($boundsOrLowerInc)) {
             if ($upperInc !== null) {
-                trigger_error('$upperInc is irrelevant - string specification for $boundsOrLowerInc given', E_USER_NOTICE);
+                trigger_error(
+                    '$upperInc is irrelevant - string specification for $boundsOrLowerInc given',
+                    E_USER_NOTICE
+                );
             }
             // OPT: measure whether preg_match('~^[[(][\])]$~', $boundsOrLowerInc) would not be faster
             if (strlen($boundsOrLowerInc) != 2 || // OPT: isset($boundsOrLowerInc[2] might be faster
@@ -743,12 +746,16 @@ class Range implements IComparable
             return 1;
         }
 
-        $cmp = $this->compareBounds(-1, $this->getLower(), $this->isLowerInc(), $other->getLower(), $other->isLowerInc());
+        $cmp = $this->compareBounds(
+            -1, $this->getLower(), $this->isLowerInc(), $other->getLower(), $other->isLowerInc()
+        );
         if ($cmp != 0) {
             return $cmp;
-        } else {
-            return $this->compareBounds(1, $this->getUpper(), $this->isUpperInc(), $other->getUpper(), $other->isUpperInc());
         }
+
+        return $this->compareBounds(
+            1, $this->getUpper(), $this->isUpperInc(), $other->getUpper(), $other->isUpperInc()
+        );
     }
 
     private function compareBounds(int $sgn, $aVal, bool $aIsInc, $bVal, bool $bIsInc): int

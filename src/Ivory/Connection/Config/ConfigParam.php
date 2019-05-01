@@ -255,7 +255,7 @@ class ConfigParam
     const LOG_TIMEZONE = 'log_timezone';
     /** @since PostgreSQL 9.5 */
     const CLUSTER_NAME = 'cluster_name';
-    const UPDATE_PROCESS_TITLE = 'update_process_title'; // categorized under Run-time Statistics Settings on PostgreSQL <= 9.4
+    const UPDATE_PROCESS_TITLE = 'update_process_title'; // listed in Run-time Statistics Settings on PostgreSQL <= 9.4
     //endregion
     //region Run-time Statistics Settings
     const TRACK_ACTIVITIES = 'track_activities';

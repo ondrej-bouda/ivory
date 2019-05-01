@@ -98,7 +98,7 @@ interface ITransactionControl
      * See {@link ITxHandle::prepareTransaction()} for more details on preparing a transaction.
      *
      * @return IQueryResult result of query to all columns of
-     *                        {@link https://www.postgresql.org/docs/current/view-pg-prepared-xacts.html <tt>pg_catalog.pg_prepared_xacts</tt>}
+     * {@link https://www.postgresql.org/docs/current/view-pg-prepared-xacts.html <tt>pg_catalog.pg_prepared_xacts</tt>}
      */
     function listPreparedTransactions(): IQueryResult;
 }

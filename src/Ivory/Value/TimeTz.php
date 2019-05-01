@@ -245,7 +245,8 @@ class TimeTz extends TimeBase
     {
         $str = $this->toString();
         try {
-            $ts = new \DateTime($str); // OPT: \DateTime::createFromFormat() is supposed to be twice as fast as new \DateTime()
+            $ts = new \DateTime($str);
+            // OPT: \DateTime::createFromFormat() is supposed to be twice as fast as new \DateTime()
         } catch (\Exception $e) {
             throw new \LogicException('Date/time error', 0, $e);
         }

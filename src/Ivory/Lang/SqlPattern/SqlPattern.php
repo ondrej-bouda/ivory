@@ -122,7 +122,10 @@ class SqlPattern
     public function __construct(string $sqlTorso, array $positionalPlaceholders, array $namedPlaceholderMap)
     {
         assert(
-            !$positionalPlaceholders || array_keys($positionalPlaceholders) == range(0, count($positionalPlaceholders) - 1),
+            (
+                !$positionalPlaceholders ||
+                array_keys($positionalPlaceholders) == range(0, count($positionalPlaceholders) - 1)
+            ),
             new \InvalidArgumentException('$positionalPlaceholders array is not a list - keys do not form a sequence')
         );
 

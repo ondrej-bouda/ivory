@@ -540,7 +540,7 @@ class Decimal implements IComparable
             return new Decimal(gmp_strval(gmp_fact($this->toGMP())));
         }
 
-        // OPT: there are more efficient algorithms calculating the factorial; see, e.g., http://www.luschny.de/math/factorial/index.html
+        // OPT: there are more efficient algorithms calculating the factorial; see http://www.luschny.de/math/factorial/
         $result = new Decimal('2');
         for ($i = new Decimal('3'); $i->compareTo($this) <= 0; $i = $i->add(1)) {
             $result = $result->multiply($i);

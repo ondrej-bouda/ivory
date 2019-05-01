@@ -35,12 +35,14 @@ class SqlPatternParser implements ISqlPatternParser
 	    	            " (?: [^"]+ | "" )* "               #       a quoted string
 	    	          )                                     #
 	    	          |                                     #
-	    	          \{ ([^}]+) \}                         #     (3) or just anything enclosed in curly braces, taken as is
+	    	          \{ ([^}]+) \}                         #     (3) or just anything enclosed in curly braces, taken
+	    	                                                #         as is
 	    	        )                                       #
 	    	        ( \[\] )*                               #     (4) optionally ended with pairs of brackets
 	    	      )?                                        #
 	    	      ( \? )?                                   #   (5) optional question mark for loose type mode
-	    	      (?: : ( [[:alpha:]_] [[:alnum:]_]* ) )?   #   (6) optional parameter name, starting with a letter or underscore
+	    	      (?: : ( [[:alpha:]_] [[:alnum:]_]* ) )?   #   (6) optional parameter name, starting with a letter or
+	    	                                                #       underscore
 	    	    |                                           # or
 	    	    ( % )                                       # (7) another percent sign -> literal %
 	    	  )
@@ -59,9 +61,11 @@ class SqlPatternParser implements ISqlPatternParser
                     $typeName = $matchWithOffsets[3][0];
                     $typeNameQuoted = false;
                 } else {
-                    $schemaItem = (!empty($matchWithOffsets[1][0]) ? $matchWithOffsets[1][0] : null); // correctness: empty() is OK as the schema name may not be "0"
+                    // correctness: empty() is OK as the schema name may not be "0"
+                    $schemaItem = (!empty($matchWithOffsets[1][0]) ? $matchWithOffsets[1][0] : null);
                     $schemaName = $this->unquoteString($schemaItem, $schemaNameQuoted);
-                    $typeItem = (!empty($matchWithOffsets[2][0]) ? $matchWithOffsets[2][0] : null); // correctness: empty() is OK as the type name may not be "0"
+                    // correctness: empty() is OK as the type name may not be "0"
+                    $typeItem = (!empty($matchWithOffsets[2][0]) ? $matchWithOffsets[2][0] : null);
                     $typeName = $this->unquoteString($typeItem, $typeNameQuoted);
                 }
 

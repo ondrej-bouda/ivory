@@ -102,7 +102,11 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
                 }
                 break;
             case DateStyle::FORMAT_POSTGRES:
-                preg_match('~^\w{3} (\d+|\w{3}) (\d+|\w{3}) (\d+):(\d+):(\d+(?:\.\d+)?) (\d+) ([^ ]+)( BC)?$~', $extRepr, $matches);
+                preg_match(
+                    '~^\w{3} (\d+|\w{3}) (\d+|\w{3}) (\d+):(\d+):(\d+(?:\.\d+)?) (\d+) ([^ ]+)( BC)?$~',
+                    $extRepr,
+                    $matches
+                );
                 if ($dateStyle->getOrder() == DateStyle::ORDER_DMY) {
                     list(, $d, $ms, $h, $i, $s, $y, $z) = $matches;
                 } else {

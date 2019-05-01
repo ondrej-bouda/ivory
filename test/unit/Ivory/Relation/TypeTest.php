@@ -345,7 +345,9 @@ class TypeTest extends IvoryTestCase
                     self::assertEquals(TimestampTz::minusInfinity(), $tuple->minus_inf, $msg);
                     self::assertEquals(TimestampTz::fromParts(-1987, 8, 17, 13, 1, 2.5, $lmtOffset), $tuple->bc,
                         $msg);
-                    self::assertEquals(TimestampTz::fromParts(294276, 12, 31, 23, 59, 59.999999, $tzStd), $tuple->mx, $msg);
+                    self::assertEquals(
+                        TimestampTz::fromParts(294276, 12, 31, 23, 59, 59.999999, $tzStd), $tuple->mx, $msg
+                    );
                     self::assertEquals(TimestampTz::fromParts(-4713, 1, 1, 0, 0, 0, $lmtOffset), $tuple->mn, $msg);
                 }
             }

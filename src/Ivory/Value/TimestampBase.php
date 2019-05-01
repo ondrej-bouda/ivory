@@ -46,7 +46,8 @@ abstract class TimestampBase extends DateBase
         // check out for more than 4 digits for the year - something date_create_immutable() does not handle properly
         $addYears = 0;
         $dateCreateInput = preg_replace_callback(
-            '~\d{5,}(?=(?:-\d+-\d+|\d{4})(?:\s+|T)\d)~', // supports both dash-separated date/time parts and also the form without dash separators
+            '~\d{5,}(?=(?:-\d+-\d+|\d{4})(?:\s+|T)\d)~', // supports both dash-separated date/time parts and also the
+                                                         // form without dash separators
             function ($y) use (&$addYears) {
                 $res = $y[0] % 10000;
                 $addYears = $y[0] - $res;

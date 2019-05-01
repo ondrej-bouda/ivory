@@ -54,7 +54,7 @@ class VarBitString extends BitString
     {
         parent::__construct($bits);
 
-        if ($maxLength !== null && $maxLength < 0) { // NOTE: zero max. length permitted for substr() to calculate correctly
+        if ($maxLength !== null && $maxLength < 0) { // zero max. length permitted for substr() to calculate correctly
             throw new \InvalidArgumentException('maxLength is negative');
         }
         $this->maxLength = $maxLength;
