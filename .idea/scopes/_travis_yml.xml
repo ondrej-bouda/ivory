@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name=".travis.yml" pattern="file:.travis.yml" />
+</component>

@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="*.txt files" pattern="file[ivory]:*.txt" />
+</component>

@@ -1,4 +1,6 @@
 /.idea
+!/.idea/inspectionProfiles/Ivory_Inspections.xml
+!/.idea/scopes
 /composer.lock
 /composer.phar
 /test/phpunit.xml
