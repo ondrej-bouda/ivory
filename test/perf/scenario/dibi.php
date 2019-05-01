@@ -127,7 +127,7 @@ class DibiPerformanceTest implements IPerformanceTest
         echo "Category $categoryId:\n";
         foreach ($res as $row) {
             $introDate = $row['introduction_date'];
-            assert($introDate instanceof \DateTimeInterface);
+            assert($introDate instanceof DateTimeInterface);
             printf(
                 '#%d %s, introduced %s: %s',
                 $row['id'],
