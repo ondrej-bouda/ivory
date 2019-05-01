@@ -219,9 +219,9 @@ class StatementExecutionTest extends IvoryTestCase
     public function testCustomExceptionByMessage()
     {
         $stmtExFactory = $this->conn->getStatementExceptionFactory();
-        $stmtExFactory->registerByMessage('~logarithm~', StatementExecutionTest__LogarithmException::class);
+        $stmtExFactory->registerByMessage('~logarithm~', StatementExecutionTestLogarithmException::class);
 
-        $this->expectException(StatementExecutionTest__LogarithmException::class);
+        $this->expectException(StatementExecutionTestLogarithmException::class);
         $this->conn->query('SELECT log(-10)');
     }
 
@@ -230,10 +230,10 @@ class StatementExecutionTest extends IvoryTestCase
         $stmtExFactory = $this->conn->getStatementExceptionFactory();
         $stmtExFactory->registerBySqlStateCode(
             SqlState::INVALID_ARGUMENT_FOR_LOGARITHM,
-            StatementExecutionTest__LogarithmException::class
+            StatementExecutionTestLogarithmException::class
         );
 
-        $this->expectException(StatementExecutionTest__LogarithmException::class);
+        $this->expectException(StatementExecutionTestLogarithmException::class);
         $this->conn->query('SELECT log(-10)');
     }
 
@@ -242,10 +242,10 @@ class StatementExecutionTest extends IvoryTestCase
         $stmtExFactory = $this->conn->getStatementExceptionFactory();
         $stmtExFactory->registerBySqlStateClass(
             SqlStateClass::DATA_EXCEPTION,
-            StatementExecutionTest__LogarithmException::class
+            StatementExecutionTestLogarithmException::class
         );
 
-        $this->expectException(StatementExecutionTest__LogarithmException::class);
+        $this->expectException(StatementExecutionTestLogarithmException::class);
         $this->conn->query('SELECT log(-10)');
     }
 
@@ -411,6 +411,6 @@ SQL
     }
 }
 
-class StatementExecutionTest__LogarithmException extends StatementException
+class StatementExecutionTestLogarithmException extends StatementException
 {
 }

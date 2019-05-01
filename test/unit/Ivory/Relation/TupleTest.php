@@ -186,19 +186,19 @@ class TupleTest extends TestCase
 
     public function testEqualable()
     {
-        $odd1Tuple = Tuple::fromMap(['a' => new TupleTest__Equalable(1), 'b' => null]);
-        $odd2Tuple = Tuple::fromMap(['a' => new TupleTest__Equalable(3), 'b' => null]);
+        $odd1Tuple = Tuple::fromMap(['a' => new TupleTestEqualable(1), 'b' => null]);
+        $odd2Tuple = Tuple::fromMap(['a' => new TupleTestEqualable(3), 'b' => null]);
         self::assertTrue($odd1Tuple->equals($odd2Tuple));
         self::assertTrue($odd2Tuple->equals($odd1Tuple));
 
-        $evenTuple = Tuple::fromMap(['a' => new TupleTest__Equalable(2), 'b' => null]);
+        $evenTuple = Tuple::fromMap(['a' => new TupleTestEqualable(2), 'b' => null]);
         self::assertFalse($odd1Tuple->equals($evenTuple));
         self::assertFalse($evenTuple->equals($odd1Tuple));
     }
 }
 
 
-class TupleTest__Equalable implements IEqualable
+class TupleTestEqualable implements IEqualable
 {
     private $num;
 
@@ -209,7 +209,7 @@ class TupleTest__Equalable implements IEqualable
 
     public function equals($other): bool
     {
-        if (!$other instanceof TupleTest__Equalable) {
+        if (!$other instanceof TupleTestEqualable) {
             return false;
         }
         return (($this->num % 2) == ($other->num % 2));
