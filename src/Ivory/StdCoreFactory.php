@@ -17,6 +17,7 @@ use Ivory\Lang;
 use Ivory\Lang\SqlPattern\CachingSqlPatternParser;
 use Ivory\Lang\SqlPattern\ISqlPatternParser;
 use Ivory\Lang\SqlPattern\SqlPatternParser;
+use Ivory\Relation\ICursor;
 use Ivory\Type\Ivory\CommandSerializer;
 use Ivory\Type\Ivory\IdentifierSerializer;
 use Ivory\Type\Ivory\LikeExpressionSerializer;
@@ -112,6 +113,7 @@ class StdCoreFactory implements ICoreFactory
             Value\PgTextSearchDictionaryRef::class => ['pg_catalog', 'regdictionary'],
             Value\PgTypeRef::class => ['pg_catalog', 'regtype'],
             Value\TupleId::class => ['pg_catalog', 'tid'],
+            ICursor::class => ['pg_catalog', 'refcursor'],
         ]);
 
         return $reg;

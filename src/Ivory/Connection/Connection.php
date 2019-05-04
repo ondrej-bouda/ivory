@@ -6,7 +6,9 @@ use Ivory\Connection\Config\ConnConfig;
 use Ivory\Connection\Config\IConnConfig;
 use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Ivory;
+use Ivory\Query\IRelationDefinition;
 use Ivory\Relation\IColumn;
+use Ivory\Relation\ICursor;
 use Ivory\Relation\ITuple;
 use Ivory\Result\IAsyncCommandResult;
 use Ivory\Result\IAsyncQueryResult;
@@ -28,6 +30,7 @@ class Connection implements IConnection
     private $stmtExec;
     private $txCtl;
     private $ipcCtl;
+    private $cursorCtl;
     private $cacheCtl;
 
     private $config;
@@ -51,6 +54,7 @@ class Connection implements IConnection
         $this->txCtl = new TransactionControl($this->connCtl, $this->stmtExec, $this);
         $this->ipcCtl = new IPCControl($this->connCtl, $this->stmtExec);
         $this->config = new ConnConfig($this->connCtl, $this->stmtExec, $this->txCtl);
+        $this->cursorCtl = new CursorControl($this->stmtExec);
         // TODO: Consider moving cacheCtl initialization out of Connection itself (let the core factory set it up), or
         //       do not hold cache control here but rather besides the connection register at Ivory.
         $this->cacheCtl = Ivory::getCoreFactory()->createCacheControl($this);
@@ -307,6 +311,25 @@ class Connection implements IConnection
     public function waitForNotification(int $millisecondTimeout): ?Notification
     {
         return $this->ipcCtl->waitForNotification($millisecondTimeout);
+    }
+
+    //endregion
+
+    //region Cursor Control
+
+    public function declareCursor(string $name, IRelationDefinition $relationDefinition, int $options = 0): ICursor
+    {
+        return $this->cursorCtl->declareCursor($name, $relationDefinition, $options);
+    }
+
+    public function getAllCursors(): array
+    {
+        return $this->cursorCtl->getAllCursors();
+    }
+
+    public function closeAllCursors(): void
+    {
+        $this->cursorCtl->closeAllCursors();
     }
 
     //endregion
