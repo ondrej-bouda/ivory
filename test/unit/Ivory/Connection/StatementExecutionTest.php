@@ -88,20 +88,14 @@ class StatementExecutionTest extends IvoryTestCase
         );
         self::assertSame([-3, 4], $tuple->toList());
 
+        self::assertNull($this->conn->querySingleTuple('SELECT 1 WHERE FALSE'));
+
         $this->assertException(
             ResultDimensionException::class,
             function () {
                 $this->conn->querySingleTuple('SELECT * FROM (VALUES (4), (-3), (3)) t (num)');
             },
             'multiple tuple were returned from the database'
-        );
-
-        $this->assertException(
-            ResultDimensionException::class,
-            function () {
-                $this->conn->querySingleTuple('SELECT 1 WHERE FALSE');
-            },
-            'no tuples were returned from the database'
         );
 
         $this->assertException(
@@ -149,6 +143,8 @@ class StatementExecutionTest extends IvoryTestCase
     {
         $value = $this->conn->querySingleValue('SELECT 1');
         self::assertSame(1, $value);
+
+        self::assertNull($this->conn->querySingleValue('SELECT 1 WHERE FALSE'));
         
         $this->assertException(
             ResultDimensionException::class,
@@ -172,14 +168,6 @@ class StatementExecutionTest extends IvoryTestCase
                 $this->conn->querySingleValue('SELECT 1 UNION SELECT 2');
             },
             'multiple rows were returned from the database'
-        );
-
-        $this->assertException(
-            ResultDimensionException::class,
-            function () {
-                $this->conn->querySingleValue('SELECT 1 WHERE FALSE');
-            },
-            'no rows were returned from the database'
         );
 
         $this->assertException(

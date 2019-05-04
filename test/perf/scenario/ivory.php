@@ -64,6 +64,7 @@ class IvoryPerformanceTest implements IPerformanceTest
                 'SELECT * FROM usr WHERE lower(email) = lower(%s)',
                 $email
             );
+            assert($user !== null);
         } catch (Exception $e) {
             exit('Error authenticating the user');
         }

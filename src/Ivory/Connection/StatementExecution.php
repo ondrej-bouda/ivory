@@ -65,15 +65,19 @@ class StatementExecution implements IStatementExecution
         return $this->rawQuery($sql);
     }
 
-    public function querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ITuple
+    public function querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ?ITuple
     {
         $rel = $this->query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
-        if ($rel->count() != 1) {
-            throw new ResultDimensionException(
-                "The query should have resulted in exactly one row, but has {$rel->count()} rows."
-            );
+        switch ($rel->count()) {
+            case 1:
+                return $rel->tuple();
+            case 0:
+                return null;
+            default:
+                throw new ResultDimensionException(
+                    "The query should have resulted in at most one row, but has {$rel->count()} rows."
+                );
         }
-        return $rel->tuple();
     }
 
     public function querySingleColumn($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IColumn
@@ -94,13 +98,6 @@ class StatementExecution implements IStatementExecution
     {
         $rel = $this->query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
 
-        $rowCnt = $rel->count();
-        if ($rowCnt != 1) {
-            throw new ResultDimensionException(
-                "The query should have resulted in exactly one row, but has $rowCnt rows."
-            );
-        }
-
         $colCnt = count($rel->getColumns());
         if ($colCnt != 1) {
             throw new ResultDimensionException(
@@ -108,7 +105,16 @@ class StatementExecution implements IStatementExecution
             );
         }
 
-        return $rel->value();
+        switch ($rel->count()) {
+            case 1:
+                return $rel->value();
+            case 0:
+                return null;
+            default:
+                throw new ResultDimensionException(
+                    "The query should have resulted in at most one row, but has {$rel->count()} rows."
+                );
+        }
     }
 
     public function command($sqlFragmentPatternOrCommand, ...$fragmentsAndParams): ICommandResult

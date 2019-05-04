@@ -98,15 +98,19 @@ interface IStatementExecution
     function query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IQueryResult;
 
     /**
-     * Queries the database for a relation using an SQL pattern, checks it results in exactly one row, and returns it.
+     * Queries the database for a relation using an SQL pattern, checks it results in at most one row, and returns it.
      *
-     * The base functionality is the same as in {@link query()}. On top of that, the result is checked on having exactly
-     * one row, and the row is returned.
+     * The base functionality is the same as in {@link query()}. On top of that, the result is checked for the number of
+     * rows:
+     * - if the result consists of exactly one row, it is returned;
+     * - in case there are more rows, a {@link ResultDimensionException} is thrown as it marks a program logic error;
+     * - if no rows are in the result, `null` is returned as that might be a regular case that, depending on the actual
+     *   data, there is no row.
      *
      * @see query() for detailed specification
      * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
      * @param array ...$fragmentsAndParams
-     * @return ITuple
+     * @return ITuple|null the single row from the result, or <tt>null</tt> if there are is no data
      * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
@@ -114,14 +118,17 @@ interface IStatementExecution
      * @throws ConnectionException when an error occurred while sending the query or processing the database response
      * @throws UsageException if the statement appears to be a command rather than a query
      */
-    function querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ITuple;
+    function querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ?ITuple;
 
     /**
      * Queries the database for a relation using an SQL pattern, checks it results in exactly one column, and returns
      * it.
      *
-     * The base functionality is the same as in {@link query()}. On top of that, the result is checked on having exactly
-     * one column, and the column is returned.
+     * The base functionality is the same as in {@link query()}. On top of that, the result is checked for having
+     * exactly one column, and the column is returned.
+     *
+     * Note that, unlike {@link querySingleTuple()}, even zero columns in the result lead to a
+     * {@link ResultDimensionException} as it obviously marks a program logic error.
      *
      * @see query() for detailed specification
      * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
@@ -137,23 +144,27 @@ interface IStatementExecution
     function querySingleColumn($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IColumn;
 
     /**
-     * Queries the database for a relation using an SQL pattern, checks it results in exactly one row with one column,
-     * and returns the value from it.
+     * Queries the database for a relation using an SQL pattern, checks it results in at most one row with exactly one
+     * column, and returns the value from it.
      *
-     * The base functionality is the same as in {@link query()}. On top of that, the result is checked on having exactly
-     * one row and one column, and the value is returned.
+     * The base functionality is the same as in {@link query()}. On top of that, the result is checked for the number of
+     * rows and columns:
+     * - if the results consists of exactly one column and one row, the single cell is returned;
+     * - if there is no data, but the result structurally has exactly one column, `null` is returned;
+     * - in other cases (i.e., more than one row or not exactly one column), a {@link ResultDimensionException} is
+     *   thrown as it marks a program logic error.
      *
-     * @see query() for detailed specification
      * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
      * @param array ...$fragmentsAndParams
-     * @return mixed value of the only row from the only column the relation has
+     * @return mixed value of the only row from the only column the relation has, or <tt>null</tt> if there is no data
      * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
      *                                     requires
-     * @throws ResultDimensionException when the resulting data set has more than one row, or no row at all, or more
-     *                                    than one column, or no column at all
+     * @throws ResultDimensionException when the resulting data set has more than one row, or more than one column, or
+     *                                    no column at all
      * @throws ConnectionException when an error occurred while sending the query or processing the database response
      * @throws UsageException if the statement appears to be a command rather than a query
+     *@see query() for detailed specification
      */
     function querySingleValue($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
 
