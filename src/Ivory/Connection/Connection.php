@@ -8,6 +8,9 @@ use Ivory\Exception\StatementExceptionFactory;
 use Ivory\Ivory;
 use Ivory\Relation\IColumn;
 use Ivory\Relation\ITuple;
+use Ivory\Result\IAsyncCommandResult;
+use Ivory\Result\IAsyncQueryResult;
+use Ivory\Result\IAsyncResult;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\IQueryResult;
 use Ivory\Result\IResult;
@@ -149,6 +152,11 @@ class Connection implements IConnection
         return $this->stmtExec->query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
     }
 
+    public function queryAsync($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IAsyncQueryResult
+    {
+        return $this->stmtExec->queryAsync($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
+    }
+
     public function querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ?ITuple
     {
         return $this->stmtExec->querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
@@ -169,6 +177,11 @@ class Connection implements IConnection
         return $this->stmtExec->command($sqlFragmentPatternOrCommand, ...$fragmentsAndParams);
     }
 
+    public function commandAsync($sqlFragmentPatternOrCommand, ...$fragmentsAndParams): IAsyncCommandResult
+    {
+        return $this->stmtExec->commandAsync($sqlFragmentPatternOrCommand, ...$fragmentsAndParams);
+    }
+
     public function rawQuery(string $sqlQuery): IQueryResult
     {
         return $this->stmtExec->rawQuery($sqlQuery);
@@ -182,6 +195,11 @@ class Connection implements IConnection
     public function executeStatement($sqlStatement): IResult
     {
         return $this->stmtExec->executeStatement($sqlStatement);
+    }
+
+    public function executeStatementAsync($sqlStatement): IAsyncResult
+    {
+        return $this->stmtExec->executeStatementAsync($sqlStatement);
     }
 
     public function runScript(string $sqlScript): array

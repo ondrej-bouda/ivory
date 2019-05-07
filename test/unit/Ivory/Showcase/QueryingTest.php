@@ -6,6 +6,8 @@ use Ivory\Connection\IConnection;
 use Ivory\Connection\ITxHandle;
 use Ivory\IvoryTestCase;
 use Ivory\Query\SqlRelationDefinition;
+use Ivory\Result\ICommandResult;
+use Ivory\Result\IQueryResult;
 use Ivory\Type\ITypeDictionary;
 use Ivory\Value\Date;
 use Ivory\Value\Decimal;
@@ -96,5 +98,32 @@ class QueryingTest extends IvoryTestCase
         // Since the definition is not tied to a connection, it may be cached and retrieved later.
         $serialized = serialize($relDef);
         self::assertCount(2, $this->conn->query(unserialize($serialized)));
+    }
+
+    public function testAsynchronousQueries()
+    {
+        // It is very easy to execute a query in the background and collect results later.
+        $startTime = microtime(true);
+        $asyncResult = $this->conn->queryAsync('SELECT pg_sleep(2) /* an expensive query */, 3.14');
+        $sentTime = microtime(true);
+        sleep(2); // some useful computation on the PHP side; avoid querying the database within the same connection!
+        $nextTime = microtime(true);
+        $result = $asyncResult->getResult();
+        $returnTime = microtime(true);
+
+        self::assertEquals(Decimal::fromNumber(3.14), $result->value(1));
+        self::assertLessThan(1, $sentTime - $startTime, 'queryAsync() will return without waiting');
+        self::assertLessThan(1, $returnTime - $nextTime, 'result will be ready when asked for');
+
+        // Commands may also be run asynchronously.
+        $startTime = microtime(true);
+        $asyncResult = $this->conn->commandAsync("DO LANGUAGE plpgsql 'BEGIN PERFORM pg_sleep(2); END'");
+        $sentTime = microtime(true);
+        $result = $asyncResult->getResult();
+        $returnTime = microtime(true);
+
+        self::assertSame('DO', $result->getCommandTag());
+        self::assertLessThan(1, $sentTime - $startTime, 'commandAsync() will return without waiting');
+        self::assertGreaterThan(2, $returnTime - $sentTime, 'next() will wait until the command is finished');
     }
 }

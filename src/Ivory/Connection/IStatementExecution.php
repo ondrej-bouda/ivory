@@ -11,6 +11,9 @@ use Ivory\Query\IRelationDefinition;
 use Ivory\Query\ISqlPatternStatement;
 use Ivory\Relation\IColumn;
 use Ivory\Relation\ITuple;
+use Ivory\Result\IAsyncCommandResult;
+use Ivory\Result\IAsyncQueryResult;
+use Ivory\Result\IAsyncResult;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\IQueryResult;
 use Ivory\Result\IResult;
@@ -96,6 +99,39 @@ interface IStatementExecution
      * @throws UsageException if the statement appears to be a command rather than a query
      */
     function query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IQueryResult;
+
+    /**
+     * Queries the database for a relation using an SQL pattern and returns without waiting. The resulting relation may
+     * then be retrieved when needed.
+     *
+     * This is an asynchronous variant of {@link query()}.
+     *
+     * Instead of a result object, which would normally be returned by {@link query()}, an {@link IAsyncQueryResult} is
+     * returned. Once the query result is needed, call `getResult()` on the object, which will return an `IQueryResult`.
+     *
+     * Until calling `getResult()`, avoid sending any other statements to the database within the same connection.
+     * Otherwise, the results might get mixed.
+     *
+     * Example:
+     * <code>
+     * $asyncResult = $connection->queryAsync('SELECT pg_sleep(2), 3.14'); // an expensive query
+     * // immediately returned
+     * sleep(2); // some useful computation on the PHP side; avoid querying the database within the same connection!
+     * $result = $asyncResult->getResult(); // now we get the results
+     * assert($result instanceof IQueryResult); // ...and we can work with it as usual
+     * </code>
+     *
+     * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
+     * @param array ...$fragmentsAndParams
+     * @return IAsyncQueryResult encapsulation of the result
+     * @throws StatementException when the query is erroneous and PostgreSQL returns an error
+     * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
+     *                                     requires
+     * @throws ConnectionException when an error occurred while sending the query or processing the database response
+     * @throws UsageException if the statement appears to be a command rather than a query
+     * @see query() for more details on the arguments
+     */
+    function queryAsync($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IAsyncQueryResult;
 
     /**
      * Queries the database for a relation using an SQL pattern, checks it results in at most one row, and returns it.
@@ -191,6 +227,25 @@ interface IStatementExecution
     function command($sqlFragmentPatternOrCommand, ...$fragmentsAndParams): ICommandResult;
 
     /**
+     * Sends a command to the database using an SQL pattern and returns without waiting. The command result may then be
+     * retrieved when needed.
+     *
+     * This is an asynchronous variant of {@link command()}.
+     *
+     * @param string|SqlPattern|ICommand $sqlFragmentPatternOrCommand
+     * @param array ...$fragmentsAndParams
+     * @return IAsyncCommandResult encapsulation of the result
+     * @throws StatementException when the command is erroneous and PostgreSQL returns an error
+     * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
+     *                                     requires
+     * @throws ConnectionException when an error occurred while sending the command or processing the database response
+     * @throws UsageException if the statement appears to be a query rather than a command
+     * @see command() for more details on the arguments
+     * @see queryAsync() for more details on how to get the result
+     */
+    function commandAsync($sqlFragmentPatternOrCommand, ...$fragmentsAndParams): IAsyncCommandResult;
+
+    /**
      * Sends a raw SQL query, as is, to the database, waits for its execution and returns the resulting relation.
      *
      * Just a single statement may be used. For sending multiple statements at once, use {@link runScript()}.
@@ -247,6 +302,22 @@ interface IStatementExecution
      * @throws ConnectionException when an error occurred while sending the command or processing the database response
      */
     function executeStatement($sqlStatement): IResult;
+
+    /**
+     * Sends an SQL statement to the database and returns without waiting. The result may then be retrieved when needed.
+     *
+     * This is an asynchronous variant of {@link executeStatement()}.
+     *
+     * @param string|ISqlPatternStatement $sqlStatement either a raw SQL string, or {@link ISqlPatternStatement}
+     * @return IAsyncResult encapsulation of the result
+     * @throws StatementException when the statement is erroneous and PostgreSQL returns an error, or if
+     *                              <tt>$sqlStatement</tt> actually contains multiple statements (e.g., separated by a
+     *                              semicolon)
+     * @throws ConnectionException when an error occurred while sending the command or processing the database response
+     * @see executeStatement() for more details on the arguments
+     * @see queryAsync() for more details on how to get the result
+     */
+    function executeStatementAsync($sqlStatement): IAsyncResult;
 
     /**
      * Sends a script of one or more statements to the database, waits for their execution, and returns the results.

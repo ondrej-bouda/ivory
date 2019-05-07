@@ -16,9 +16,15 @@ use Ivory\Query\SqlCommand;
 use Ivory\Query\SqlRelationDefinition;
 use Ivory\Relation\IColumn;
 use Ivory\Relation\ITuple;
+use Ivory\Result\AsyncCommandResult;
+use Ivory\Result\AsyncQueryResult;
+use Ivory\Result\AsyncResult;
 use Ivory\Result\CommandResult;
 use Ivory\Result\CopyInResult;
 use Ivory\Result\CopyOutResult;
+use Ivory\Result\IAsyncCommandResult;
+use Ivory\Result\IAsyncQueryResult;
+use Ivory\Result\IAsyncResult;
 use Ivory\Result\ICommandResult;
 use Ivory\Result\IQueryResult;
 use Ivory\Result\IResult;
@@ -39,6 +45,23 @@ class StatementExecution implements IStatementExecution
 
     public function query($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IQueryResult
     {
+        $sql = $this->extractRawQuery($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
+        return $this->rawQuery($sql);
+    }
+
+    public function queryAsync($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): IAsyncQueryResult
+    {
+        $sql = $this->extractRawQuery($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams);
+        $this->sendRawStatement($sql);
+        return new AsyncQueryResult(
+            function () use ($sql) {
+                return $this->fetchStatementResult($sql);
+            }
+        );
+    }
+
+    private function extractRawQuery($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): string
+    {
         $typeDict = $this->typeCtl->getTypeDictionary();
 
         try {
@@ -46,23 +69,21 @@ class StatementExecution implements IStatementExecution
                 $this->checkMaxArgs($fragmentsAndParams, 1);
                 $sqlRelDef = $sqlFragmentPatternOrRelationDefinition;
                 $serializeArgs = $fragmentsAndParams;
-                $sql = $sqlRelDef->toSql($typeDict, ...$serializeArgs);
+                return $sqlRelDef->toSql($typeDict, ...$serializeArgs);
             } elseif ($sqlFragmentPatternOrRelationDefinition instanceof IRelationDefinition) {
                 $this->checkMaxArgs($fragmentsAndParams, 0);
                 $relDef = $sqlFragmentPatternOrRelationDefinition;
-                $sql = $relDef->toSql($typeDict);
+                return $relDef->toSql($typeDict);
             } else {
                 $relDef = SqlRelationDefinition::fromFragments(
                     $sqlFragmentPatternOrRelationDefinition,
                     ...$fragmentsAndParams
                 );
-                $sql = $relDef->toSql($typeDict);
+                return $relDef->toSql($typeDict);
             }
         } catch (InvalidStateException $e) {
             throw new \InvalidArgumentException($e->getMessage());
         }
-
-        return $this->rawQuery($sql);
     }
 
     public function querySingleTuple($sqlFragmentPatternOrRelationDefinition, ...$fragmentsAndParams): ?ITuple
@@ -119,6 +140,23 @@ class StatementExecution implements IStatementExecution
 
     public function command($sqlFragmentPatternOrCommand, ...$fragmentsAndParams): ICommandResult
     {
+        $sql = $this->extractRawCommand($sqlFragmentPatternOrCommand, ...$fragmentsAndParams);
+        return $this->rawCommand($sql);
+    }
+
+    public function commandAsync($sqlFragmentPatternOrCommand, ...$fragmentsAndParams): IAsyncCommandResult
+    {
+        $sql = $this->extractRawCommand($sqlFragmentPatternOrCommand, ...$fragmentsAndParams);
+        $this->sendRawStatement($sql);
+        return new AsyncCommandResult(
+            function () use ($sql) {
+                return $this->fetchStatementResult($sql);
+            }
+        );
+    }
+
+    private function extractRawCommand($sqlFragmentPatternOrCommand, ...$fragmentsAndParams): string
+    {
         $typeDict = $this->typeCtl->getTypeDictionary();
 
         try {
@@ -126,20 +164,18 @@ class StatementExecution implements IStatementExecution
                 $this->checkMaxArgs($fragmentsAndParams, 1);
                 $sqlCommand = $sqlFragmentPatternOrCommand;
                 $serializeArgs = $fragmentsAndParams;
-                $sql = $sqlCommand->toSql($typeDict, ...$serializeArgs);
+                return $sqlCommand->toSql($typeDict, ...$serializeArgs);
             } elseif ($sqlFragmentPatternOrCommand instanceof ICommand) {
                 $this->checkMaxArgs($fragmentsAndParams, 0);
                 $command = $sqlFragmentPatternOrCommand;
-                $sql = $command->toSql($typeDict);
+                return $command->toSql($typeDict);
             } else {
                 $command = SqlCommand::fromFragments($sqlFragmentPatternOrCommand, ...$fragmentsAndParams);
-                $sql = $command->toSql($typeDict);
+                return $command->toSql($typeDict);
             }
         } catch (InvalidStateException $e) {
             throw new \InvalidArgumentException($e->getMessage());
         }
-
-        return $this->rawCommand($sql);
     }
 
     private function checkMaxArgs($args, int $maxCount): void
@@ -177,21 +213,42 @@ class StatementExecution implements IStatementExecution
 
     public function executeStatement($sqlStatement): IResult
     {
+        $rawStatement = $this->extractRawStatement($sqlStatement);
+        return $this->executeRawStatement($rawStatement);
+    }
+
+    public function executeStatementAsync($sqlStatement): IAsyncResult
+    {
+        $rawStatement = $this->extractRawStatement($sqlStatement);
+        $this->sendRawStatement($rawStatement);
+        return new AsyncResult(
+            function () use ($rawStatement) {
+                return $this->fetchStatementResult($rawStatement);
+            }
+        );
+    }
+
+    private function extractRawStatement($sqlStatement): string
+    {
         if (is_string($sqlStatement)) {
-            $rawStatement = $sqlStatement;
+            return $sqlStatement;
         } elseif ($sqlStatement instanceof ISqlPatternStatement) {
             $typeDict = $this->typeCtl->getTypeDictionary();
-            $rawStatement = $sqlStatement->toSql($typeDict);
+            return $sqlStatement->toSql($typeDict);
         } else {
             throw new \InvalidArgumentException(
                 '$sqlStatement must either by a string or ' . ISqlPatternStatement::class
             );
         }
-
-        return $this->executeRawStatement($rawStatement);
     }
 
     private function executeRawStatement(string $sqlStatement): IResult
+    {
+        $this->sendRawStatement($sqlStatement);
+        return $this->fetchStatementResult($sqlStatement);
+    }
+
+    private function sendRawStatement(string $sqlStatement): void
     {
         $connHandler = $this->connCtl->requireConnection();
 
@@ -205,6 +262,11 @@ class StatementExecution implements IStatementExecution
             // TODO: consider trapping errors to get more detailed error message
             throw new ConnectionException('Error sending the query to the database.');
         }
+    }
+
+    private function fetchStatementResult(string $sqlStatement): IResult
+    {
+        $connHandler = $this->connCtl->requireConnection();
 
         $resultHandler = pg_get_result($connHandler);
         if ($resultHandler === false) {
