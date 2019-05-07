@@ -4,6 +4,7 @@ namespace Ivory\Relation;
 
 use Ivory\Connection\IStatementExecution;
 use Ivory\Exception\ClosedCursorException;
+use Ivory\Query\SqlRelationDefinition;
 
 /**
  * {@inheritDoc}
@@ -173,14 +174,46 @@ class Cursor implements ICursor
         }
     }
 
-    public function getIterator()
+    /**
+     * {@inheritDoc}
+     *
+     * In the buffered mode, the implementation fetches the first batch of `$bufferSize` rows immediately, and while
+     * iterating through the rows, it fetches another batch of rows in the background.
+     */
+    public function getIterator(int $bufferSize = 0): \Traversable
     {
-        for ($i = 1; ; $i++) {
-            $tuple = $this->fetchAt($i);
-            if ($tuple === null) {
-                return;
+        if ($bufferSize <= 0) {
+            for ($i = 1; ; $i++) {
+                $tuple = $this->fetchAt($i);
+                if ($tuple === null) {
+                    return;
+                }
+                yield $i => $tuple;
             }
-            yield $i => $tuple;
+        } else {
+            $fetchSql = SqlRelationDefinition::fromPattern(
+                'FETCH %sql %ident', $this->getCountingDirectionSql($bufferSize), $this->name
+            );
+            $this->moveTo(0);
+            $i = 1;
+            $buffer = $this->fetchMulti($bufferSize);
+            while (true) {
+                // start querying for the next batch in the background, if not at the end
+                if (count($buffer) == $bufferSize) {
+                    $nextBatchGen = $this->stmtExec->executeStatementAsync($fetchSql);
+                } else {
+                    $nextBatchGen = null;
+                }
+                // read all the buffered tuples
+                foreach ($buffer as $t) {
+                    yield $i++ => $t;
+                }
+                // all read, check if we have fetched more data in the meantime, and put them in the buffer
+                if ($nextBatchGen === null) {
+                    return;
+                }
+                $buffer = $nextBatchGen->getResult();
+            }
         }
     }
 

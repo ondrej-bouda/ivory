@@ -607,4 +607,37 @@ SQL
             $tx->rollback();
         }
     }
+
+    /**
+     * @depends testCursorTraversable
+     */
+    public function testBufferedIterator()
+    {
+        $relDef = SqlRelationDefinition::fromSql("VALUES (1, 'a'), (2, 'b'), (3, 'c'), (4, 'd'), (5, 'e')");
+
+        $conn = $this->getIvoryConnection();
+        $tx = $conn->startTransaction();
+        try {
+            $cur = $conn->declareCursor('no-scroll-cur', $relDef, ICursor::NON_SCROLLABLE);
+
+            $bufSizes = [0, 1, 2, 4, 5, 10];
+            foreach ($bufSizes as $bufSize) {
+                $actualValues = [];
+                foreach ($cur->getIterator($bufSize) as $key => $tuple) {
+                    assert($tuple instanceof ITuple);
+                    $actualValues[$key] = $tuple->value(1);
+                }
+                self::assertSame([1 => 'a', 'b', 'c', 'd', 'e'], $actualValues, "Buffer size $bufSize");
+
+                $actualValuesAgain = [];
+                foreach ($cur->getIterator($bufSize) as $key => $tuple) {
+                    assert($tuple instanceof ITuple);
+                    $actualValuesAgain[$key] = $tuple->value(1);
+                }
+                self::assertSame([1 => 'a', 'b', 'c', 'd', 'e'], $actualValuesAgain, "Buffer size $bufSize");
+            }
+        } finally {
+            $tx->rollback();
+        }
+    }
 }

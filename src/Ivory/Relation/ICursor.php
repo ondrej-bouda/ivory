@@ -192,4 +192,12 @@ interface ICursor extends \IteratorAggregate
      * Tells whether the cursor is already closed.
      */
     function isClosed(): bool;
+
+    /**
+     * {@inheritDoc}
+     *
+     * If `$bufferSize` is given as a positive integer, a buffer of the given size will be used for fetching tuples from
+     * the cursor instead of fetching each row separately.
+     */
+    function getIterator(int $bufferSize = 0): \Traversable;
 }
