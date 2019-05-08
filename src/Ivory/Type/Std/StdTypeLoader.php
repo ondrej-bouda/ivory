@@ -132,6 +132,9 @@ class StdTypeLoader implements ITypeLoader
                     case 'record':
                         return new RecordType($schemaName, $typeName);
 
+                    case 'refcursor':
+                        return new RefCursorType($schemaName, $typeName);
+
                     case 'oid':
                         return new IntegerType($schemaName, $typeName);
                     case 'regproc':

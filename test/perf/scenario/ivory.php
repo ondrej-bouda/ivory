@@ -5,6 +5,7 @@ use Cache\Adapter\Filesystem\FilesystemCachePool;
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use Ivory\Connection\IConnection;
 use Ivory\Ivory;
+use Ivory\Query\SqlRelationDefinition;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 
@@ -16,16 +17,22 @@ class IvoryPerformanceTest implements IPerformanceTest
     const NO_CACHE = 2;
     /** Flag to use a file-based cache. If neither this nor `NO_CACHE` is used, a memory cache is used. */
     const FILE_CACHE = 4;
+    /** Flag to use a cursor instead of fetching the whole result set at once. */
+    const CURSOR = 8;
 
     const FILE_CACHE_DIR = __DIR__ . '/out';
 
     private $async;
+    private $useCursor;
+    private $bufferSize;
     /** @var IConnection */
     private $conn;
 
-    public function __construct(int $options = 0)
+    public function __construct(int $options = 0, int $bufferSize = null)
     {
-        $this->async = !($options & self::SYNCHRONOUS);
+        $this->async = (($options & self::SYNCHRONOUS) == 0);
+        $this->useCursor = (($options & self::CURSOR) != 0);
+        $this->bufferSize = $bufferSize;
 
         if ($options & self::FILE_CACHE) {
             $fsAdapter = new Local(self::FILE_CACHE_DIR);
@@ -88,7 +95,7 @@ class IvoryPerformanceTest implements IPerformanceTest
 
     public function starredItems(int $userId)
     {
-        $rel = $this->conn->query(
+        $relDef = SqlRelationDefinition::fromPattern(
             'SELECT item.id, item.name, item.description, item.introduction_date,
                     array_agg((category.id, category.name) ORDER BY category.name, category.id)
                       FILTER (WHERE category.id IS NOT NULL)
@@ -103,8 +110,18 @@ class IvoryPerformanceTest implements IPerformanceTest
              ORDER BY usr_starred_item.star_time DESC, item.name',
             $userId
         );
+        if ($this->useCursor) {
+            $tx = $this->conn->startTransaction();
+            $traversable = $this->conn->declareCursor('starred', $relDef);
+            if ($this->bufferSize !== null) {
+                $traversable = $traversable->getIterator($this->bufferSize);
+            }
+        } else {
+            $tx = null;
+            $traversable = $this->conn->query($relDef);
+        }
         echo "Your starred items:\n";
-        foreach ($rel as $item) {
+        foreach ($traversable as $item) {
             printf('#%d %s', $item->id, $item->name);
             if ($item->categories) {
                 $catStrings = [];
@@ -117,11 +134,14 @@ class IvoryPerformanceTest implements IPerformanceTest
             echo $item->description;
             echo "\n";
         }
+        if ($tx !== null) {
+            $tx->rollback();
+        }
     }
 
     public function categoryItems(int $categoryId)
     {
-        $rel = $this->conn->query(
+        $relDef = SqlRelationDefinition::fromPattern(
             'SELECT item.id, item.name, item.description, item.introduction_date,
                     COALESCE(
                       json_object_agg(param.name, item_param_value.value ORDER BY param.priority DESC, param.name)
@@ -138,8 +158,18 @@ class IvoryPerformanceTest implements IPerformanceTest
              ORDER BY item.introduction_date DESC, item.name, item.id',
             $categoryId
         );
+        if ($this->useCursor) {
+            $tx = $this->conn->startTransaction();
+            $traversable = $this->conn->declareCursor('items', $relDef);
+            if ($this->bufferSize !== null) {
+                $traversable = $traversable->getIterator($this->bufferSize);
+            }
+        } else {
+            $tx = null;
+            $traversable = $this->conn->query($relDef);
+        }
         echo "Category $categoryId:\n";
-        foreach ($rel as $row) {
+        foreach ($traversable as $row) {
             printf('#%d %s, introduced %s: %s',
                 $row->id, $row->name,
                 $row->introduction_date->format('n/j/Y'),
@@ -149,6 +179,9 @@ class IvoryPerformanceTest implements IPerformanceTest
                 echo "; $parName: " . strtr(var_export($parValue, true), "\n", ' ');
             }
             echo "\n";
+        }
+        if ($tx !== null) {
+            $tx->rollback();
         }
     }
 

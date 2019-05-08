@@ -4,6 +4,7 @@ namespace Ivory;
 
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
+use Ivory\Relation\ITuple;
 use PHPUnit\DbUnit\Database\Connection as DbUnitConnection;
 use PHPUnit\DbUnit\TestCase;
 use PHPUnit\Framework\Constraint;
@@ -91,7 +92,7 @@ abstract class IvoryTestCase extends TestCase
      * @param \Closure $function piece of code within which an exception is expected to be thrown
      * @param string $message message to show upon failure
      */
-    protected function assertException($expectedTypeOrTypeMessagePair, \Closure $function, $message = '')
+    protected static function assertException($expectedTypeOrTypeMessagePair, \Closure $function, $message = '')
     {
         if (is_array($expectedTypeOrTypeMessagePair)) {
             list($expectedType, $expectedMessage) = $expectedTypeOrTypeMessagePair;
@@ -113,6 +114,23 @@ abstract class IvoryTestCase extends TestCase
         if ($expectedMessage !== null) {
             self::assertThat($exception, new Constraint\ExceptionMessage($expectedMessage), $message);
         }
+    }
+
+    /**
+     * @param array $expectedValues
+     * @param iterable $actualTuples
+     * @param string|int|\Closure $attribute what to take from each tuple; like for {@link ITuple::value()}
+     * @param string $message
+     */
+    protected static function assertTupleVals(array $expectedValues, iterable $actualTuples, $attribute, $message = '')
+    {
+        $actualValues = [];
+        foreach ($actualTuples as $tuple) {
+            assert($tuple instanceof ITuple);
+            $actualValues[] = $tuple->value($attribute);
+        }
+
+        self::assertSame($expectedValues, $actualValues, $message);
     }
 
     /**

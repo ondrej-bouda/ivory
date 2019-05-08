@@ -15,13 +15,7 @@ $command = new Commando\Command();
 $command->argument()
     ->require()
     ->describe('Implementation to use')
-    ->must(function ($impl) {
-        return in_array($impl, [
-            'ivory', 'ivory-sync', 'ivory-nocache', 'ivory-filecache',
-            'pgsql', 'dibi', 'dibi-lazy', 'doctrine', 'laravel',
-        ]);
-    })
-    ->map(function ($impl) {
+    ->map(function ($impl) use ($command) {
         switch ($impl) {
             case 'ivory':
                 return new IvoryPerformanceTest();
@@ -31,6 +25,8 @@ $command->argument()
                 return new IvoryPerformanceTest(IvoryPerformanceTest::NO_CACHE);
             case 'ivory-filecache':
                 return new IvoryPerformanceTest(IvoryPerformanceTest::FILE_CACHE);
+            case 'ivory-cursor':
+                return new IvoryPerformanceTest(IvoryPerformanceTest::CURSOR, ((int)$command['buffer-size'] ?: null));
             case 'pgsql':
                 return new PgSQLPerformanceTest();
             case 'dibi':
@@ -110,6 +106,9 @@ $command->flag('test-category')
     ->describe('ID of category to use for the categoryItems() benchmark section. Defaults to 5.')
     ->map(function ($id) { return (int)$id; })
     ->defaultsTo('5');
+
+$command->option('buffer-size')
+    ->describe('Buffer size to use if relevant for the requested implementation.');
 
 //endregion
 
