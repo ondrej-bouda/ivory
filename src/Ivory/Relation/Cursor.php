@@ -76,12 +76,11 @@ class Cursor implements ICursor
         return $this->stmtExec->querySingleTuple('FETCH %sql %ident', $directionSql, $this->name);
     }
 
-    public function fetchMulti(int $count): array
+    public function fetchMulti(int $count): IRelation
     {
         $this->assertOpen();
         $dirSql = $this->getCountingDirectionSql($count);
-        $rel = $this->stmtExec->query('FETCH %sql %ident', $dirSql, $this->name);
-        return iterator_to_array($rel);
+        return $this->stmtExec->query('FETCH %sql %ident', $dirSql, $this->name);
     }
 
     public function moveBy(int $offset): int

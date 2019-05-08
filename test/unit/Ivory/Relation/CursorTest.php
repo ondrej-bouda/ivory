@@ -315,27 +315,28 @@ SQL
         $tx = $conn->startTransaction();
         try {
             $cur = $conn->declareCursor('cur', $relDef, ICursor::SCROLLABLE);
-            self::assertSame([], $cur->fetchMulti(0), 'stay before the first row');
-            $res = $cur->fetchMulti(1);
-            self::assertTupleVals(['a'], $res, 1, 'move to the first row');
-            self::assertTupleVals(['b', 'c', 'd', 'e'], $cur->fetchMulti(4), 1, 'move to the fifth row');
-            self::assertSame([], $cur->fetchMulti(1), 'move after the last row');
-            self::assertSame([], $cur->fetchMulti(1), 'stay after the last row');
-            self::assertSame([], $cur->fetchMulti(0), 'stay after the last row');
-            self::assertTupleVals(['e'], $cur->fetchMulti(-1), 1, 'move to the fifth row');
-            self::assertTupleVals(['d', 'c', 'b', 'a'], $cur->fetchMulti(-10), 1, 'move before the first row');
-            self::assertTupleVals(['a', 'b'], $cur->fetchMulti(2), 1, 'move to the second row');
-            self::assertTupleVals(['b'], $cur->fetchMulti(0), 1, 'stay at the second row');
-            self::assertTupleVals(
+            self::assertSame([], $cur->fetchMulti(0)->toArray(), 'stay before the first row');
+            self::assertSame(['a'], $cur->fetchMulti(1)->col(1)->toArray(), 'move to the first row');
+            self::assertSame(['b', 'c', 'd', 'e'], $cur->fetchMulti(4)->col(1)->toArray(), 'move to the fifth row');
+            self::assertSame([], $cur->fetchMulti(1)->toArray(), 'move after the last row');
+            self::assertSame([], $cur->fetchMulti(1)->toArray(), 'stay after the last row');
+            self::assertSame([], $cur->fetchMulti(0)->toArray(), 'stay after the last row');
+            self::assertSame(['e'], $cur->fetchMulti(-1)->col(1)->toArray(), 'move to the fifth row');
+            self::assertSame(
+                ['d', 'c', 'b', 'a'],
+                $cur->fetchMulti(-10)->col(1)->toArray(),
+                'move before the first row'
+            );
+            self::assertSame(['a', 'b'], $cur->fetchMulti(2)->col(1)->toArray(), 'move to the second row');
+            self::assertSame(['b'], $cur->fetchMulti(0)->col(1)->toArray(), 'stay at the second row');
+            self::assertSame(
                 ['c', 'd', 'e'],
-                $cur->fetchMulti(ICursor::ALL_REMAINING),
-                1,
+                $cur->fetchMulti(ICursor::ALL_REMAINING)->col(1)->toArray(),
                 'move after the last row'
             );
-            self::assertTupleVals(
+            self::assertSame(
                 ['e', 'd', 'c', 'b', 'a'],
-                $cur->fetchMulti(ICursor::ALL_FOREGOING),
-                1,
+                $cur->fetchMulti(ICursor::ALL_FOREGOING)->col(1)->toArray(),
                 'move before the first row'
             );
             $cur->close();
@@ -349,12 +350,11 @@ SQL
 
             $noScrollCur = $conn->declareCursor('no-scroll-cur', $relDef, ICursor::NON_SCROLLABLE);
 
-            $tuples = $noScrollCur->fetchMulti(1);
-            self::assertCount(1, $tuples);
-            self::assertInstanceOf(ITuple::class, $tuples[0]);
-            self::assertSame('a', $tuples[0]->value(1));
+            $rel = $noScrollCur->fetchMulti(1);
+            self::assertCount(1, $rel);
+            self::assertSame('a', $rel->value(1, 0));
 
-            self::assertTupleVals(['b', 'c', 'd'], $noScrollCur->fetchMulti(3), 1);
+            self::assertSame(['b', 'c', 'd'], $noScrollCur->fetchMulti(3)->col(1)->toArray());
 
             $tx->savepoint('s');
 
@@ -378,10 +378,10 @@ SQL
             $binaryCur = $conn->declareCursor('binary-cur', $relDef, ICursor::BINARY | ICursor::SCROLLABLE);
             self::assertTrue($binaryCur->getProperties()->isBinary());
             self::assertTrue($conn->getAllCursors()['binary-cur']->getProperties()->isBinary());
-            self::assertSame('a', $binaryCur->fetchMulti(1)[0]->value(1));
-            self::assertSame('c', $binaryCur->fetchMulti(2)[1]->value(1));
-            self::assertSame('c', $binaryCur->fetchMulti(0)[0]->value(1));
-            self::assertSame('a', $binaryCur->fetchMulti(-2)[1]->value(1));
+            self::assertSame('a', $binaryCur->fetchMulti(1)->value(1, 0));
+            self::assertSame('c', $binaryCur->fetchMulti(2)->value(1, 1));
+            self::assertSame('c', $binaryCur->fetchMulti(0)->value(1, 0));
+            self::assertSame('a', $binaryCur->fetchMulti(-2)->value(1, 1));
         } finally {
             $tx->rollback();
         }

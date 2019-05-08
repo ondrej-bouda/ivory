@@ -111,10 +111,10 @@ interface ICursor extends \IteratorAggregate
      * exception, i.e., a `StatementException` is thrown).
      *
      * @param int $count
-     * @return ITuple[]
+     * @return IRelation relation consisting of fetched rows
      * @throws ClosedCursorException if the cursor is known to be closed
      */
-    function fetchMulti(int $count): array;
+    function fetchMulti(int $count): IRelation;
 
 
     /**
