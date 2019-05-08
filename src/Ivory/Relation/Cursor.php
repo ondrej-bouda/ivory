@@ -199,7 +199,7 @@ class Cursor implements ICursor
             while (true) {
                 // start querying for the next batch in the background, if not at the end
                 if (count($buffer) == $bufferSize) {
-                    $nextBatchGen = $this->stmtExec->executeStatementAsync($fetchSql);
+                    $nextBatchGen = $this->stmtExec->queryAsync($fetchSql);
                 } else {
                     $nextBatchGen = null;
                 }
