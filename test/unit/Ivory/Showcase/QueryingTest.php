@@ -6,8 +6,8 @@ use Ivory\Connection\IConnection;
 use Ivory\Connection\ITxHandle;
 use Ivory\IvoryTestCase;
 use Ivory\Query\SqlRelationDefinition;
-use Ivory\Result\ICommandResult;
-use Ivory\Result\IQueryResult;
+use Ivory\Relation\ICursor;
+use Ivory\Relation\ITuple;
 use Ivory\Type\ITypeDictionary;
 use Ivory\Value\Date;
 use Ivory\Value\Decimal;
@@ -125,5 +125,62 @@ class QueryingTest extends IvoryTestCase
         self::assertSame('DO', $result->getCommandTag());
         self::assertLessThan(1, $sentTime - $startTime, 'commandAsync() will return without waiting');
         self::assertGreaterThan(2, $returnTime - $sentTime, 'next() will wait until the command is finished');
+    }
+
+    public function testCursors()
+    {
+        // Operations on cursors are encapsulated in the ICursor interface.
+
+        // Ivory can both declare new cursors...
+        $relDef = SqlRelationDefinition::fromSql("VALUES ('a'), ('b'), ('c'), ('d'), ('e')");
+        // (note we are in a transaction due to setUp())
+        $curOne = $this->conn->declareCursor('cur1', $relDef, ICursor::SCROLLABLE);
+        // ...and take an already declared cursor from a refcursor value.
+        $this->conn->command(
+            <<<'SQL'
+            CREATE FUNCTION get_cur() RETURNS refcursor AS $$
+            DECLARE
+                cur refcursor;
+            BEGIN
+                OPEN cur FOR VALUES ('x'), ('y'), ('z');
+                RETURN cur;
+            END;
+            $$ LANGUAGE plpgsql
+SQL
+        );
+        $curTwo = $this->conn->querySingleValue('SELECT get_cur()');
+
+        // Any low-level operations are supported.
+        // (Depending on whether the cursor is scrollable, one can do any movement/fetching, or just serial operations.)
+        self::assertSame('c', $curOne->fetchAt(3)->value(0));
+        self::assertSame('d', $curOne->fetch()->value(0));
+        self::assertSame('b', $curOne->fetch(-2)->value(0));
+        self::assertSame(1, $curOne->moveBy(2));
+        self::assertSame('e', $curOne->fetch()->value(0));
+
+        // Multiple rows may be fetched at once, forming a relation.
+        $curOne->moveTo(0);
+        self::assertSame(['a', 'b', 'c'], $curOne->fetchMulti(3)->col(0)->toArray());
+
+        // ICursor is a traversable object, so it is trivial to process all rows.
+        $expectedTupleValues = [1 => 'x', 2 => 'y', 3 => 'z'];
+        foreach ($curTwo as $i => $tuple) {
+            assert($tuple instanceof ITuple);
+            self::assertSame($expectedTupleValues[$i], $tuple->value(0));
+        }
+
+        // Fetching the rows one-by-one is, however, slow - for each row, a complete PHP -> DB -> PHP loop is done.
+        // ICursor extends the getIterator() method with an optional $bufferSize parameter, which leads to using a
+        // buffer: a batch of $bufferSize rows is fetched at once and, while iterating through the rows of the batch,
+        // rows from the following batch are fetch *in the background* so they are ready once the current buffer is
+        // processed.
+        $bigRelDef = SqlRelationDefinition::fromSql('SELECT generate_series(1, 100000)');
+        $curThree = $this->conn->declareCursor('cur3', $bigRelDef);
+        $fetchedValues = [];
+        foreach ($curThree->getIterator(1000) as $tuple) { // fetch 1000 rows at once
+            assert($tuple instanceof ITuple);                  // meanwhile, the next 1000 are fetched in the background
+            $fetchedValues[] = $tuple->value(0);
+        }
+        self::assertSame(range(1, 100000), $fetchedValues);
     }
 }
