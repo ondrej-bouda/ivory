@@ -47,7 +47,7 @@ class PgSQLPerformanceTest implements IPerformanceTest
             echo "Welcome!\n";
         }
 
-        return $user['id'];
+        return (int)$user['id'];
     }
 
     public function starredItems(int $userId)
