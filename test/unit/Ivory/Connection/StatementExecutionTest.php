@@ -72,7 +72,7 @@ class StatementExecutionTest extends IvoryTestCase
         self::assertSame(1, $result->count());
         self::assertSame([42, 'wheee'], $result->tuple()->toList());
 
-        $this->assertException(
+        self::assertException(
             UsageException::class,
             function () {
                 $this->conn->query("DO LANGUAGE plpgsql 'BEGIN END'");
@@ -90,7 +90,7 @@ class StatementExecutionTest extends IvoryTestCase
 
         self::assertNull($this->conn->querySingleTuple('SELECT 1 WHERE FALSE'));
 
-        $this->assertException(
+        self::assertException(
             ResultDimensionException::class,
             function () {
                 $this->conn->querySingleTuple('SELECT * FROM (VALUES (4), (-3), (3)) t (num)');
@@ -98,7 +98,7 @@ class StatementExecutionTest extends IvoryTestCase
             'multiple tuple were returned from the database'
         );
 
-        $this->assertException(
+        self::assertException(
             UsageException::class,
             function () {
                 $this->conn->querySingleTuple("DO LANGUAGE plpgsql 'BEGIN END'");
@@ -114,7 +114,7 @@ class StatementExecutionTest extends IvoryTestCase
         );
         self::assertSame([4, -3, 3], $col->toArray());
 
-        $this->assertException(
+        self::assertException(
             ResultDimensionException::class,
             function () {
                 $this->conn->querySingleColumn('SELECT 1, 2');
@@ -122,7 +122,7 @@ class StatementExecutionTest extends IvoryTestCase
             'multiple columns were returned from the database'
         );
 
-        $this->assertException(
+        self::assertException(
             ResultDimensionException::class,
             function () {
                 $this->conn->querySingleColumn('SELECT FROM (VALUES (4), (-3), (3)) t (num)');
@@ -130,7 +130,7 @@ class StatementExecutionTest extends IvoryTestCase
             'no columns were returned from the database'
         );
 
-        $this->assertException(
+        self::assertException(
             UsageException::class,
             function () {
                 $this->conn->querySingleColumn("DO LANGUAGE plpgsql 'BEGIN END'");
@@ -145,8 +145,8 @@ class StatementExecutionTest extends IvoryTestCase
         self::assertSame(1, $value);
 
         self::assertNull($this->conn->querySingleValue('SELECT 1 WHERE FALSE'));
-        
-        $this->assertException(
+
+        self::assertException(
             ResultDimensionException::class,
             function () {
                 $this->conn->querySingleValue('SELECT 1, 2');
@@ -154,7 +154,7 @@ class StatementExecutionTest extends IvoryTestCase
             'multiple columns were returned from the database'
         );
 
-        $this->assertException(
+        self::assertException(
             ResultDimensionException::class,
             function () {
                 $this->conn->querySingleValue('SELECT');
@@ -162,7 +162,7 @@ class StatementExecutionTest extends IvoryTestCase
             'no columns were returned from the database'
         );
 
-        $this->assertException(
+        self::assertException(
             ResultDimensionException::class,
             function () {
                 $this->conn->querySingleValue('SELECT 1 UNION SELECT 2');
@@ -170,7 +170,7 @@ class StatementExecutionTest extends IvoryTestCase
             'multiple rows were returned from the database'
         );
 
-        $this->assertException(
+        self::assertException(
             UsageException::class,
             function () {
                 $this->conn->querySingleValue("DO LANGUAGE plpgsql 'BEGIN END'");
@@ -185,7 +185,7 @@ class StatementExecutionTest extends IvoryTestCase
         self::assertSame(0, $result->getAffectedRows());
         self::assertSame('DO', $result->getCommandTag());
 
-        $this->assertException(
+        self::assertException(
             UsageException::class,
             function () {
                 $this->conn->command('VALUES (1),(2)');

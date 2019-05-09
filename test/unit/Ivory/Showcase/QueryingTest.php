@@ -124,7 +124,8 @@ class QueryingTest extends IvoryTestCase
 
         self::assertSame('DO', $result->getCommandTag());
         self::assertLessThan(1, $sentTime - $startTime, 'commandAsync() will return without waiting');
-        self::assertGreaterThan(2, $returnTime - $sentTime, 'next() will wait until the command is finished');
+        $delta = .001;
+        self::assertGreaterThan(2 - $delta, $returnTime - $sentTime, 'next() will wait until the command is finished');
     }
 
     public function testCursors()
