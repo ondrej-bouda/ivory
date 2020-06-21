@@ -28,10 +28,16 @@
   * at the bottom of the page, update the latest version info
 
 
-## Installing the Environment Locally
+## Website
+
+### Installing the Environment Locally
 * Install Ruby
 * run `gem update`
 * run `gem install jekyll bundler` to install [Jekyll](https://jekyllrb.com/docs/installation/), managing the website
 * run `jekyll -v` to check if installed successfully
-* in the `/docs` directory, run `bundle install` and then `bundle exec jekyll serve`
+* in the `/docs` directory, run `bundle install`
 * to update the gems used for docs, as locked in `Gemfile.lock`, run `bundle update` in the `/docs` directory
+
+### Running the Website Locally
+* run `bundle exec jekyll serve` in the `/docs` directory
+
