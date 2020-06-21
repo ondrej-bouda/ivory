@@ -165,7 +165,7 @@ class ConnConfigTest extends IvoryTestCase
             self::assertSame([[ConfigParam::DATE_STYLE, 'Postgres']], $obsAll->fetchObserved());
             self::assertSame([], $obsSome->fetchObserved());
 
-            $val = (System::isWindows() ? 'Czech_Czech Republic.1250' : 'cs_CZ.utf8');
+            $val = (System::isWindows() ? 'Czech_Czechia.1250' : 'cs_CZ.utf8');
             $this->cfg->setForSession(ConfigParam::LC_MONETARY, $val);
             self::assertSame(
                 [[ConfigParam::LC_MONETARY, $val], [ConfigParam::MONEY_DEC_SEP, ',']],

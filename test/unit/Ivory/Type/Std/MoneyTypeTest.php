@@ -18,7 +18,7 @@ class MoneyTypeTest extends IvoryTestCase
         parent::setUp();
 
         $this->transaction = $this->getIvoryConnection()->startTransaction();
-        $val = (System::isWindows() ? 'Czech_Czech Republic.1250' : 'cs_CZ.utf8');
+        $val = (System::isWindows() ? 'Czech_Czechia.1250' : 'cs_CZ.utf8');
         $this->getIvoryConnection()->getConfig()->setForTransaction(ConfigParam::LC_MONETARY, $val);
     }
 
