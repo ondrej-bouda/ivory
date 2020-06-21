@@ -18,7 +18,7 @@ class RenamedRelation extends ProjectedRelationBase
         /** @var string $byOffset map: column offset => new name for the corresponding column */
         $byOffset = [];
         foreach ($renamePairs as $orig => $new) {
-            if ($orig[0] == '/') {
+            if (is_string($orig) && $orig[0] == '/') {
                 $pcres[] = $orig;
                 $repls[] = $new;
             } elseif (is_int($orig) || filter_var((string)$orig, FILTER_VALIDATE_INT)) {
