@@ -1,6 +1,8 @@
 # Internal Instructions
 
-## Development
+## Release
+
+### Development
 * Mark each change appropriately in the [CHANGELOG.md](../CHANGELOG.md)
 * Before commit:
   * run all tests -- all should pass
@@ -10,13 +12,13 @@
   * new features to the `master` branch
   * fixes to all supported branches, to the releasing branch (if any), and to the `master` branch
 
-## Preparing for a Major/Minor Release
+### Preparing for a Major/Minor Release
 * Create a new branch `X.Y` from `master`
 * Update [CHANGELOG.md](../CHANGELOG.md):
   * change the label of _Unreleased_ section to _Unreleased `X.Y`_
   * add a new _Unreleased_ section, linking to the diff between the new version number and the `master` `HEAD`
 
-## Making a Release
+### Making a Release
 * Update `Ivory::VERSION`
 * Tag the version in the Git branch `X.Y`
 * Update [CHANGELOG.md](../CHANGELOG.md):
@@ -25,3 +27,11 @@
 * Update [docs/index.md](index.md):
   * at the bottom of the page, update the latest version info
 
+
+## Installing the Environment Locally
+* Install Ruby
+* run `gem update`
+* run `gem install jekyll bundler` to install [Jekyll](https://jekyllrb.com/docs/installation/), managing the website
+* run `jekyll -v` to check if installed successfully
+* in the `/docs` directory, run `bundle install` and then `bundle exec jekyll serve`
+* to update the gems used for docs, as locked in `Gemfile.lock`, run `bundle update` in the `/docs` directory
