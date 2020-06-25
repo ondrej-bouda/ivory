@@ -3,11 +3,9 @@ Ivory
 
 ...to the elephant's bone
 
-<!--
 [![Latest Stable Version](https://poser.pugx.org/ondrej-bouda/ivory/version)](
 	https://packagist.org/packages/ondrej-bouda/ivory
 )
--->
 [![Build Status](https://img.shields.io/travis/ondrej-bouda/ivory/master.svg?style=flat-square)](
 	https://travis-ci.org/ondrej-bouda/ivory
 )
