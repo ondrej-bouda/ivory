@@ -59,8 +59,8 @@ class TimeTz extends TimeBase
             throw new \InvalidArgumentException('$timeString');
         }
 
-        $hour = $m[1];
-        $min = $m[2];
+        $hour = (int)$m[1];
+        $min = (int)$m[2];
         $sec = (!empty($m[3]) ? $m[3] : 0);
 
         self::checkTimeParts($hour, $min, $sec);
