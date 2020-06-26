@@ -194,7 +194,7 @@ interface ICursor extends \IteratorAggregate
     function isClosed(): bool;
 
     /**
-     * {@inheritDoc}
+     * Retrieves an iterator to traverse rows of this cursor.
      *
      * If `$bufferSize` is given as a positive integer, a buffer of the given size will be used for fetching tuples from
      * the cursor instead of fetching each row separately.

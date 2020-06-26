@@ -18,10 +18,8 @@ class DoctrinePerformanceTest implements IPerformanceTest
             list($k, $v) = explode('=', $pair);
             $params[$k] = $v;
         }
-        /** @noinspection PhpUnhandledExceptionInspection */
         $this->conn = DriverManager::getConnection($params, $config);
         $this->conn->setFetchMode(PDO::FETCH_ASSOC);
-        /** @noinspection PhpUnhandledExceptionInspection */
         $this->conn->exec("SET search_path = $searchPathSchema");
     }
 

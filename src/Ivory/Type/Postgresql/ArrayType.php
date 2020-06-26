@@ -202,7 +202,9 @@ class ArrayType extends TypeBase implements ITotallyOrderedType
     }
 
     /**
-     * {@inheritdoc}
+     * Serializes an array to the corresponding SQL literal.
+     *
+     * {@inheritDoc}
      *
      * Note that, in the strict mode, the `ARRAY[1,2,3]` syntax cannot be used as it does not allow for specifying
      * custom array bounds. Instead, the string representation (e.g., `'{1,2,3}'`) is employed.
