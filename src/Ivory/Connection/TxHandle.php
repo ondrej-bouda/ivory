@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpInappropriateInheritDocUsageInspection PhpStorm bug WI-54015 */
 declare(strict_types=1);
 namespace Ivory\Connection;
 

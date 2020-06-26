@@ -198,6 +198,9 @@ interface ICursor extends \IteratorAggregate
      *
      * If `$bufferSize` is given as a positive integer, a buffer of the given size will be used for fetching tuples from
      * the cursor instead of fetching each row separately.
+     *
+     * @param int $bufferSize
+     * @return \Traversable
      */
     function getIterator(int $bufferSize = 0): \Traversable;
 }

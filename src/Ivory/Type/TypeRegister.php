@@ -14,7 +14,7 @@ namespace Ivory\Type;
  * By {@link registerType() registering a type object} or a whole {@link registerTypeLoader() type loader}, one may
  * define the processing of any custom PostgreSQL type not yet covered by Ivory or override any builtin type object with
  * a custom one. Likewise, abbreviations of type names may be defined at will - they will be recognized in
- * {@link \Ivory\Lange\SqlPattern\SqlPattern SQL patterns} when composing an SQL query or command.
+ * {@link \Ivory\Lang\SqlPattern\SqlPattern SQL patterns} when composing an SQL query or command.
  *
  * The type registers are used at two levels: a *global* one at the Ivory class and a *local* one at the connection to
  * a concrete database. Definitions from the local type register are preferred. Only when the type or abbreviation is
@@ -132,7 +132,7 @@ class TypeRegister implements ITypeProvider
     }
 
     /**
-     * Registers value serializer to be used for serializing parameters of {@link Ivory\Lang\SqlPattern\SqlPattern}
+     * Registers value serializer to be used for serializing parameters of {@link \Ivory\Lang\SqlPattern\SqlPattern}
      * typed placeholders.
      *
      * This method is only useful for registering special serializers, such as `sql`. Common data types are registered

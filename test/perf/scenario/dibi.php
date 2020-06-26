@@ -5,7 +5,7 @@ class DibiPerformanceTest implements IPerformanceTest
 {
     const LAZY = 1;
 
-    private $lazy = false;
+    private $lazy;
     /** @var Dibi\Connection */
     private $conn;
 

@@ -7,7 +7,7 @@ use Psr\Cache\CacheItemPoolInterface;
 class CacheControl implements ICacheControl
 {
     /** @var CacheItemPoolInterface|null */
-    private $cacheItemPool = null;
+    private $cacheItemPool;
     /** @var string */
     private $prefix;
     /** @var string */

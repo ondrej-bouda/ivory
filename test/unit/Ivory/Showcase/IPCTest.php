@@ -9,10 +9,10 @@ use Ivory\IvoryTestCase;
  * This test presents the inter-process communication support.
  *
  * PostgreSQL offers a simple LISTEN/NOTIFY system for IPC. It is encapsulated in Ivory within the
- * {@link Ivory\Connection\IIPCControl} part of the connection.
+ * {@link \Ivory\Connection\IIPCControl} part of the connection.
  *
- * When listening for notifications, both non-blocking {@link Ivory\Connection\IIPCControl::pollNotification() polling}
- * and blocking {@link Ivory\Connection\IIPCControl::waitForNotification() waiting} is supported.
+ * When listening for notifications, both non-blocking {@link \Ivory\Connection\IIPCControl::pollNotification() polling}
+ * and blocking {@link \Ivory\Connection\IIPCControl::waitForNotification() waiting} is supported.
  */
 class IPCTest extends IvoryTestCase
 {

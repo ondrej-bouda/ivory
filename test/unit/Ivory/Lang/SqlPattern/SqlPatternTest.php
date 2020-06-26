@@ -9,23 +9,17 @@ class SqlPatternTest extends IvoryTestCase
 {
     /** @var ISqlPatternParser */
     private $parser;
-    /** @var SqlPattern */
-    private $pattern;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->parser = new SqlPatternParser();
-        $this->pattern = $this->parser->parse(
-            'SELECT * FROM %:tbl WHERE name = % AND ord %% 2 = 0 AND %s:cond'
-        );
     }
-
 
     public function testGenerateSql()
     {
         $pattern = $this->parser->parse(
-            'SELECT id FROM %n:tbl UNION SELECT object_id FROM log WHERE table = %s:tbl'
+            'SELECT id FROM %n:tbl UNION SELECT object_id FROM log WHERE table = %:tbl'
         );
         $gen = $pattern->generateSql();
         while ($gen->valid()) {
@@ -33,10 +27,10 @@ class SqlPatternTest extends IvoryTestCase
             assert($plcHdr instanceof SqlPatternPlaceholder);
             if ($plcHdr->getNameOrPosition() == 'tbl' && $plcHdr->getTypeName() == 'n') {
                 $gen->send('person');
-            } elseif ($plcHdr->getNameOrPosition() == 'tbl' && $plcHdr->getTypeName() == 's') {
+            } elseif ($plcHdr->getNameOrPosition() == 'tbl' && $plcHdr->getTypeName() === null) {
                 $gen->send("'person'");
             } else {
-                self::fail('Unexpected parameter to give value for.');
+                static::fail('Unexpected parameter to give value for: ' . $plcHdr->getNameOrPosition());
             }
         }
 
@@ -44,6 +38,30 @@ class SqlPatternTest extends IvoryTestCase
             "SELECT id FROM person UNION SELECT object_id FROM log WHERE table = 'person'",
             $gen->getReturn()
         );
+    }
+
+    public function testGenerateAutoTypedSql()
+    {
+        $pattern = $this->parser->parse(
+            'SELECT * FROM %:tbl WHERE name = % AND ord %% 2 = 0 AND %:cond'
+        );
+        $gen = $pattern->generateSql();
+        while ($gen->valid()) {
+            $plcHdr = $gen->current();
+            assert($plcHdr instanceof SqlPatternPlaceholder);
+            if ($plcHdr->getNameOrPosition() == 'tbl') {
+                static::assertNull($plcHdr->getTypeName());
+                $gen->send('t');
+            } elseif ($plcHdr->getNameOrPosition() == 'cond') {
+                static::assertNull($plcHdr->getTypeName());
+                $gen->send('TRUE');
+            } elseif ($plcHdr->getNameOrPosition() == 0) {
+                static::assertNull($plcHdr->getTypeName());
+                $gen->send("'foo'");
+            } else {
+                static::fail('Unexpected parameter to give value for: ' . $plcHdr->getNameOrPosition());
+            }
+        }
     }
 
     public function testGenerateSqlNotProvidingValue()
