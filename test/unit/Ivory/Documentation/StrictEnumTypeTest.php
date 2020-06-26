@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace Ivory\Documentation;
 
-use Ivory\Connection\Connection;
 use Ivory\Connection\ITxHandle;
 use Ivory\Exception\IncomparableException;
 use Ivory\IvoryTestCase;
@@ -11,8 +10,6 @@ use Ivory\Value\Range;
 
 class StrictEnumTypeTest extends IvoryTestCase
 {
-    /** @var Connection */
-    private $conn;
     /** @var ITxHandle */
     private $tx;
 
@@ -20,20 +17,20 @@ class StrictEnumTypeTest extends IvoryTestCase
     {
         parent::setUp();
 
-        $this->conn = $this->getIvoryConnection();
-        $this->tx = $this->conn->startTransaction();
+        $conn = $this->getIvoryConnection();
+        $this->tx = $conn->startTransaction();
 
-        $this->conn->command(
+        $conn->command(
             "CREATE TYPE chocolate_bar AS ENUM ('Mars', 'Snickers', 'Twix')"
         );
-        $this->conn->command(
+        $conn->command(
             "CREATE TYPE planet AS ENUM ('Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune')"
         );
-        $this->conn->command(
+        $conn->command(
             "CREATE TYPE planet_range AS RANGE (SUBTYPE = planet)"
         );
 
-        $typeRegister = $this->conn->getTypeRegister();
+        $typeRegister = $conn->getTypeRegister();
         $typeRegister->registerType(new StrictEnumType('public', 'chocolate_bar', ChocolateBar::class));
         $typeRegister->registerType(new StrictEnumType('public', 'planet', Planet::class));
     }

@@ -18,10 +18,8 @@ class DoctrinePerformanceTest implements IPerformanceTest
             list($k, $v) = explode('=', $pair);
             $params[$k] = $v;
         }
-        /** @noinspection PhpUnhandledExceptionInspection */
         $this->conn = DriverManager::getConnection($params, $config);
         $this->conn->setFetchMode(PDO::FETCH_ASSOC);
-        /** @noinspection PhpUnhandledExceptionInspection */
         $this->conn->exec("SET search_path = $searchPathSchema");
     }
 
@@ -43,7 +41,6 @@ class DoctrinePerformanceTest implements IPerformanceTest
             exit('User inactive');
         }
 
-        /** @noinspection PhpUnhandledExceptionInspection */
         $this->conn->executeQuery('UPDATE usr SET last_login = CURRENT_TIMESTAMP WHERE id = ?', [$user['id']]);
         if ($user['last_login']) {
             echo 'Welcome back since ' . date('n/j/Y H:i:s', strtotime($user['last_login'])) . "\n";
@@ -57,7 +54,6 @@ class DoctrinePerformanceTest implements IPerformanceTest
 
     public function starredItems(int $userId)
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $res = $this->conn->executeQuery(
             'SELECT item.id, item.name, item.description
              FROM usr_starred_item
@@ -72,7 +68,6 @@ class DoctrinePerformanceTest implements IPerformanceTest
             $items[$row['id']]['categories'] = [];
         }
         if ($items) {
-            /** @noinspection PhpUnhandledExceptionInspection */
             $res = $this->conn->executeQuery(
                 "SELECT item_id, category_id, name AS category_name
                  FROM item_category
@@ -104,7 +99,6 @@ class DoctrinePerformanceTest implements IPerformanceTest
 
     public function categoryItems(int $categoryId)
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $res = $this->conn->executeQuery(
             'SELECT item.id, item.name, item.description, item.introduction_date,
                     COALESCE(

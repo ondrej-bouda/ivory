@@ -23,7 +23,7 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
     const CONNECT_TIMEOUT = 'connect_timeout';
     const OPTIONS = 'options';
 
-    private $params = [];
+    private $params;
 
     /**
      * Create connection parameters from an array, a URI, or a connection string.

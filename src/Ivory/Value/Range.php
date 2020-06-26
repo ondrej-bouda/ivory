@@ -117,7 +117,7 @@ class Range implements IComparable
         ?IValueComparator $customComparator = null,
         ?IDiscreteStepper $customDiscreteStepper = null
     ): Range {
-        list($loInc, $upInc) = self::processBoundSpec($boundsOrLowerInc, $upperInc);
+        [$loInc, $upInc] = self::processBoundSpec($boundsOrLowerInc, $upperInc);
 
         $comparator = ($customComparator ?? Ivory::getDefaultValueComparator());
         $discreteStepper = ($customDiscreteStepper ?? self::inferDiscreteStepper($lower ?? $upper));
@@ -346,7 +346,7 @@ class Range implements IComparable
             );
         }
 
-        list($loInc, $upInc) = self::processBoundSpec($boundsOrLowerInc, $upperInc);
+        [$loInc, $upInc] = self::processBoundSpec($boundsOrLowerInc, $upperInc);
 
         if ($this->lower === null) {
             $lo = null;
@@ -656,16 +656,9 @@ class Range implements IComparable
     {
         if ($other === null) {
             return null;
+        } else {
+            return $other->strictlyLeftOf($this);
         }
-        if ($this->empty || $other->empty) {
-            return false;
-        }
-
-        if ($other->upper === null || $this->lower === null) {
-            return false;
-        }
-        $cmp = $this->comparator->compareValues($other->upper, $this->lower);
-        return ($cmp < 0 || ($cmp == 0 && (!$other->upperInc || !$this->lowerInc)));
     }
 
     //endregion

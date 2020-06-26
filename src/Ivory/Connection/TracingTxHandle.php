@@ -1,9 +1,12 @@
 <?php
+/** @noinspection PhpInappropriateInheritDocUsageInspection PhpStorm bug WI-54015 */
 declare(strict_types=1);
 namespace Ivory\Connection;
 
 /**
- * {@inheritdoc}
+ * Handle of an open transaction, tracing the point in source code where the transaction was opened.
+ *
+ * {@inheritDoc}
  *
  * This implementation helps the development by keeping track where exactly the transaction was started. Then, if the
  * transaction is not closed properly before the handle gets freed up from memory, a warning is printed with the call

@@ -1,9 +1,12 @@
 <?php
+/** @noinspection PhpInappropriateInheritDocUsageInspection PhpStorm bug WI-54015 */
 declare(strict_types=1);
 namespace Ivory\Data\Set;
 
 /**
- * {@inheritdoc}
+ * An array-based set of values.
+ *
+ * {@inheritDoc}
  *
  * This implementation:
  * - uses the PHP array type to store the data;

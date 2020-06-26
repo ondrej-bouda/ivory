@@ -98,7 +98,7 @@ SQL
         $polygon = $tuple->polygon;
         assert($polygon instanceof Polygon);
         self::assertInstanceOf(Polygon::class, $polygon);
-        self::assertEquals(6, $polygon->getArea(), '', 1e-12);
+        self::assertEqualsWithDelta(6, $polygon->getArea(), 1e-12);
 
         self::assertSame(['1', '2', 'foo'], $tuple->row);
     }

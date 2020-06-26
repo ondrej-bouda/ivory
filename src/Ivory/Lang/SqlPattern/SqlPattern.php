@@ -52,7 +52,7 @@ use Ivory\Exception\NoDataException;
  *   specification. An array placeholder immediately followed by a subscript works as expected: `SELECT %bigint[][2]`
  *   selects the item at index 2 from the provided array.
  * * Names of available types, as well as the rules inferring the type automatically (when the type is not specified),
- *   are defined by the {@link Ivory\Type\TypeDictionary} used by the connection for which the pattern will be
+ *   are defined by the {@link \Ivory\Type\TypeDictionary} used by the connection for which the pattern will be
  *   serialized to an SQL string. The standard Ivory deployment registers all types defined in the connected-to database
  *   under their fully qualified names (e.g., `public.sometype`) and also some aliases, especially those corresponding
  *   to the SQL reserved types (e.g., `int`). Besides, some custom types special for being used in SQL patterns may be

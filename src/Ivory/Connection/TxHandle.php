@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpInappropriateInheritDocUsageInspection PhpStorm bug WI-54015 */
 declare(strict_types=1);
 namespace Ivory\Connection;
 
@@ -7,7 +8,9 @@ use Ivory\Lang\Sql\Types;
 use Ivory\Utils\StringUtils;
 
 /**
- * {@inheritdoc}
+ * Handle of an open transaction.
+ *
+ * {@inheritDoc}
  *
  * This implementation checks, upon destruction, whether the transaction has properly been closed. If not, i.e., when
  * the transaction handle gets lost and thus no further means of controlling the transaction are available, a warning is
