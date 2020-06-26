@@ -56,5 +56,8 @@
         "psr-4": {
             "Ivory\\": "test/unit/Ivory/"
         }
+    },
+    "scripts": {
+        "test": "phpunit --bootstrap ./test/bootstrap.php --configuration ./test/phpunit.xml ./test/"
     }
 }

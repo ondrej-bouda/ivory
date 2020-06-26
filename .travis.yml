@@ -48,4 +48,4 @@ before_script:
     - sed -e 's~\(name="DB_DBNAME" value="\).*\("\)~\1ivory_test\2~' --in-place test/phpunit.xml
 
 script:
-    - vendor/bin/phpunit --bootstrap test/bootstrap.php --configuration test/phpunit.xml test/unit
+    - composer run-script test
