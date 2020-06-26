@@ -50,6 +50,13 @@ abstract class TimeBase implements IComparable
      */
     protected static function partsToSecStrict(int $hour, int $minute, $second)
     {
+        self::checkTimeParts($hour, $minute, $second);
+
+        return $hour * 60 * 60 + $minute * 60 + $second;
+    }
+
+    protected static function checkTimeParts(int $hour, int $minute, $second)
+    {
         if ($hour == 24) {
             if ($minute > 0 || $second > 0) {
                 throw new \OutOfRangeException('with hour 24, the minutes and seconds must be zero');
@@ -65,8 +72,6 @@ abstract class TimeBase implements IComparable
         if ($second < 0 || $second >= 61) {
             throw new \OutOfRangeException('seconds');
         }
-
-        return $hour * 60 * 60 + $minute * 60 + $second;
     }
 
     /**

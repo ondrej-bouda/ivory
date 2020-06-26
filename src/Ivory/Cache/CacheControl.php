@@ -74,7 +74,6 @@ class CacheControl implements ICacheControl
         }
 
         $key = $this->composeCacheKey($cacheKey);
-        /** @noinspection PhpUnhandledExceptionInspection PhpStorm bug WI-38168 */
         $item = $this->cacheItemPool->getItem($key);
         $item->set($object);
 
@@ -88,7 +87,6 @@ class CacheControl implements ICacheControl
         }
 
         $key = $this->composeCacheKey($cacheKey);
-        /** @noinspection PhpUnhandledExceptionInspection PhpStorm bug WI-38168 */
         $item = $this->cacheItemPool->getItem($key);
         return $item->get();
     }
@@ -100,7 +98,6 @@ class CacheControl implements ICacheControl
         }
 
         $key = $this->composeCacheKey($cacheKey);
-        /** @noinspection PhpUnhandledExceptionInspection PhpStorm bug WI-38168 */
         return $this->cacheItemPool->deleteItem($key);
     }
 }

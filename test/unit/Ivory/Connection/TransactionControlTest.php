@@ -52,9 +52,10 @@ class TransactionControlTest extends IvoryTestCase
             unset($tx);
             self::fail('A warning was expected due to destroying an open transaction handle.');
         } catch (Warning $warning) {
-            self::assertContains(
-                'open', $warning->getMessage(),
-                'The warning message should mention the transaction handle stayed open', true
+            self::assertStringContainsStringIgnoringCase(
+                'open',
+                $warning->getMessage(),
+                'The warning message should mention the transaction handle stayed open'
             );
         }
     }

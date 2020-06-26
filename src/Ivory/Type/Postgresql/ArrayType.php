@@ -99,7 +99,7 @@ class ArrayType extends TypeBase implements ITotallyOrderedType
             $decorSepPos = strpos($extRepr, '=');
             $decoration = substr($extRepr, 0, $decorSepPos);
 
-            preg_match_all('~\[(\d+):\d+\]~', $decoration, $m);
+            preg_match_all('~\[(\d+):\d+]~', $decoration, $m);
             if ($decorSepPos === false || !$m) {
                 $this->throwParseException($extRepr, 'Invalid array bounds decoration');
             }

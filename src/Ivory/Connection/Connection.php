@@ -343,19 +343,16 @@ class Connection implements IConnection
 
     public function cachePermanently(string $cacheKey, $object): bool
     {
-        /** @noinspection PhpUnhandledExceptionInspection PhpStorm bug WI-38168 */
         return $this->cacheCtl->cachePermanently($cacheKey, $object);
     }
 
     public function getCached(string $cacheKey)
     {
-        /** @noinspection PhpUnhandledExceptionInspection PhpStorm bug WI-38168 */
         return $this->cacheCtl->getCached($cacheKey);
     }
 
     public function flushCache(string $cacheKey): bool
     {
-        /** @noinspection PhpUnhandledExceptionInspection PhpStorm bug WI-38168 */
         return $this->cacheCtl->flushCache($cacheKey);
     }
 

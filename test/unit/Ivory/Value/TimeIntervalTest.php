@@ -44,7 +44,7 @@ class TimeIntervalTest extends TestCase
             [TimeInterval::DAY => 27, TimeInterval::HOUR => 21, TimeInterval::MINUTE => 48],
             array_slice($parts, 0, -1)
         );
-        self::assertEquals(57.6, $parts[TimeInterval::SECOND], '', 1e-9);
+        self::assertEqualsWithDelta(57.6, $parts[TimeInterval::SECOND], 1e-9);
     }
 
     public function testFromString()

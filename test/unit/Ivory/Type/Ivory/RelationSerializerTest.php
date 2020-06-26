@@ -49,8 +49,7 @@ class RelationSerializerTest extends IvoryTestCase
     {
         $inputRel = $this->conn->query($sqlQuery);
         $serialized = $this->relationSerializer->serializeValue($inputRel);
-        $checkRel = $this->conn->query("SELECT * FROM ($serialized) rel");
-        return $checkRel;
+        return $this->conn->query("SELECT * FROM ($serialized) rel");
     }
 
     public function testSerializeRelation()

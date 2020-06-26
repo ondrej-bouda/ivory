@@ -98,7 +98,7 @@ class QuantityTest extends TestCase
 
         $q = Quantity::fromValue(15302.5, Quantity::KILOBYTE);
         $c = $q->convert(Quantity::GIGABYTE);
-        self::assertEquals(0.014593601226806640625, $c->getValue(), '', 1e-20);
+        self::assertEqualsWithDelta(0.014593601226806640625, $c->getValue(), 1e-20);
         self::assertSame(Quantity::GIGABYTE, $c->getUnit());
 
         try {
