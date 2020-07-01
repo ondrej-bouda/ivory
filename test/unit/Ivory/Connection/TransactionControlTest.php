@@ -136,6 +136,42 @@ class TransactionControlTest extends IvoryTestCase
         }
     }
 
+    public function testAutoTransaction()
+    {
+        $observer = new class() extends TransactionControlObserverBase
+        {
+            public $rollbackCalled = 0;
+
+            /** @noinspection PhpMissingParentCallCommonInspection */
+            public function handleTransactionRollback(): void
+            {
+                $this->rollbackCalled++;
+            }
+        };
+        $this->conn->addTransactionControlObserver($observer);
+
+        $f = function () {
+            $tx = $this->conn->startAutoTransaction();
+            self::assertTrue($this->conn->inTransaction());
+            $tx->commit();
+            self::assertFalse($this->conn->inTransaction());
+        };
+        $f();
+        self::assertFalse($this->conn->inTransaction());
+        self::assertEquals(0, $observer->rollbackCalled);
+
+        $f = function () {
+            $tx = $this->conn->startAutoTransaction();
+            if (false) {
+                $tx->commit();
+            }
+            self::assertTrue($this->conn->inTransaction());
+        };
+        $f();
+        self::assertFalse($this->conn->inTransaction());
+        self::assertEquals(1, $observer->rollbackCalled);
+    }
+
     public function testPrepareTransaction()
     {
         $conn1 = $this->createNewIvoryConnection('conn1');

@@ -49,6 +49,67 @@ interface ITransactionControl
     function startTransaction($transactionOptions = 0): ITxHandle;
 
     /**
+     * Begins a new automatic transaction.
+     *
+     * Besides the normal transaction functionality as implemented by the {@link startTransaction()} method, the handle
+     * created by this method will automatically call {@link ITxHandle::rollbackIfOpen()} when destructed. This may come
+     * in handy in simple functions or methods, where the handle gets destructed when leaving the function. Especially,
+     * the code within the transaction need not be enclosed in an explicit `try-catch-finally` block to rollback the
+     * transaction upon an exception.
+     *
+     * Hence, instead:
+     * <code>
+     * <?php
+     * function () use ($conn)
+     * {
+     *     $tx = $conn->startTransaction();
+     *     try {
+     *         $conn->command('INSERT INTO usr (username) VALUES (%s)', 'admin');
+     *         $conn->command(
+     *             "INSERT INTO usrrole (usr_id, role_id)
+     *              SELECT currval(REGCLASS 'usr_id_seq'), id
+     *              FROM role"
+     *         );
+     *         $tx->commit();
+     *     } finally {
+     *         $tx->rollbackIfOpen();
+     *     }
+     * }
+     * </code>
+     * an automatic transaction may simplify the code and especially make it foolproof:
+     * <code>
+     * <?php
+     * function () use ($conn)
+     * {
+     *     $tx = $conn->startAutoTransaction();
+     *     // do stuff, exceptions expected
+     *     $conn->command('INSERT INTO usr (username) VALUES (%s)', 'admin');
+     *     $conn->command(
+     *         "INSERT INTO usrrole (usr_id, role_id)
+     *          SELECT currval(REGCLASS 'usr_id_seq'), id
+     *          FROM role"
+     *     );
+     *     $tx->commit(); // if the program does not reach this statement due to an exception (perhaps due to a unique
+     *                    // constraint fail), the transaction gets rolled back
+     * }
+     * </code>
+     *
+     * Like with {@link startTransaction()}, the started transaction may further be controlled using an
+     * {@link ITxHandle} returned by this method.
+     *
+     * Note that transactions cannot be nested in PostgreSQL. Thus, an InvalidStateException is thrown if a transaction
+     * is already active. {@link ITxHandle::savepoint() Savepoints} may be used instead on the returned handle.
+     *
+     * Transaction options may be specified, overriding the defaults set up by {@link setupSubsequentTransactions()}.
+     *
+     * @param int|TxConfig $transactionOptions options for the transaction to be started, overriding the defaults;
+     *                                         a {@link TxConfig} object, or a combination of {@link TxConfig} constants
+     * @return ITxHandle handle of the started transaction
+     * @throws InvalidStateException when already inside a transaction
+     */
+    function startAutoTransaction($transactionOptions = 0): ITxHandle;
+
+    /**
      * Sets up the default options for new transactions started in the current session.
      *
      * The current transaction (if any) is unaffected by this command. See {@link ITxHandle::setupTransaction()}

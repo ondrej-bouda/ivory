@@ -33,6 +33,21 @@ class TransactionControl implements IObservableTransactionControl
 
     public function startTransaction($transactionOptions = 0): ITxHandle
     {
+        $this->executeTransactionStart($transactionOptions);
+
+        $coreFactory = Ivory::getCoreFactory();
+        return $coreFactory->createTransactionHandle($this->stmtExec, $this, $this->sessionCtl);
+    }
+
+    public function startAutoTransaction($transactionOptions = 0): ITxHandle
+    {
+        $this->executeTransactionStart($transactionOptions);
+
+        return new AutoTxHandle($this->stmtExec, $this, $this->sessionCtl);
+    }
+
+    private function executeTransactionStart($transactionOptions = 0): void
+    {
         if ($this->inTransaction()) {
             throw new InvalidStateException('A transaction is already active, cannot start a new one.');
         }
@@ -47,9 +62,6 @@ class TransactionControl implements IObservableTransactionControl
 
         $this->stmtExec->rawCommand($command);
         $this->notifyTransactionStart();
-
-        $coreFactory = Ivory::getCoreFactory();
-        return $coreFactory->createTransactionHandle($this->stmtExec, $this, $this->sessionCtl);
     }
 
     public function setupSubsequentTransactions($transactionOptions): void

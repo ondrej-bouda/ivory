@@ -230,6 +230,11 @@ class Connection implements IConnection
         return $this->txCtl->startTransaction($transactionOptions);
     }
 
+    public function startAutoTransaction($transactionOptions = 0): ITxHandle
+    {
+        return $this->txCtl->startAutoTransaction($transactionOptions);
+    }
+
     public function setupSubsequentTransactions($transactionOptions): void
     {
         $this->txCtl->setupSubsequentTransactions($transactionOptions);

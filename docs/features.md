@@ -81,6 +81,25 @@ try {
     $tx->rollbackIfOpen();
 }
 ```
+* In the typical case when a transaction is performed within a function or method, **automatic transaction handles** may
+  come in handy. Instead of writing the explicit boilerplate to rollback the transaction upon an exception, the
+  `$tx->rollbackIfOpen()` gets called automatically when destructed. As a result, the code is simpler and foolproof.
+```php
+<?php
+function () use ($conn)
+{
+    $tx = $conn->startAutoTransaction();
+    // do stuff, exceptions expected
+    $conn->command('INSERT INTO usr (username) VALUES (%s)', 'admin');
+    $conn->command(
+        "INSERT INTO usrrole (usr_id, role_id)
+         SELECT currval(REGCLASS 'usr_id_seq'), id
+         FROM role"
+    );
+    $tx->commit(); // if the program does not reach this statement due to an exception (perhaps due to a unique
+                   // constraint fail), the transaction gets rolled back
+}
+```
 * Prepared transactions (a.k.a. two-phase commits) are supported by an API, too.
 ```php
 <?php
