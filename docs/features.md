@@ -81,7 +81,19 @@ try {
     $tx->rollbackIfOpen();
 }
 ```
-* Prepared transactions (a.k.a. two-phase commits) are supported.
+* Prepared transactions (a.k.a. two-phase commits) are supported by an API, too.
+```php
+<?php
+$tx = $conn->startTransaction();
+$conn->command('...');
+$txName = $tx->prepareTransaction();
+// ...
+$conn->commitPreparedTransaction($txName); // $conn is not necessarily the same connection
+// or
+$conn->rollbackPreparedTransaction($txName);
+
+$conn->listPreparedTransactions(); // lists all prepared transactions
+```
 
 ### Session Control
 * Type-safe encapsulation of the database session configuration (e.g., statement timeout or search path).

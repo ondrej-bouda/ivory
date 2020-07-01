@@ -167,7 +167,9 @@ interface ITxHandle
      *
      * @param string|null $name name for the prepared transaction; must be server-wide unique;
      *                          if <tt>null</tt> is given, a random name is generated automatically
-     * @return string name of the prepared transaction
+     * @return string name of the prepared transaction, eventually to be passed to either
+     *                  {@link ITransactionControl::commitPreparedTransaction()} or
+     *                  {@link ITransactionControl::rollbackPreparedTransaction()}
      * @throws InvalidStateException if the transaction is not open anymore
      */
     function prepareTransaction(?string $name = null): string;
