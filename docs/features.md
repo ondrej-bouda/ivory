@@ -96,8 +96,8 @@ function () use ($conn)
          SELECT currval(REGCLASS 'usr_id_seq'), id
          FROM role"
     );
-    $tx->commit(); // if the program does not reach this statement due to an exception (perhaps due to a unique
-                   // constraint fail), the transaction gets rolled back
+    $tx->commit(); // if the program does not reach this statement due to an exception (perhaps due
+                   // to a unique constraint fail), the transaction gets rolled back
 }
 ```
 * Prepared transactions (a.k.a. two-phase commits) are supported by an API, too.
@@ -113,6 +113,7 @@ $conn->rollbackPreparedTransaction($txName);
 
 $conn->listPreparedTransactions(); // lists all prepared transactions
 ```
+
 
 ### Session Control
 * Type-safe encapsulation of the database session configuration (e.g., statement timeout or search path).
