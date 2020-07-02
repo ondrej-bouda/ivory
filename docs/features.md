@@ -101,6 +101,7 @@ function () use ($conn)
 }
 ```
 * Prepared transactions (a.k.a. two-phase commits) are supported by an API, too.
+
 ```php
 <?php
 $tx = $conn->startTransaction();
@@ -216,15 +217,6 @@ try {
 
 ### High-Level Transaction API
 * <!-- #6 --> Emulate nested transactions.
-* <!-- #5 --> Introduce auto-transactions, rolling back the transaction on error implicitly:
-```php
-<?php
-function foo() {
-    $tx = $conn->startAutoTransaction();
-    // do stuff, exceptions expected - if thrown, transaction is rolled back
-    $tx->commit();
-}
-```
 
 ### <!-- #13 --> BLOBS
 * Implement support for large binary objects.
