@@ -101,8 +101,7 @@ function () use ($conn)
 }
 ```
 * Prepared transactions (a.k.a. two-phase commits) are supported by an API, too.
-
-```php
+{% highlight php %}
 <?php
 $tx = $conn->startTransaction();
 $conn->command('...');
@@ -113,7 +112,7 @@ $conn->commitPreparedTransaction($txName); // $conn is not necessarily the same 
 $conn->rollbackPreparedTransaction($txName);
 
 $conn->listPreparedTransactions(); // lists all prepared transactions
-```
+{% endhighlight %}
 
 
 ### Session Control
