@@ -18,91 +18,8 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
 
     protected function yieldTypes(ITypeProvider $typeProvider, ITypeDictionary $dict): \Generator
     {
-        $query = <<<'SQL'
-WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypdelim) AS (
-    SELECT
-        t.oid,
-        nsp.nspname,
-        t.typname,
-        (CASE WHEN arrelemtype.oid IS NOT NULL THEN 'A' ELSE t.typtype END), -- marking array types as of typtype 'A'
-        (CASE WHEN arrelemtype.oid IS NOT NULL THEN arrelemtype.oid
-              WHEN t.typtype = 'd' THEN t.typbasetype
-              WHEN t.typtype = 'r' THEN rngsubtype
-         END),
-        arrelemtype.typdelim,
-        (
-            CASE WHEN t.typtype = 'e' THEN
-                (
-                    SELECT to_json(array_agg(enumlabel ORDER BY enumsortorder))
-                    FROM pg_catalog.pg_enum
-                    WHERE enumtypid = t.oid
-                )
-            END
-        ) AS enum_labels,
-        (
-            CASE WHEN t.typtype = 'c' THEN
-                (
-                    SELECT json_agg(ARRAY[attname::TEXT, atttypid::TEXT] ORDER BY attnum)
-                    FROM pg_catalog.pg_attribute
-                    WHERE
-                        attrelid = t.typrelid AND
-                        attnum > 0 AND
-                        NOT attisdropped
-                )
-            END
-        ) AS composite_attributes
-    FROM
-        pg_catalog.pg_type t
-        JOIN pg_catalog.pg_namespace nsp ON nsp.oid = t.typnamespace
-        LEFT JOIN pg_catalog.pg_range rng ON rng.rngtypid = t.oid
-        LEFT JOIN pg_catalog.pg_type arrelemtype ON arrelemtype.typarray = t.oid
-),
-typetree (oid, depth) AS (
-    SELECT oid, 0 FROM typeinfo WHERE parenttype IS NULL
-    UNION ALL
-    SELECT ti.oid, tt.depth + 1
-    FROM
-        typeinfo ti
-        JOIN typetree tt ON tt.oid = ti.parenttype
-)
-SELECT ti.*
-FROM
-    typeinfo ti
-    JOIN typetree tt USING (oid)
-ORDER BY tt.depth
-SQL;
-        /* NOTE: The query sorts the types so that, when processing them one by one, there are no forward references.
-                 This is achieved by constituting the types dependency tree, and ordering the types by the depth in the
-                 tree. For such method to be correct, we should prove the dependency graph among types actually forms
-                 a tree, or more precisely, a forest. See the following points:
-                 1) There are only four types of types which refer other types and thus might be involved in a cycle:
-                    arrays, ranges, domains, and composites.
-                 2) Neither of these types may be created above a shell type. Their creation must thus only be made
-                    above existing, fully-defined types.
-                 3) Neither arrays, ranges, nor domains can be altered to be defined on a different type - a drop is
-                    required. Thus, considering 1), any circular dependency must involve a composite type.
-                 4) In a circular dependency only involving composite, array and domain types, the composite type would
-                    be a member of itself, which is checked and rejected by PostgreSQL.
-                 5) Thus, the only possibility for a circular dependency is such that it contains a composite and a
-                    range type. Which, indeed, is possible:
-                      CREATE TYPE c AS (a INT);
-                      CREATE TYPE r AS RANGE (SUBTYPE = c);
-                      ALTER TYPE c ADD ATTRIBUTE rng r;
-                 That said, the dependency graph does not form a forest, but that's only due to attributes of composite
-                 types. However, the composite type in a circular dependency may only be referred to as a whole.
-                 Therefore, the solution to compiling a type dictionary is such that only empty composite types are
-                 created at first, then their attributes are added to them. For such proceeding, (empty) composite types
-                 are considered as having no dependencies. The rest of types form a dependency tree, as follows from
-                 point 3) and from the fact that no type (except composites) may depend on more than one other type.
-                 Moreover, to be correct, we should prove that ordering the dependency forest by the tree depth suffices
-                 for the ordered result set not to contain any forward references. That's an easy induction, though:
-                 i)  Types in the level 0 have no dependencies, and thus may all be processed first, in any order.
-                 ii) Types in the level N+1 only have dependencies on types in the level N, which have already been
-                     processed, and thus all the (N+1)-level types may be processed, in any order.
-         */
-        $errorDesc = 'Error fetching types';
         $compositeAttrMap = [];
-        foreach ($this->query($query, $errorDesc) as $row) {
+        foreach ($this->queryTypes() as $row) {
             $schemaName = $row['nspname'];
             $typeName = $row['typname'];
 
@@ -186,6 +103,100 @@ SQL;
         $this->addCompositeAttributes($dict, $compositeAttrMap);
     }
 
+    private function queryTypes(): \Generator
+    {
+        $query = <<<'SQL'
+WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypdelim) AS (
+    SELECT
+        t.oid,
+        nsp.nspname,
+        t.typname,
+        (CASE WHEN arrelemtype.oid IS NOT NULL THEN 'A' ELSE t.typtype END), -- marking array types as of typtype 'A'
+        (CASE WHEN arrelemtype.oid IS NOT NULL THEN arrelemtype.oid
+              WHEN t.typtype = 'd' THEN t.typbasetype
+              WHEN t.typtype = 'r' THEN rngsubtype
+         END),
+        arrelemtype.typdelim,
+        (
+            CASE WHEN t.typtype = 'e' THEN
+                (
+                    SELECT to_json(array_agg(enumlabel ORDER BY enumsortorder))
+                    FROM pg_catalog.pg_enum
+                    WHERE enumtypid = t.oid
+                )
+            END
+        ) AS enum_labels,
+        (
+            CASE WHEN t.typtype = 'c' THEN
+                (
+                    SELECT json_agg(ARRAY[attname::TEXT, atttypid::TEXT] ORDER BY attnum)
+                    FROM pg_catalog.pg_attribute
+                    WHERE
+                        attrelid = t.typrelid AND
+                        attnum > 0 AND
+                        NOT attisdropped
+                )
+            END
+        ) AS composite_attributes
+    FROM
+        pg_catalog.pg_type t
+        JOIN pg_catalog.pg_namespace nsp ON nsp.oid = t.typnamespace
+        LEFT JOIN pg_catalog.pg_range rng ON rng.rngtypid = t.oid
+        LEFT JOIN pg_catalog.pg_type arrelemtype ON arrelemtype.typarray = t.oid
+),
+typetree (oid, depth) AS (
+    SELECT oid, 0 FROM typeinfo WHERE parenttype IS NULL
+    UNION ALL
+    SELECT ti.oid, tt.depth + 1
+    FROM
+        typeinfo ti
+        JOIN typetree tt ON tt.oid = ti.parenttype
+)
+SELECT ti.*
+FROM
+    typeinfo ti
+    JOIN typetree tt USING (oid)
+ORDER BY tt.depth
+SQL;
+        /* NOTE: The query sorts the types so that, when processing them one by one, there are no forward references.
+                 This is achieved by constituting the types dependency tree, and ordering the types by the depth in the
+                 tree. For such method to be correct, we should prove the dependency graph among types actually forms
+                 a tree, or more precisely, a forest. See the following points:
+                 1) There are only four types of types which refer other types and thus might be involved in a cycle:
+                    arrays, ranges, domains, and composites.
+                 2) Neither of these types may be created above a shell type. Their creation must thus only be made
+                    above existing, fully-defined types.
+                 3) Neither arrays, ranges, nor domains can be altered to be defined on a different type - a drop is
+                    required. Thus, considering 1), any circular dependency must involve a composite type.
+                 4) In a circular dependency only involving composite, array and domain types, the composite type would
+                    be a member of itself, which is checked and rejected by PostgreSQL.
+                 5) Thus, the only possibility for a circular dependency is such that it contains a composite and a
+                    range type. Which, indeed, is possible:
+                      CREATE TYPE c AS (a INT);
+                      CREATE TYPE r AS RANGE (SUBTYPE = c);
+                      ALTER TYPE c ADD ATTRIBUTE rng r;
+                 That said, the dependency graph does not form a forest, but that's only due to attributes of composite
+                 types. However, the composite type in a circular dependency may only be referred to as a whole.
+                 Therefore, the solution to compiling a type dictionary is such that only empty composite types are
+                 created at first, then their attributes are added to them. For such proceeding, (empty) composite types
+                 are considered as having no dependencies. The rest of types form a dependency tree, as follows from
+                 point 3) and from the fact that no type (except composites) may depend on more than one other type.
+                 Moreover, to be correct, we should prove that ordering the dependency forest by the tree depth suffices
+                 for the ordered result set not to contain any forward references. That's an easy induction, though:
+                 i)  Types in the level 0 have no dependencies, and thus may all be processed first, in any order.
+                 ii) Types in the level N+1 only have dependencies on types in the level N, which have already been
+                     processed, and thus all the (N+1)-level types may be processed, in any order.
+         */
+
+        $result = pg_query($this->connHandler, $query);
+        if (!is_resource($result)) {
+            throw new \RuntimeException("Error fetching types: " . pg_last_error($this->connHandler));
+        }
+        while (($row = pg_fetch_assoc($result)) !== false) {
+            yield $row;
+        }
+    }
+
     private function addCompositeAttributes(ITypeDictionary $dict, array $attrMap): void
     {
         foreach ($attrMap as $compTypeOid => $attrs) {
@@ -195,17 +206,6 @@ SQL;
                 $attrType = $dict->requireTypeByOid((int)$attrTypeOid);
                 $compType->addAttribute($attrName, $attrType);
             }
-        }
-    }
-
-    private function query(string $query, string $errorDesc): \Generator
-    {
-        $result = pg_query($this->connHandler, $query);
-        if (!is_resource($result)) {
-            throw new \RuntimeException("$errorDesc: " . pg_last_error($this->connHandler));
-        }
-        while (($row = pg_fetch_assoc($result)) !== false) {
-            yield $row;
         }
     }
 }
