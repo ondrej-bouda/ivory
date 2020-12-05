@@ -42,59 +42,7 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
             if ($providedType !== null) {
                 $type = clone $providedType; // clone: do not touch the original object - it might be reused by others
             } else {
-                switch ($row['typtype']) {
-                    case 'A':
-                        $elemType = $dict->requireTypeByOid((int)$row['parenttype']);
-                        assert($elemType instanceof IType,
-                            new InternalException('Only named types are supposed to be used as array element types.')
-                        );
-                        $type = $this->createArrayType($elemType, $row['arrelemtypdelim']);
-                        // NOTE: typdelim of the array type itself seems irrelevant
-                        break;
-
-                    case 'b':
-                    case 'p': // treating pseudo-types as base types - they must be recognized by Ivory
-                        $type = $this->createBaseType($schemaName, $typeName, $typeProvider);
-                        // OPT: types not recognized by the type provider are queried twice
-                        break;
-
-                    case 'c':
-                        $type = $this->createCompositeType($schemaName, $typeName); // attributes added later
-                        break;
-
-                    case 'd':
-                        $baseType = $dict->requireTypeByOid((int)$row['parenttype']);
-                        assert($baseType instanceof IType,
-                            new InternalException('Only named types are supposed to be used as domain base types.')
-                        );
-                        $type = $this->createDomainType($schemaName, $typeName, $baseType);
-                        break;
-
-                    case 'e':
-                        $labels = ($row['enum_labels'] ? json_decode($row['enum_labels']) : []);
-                        if (!is_array($labels)) {
-                            $err = (json_last_error_msg() ?: '?');
-                            throw new \RuntimeException(
-                                "Error decoding labels of enum type `$schemaName`.`$typeName`: $err"
-                            );
-                        }
-                        $type = $this->createEnumType($schemaName, $typeName, $labels);
-                        break;
-
-                    case 'r':
-                        $subtype = $dict->requireTypeByOid((int)$row['parenttype']);
-                        if ($subtype instanceof ITotallyOrderedType) {
-                            $type = $this->createRangeType($schemaName, $typeName, $subtype);
-                        } elseif ($subtype instanceof UndefinedType) {
-                            $type = new UndefinedType($schemaName, $typeName);
-                        } else {
-                            $type = new UnorderedRangeType($schemaName, $typeName);
-                        }
-                        break;
-
-                    default:
-                        throw new \RuntimeException("Error fetching types: unexpected typtype '$row[typtype]'");
-                }
+                $type = $this->createTypeFromRow($row, $typeProvider, $dict);
             }
 
             yield (int)$row['oid'] => $type;
@@ -194,6 +142,60 @@ SQL;
         }
         while (($row = pg_fetch_assoc($result)) !== false) {
             yield $row;
+        }
+    }
+
+    private function createTypeFromRow(array $row, ITypeProvider $typeProvider, ITypeDictionary $dict): IType
+    {
+        $schemaName = $row['nspname'];
+        $typeName = $row['typname'];
+
+        switch ($row['typtype']) {
+            case 'A':
+                $elemType = $dict->requireTypeByOid((int)$row['parenttype']);
+                assert($elemType instanceof IType,
+                    new InternalException('Only named types are supposed to be used as array element types.')
+                );
+                return $this->createArrayType($elemType, $row['arrelemtypdelim']);
+                // NOTE: typdelim of the array type itself seems irrelevant
+
+            case 'b':
+            case 'p': // treating pseudo-types as base types - they must be recognized by Ivory
+                return $this->createBaseType($schemaName, $typeName, $typeProvider);
+                // OPT: types not recognized by the type provider are queried twice
+
+            case 'c':
+                return $this->createCompositeType($schemaName, $typeName); // attributes added later
+
+            case 'd':
+                $baseType = $dict->requireTypeByOid((int)$row['parenttype']);
+                assert($baseType instanceof IType,
+                    new InternalException('Only named types are supposed to be used as domain base types.')
+                );
+                return $this->createDomainType($schemaName, $typeName, $baseType);
+
+            case 'e':
+                $labels = ($row['enum_labels'] ? json_decode($row['enum_labels']) : []);
+                if (!is_array($labels)) {
+                    $err = (json_last_error_msg() ?: '?');
+                    throw new \RuntimeException(
+                        "Error decoding labels of enum type `$schemaName`.`$typeName`: $err"
+                    );
+                }
+                return $this->createEnumType($schemaName, $typeName, $labels);
+
+            case 'r':
+                $subtype = $dict->requireTypeByOid((int)$row['parenttype']);
+                if ($subtype instanceof ITotallyOrderedType) {
+                    return $this->createRangeType($schemaName, $typeName, $subtype);
+                } elseif ($subtype instanceof UndefinedType) {
+                    return new UndefinedType($schemaName, $typeName);
+                } else {
+                    return new UnorderedRangeType($schemaName, $typeName);
+                }
+
+            default:
+                throw new \RuntimeException("Error fetching types: unexpected typtype '$row[typtype]'");
         }
     }
 
