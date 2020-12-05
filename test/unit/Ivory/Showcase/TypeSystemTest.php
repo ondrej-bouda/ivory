@@ -64,7 +64,7 @@ class TypeSystemTest extends IvoryTestCase
     public function testComplexTypes()
     {
         $tuple = $this->conn->querySingleTuple(
-            <<<SQL
+            <<<'SQL'
             SELECT ARRAY[
                     daterange('2015-05-19', '2015-12-01'),
                     daterange('2015-12-01', '2017-02-19'),

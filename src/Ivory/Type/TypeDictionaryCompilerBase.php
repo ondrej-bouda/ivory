@@ -29,7 +29,7 @@ abstract class TypeDictionaryCompilerBase implements ITypeDictionaryCompiler
     {
         $dict = $this->createTypeDictionary();
 
-        foreach ($typeProvider->getTypeAbbreviations() as $abbr => list($schemaName, $typeName)) {
+        foreach ($typeProvider->getTypeAbbreviations() as $abbr => [$schemaName, $typeName]) {
             assert(is_string($typeName));
             $dict->defineTypeAlias($abbr, $schemaName, $typeName);
             $dict->defineTypeAlias("{$abbr}[]", $schemaName, "{$typeName}[]");

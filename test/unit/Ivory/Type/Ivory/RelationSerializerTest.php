@@ -54,7 +54,7 @@ class RelationSerializerTest extends IvoryTestCase
 
     public function testSerializeRelation()
     {
-        $checkRel = $this->queryUsingSerializedRelation(<<<SQL
+        $checkRel = $this->queryUsingSerializedRelation(<<<'SQL'
 SELECT 1::BIGINT AS "Num", 'a'::TEXT AS char
 UNION
 SELECT 3, 'b'

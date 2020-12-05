@@ -20,7 +20,7 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
     {
         $enumLabels = $this->retrieveEnumLabels();
 
-        $query = <<<SQL
+        $query = <<<'SQL'
 WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypdelim) AS (
     SELECT
         t.oid,
@@ -31,7 +31,21 @@ WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypd
               WHEN t.typtype = 'd' THEN t.typbasetype
               WHEN t.typtype = 'r' THEN rngsubtype
          END),
-        arrelemtype.typdelim
+        arrelemtype.typdelim,
+        (
+            CASE WHEN t.typrelid = 0
+                THEN NULL -- optimization
+                ELSE
+                    (
+                        SELECT json_agg(ARRAY[attname::TEXT, atttypid::TEXT] ORDER BY attnum)
+                        FROM pg_catalog.pg_attribute
+                        WHERE
+                            attrelid = t.typrelid AND
+                            attnum > 0 AND
+                            NOT attisdropped
+                    )
+            END
+        ) AS composite_attributes
     FROM
         pg_catalog.pg_type t
         JOIN pg_catalog.pg_namespace nsp ON nsp.oid = t.typnamespace
@@ -42,12 +56,14 @@ typetree (oid, depth) AS (
     SELECT oid, 0 FROM typeinfo WHERE parenttype IS NULL
     UNION ALL
     SELECT ti.oid, tt.depth + 1
-    FROM typeinfo ti
-         JOIN typetree tt ON tt.oid = ti.parenttype
+    FROM
+        typeinfo ti
+        JOIN typetree tt ON tt.oid = ti.parenttype
 )
 SELECT ti.*
-FROM typeinfo ti
-     JOIN typetree tt USING (oid)
+FROM
+    typeinfo ti
+    JOIN typetree tt USING (oid)
 ORDER BY tt.depth
 SQL;
         /* NOTE: The query sorts the types so that, when processing them one by one, there are no forward references.
@@ -80,9 +96,22 @@ SQL;
                      processed, and thus all the (N+1)-level types may be processed, in any order.
          */
         $errorDesc = 'Error fetching types';
+        $compositeAttrMap = [];
         foreach ($this->query($query, $errorDesc) as $row) {
             $schemaName = $row['nspname'];
             $typeName = $row['typname'];
+
+            if ($row['composite_attributes']) {
+                $attrs = json_decode($row['composite_attributes']);
+                if (is_array($attrs)) {
+                    $compositeAttrMap[$row['oid']] = $attrs;
+                } else {
+                    $err = (json_last_error_msg() ?: '?');
+                    throw new \RuntimeException(
+                        "Error decoding composite attributes of type `$schemaName`.`$typeName`: $err"
+                    );
+                }
+            }
 
             /* OPT: This leads to a great flexibility - any type may be registered explicitly, bypassing the generic
              *      type constructors offered by Ivory. It may as well lead to a performance penalty, though.
@@ -143,7 +172,7 @@ SQL;
             yield (int)$row['oid'] => $type;
         }
 
-        $this->fetchCompositeAttributes($dict);
+        $this->addCompositeAttributes($dict, $compositeAttrMap);
     }
 
     private function retrieveEnumLabels(): array
@@ -165,21 +194,15 @@ SQL;
         return $labels;
     }
 
-    private function fetchCompositeAttributes(ITypeDictionary $dict): void
+    private function addCompositeAttributes(ITypeDictionary $dict, array $attrMap): void
     {
-        $query = <<<'SQL'
-SELECT pg_type.oid, attname, atttypid
-FROM pg_catalog.pg_attribute
-     JOIN pg_catalog.pg_type ON typrelid = attrelid
-WHERE attnum > 0 AND NOT attisdropped
-ORDER BY attrelid, attnum
-SQL;
-        $errorDesc = 'Error fetching composite type attributes';
-        foreach ($this->query($query, $errorDesc) as $row) {
-            $compType = $dict->requireTypeByOid((int)$row['oid']);
+        foreach ($attrMap as $compTypeOid => $attrs) {
+            $compType = $dict->requireTypeByOid($compTypeOid);
             assert($compType instanceof CompositeType);
-            $attType = $dict->requireTypeByOid((int)$row['atttypid']);
-            $compType->addAttribute($row['attname'], $attType);
+            foreach ($attrs as [$attrName, $attrTypeOid]) {
+                $attrType = $dict->requireTypeByOid((int)$attrTypeOid);
+                $compType->addAttribute($attrName, $attrType);
+            }
         }
     }
 
