@@ -18,8 +18,6 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
 
     protected function yieldTypes(ITypeProvider $typeProvider, ITypeDictionary $dict): \Generator
     {
-        $enumLabels = $this->retrieveEnumLabels();
-
         $query = <<<'SQL'
 WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypdelim) AS (
     SELECT
@@ -33,17 +31,24 @@ WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypd
          END),
         arrelemtype.typdelim,
         (
-            CASE WHEN t.typrelid = 0
-                THEN NULL -- optimization
-                ELSE
-                    (
-                        SELECT json_agg(ARRAY[attname::TEXT, atttypid::TEXT] ORDER BY attnum)
-                        FROM pg_catalog.pg_attribute
-                        WHERE
-                            attrelid = t.typrelid AND
-                            attnum > 0 AND
-                            NOT attisdropped
-                    )
+            CASE WHEN t.typtype = 'e' THEN
+                (
+                    SELECT to_json(array_agg(enumlabel ORDER BY enumsortorder))
+                    FROM pg_catalog.pg_enum
+                    WHERE enumtypid = t.oid
+                )
+            END
+        ) AS enum_labels,
+        (
+            CASE WHEN t.typtype = 'c' THEN
+                (
+                    SELECT json_agg(ARRAY[attname::TEXT, atttypid::TEXT] ORDER BY attnum)
+                    FROM pg_catalog.pg_attribute
+                    WHERE
+                        attrelid = t.typrelid AND
+                        attnum > 0 AND
+                        NOT attisdropped
+                )
             END
         ) AS composite_attributes
     FROM
@@ -108,7 +113,7 @@ SQL;
                 } else {
                     $err = (json_last_error_msg() ?: '?');
                     throw new \RuntimeException(
-                        "Error decoding composite attributes of type `$schemaName`.`$typeName`: $err"
+                        "Error decoding attributes of composite type `$schemaName`.`$typeName`: $err"
                     );
                 }
             }
@@ -149,7 +154,13 @@ SQL;
                         break;
 
                     case 'e':
-                        $labels = ($enumLabels[$row['oid']] ?? []);
+                        $labels = ($row['enum_labels'] ? json_decode($row['enum_labels']) : []);
+                        if (!is_array($labels)) {
+                            $err = (json_last_error_msg() ?: '?');
+                            throw new \RuntimeException(
+                                "Error decoding labels of enum type `$schemaName`.`$typeName`: $err"
+                            );
+                        }
                         $type = $this->createEnumType($schemaName, $typeName, $labels);
                         break;
 
@@ -173,25 +184,6 @@ SQL;
         }
 
         $this->addCompositeAttributes($dict, $compositeAttrMap);
-    }
-
-    private function retrieveEnumLabels(): array
-    {
-        $query = <<<'SQL'
-SELECT enumtypid, enumlabel
-FROM pg_catalog.pg_enum
-ORDER BY enumtypid, enumsortorder
-SQL;
-        $errorDesc = 'Error fetching enum labels';
-        $labels = [];
-        foreach ($this->query($query, $errorDesc) as $row) {
-            $oid = $row['enumtypid'];
-            if (!isset($labels[$oid])) {
-                $labels[$oid] = [];
-            }
-            $labels[$oid][] = $row['enumlabel'];
-        }
-        return $labels;
     }
 
     private function addCompositeAttributes(ITypeDictionary $dict, array $attrMap): void
