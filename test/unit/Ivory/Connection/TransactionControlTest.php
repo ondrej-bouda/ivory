@@ -162,10 +162,9 @@ class TransactionControlTest extends IvoryTestCase
 
         $f = function () {
             $tx = $this->conn->startAutoTransaction();
-            if (false) {
-                $tx->commit();
-            }
             self::assertTrue($this->conn->inTransaction());
+            unset($tx);
+            self::assertFalse($this->conn->inTransaction());
         };
         $f();
         self::assertFalse($this->conn->inTransaction());

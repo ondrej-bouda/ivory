@@ -93,12 +93,14 @@ class StrictEnumTypeTest extends IvoryTestCase
         );
 
         try {
+            /** @noinspection PhpParamsInspection */
             $conn->querySingleValue('SELECT %planet', 'Mars');
             self::fail(\InvalidArgumentException::class . ' was expected');
         } catch (\InvalidArgumentException $e) {
         }
 
         try {
+            /** @noinspection PhpParamsInspection */
             $conn->querySingleValue('SELECT %planet', ChocolateBar::Mars());
             self::fail(\InvalidArgumentException::class . ' was expected');
         } catch (\InvalidArgumentException $e) {
@@ -117,7 +119,8 @@ class StrictEnumTypeTest extends IvoryTestCase
         self::assertTrue(Planet::Mars() == new Planet('Mars'));
 
         try {
-            new Planet('mars');
+            $p = new Planet('mars');
+            assert($p !== null);
             self::fail(\InvalidArgumentException::class . ' expected');
         } catch (\InvalidArgumentException $e) {
         }

@@ -68,6 +68,7 @@ class TimestampType extends ConnectionDependentBaseType implements ITotallyOrder
         $dateStyle = $this->dateStyleRetriever->getValue();
         assert($dateStyle instanceof DateStyle);
         switch ($dateStyle->getFormat()) {
+            /** @noinspection PhpMissingBreakStatementInspection */
             default:
                 trigger_error(
                     "Unexpected DateStyle format '{$dateStyle->getFormat()}', assuming the ISO style",
@@ -75,18 +76,18 @@ class TimestampType extends ConnectionDependentBaseType implements ITotallyOrder
                 );
             case DateStyle::FORMAT_ISO:
                 preg_match('~^(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+(?:\.\d+)?).*?(BC)?$~', $extRepr, $matches);
-                list(, $y, $m, $d, $h, $i, $s) = $matches;
+                [, $y, $m, $d, $h, $i, $s] = $matches;
                 break;
             case DateStyle::FORMAT_GERMAN:
                 preg_match('~^(\d+)\.(\d+)\.(\d+) (\d+):(\d+):(\d+(?:\.\d+)?).*?(BC)?$~', $extRepr, $matches);
-                list(, $d, $m, $y, $h, $i, $s) = $matches;
+                [, $d, $m, $y, $h, $i, $s] = $matches;
                 break;
             case DateStyle::FORMAT_SQL:
                 preg_match('~^(\d+)/(\d+)/(\d+) (\d+):(\d+):(\d+(?:\.\d+)?).*?(BC)?$~', $extRepr, $matches);
                 if ($dateStyle->getOrder() == DateStyle::ORDER_DMY) {
-                    list(, $d, $m, $y, $h, $i, $s) = $matches;
+                    [, $d, $m, $y, $h, $i, $s] = $matches;
                 } else {
-                    list(, $m, $d, $y, $h, $i, $s) = $matches;
+                    [, $m, $d, $y, $h, $i, $s] = $matches;
                 }
                 break;
             case DateStyle::FORMAT_POSTGRES:
@@ -94,9 +95,9 @@ class TimestampType extends ConnectionDependentBaseType implements ITotallyOrder
                     '~^\w{3} (\d+|\w{3}) (\d+|\w{3}) (\d+):(\d+):(\d+(?:\.\d+)?) (\d+).*?(BC)?$~', $extRepr, $matches
                 );
                 if ($dateStyle->getOrder() == DateStyle::ORDER_DMY) {
-                    list(, $d, $ms, $h, $i, $s, $y) = $matches;
+                    [, $d, $ms, $h, $i, $s, $y] = $matches;
                 } else {
-                    list(, $ms, $d, $h, $i, $s, $y) = $matches;
+                    [, $ms, $d, $h, $i, $s, $y] = $matches;
                 }
                 static $monthNames = [
                     'Jan' => 1, 'Feb' => 2, 'Mar' => 3, 'Apr' => 4, 'May' => 5, 'Jun' => 6,
