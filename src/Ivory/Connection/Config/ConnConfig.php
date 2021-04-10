@@ -159,7 +159,7 @@ class ConnConfig implements IObservableConnConfig
         if ($type === null) { // type unknown, try to look in the catalog for server configuration
             $query = 'SELECT setting, vartype, unit FROM pg_catalog.pg_settings WHERE name ILIKE $1';
             $res = pg_query_params($connHandler, $query, [$propertyName]);
-            if ($res !== false || pg_num_rows($res) > 0) {
+            if ($res !== false && pg_num_rows($res) > 0) {
                 $row = pg_fetch_assoc($res);
                 try {
                     $type = ConfigParamType::detectType($row['vartype'], $row['setting'], $row['unit']);
