@@ -8,16 +8,28 @@ class XmlContentTest extends TestCase
 {
     public function testFromValue()
     {
-        $xml = XmlContent::fromValue('<root><a/><b><c/></b><a/></root>');
+        $xml = XmlContent::fromValue(
+            /** @lang XML */
+            '<root><a/><b><c/></b><a/></root>'
+        );
         self::assertTrue($xml instanceof XmlDocument);
 
-        $xml = XmlContent::fromValue('<a/><b><c/></b><a/>');
+        $xml = XmlContent::fromValue(
+            /** @lang TEXT */
+            '<a/><b><c/></b><a/>'
+        );
         self::assertFalse($xml instanceof XmlDocument);
 
-        $xml = XmlContent::fromValue('<?xml version="1.1" encoding="utf-8"?><root><a/><b><c/></b><a/></root>');
+        $xml = XmlContent::fromValue(
+            /** @lang XML */
+            '<?xml version="1.1" encoding="utf-8"?><root><a/><b><c/></b><a/></root>'
+        );
         self::assertTrue($xml instanceof XmlDocument);
 
-        $xml = XmlContent::fromValue('<?xml version="1.1" encoding="utf-8"?><a/><b><c/></b><a/>');
+        $xml = XmlContent::fromValue(
+            /** @lang TEXT */
+            '<?xml version="1.1" encoding="utf-8"?><a/><b><c/></b><a/>'
+        );
         self::assertFalse($xml instanceof XmlDocument);
     }
 }

@@ -149,7 +149,8 @@ class TypeDictionary implements ITypeDictionary
     {
         try {
             $valueClass = new \ReflectionClass($value);
-        } catch (\ReflectionException $e) {
+        } /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (\ReflectionException $e) {
             throw new \InvalidArgumentException('$value is neither an object nor a classname');
         }
 
