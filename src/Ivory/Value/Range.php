@@ -466,7 +466,7 @@ class Range implements IComparable
     }
 
     /**
-     * @param Range $other a range of the same subtype as this range
+     * @param Range|null $other a range of the same subtype as this range
      * @return bool|null whether this range entirely contains the other range;
      *                   an empty range is considered to be contained in any range, even an empty one;
      *                   <tt>null</tt> on <tt>null</tt> input
@@ -509,7 +509,7 @@ class Range implements IComparable
     }
 
     /**
-     * @param Range $other a range of the same subtype as this range
+     * @param Range|null $other a range of the same subtype as this range
      * @return bool|null whether this range is entirely contained in the other range;
      *                   an empty range is considered to be contained in any range, even an empty one;
      *                   <tt>null</tt> on <tt>null</tt> input
@@ -523,7 +523,7 @@ class Range implements IComparable
     }
 
     /**
-     * @param Range $other a range of the same subtype as this range
+     * @param Range|null $other a range of the same subtype as this range
      * @return bool|null whether this and the other range overlap, i.e., have a non-empty intersection;
      *                   <tt>null</tt> on <tt>null</tt> input
      */
@@ -554,7 +554,7 @@ class Range implements IComparable
     /**
      * Computes the intersection of this range with another range.
      *
-     * @param Range $other a range of the same subtype as this range
+     * @param Range|null $other a range of the same subtype as this range
      * @return Range|null intersection of this and the other range
      *                    <tt>null</tt> on <tt>null</tt> input
      */

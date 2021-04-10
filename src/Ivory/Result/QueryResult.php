@@ -133,6 +133,7 @@ class QueryResult extends Result implements IQueryResult
             $rawData = pg_fetch_row($this->handler, $this->numRows + $offset);
         }
 
+        /** @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection pg_fetch_row() may return FALSE */
         if ($rawData === false || $rawData === null) {
             throw new InvalidResultException("Error fetching row at offset $offset");
         }

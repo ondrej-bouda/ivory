@@ -34,11 +34,6 @@ abstract class TimestampBase extends DateBase
         return $timestamp;
     }
 
-    /**
-     * @param string $isoDateTimeString
-     * @param \DateTimeZone $forcedTimezone
-     * @return \DateTimeImmutable
-     */
     protected static function isoStringToDateTime(
         string $isoDateTimeString,
         ?\DateTimeZone $forcedTimezone = null

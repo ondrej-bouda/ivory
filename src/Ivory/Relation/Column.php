@@ -90,7 +90,6 @@ class Column implements \IteratorAggregate, IColumn
             $h = $hasher->hash($value);
             if (!isset($hashTable[$h])) {
                 $hashTable[$h] = [$value];
-                return true;
             } else {
                 foreach ($hashTable[$h] as $v) {
                     if ($equalizer->equal($value, $v)) {
@@ -98,8 +97,8 @@ class Column implements \IteratorAggregate, IColumn
                     }
                 }
                 $hashTable[$h][] = $value;
-                return true;
             }
+            return true;
         });
     }
 

@@ -51,7 +51,7 @@ class TracingTxHandleTest extends IvoryTestCase
             unset($tx);
             self::fail('A warning should have been thrown');
         } catch (Warning $warning) {
-            self::assertContains(__FILE__, $warning->getMessage());
+            self::assertStringContainsString(__FILE__, $warning->getMessage());
         } finally {
             $conn->command('ROLLBACK');
         }

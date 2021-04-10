@@ -37,6 +37,7 @@ class IPCControlTest extends IvoryTestCase
 
         $this->conn2->notify('test');
         $safetyBreak = 100;
+        /** @noinspection PhpAssignmentInConditionInspection it's a pity explicit parentheses do not suffice */
         while (($notification = $this->conn1->pollNotification()) === null) {
             if (--$safetyBreak < 0) {
                 break;

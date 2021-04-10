@@ -193,6 +193,7 @@ class ConnectionControl implements IConnectionControl
         }
     }
 
+    /** @noinspection PhpSameParameterValueInspection */
     private static function isStreamReadable($stream, int $sec, int $usec = 0): bool
     {
         $r = [$stream];

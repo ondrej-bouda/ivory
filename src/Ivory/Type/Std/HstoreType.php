@@ -52,6 +52,7 @@ class HstoreType extends TypeBase
 
     public function parseValue(string $extRepr)
     {
+        /** @noinspection RegExpUnnecessaryNonCapturingGroup PhpStorm does not understand the regex */
         $re = '~
                 \s*
                 (?: " ((?: [^"\\\\] | \\\\" | \\\\\\\\ )*) "

@@ -32,7 +32,6 @@ class FixedBitString extends BitString
      */
     public static function fromString(string $bits, ?int $length = null): FixedBitString
     {
-        $bits = (string)$bits;
         $bitsLen = strlen($bits);
 
         if ($length === null) {

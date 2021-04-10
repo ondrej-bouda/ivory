@@ -45,16 +45,19 @@ class TimeTz extends TimeBase
      */
     public static function fromString(string $timeString): TimeTz
     {
-        $re = '~^
-                (\d+):                  # hours
-                (\d+)                   # minutes
-                (?::(\d+(?:\.\d*)?))?   # optional seconds, possibly with fractional part
-                (?P<zone>               # optional timezone specification
-                 Z|                     # ...either the "Z" letter or offset
-                 (?P<offh>[-+]\d{1,2})  # ...or two digits for hours offset
-                 (?::?(?P<offm>\d{2}))? # ...and possibly two digits for minutes offset, optionally separated by a colon
-                )?
-                $~x';
+        $re = /** @lang PhpRegExp */
+            '~
+              ^
+              (\d+):                    # hours
+              (\d+)                     # minutes
+              (?::(\d+(?:\.\d*)?))?     # optional seconds, possibly with fractional part
+              (?P<zone>                 # optional timezone specification
+                Z|                      # ...either the "Z" letter or offset
+                (?P<offh>[-+]\d{1,2})   # ...or two digits for hours offset
+                (?::?(?P<offm>\d{2}))?  # ...and possibly two digits for minutes offset, optionally separated by a colon
+              )?
+              $
+             ~x';
         if (!preg_match($re, $timeString, $m)) {
             throw new \InvalidArgumentException('$timeString');
         }

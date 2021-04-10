@@ -10,6 +10,6 @@ class BigIntSafeStepper implements IDiscreteStepper
             throw new \InvalidArgumentException();
         }
 
-        return bcadd($value, $delta, 0);
+        return bcadd($value, (string)$delta, 0);
     }
 }

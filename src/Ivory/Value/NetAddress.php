@@ -335,23 +335,23 @@ class NetAddress implements IEqualable
      * Two addresses are considered as equal iff they are of the same IP version, the same netmask, and the same
      * expanded address.
      *
-     * @param NetAddress|string $address a {@link NetAddress} or anything {@link NetAddress::fromString()} accepts as
+     * @param NetAddress|string $other a {@link NetAddress} or anything {@link NetAddress::fromString()} accepts as
      *                                     its first argument
      * @return bool
      */
-    public function equals($address): bool
+    public function equals($other): bool
     {
-        if ($address === null) {
+        if ($other === null) {
             return false;
         }
-        if (!$address instanceof NetAddress) {
-            $address = NetAddress::fromString($address);
+        if (!$other instanceof NetAddress) {
+            $other = NetAddress::fromString($other);
         }
 
         return (
-            $this->ipVersion == $address->ipVersion &&
-            $this->netmaskLength == $address->netmaskLength &&
-            $this->getExpandedAddress() == $address->getExpandedAddress()
+            $this->ipVersion == $other->ipVersion &&
+            $this->netmaskLength == $other->netmaskLength &&
+            $this->getExpandedAddress() == $other->getExpandedAddress()
         );
     }
 

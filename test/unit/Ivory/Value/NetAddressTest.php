@@ -343,27 +343,21 @@ class NetAddressTest extends TestCase
         self::assertSame('1.2.3.4', $a->getAddressString());
         self::assertSame(26, $a->getNetmaskLength());
 
-        if (System::is32Bit()) {
-            $a = NetAddress::fromInt(-1073732954);
-            self::assertSame(4, $a->getIpVersion());
-            self::assertSame('192.0.34.166', $a->getAddressString());
-            self::assertSame(32, $a->getNetmaskLength());
+        $a = (System::is32Bit() ?
+            NetAddress::fromInt(-1073732954) :
+            NetAddress::fromInt(3221234342)
+        );
+        self::assertSame(4, $a->getIpVersion());
+        self::assertSame('192.0.34.166', $a->getAddressString());
+        self::assertSame(32, $a->getNetmaskLength());
 
-            $a = NetAddress::fromInt(-1);
-            self::assertSame(4, $a->getIpVersion());
-            self::assertSame('255.255.255.255', $a->getAddressString());
-            self::assertSame(32, $a->getNetmaskLength());
-        } else {
-            $a = NetAddress::fromInt(3221234342);
-            self::assertSame(4, $a->getIpVersion());
-            self::assertSame('192.0.34.166', $a->getAddressString());
-            self::assertSame(32, $a->getNetmaskLength());
-
-            $a = NetAddress::fromInt(4294967295);
-            self::assertSame(4, $a->getIpVersion());
-            self::assertSame('255.255.255.255', $a->getAddressString());
-            self::assertSame(32, $a->getNetmaskLength());
-        }
+        $a = (System::is32Bit() ?
+            NetAddress::fromInt(-1) :
+            NetAddress::fromInt(4294967295)
+        );
+        self::assertSame(4, $a->getIpVersion());
+        self::assertSame('255.255.255.255', $a->getAddressString());
+        self::assertSame(32, $a->getNetmaskLength());
     }
 
     public function testGetExpandedAddress()

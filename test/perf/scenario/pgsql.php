@@ -61,6 +61,7 @@ class PgSQLPerformanceTest implements IPerformanceTest
             [$userId]
         );
         $items = [];
+        /** @noinspection PhpAssignmentInConditionInspection it's a pity explicit parentheses do not suffice */
         while (($row = pg_fetch_assoc($res))) {
             $items[$row['id']] = $row;
             $items[$row['id']]['categories'] = [];
@@ -75,6 +76,7 @@ class PgSQLPerformanceTest implements IPerformanceTest
                  WHERE item_id IN ($itemIdList)
                  ORDER BY category_name, category_id"
             );
+            /** @noinspection PhpAssignmentInConditionInspection it's a pity explicit parentheses do not suffice */
             while (($row = pg_fetch_assoc($res))) {
                 $items[$row['item_id']]['categories'][$row['category_id']] = $row['category_name'];
             }
@@ -116,6 +118,7 @@ class PgSQLPerformanceTest implements IPerformanceTest
             [$categoryId]
         );
         echo "Category $categoryId:\n";
+        /** @noinspection PhpAssignmentInConditionInspection it's a pity explicit parentheses do not suffice */
         while (($row = pg_fetch_assoc($res))) {
             printf('#%d %s, introduced %s: %s',
                 $row['id'], $row['name'],

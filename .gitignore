@@ -1,7 +1,6 @@
-/.idea
+/.idea/*
 !/.idea/inspectionProfiles/Ivory_Inspections.xml
 !/.idea/scopes
-!/.idea/scopes/Documentation_Tests.xml
 /.private
 /composer.lock
 /composer.phar

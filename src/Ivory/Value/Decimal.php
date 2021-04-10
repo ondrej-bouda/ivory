@@ -251,15 +251,15 @@ class Decimal implements IComparable
      * which might or might not be desired. Such a difference only arises in the trailing fractional zero digits,
      * though.
      *
-     * @param string|int|float|Decimal|object $number number to compare this number with
+     * @param string|int|float|Decimal|object $other number to compare this number with
      * @return bool whether this number numerically equals to <tt>$number</tt>
      */
-    public function equals($number): bool
+    public function equals($other): bool
     {
-        if ($number === null) {
+        if ($other === null) {
             return false;
         }
-        return ($this->compareTo($number) == 0);
+        return ($this->compareTo($other) == 0);
     }
 
     /**
@@ -281,12 +281,12 @@ class Decimal implements IComparable
     }
 
     /**
-     * @param string|int|float|Decimal|object $number number to compare this number with
+     * @param string|int|float|Decimal|object $other number to compare this number with
      * @return int -1, 0, or 1 if this number is numerically less than, equal to, or greater than <tt>$number</tt>
      */
-    public function compareTo($number): int
+    public function compareTo($other): int
     {
-        $arg = self::fromNumber($number);
+        $arg = self::fromNumber($other);
         if ($this->isNaN()) {
             if ($arg->isNaN()) {
                 return 0;

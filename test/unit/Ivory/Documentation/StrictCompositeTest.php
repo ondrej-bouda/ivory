@@ -31,8 +31,10 @@ class StrictCompositeTest extends IvoryTestCase
             self::assertSame(null, $val->message);
 
             try {
-                $val->undefProp;
-                self::fail('Accessing an undefined attribute should have emitted a warning');
+                $x = $val->undefProp;
+                self::fail(
+                    'Accessing an undefined attribute should have emitted a warning, but returned a ' . gettype($x)
+                );
             } catch (\PHPUnit\Framework\Error\Warning $e) {
             }
         } finally {
@@ -64,8 +66,10 @@ class StrictCompositeTest extends IvoryTestCase
             self::assertSame(null, $least->message);
 
             try {
-                $least->undefProp;
-                self::fail('Accessing an undefined attribute should have emitted a warning');
+                $x = $least->undefProp;
+                self::fail(
+                    'Accessing an undefined attribute should have emitted a warning, but returned a ' . gettype($x)
+                );
             } catch (\PHPUnit\Framework\Error\Warning $e) {
             }
         } finally {

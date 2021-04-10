@@ -31,7 +31,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
      * Converts a simple macro, as accepted, e.g., by {@link IRelation::project()}, to a PCRE.
      *
      * @param string $macroPattern the simple macro to convert
-     * @param int $starCnt number of star wildcards is stored here
+     * @param int|null $starCnt number of star wildcards is stored here
      * @return string PCRE equivalent to <tt>$macroPattern</tt>
      */
     protected static function simpleMacroPatternToPcre(string $macroPattern, int &$starCnt = null): string

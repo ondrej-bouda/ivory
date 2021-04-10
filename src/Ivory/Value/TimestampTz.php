@@ -34,7 +34,6 @@ class TimestampTz extends TimestampBase
             } catch (\Exception $e) {
                 throw new \LogicException('Date/time error', 0, $e);
             }
-            return new TimestampTz(0, $datetime);
         } else {
             list($micro, $sec) = explode(' ', microtime());
             $microFrac = substr($micro, 1); // cut off the whole part (always a zero)
@@ -44,8 +43,9 @@ class TimestampTz extends TimestampBase
             } catch (\Exception $e) {
                 throw new \LogicException('Date/time error', 0, $e);
             }
-            return new TimestampTz(0, $datetime);
         }
+
+        return new TimestampTz(0, $datetime);
     }
 
     /**
@@ -254,11 +254,11 @@ class TimestampTz extends TimestampBase
     }
 
     /**
-     * @return mixed[]|null a list of seven items: year, month, day, hours, minutes, seconds, and timezone of this
-     *                       date/time, all of which are integers except the seconds part, which might be a float if
-     *                       containing the fractional part, and the timezone part, which is a {@link \DateTimeZone}
-     *                       object;
-     *                     <tt>null</tt> iff the date/time is not finite
+     * @return array|null a list of seven items: year, month, day, hours, minutes, seconds, and timezone of this
+     *                      date/time, all of which are integers except the seconds part, which might be a float if
+     *                      containing the fractional part, and the timezone part, which is a {@link \DateTimeZone}
+     *                      object;
+     *                    <tt>null</tt> iff the date/time is not finite
      */
     public function toParts(): ?array
     {

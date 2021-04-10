@@ -104,7 +104,11 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
         if ($c === false) {
             // NOTE: parse_url() denies the input if the host part is omitted, even though RFC 3986 says it is optional
             $auxUri = preg_replace('~//~', '//host', $uri, 1, $found); // NOTE: only preg_replace has a limit :-(
-            if ($found == 0 || ($c = parse_url($auxUri)) === false) {
+            if ($found == 0) {
+                throw new \InvalidArgumentException('uri is malformed');
+            }
+            $c = parse_url($auxUri);
+            if ($c === false) {
                 throw new \InvalidArgumentException('uri is malformed');
             }
             unset($c['host']);

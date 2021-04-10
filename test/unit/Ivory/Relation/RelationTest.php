@@ -40,6 +40,8 @@ class RelationTest extends IvoryTestCase
             ],
             $rel->toArray()
         );
+        self::assertCount(4, $tuples);
+        self::assertSame('Tommy Emmanuel', $tuples[3]->name);
     }
 
     public function testResultAccess()

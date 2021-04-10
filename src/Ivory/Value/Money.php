@@ -39,6 +39,7 @@ class Money implements IComparable
     public static function fromString(string $moneyStr, string $decimalSeparator): Money
     {
         $ds = preg_quote($decimalSeparator, '~');
+        /** @noinspection RegExpUnnecessaryNonCapturingGroup PhpStorm does not understand the regex */
         $re = '~^ \s*
                 (\D+?)?                             # optional unit before the amount
                 \s*

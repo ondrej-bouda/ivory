@@ -8,6 +8,8 @@
   * run all tests -- all should pass
   * run the _Ivory Inspections_ inspection profile on _Inspection Scope_, including test sources -- no inspection
     violations should be reported
+    * `src/Ivory` must be marked as Sources Root
+    * `test/perf` and `test/unit/Ivory` must be marked as Test Sources Root
 * Commit:
   * new features to the `master` branch
   * fixes to all supported branches, to the releasing branch (if any), and to the `master` branch

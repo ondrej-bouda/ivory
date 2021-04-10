@@ -255,7 +255,7 @@ trait SqlPatternDefinitionMacros
         $curNamedParams = $curFragment->getNamedPlaceholderMap();
         // OPT: Require SqlPattern::$namedPlaceholderMap to be sorted by offset of the first occurrence of the name.
         //      Then, take just the first item instead of iterating over all names.
-        foreach ($curNamedParams as $name => $occurrences) {
+        foreach ($curNamedParams as $occurrences) {
             assert($occurrences[0] instanceof SqlPatternPlaceholder);
             if ($occurrences[0]->getOffset() == 0) { // occurrences are sorted, so checking only the first is sufficient
                 return true;

@@ -352,7 +352,8 @@ class ArrayType extends TypeBase implements ITotallyOrderedType
                        As an optimization, doubled single quotes (meaning the literal single quote) will be preserved
                        not to undo and do the job again on the whole array.
                      */
-                    if (($beg = strpos($valOut, "'")) !== false) {
+                    $beg = strpos($valOut, "'");
+                    if ($beg !== false) {
                         $end = strrpos($valOut, "'");
                         if ($beg == $end) {
                             throw new InternalException("Malformed element value serialization: $valOut");

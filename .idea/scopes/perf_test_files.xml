@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="perf test files" pattern="file[ivory]:test/perf//*" />
+</component>

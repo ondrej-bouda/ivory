@@ -35,9 +35,7 @@ class TimeType extends TypeBase implements ITotallyOrderedType
             } elseif (is_string($val)) {
                 try {
                     $val = Time::fromString($val);
-                } catch (\InvalidArgumentException $e) {
-                    throw $this->invalidValueException($val, $e);
-                } catch (\OutOfRangeException $e) {
+                } catch (\InvalidArgumentException | \OutOfRangeException $e) {
                     throw $this->invalidValueException($val, $e);
                 }
             } else {

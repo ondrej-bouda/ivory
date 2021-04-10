@@ -64,6 +64,7 @@ class TypeSystemTest extends IvoryTestCase
     public function testComplexTypes()
     {
         $tuple = $this->conn->querySingleTuple(
+            /** @lang SQL due to the XML fragment erroneously recognized as HTML by PhpStorm */
             <<<'SQL'
             SELECT ARRAY[
                     daterange('2015-05-19', '2015-12-01'),
@@ -136,7 +137,7 @@ SQL
         // define the serializer...
         $strListSerializer = new class implements IValueSerializer
         {
-            public function serializeValue($val, bool $forceType = false): string
+            public function serializeValue($val, bool $strictType = false): string
             {
                 if (!is_array($val)) {
                     throw new \InvalidArgumentException('%strlist expects an array');
@@ -229,12 +230,12 @@ SQL
                 return \DateTime::createFromFormat('!Y-m-d', $extRepr);
             }
 
-            public function serializeValue($val, bool $forceType = false): string
+            public function serializeValue($val, bool $strictType = false): string
             {
                 if ($val === null) {
-                    return $this->typeCastExpr($forceType, 'NULL');
+                    return $this->typeCastExpr($strictType, 'NULL');
                 } elseif ($val instanceof \DateTime) {
-                    return $this->indicateType($forceType, $val->format("'Y-m-d'"));
+                    return $this->indicateType($strictType, $val->format("'Y-m-d'"));
                 } else {
                     throw new \InvalidArgumentException();
                 }

@@ -12,6 +12,7 @@ use Ivory\Value\Composite;
  */
 class CompositeTest extends IvoryTestCase
 {
+    /** @noinspection PhpPossiblePolymorphicInvocationInspection */
     public function testStoredComposites()
     {
         $conn = $this->getIvoryConnection();

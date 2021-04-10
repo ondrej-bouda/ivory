@@ -33,19 +33,20 @@ class RangeType extends TypeBase implements ITotallyOrderedType
             return Range::empty();
         }
 
-        $regex = '~
-                   ^\s*
-                   (?P<open> [[(] )
-                   (?P<lower> "(?:[^"\\\\]|""|\\\\.)*"  # either a double-quoted string (backslashes used for escaping,
+        $regex = /** @lang PhpRegExp */
+            '~
+              ^\s*
+              (?P<open> [[(] )
+              (?P<lower> "(?:[^"\\\\]|""|\\\\.)*"       # either a double-quoted string (backslashes used for escaping,
                                                         # or double quotes double for a single double-quote character),
-                              |                         # or an unquoted string of characters which do not confuse the
-                              (?:[^"\\\\()[\],]|\\\\.)* # parser or are backslash-escaped
-                   )
-                   ,
-                   (?P<upper> (?P>lower) )              # the upper-bound follows the same rules as the lower-bound
-                   (?P<close> [])] )
-                   \s*$
-                  ~x';
+                         |                              # or an unquoted string of characters which do not confuse the
+                         (?:[^"\\\\()[\],]|\\\\.)*      # parser or are backslash-escaped
+              )
+              ,
+              (?P<upper> (?P>lower) )                   # the upper-bound follows the same rules as the lower-bound
+              (?P<close> [])] )
+              \s*$
+             ~x';
         if (!preg_match($regex, $extRepr, $m)) {
             throw new \InvalidArgumentException("Invalid value for range {$this->getSchemaName()}.{$this->getName()}");
         }

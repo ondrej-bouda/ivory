@@ -72,6 +72,7 @@ class XmlContent
     private static function isXmlDocument(string $xmlStr): bool
     {
         $reader = new \XMLReader();
+        /** @noinspection PhpStaticAsDynamicMethodCallInspection it is also a non-static method */
         $reader->XML($xmlStr);
 
         if (!@$reader->read()) {

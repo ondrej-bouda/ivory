@@ -306,6 +306,7 @@ class ConnConfigTest extends IvoryTestCase
         }
     }
 
+    /** @noinspection PhpSameParameterValueInspection */
     private function clearPreparedTransaction($name)
     {
         $conn = $this->getIvoryConnection();

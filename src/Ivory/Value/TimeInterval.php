@@ -84,6 +84,7 @@ class TimeInterval implements IComparable
             $queue[] = [$unit, $quantity];
         }
 
+        /** @noinspection PhpAssignmentInConditionInspection it's a pity explicit parentheses do not suffice */
         for (; ($pair = current($queue)) !== false; next($queue)) {
             list($unit, $quantity) = $pair;
             $intQuantity = (int)round($quantity, self::PRECISION);

@@ -69,7 +69,7 @@ class ArrayRelation extends RelationBase implements IConnectionDependentObject
      * performed using the type dictionary used by the connection which this relation gets attached to.
      *
      * @param array $rows list of data rows, each a map of column names to values
-     * @param array $typeMap optional map specifying columns mutual order and types
+     * @param array|null $typeMap optional map specifying columns mutual order and types
      * @return ArrayRelation
      */
     public static function fromRows(array $rows, ?array $typeMap = null): ArrayRelation

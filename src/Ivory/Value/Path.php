@@ -36,15 +36,6 @@ class Path
         if (count($points) == 0) {
             throw new \InvalidArgumentException('points');
         }
-        if (!is_bool($isOpen)) {
-            $isOpen = (bool)$isOpen;
-            trigger_error(
-                sprintf('%s: $isOpen shall be one of %s::OPEN or %s::CLOSED, or just a boolean. %s::%s is considered.',
-                    __METHOD__, __CLASS__, __CLASS__, __CLASS__, ($isOpen ? 'OPEN' : 'CLOSED')
-                ),
-                E_USER_NOTICE
-            );
-        }
 
         $normalized = [];
         foreach ($points as $i => $point) {

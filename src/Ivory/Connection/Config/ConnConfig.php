@@ -324,6 +324,10 @@ class ConnConfig implements IObservableConnConfig
         $res = pg_query($connHandler, 'SELECT unnest(pg_catalog.current_schemas(TRUE))');
         if ($res !== false) {
             $this->effectiveSearchPathCache = [];
+            /** @noinspection PhpAssignmentInConditionInspection it's a pity explicit parentheses do not suffice */
+            /**
+             * @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection pg_fetch_row() may return FALSE
+             */
             while (($row = pg_fetch_row($res)) !== false) {
                 $this->effectiveSearchPathCache[] = $row[0];
             }
@@ -411,7 +415,7 @@ class ConnConfig implements IObservableConnConfig
     public function notifyPropertiesReset(): void
     {
         $obsSet = [];
-        foreach ($this->observers as $k => $obsList) {
+        foreach ($this->observers as $obsList) {
             foreach ($obsList as $obs) {
                 $obsSet[spl_object_hash($obs)] = $obs;
             }

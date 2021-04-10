@@ -141,7 +141,7 @@ class MapTest extends IvoryTestCase
             self::fail('A warning expected due to multiple tuples mapping to the same key.');
         } catch (Warning $e) {
             $expDesc = implode(', ', $dupKeys);
-            self::assertContains($expDesc, $e->getMessage());
+            self::assertStringContainsString($expDesc, $e->getMessage());
         }
     }
 

@@ -140,6 +140,8 @@ SQL;
         if (!is_resource($result)) {
             throw new \RuntimeException("Error fetching types: " . pg_last_error($this->connHandler));
         }
+        /** @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection pg_fetch_assoc() may return FALSE */
+        /** @noinspection PhpAssignmentInConditionInspection it's a pity explicit parentheses do not suffice */
         while (($row = pg_fetch_assoc($result)) !== false) {
             yield $row;
         }

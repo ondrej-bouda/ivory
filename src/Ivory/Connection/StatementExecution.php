@@ -300,6 +300,7 @@ class StatementExecution implements IStatementExecution
         }
 
         $resHandlers = [];
+        /** @noinspection PhpAssignmentInConditionInspection it's a pity explicit parentheses do not suffice */
         while (($res = pg_get_result($connHandler)) !== false) {
             /* NOTE: Cannot process the result right away - the remaining results must all be read, or they would, in
              * case of error, block the connection from accepting further queries.

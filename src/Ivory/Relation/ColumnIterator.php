@@ -37,8 +37,8 @@ class ColumnIterator implements \SeekableIterator
         return $this->pos = 0;
     }
 
-    public function seek($position)
+    public function seek($offset)
     {
-        $this->pos = $position;
+        $this->pos = $offset;
     }
 }

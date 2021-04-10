@@ -71,6 +71,7 @@ class Quantity implements IEqualable
     public static function fromString(string $quantityStr, string $decimalSeparator = '.'): Quantity
     {
         $ds = preg_quote($decimalSeparator, '~');
+        /** @noinspection RegExpUnnecessaryNonCapturingGroup PhpStorm does not understand the regex */
         $re = '~^ \s*
                 (\D+?)?                             # optional unit before the amount
                 \s*
@@ -155,39 +156,39 @@ class Quantity implements IEqualable
     }
 
     /**
-     * @param Quantity|string $quantity quantity to compare this quantity with;
+     * @param Quantity|string $other quantity to compare this quantity with;
      *                                  if Quantity is not given, {@link Quantity::fromString()} is used to parse it
      * @return bool whether the two quantities are comparable and of equal value (after converting to the same unit if
      *                convertible)
      */
-    public function equals($quantity): bool
+    public function equals($other): bool
     {
-        if ($quantity === null) {
+        if ($other === null) {
             return false;
         }
-        if (!$quantity instanceof Quantity) {
-            $quantity = self::fromString($quantity);
+        if (!$other instanceof Quantity) {
+            $other = self::fromString($other);
         }
 
-        if ($this->unit == $quantity->unit) {
+        if ($this->unit == $other->unit) {
             $thisNormValue = $this->value;
-            $quanNormValue = $quantity->value;
+            $otherNormValue = $other->value;
         } else {
-            if (!isset(self::CONVERSION[$this->unit], self::CONVERSION[$quantity->unit])) {
+            if (!isset(self::CONVERSION[$this->unit], self::CONVERSION[$other->unit])) {
                 return false;
             }
 
             list($thisBase, $thisMult) = self::CONVERSION[$this->unit];
-            list($quanBase, $quanMult) = self::CONVERSION[$quantity->unit];
-            if ($thisBase != $quanBase) {
+            list($otherBase, $otherMult) = self::CONVERSION[$other->unit];
+            if ($thisBase != $otherBase) {
                 return false;
             }
 
             $thisNormValue = $this->value * $thisMult;
-            $quanNormValue = $quantity->value * $quanMult;
+            $otherNormValue = $other->value * $otherMult;
         }
 
-        return (abs($thisNormValue - $quanNormValue) < self::EPSILON);
+        return (abs($thisNormValue - $otherNormValue) < self::EPSILON);
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpPropertyOnlyWrittenInspection unfinished code */
 declare(strict_types=1);
 namespace Ivory\Connection\Config;
 

@@ -38,8 +38,8 @@ class RelationSeekableIterator implements \SeekableIterator
         $this->pos = 0;
     }
 
-    public function seek($position)
+    public function seek($offset)
     {
-        $this->pos = $position;
+        $this->pos = $offset;
     }
 }

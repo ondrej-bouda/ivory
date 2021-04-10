@@ -320,6 +320,7 @@ class TypeDictionary implements ITypeDictionary
 
     private static function removeAll(array &$array, $item): void
     {
+        /** @noinspection PhpAssignmentInConditionInspection it's a pity explicit parentheses do not suffice */
         while (($key = array_search($item, $array, true)) !== false) {
             unset($array[$key]);
         }

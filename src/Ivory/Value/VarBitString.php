@@ -32,8 +32,6 @@ class VarBitString extends BitString
      */
     public static function fromString(string $bits, ?int $maxLength = null): VarBitString
     {
-        $bits = (string)$bits;
-
         if ($maxLength === null) {
             return new VarBitString($bits, null);
         } elseif ($maxLength <= 0) {
@@ -64,7 +62,7 @@ class VarBitString extends BitString
     {
         $parRes = parent::equals($other);
         if (!$parRes) {
-            return $parRes;
+            return false;
         }
         assert($other instanceof VarBitString);
         return ($this->maxLength == $other->maxLength);

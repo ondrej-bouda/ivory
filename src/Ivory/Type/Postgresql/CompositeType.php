@@ -26,7 +26,7 @@ class CompositeType extends RowTypeBase
      */
     public function addAttribute(string $attName, IType $attType): self
     {
-        if ((string)$attName == '') {
+        if ($attName == '') {
             $typeName = "{$this->getSchemaName()}.{$this->getName()}";
             $msg = "No attribute name given when adding attribute to composite type $typeName";
             throw new \InvalidArgumentException($msg);

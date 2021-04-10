@@ -63,6 +63,7 @@ class DoctrinePerformanceTest implements IPerformanceTest
             [$userId]
         );
         $items = [];
+        /** @noinspection PhpAssignmentInConditionInspection it's a pity explicit parentheses do not suffice */
         while (($row = $res->fetch())) {
             $items[$row['id']] = $row;
             $items[$row['id']]['categories'] = [];
@@ -77,6 +78,7 @@ class DoctrinePerformanceTest implements IPerformanceTest
                 [array_keys($items)],
                 [Connection::PARAM_INT_ARRAY]
             );
+            /** @noinspection PhpAssignmentInConditionInspection it's a pity explicit parentheses do not suffice */
             while (($row = $res->fetch())) {
                 $items[$row['item_id']]['categories'][$row['category_id']] = $row['category_name'];
             }
@@ -117,6 +119,7 @@ class DoctrinePerformanceTest implements IPerformanceTest
             [$categoryId]
         );
         echo "Category $categoryId:\n";
+        /** @noinspection PhpAssignmentInConditionInspection it's a pity explicit parentheses do not suffice */
         while (($row = $res->fetch())) {
             printf('#%d %s, introduced %s: %s',
                 $row['id'], $row['name'],
