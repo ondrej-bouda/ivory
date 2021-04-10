@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class TimestampTest extends TestCase
 {
-    private static function dt($year, $month, $day, $hour, $min, $sec)
+    private static function dt($year, $month, $day, $hour, $min, $sec): Timestamp
     {
         return Timestamp::fromPartsStrict($year, $month, $day, $hour, $min, $sec);
     }

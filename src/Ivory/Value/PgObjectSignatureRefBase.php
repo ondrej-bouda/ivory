@@ -10,7 +10,7 @@ abstract class PgObjectSignatureRefBase extends PgObjectRefBase
     private $argTypes;
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public static function fromUnqualifiedName(string $name, PgTypeRef ...$argTypes)
+    public static function fromUnqualifiedName(string $name, PgTypeRef ...$argTypes): PgObjectRefBase
     {
         $ref = new static(null, $name);
         $ref->argTypes = $argTypes;
@@ -18,7 +18,7 @@ abstract class PgObjectSignatureRefBase extends PgObjectRefBase
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public static function fromQualifiedName(?string $schemaName, string $name, PgTypeRef ...$argTypes)
+    public static function fromQualifiedName(?string $schemaName, string $name, PgTypeRef ...$argTypes): PgObjectRefBase
     {
         $ref = new static($schemaName, $name);
         $ref->argTypes = $argTypes;

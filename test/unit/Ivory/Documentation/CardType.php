@@ -57,7 +57,7 @@ class CardType extends TypeBase implements ITotallyOrderedType
         if (self::$discreteStepper === null) {
             self::$discreteStepper = new class implements IDiscreteStepper
             {
-                public function step(int $delta, $value)
+                public function step(int $delta, $value): string
                 {
                     $pos = array_search($value, CardType::CARD_ORDER);
                     if ($pos === false) {
@@ -74,7 +74,7 @@ class CardType extends TypeBase implements ITotallyOrderedType
         return self::$discreteStepper;
     }
 
-    public function parseValue(string $extRepr)
+    public function parseValue(string $extRepr): string
     {
         return $extRepr;
     }

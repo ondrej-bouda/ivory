@@ -29,7 +29,7 @@ class RefCursorType extends ConnectionDependentBaseType
         $this->connection = null;
     }
 
-    public function parseValue(string $extRepr)
+    public function parseValue(string $extRepr): ICursor
     {
         return new Cursor($this->connection, $extRepr);
     }

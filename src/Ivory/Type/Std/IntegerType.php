@@ -14,7 +14,7 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class IntegerType extends TypeBase implements ITotallyOrderedType
 {
-    public function parseValue(string $extRepr)
+    public function parseValue(string $extRepr): int
     {
         return (int)$extRepr;
     }

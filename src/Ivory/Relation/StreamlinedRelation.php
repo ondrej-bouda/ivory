@@ -27,7 +27,7 @@ abstract class StreamlinedRelation extends RelationBase
         return $this->cols;
     }
 
-    private function getColNameMap()
+    private function getColNameMap(): array
     {
         if ($this->colNameMap === null) {
             $this->colNameMap = self::computeColNameMap($this->source);
@@ -36,9 +36,12 @@ abstract class StreamlinedRelation extends RelationBase
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
-        return ($this->source instanceof \Iterator ? $this->source : new \IteratorIterator($this->source));
+        return ($this->source instanceof \Iterator ?
+            $this->source :
+            new \IteratorIterator($this->source)
+        );
     }
 
     public function tuple(int $offset = 0): ITuple
@@ -52,7 +55,7 @@ abstract class StreamlinedRelation extends RelationBase
         return $this->colImpl($offsetOrNameOrEvaluator, $this->getColumns(), $this->getColNameMap(), $this);
     }
 
-    public function count()
+    public function count(): int
     {
         return $this->source->count();
     }

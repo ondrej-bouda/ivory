@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class TimeTest extends TestCase
 {
-    private static function t($hour, $min, $sec)
+    private static function t($hour, $min, $sec): Time
     {
         return Time::fromPartsStrict($hour, $min, $sec);
     }

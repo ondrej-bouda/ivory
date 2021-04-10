@@ -67,7 +67,7 @@ class Composite implements IComparable, \IteratorAggregate
      * @param string $name attribute name
      * @return bool whether the attribute is defined and non-null on this value
      */
-    public function __isset($name)
+    public function __isset($name): bool
     {
         return isset($this->values[$name]);
     }
@@ -127,7 +127,7 @@ class Composite implements IComparable, \IteratorAggregate
 
     //region IteratorAggregate
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->values);
     }

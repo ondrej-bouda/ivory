@@ -158,7 +158,7 @@ class ConnConfigTransactionWatcher implements ITransactionControlObserver
         $this->handlePropertyChanges($rolledBack);
     }
 
-    private function findSavepoint(string $name)
+    private function findSavepoint(string $name): ?int
     {
         for ($idx = $this->tailIdx - 1; $idx >= 0; $idx--) {
             if ($this->bySavepoint[$idx]['name'] == $name) {

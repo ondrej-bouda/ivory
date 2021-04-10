@@ -28,7 +28,7 @@ class RelationSeekableIterator implements \SeekableIterator
         return $this->pos;
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return ($this->pos < $this->relation->count());
     }

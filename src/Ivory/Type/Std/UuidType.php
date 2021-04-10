@@ -19,7 +19,7 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class UuidType extends TypeBase implements ITotallyOrderedType
 {
-    public function parseValue(string $extRepr)
+    public function parseValue(string $extRepr): string
     {
         return $extRepr;
     }

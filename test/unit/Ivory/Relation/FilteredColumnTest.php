@@ -53,7 +53,7 @@ class FilteredColumnTest extends IvoryTestCase
                 return ($value > 4);
             }
 
-            public function getDecided()
+            public function getDecided(): array
             {
                 return $this->decided;
             }

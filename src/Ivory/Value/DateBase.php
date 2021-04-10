@@ -24,7 +24,7 @@ abstract class DateBase implements IComparable
     /**
      * @return static the special `infinity` date, taking part after any other date
      */
-    public static function infinity()
+    public static function infinity(): DateBase
     {
         static $inst = null;
         if ($inst === null) {
@@ -36,7 +36,7 @@ abstract class DateBase implements IComparable
     /**
      * @return static the special `-infinity` date, taking part before any other date
      */
-    public static function minusInfinity()
+    public static function minusInfinity(): DateBase
     {
         static $inst = null;
         if ($inst === null) {
@@ -221,7 +221,7 @@ abstract class DateBase implements IComparable
      * @param int $days
      * @return static the date/time <tt>$days</tt> days after (or before, if negative) this date/time
      */
-    public function addDay(int $days = 1)
+    public function addDay(int $days = 1): DateBase
     {
         return $this->addPartsImpl(0, 0, $days, 0, 0, 0);
     }
@@ -235,7 +235,7 @@ abstract class DateBase implements IComparable
      * @param int $months
      * @return static the date/time <tt>$months</tt> months after (or before, if negative) this date/time
      */
-    public function addMonth(int $months = 1)
+    public function addMonth(int $months = 1): DateBase
     {
         return $this->addPartsImpl(0, $months, 0, 0, 0, 0);
     }
@@ -246,14 +246,15 @@ abstract class DateBase implements IComparable
      * @param int $years
      * @return static the date/time <tt>$years</tt> years after (or before, if negative) this date/time
      */
-    public function addYear(int $years = 1)
+    public function addYear(int $years = 1): DateBase
     {
         return $this->addPartsImpl($years, 0, 0, 0, 0, 0);
     }
 
 
-    final protected function addPartsImpl(int $years, int $months, int $days, int $hours, int $minutes, $seconds)
-    {
+    final protected function addPartsImpl(
+        int $years, int $months, int $days, int $hours, int $minutes, $seconds
+    ): DateBase {
         if ($this->inf) {
             return $this;
         }

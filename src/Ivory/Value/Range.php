@@ -181,7 +181,7 @@ class Range implements IComparable
         return new static(true, null, null, null, null, $comparator, null);
     }
 
-    private static function processBoundSpec($boundsOrLowerInc = '[)', ?bool $upperInc = null)
+    private static function processBoundSpec($boundsOrLowerInc = '[)', ?bool $upperInc = null): array
     {
         if (is_string($boundsOrLowerInc)) {
             if ($upperInc !== null) {

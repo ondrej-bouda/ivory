@@ -92,12 +92,12 @@ trait ArrayMapMacros
         return array_keys($this->map);
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->map);
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return ($this->maybe($offset) !== null);
     }
@@ -121,7 +121,7 @@ trait ArrayMapMacros
 
     //region IteratorAggregate
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->map);
     }

@@ -114,7 +114,7 @@ class Column implements \IteratorAggregate, IColumn
 
     //region Countable
 
-    public function count()
+    public function count(): int
     {
         return $this->relation->count();
     }
@@ -123,7 +123,7 @@ class Column implements \IteratorAggregate, IColumn
 
     //region IteratorAggregate
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new ColumnIterator($this);
     }

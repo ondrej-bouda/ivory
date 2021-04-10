@@ -151,7 +151,7 @@ class QueryResult extends Result implements IQueryResult
 
     //region \Countable
 
-    public function count()
+    public function count(): int
     {
         return $this->numRows;
     }

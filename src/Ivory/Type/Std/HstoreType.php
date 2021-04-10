@@ -104,7 +104,7 @@ class HstoreType extends TypeBase
         return strtr($escapedAtom, ['\\"' => '"', '\\\\' => '\\']);
     }
 
-    private function parseLongValue($str)
+    private function parseLongValue($str): ?array
     {
         if ($str === null) {
             return null;

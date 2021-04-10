@@ -212,7 +212,7 @@ class ArrayRelation extends RelationBase implements IConnectionDependentObject
         return new Tuple($data, $this->colNameMap);
     }
 
-    public function count()
+    public function count(): int
     {
         return $this->numRows;
     }

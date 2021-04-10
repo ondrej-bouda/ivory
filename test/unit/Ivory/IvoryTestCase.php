@@ -6,7 +6,9 @@ use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
 use Ivory\Relation\ITuple;
 use PHPUnit\DbUnit\Database\Connection as DbUnitConnection;
+use PHPUnit\DbUnit\DataSet\IDataSet;
 use PHPUnit\DbUnit\TestCase;
+use PHPUnit\DbUnit\Tester;
 use PHPUnit\Framework\Constraint;
 
 abstract class IvoryTestCase extends TestCase
@@ -94,7 +96,7 @@ abstract class IvoryTestCase extends TestCase
     protected static function assertException($expectedTypeOrTypeMessagePair, \Closure $function, $message = '')
     {
         if (is_array($expectedTypeOrTypeMessagePair)) {
-            list($expectedType, $expectedMessage) = $expectedTypeOrTypeMessagePair;
+            [$expectedType, $expectedMessage] = $expectedTypeOrTypeMessagePair;
         } else {
             $expectedType = $expectedTypeOrTypeMessagePair;
             $expectedMessage = null;
@@ -140,8 +142,11 @@ abstract class IvoryTestCase extends TestCase
      *                             skip with <tt>E_ALL</tt> if the error type does not matter
      * @param string $message
      */
-    protected function assertErrorTriggered($expectedErrMsgRegex, $expectedErrType = E_ALL, $message = '')
-    {
+    protected function assertErrorTriggered(
+        string $expectedErrMsgRegex,
+        int $expectedErrType = E_ALL,
+        string $message = ''
+    ): void {
         if (!$this->triggeredErrors) {
             $failMsg = 'There were no (more) errors triggered';
             if (strlen($message) > 0) {
@@ -167,8 +172,12 @@ abstract class IvoryTestCase extends TestCase
         self::assertRegExp($expectedErrMsgRegex, $err['msg'], $message);
     }
 
-    protected function assertErrorsTriggered($count, $expectedErrMsgRegex, $expectedErrType = E_ALL, $message = '')
-    {
+    protected function assertErrorsTriggered(
+        int $count,
+        string $expectedErrMsgRegex,
+        int $expectedErrType = E_ALL,
+        string $message = ''
+    ): void {
         for ($i = 1; $i <= $count; $i++) {
             $this->assertErrorTriggered(
                 $expectedErrMsgRegex, $expectedErrType,
@@ -195,7 +204,7 @@ abstract class IvoryTestCase extends TestCase
         E_USER_DEPRECATED => 'E_USER_DEPRECATED',
     ];
 
-    private static function errorTypeBitmaskToString($errorTypeBitmask)
+    private static function errorTypeBitmaskToString(int $errorTypeBitmask): string
     {
         $contained = [];
         $absent = [];
@@ -224,9 +233,9 @@ abstract class IvoryTestCase extends TestCase
         }
     }
 
-    private static function errorTypeToString($errorType)
+    private static function errorTypeToString(int $errorType): string
     {
-        return (self::ERROR_TYPES[$errorType] ?? $errorType);
+        return (self::ERROR_TYPES[$errorType] ?? (string)$errorType);
     }
 
     /**
@@ -299,7 +308,7 @@ abstract class IvoryTestCase extends TestCase
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function newDatabaseTester()
+    protected function newDatabaseTester(): Tester
     {
         return new IvoryTester($this->getConnection());
     }
@@ -338,7 +347,7 @@ SQL
         );
     }
 
-    protected function getDataSet()
+    protected function getDataSet(): IDataSet
     {
         return new ArrayDataSet([
             'artist' => [

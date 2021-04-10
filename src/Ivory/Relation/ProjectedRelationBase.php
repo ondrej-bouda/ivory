@@ -127,7 +127,7 @@ abstract class ProjectedRelationBase extends StreamlinedRelation
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $cnt = $this->count();
         for ($i = 0; $i < $cnt; $i++) {

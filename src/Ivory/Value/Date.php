@@ -253,7 +253,7 @@ class Date extends DateBase implements IDiscreteStepper
      * @return int[]|null a triple of year, month, and day of this date;
      *                    <tt>null</tt> iff the date is not finite
      */
-    public function toParts()
+    public function toParts(): ?array
     {
         if ($this->inf) {
             return null;

@@ -11,7 +11,7 @@ class LtreeComparable extends Ltree implements IComparable
     use EqualableWithCompareTo;
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public static function fromArray(array $labels)
+    public static function fromArray(array $labels): Ltree // declare returning LtreeComparable on PHP >= 7.4
     {
         foreach ($labels as $label) {
             self::checkLabel($label);

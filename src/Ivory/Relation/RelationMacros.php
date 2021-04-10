@@ -231,7 +231,7 @@ trait RelationMacros
 
     //region \IteratorAggregate
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $thisRel = $this;
         assert($thisRel instanceof IRelation);

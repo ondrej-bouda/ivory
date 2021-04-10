@@ -18,7 +18,7 @@ class MapTest extends IvoryTestCase
     /** @var IRelation relation with distinct artist-album years */
     private $artistYearRel;
 
-    private function createRel($distinctFields = [])
+    private function createRel($distinctFields = []): IRelation
     {
         $conn = $this->getIvoryConnection();
 

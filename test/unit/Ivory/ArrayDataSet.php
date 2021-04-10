@@ -7,6 +7,7 @@ use PHPUnit\DbUnit\DataSet\DefaultTable;
 use PHPUnit\DbUnit\DataSet\DefaultTableIterator;
 use PHPUnit\DbUnit\DataSet\DefaultTableMetadata;
 use PHPUnit\DbUnit\DataSet\ITable;
+use PHPUnit\DbUnit\DataSet\ITableIterator;
 
 /**
  * Array-based data set for the PHPUnit Database extension.
@@ -36,13 +37,13 @@ class ArrayDataSet extends AbstractDataSet
         }
     }
 
-    protected function createIterator($reverse = false)
+    protected function createIterator($reverse = false): ITableIterator
     {
         return new DefaultTableIterator($this->tables, $reverse);
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function getTable($tableName)
+    public function getTable($tableName): ITable
     {
         if (!isset($this->tables[$tableName])) {
             throw new \InvalidArgumentException("$tableName is not a table in the current database.");

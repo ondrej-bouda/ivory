@@ -15,7 +15,7 @@ abstract class TimestampBase extends DateBase
      *                         {@link mktime()} or {@link date()}
      * @return static
      */
-    public static function fromUnixTimestamp($timestamp)
+    public static function fromUnixTimestamp($timestamp): TimestampBase
     {
         $str = gmdate('Y-m-d H:i:s', (int)$timestamp);
         $tz = self::getUTCTimeZone();
@@ -175,7 +175,7 @@ abstract class TimestampBase extends DateBase
      *                  <tt>$hours</tt> hours, <tt>$minutes</tt> minutes, and <tt>$seconds</tt> seconds after this
      *                  date/time
      */
-    public function addParts(int $years, int $months, int $days, int $hours, int $minutes, $seconds)
+    public function addParts(int $years, int $months, int $days, int $hours, int $minutes, $seconds): TimestampBase
     {
         return $this->addPartsImpl($years, $months, $days, $hours, $minutes, $seconds);
     }
@@ -186,7 +186,7 @@ abstract class TimestampBase extends DateBase
      * @param int $hours
      * @return static the date <tt>$hours</tt> hours after (or before, if negative) this date/time
      */
-    public function addHour(int $hours = 1)
+    public function addHour(int $hours = 1): TimestampBase
     {
         return $this->addPartsImpl(0, 0, 0, $hours, 0, 0);
     }
@@ -198,7 +198,7 @@ abstract class TimestampBase extends DateBase
      * @param int $minutes
      * @return static the date <tt>$minutes</tt> minutes after (or before, if negative) this date/time
      */
-    public function addMinute(int $minutes = 1)
+    public function addMinute(int $minutes = 1): TimestampBase
     {
         return $this->addPartsImpl(0, 0, 0, 0, $minutes, 0);
     }
@@ -210,7 +210,7 @@ abstract class TimestampBase extends DateBase
      * @param int|float $seconds
      * @return static the date <tt>$seconds</tt> seconds after (or before, if negative) this date/time
      */
-    public function addSecond($seconds = 1)
+    public function addSecond($seconds = 1): TimestampBase
     {
         return $this->addPartsImpl(0, 0, 0, 0, 0, $seconds);
     }

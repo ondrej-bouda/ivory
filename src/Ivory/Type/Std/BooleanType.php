@@ -14,7 +14,7 @@ use Ivory\Type\ITotallyOrderedType;
  */
 class BooleanType extends TypeBase implements ITotallyOrderedType
 {
-    public function parseValue(string $extRepr)
+    public function parseValue(string $extRepr): bool
     {
         switch (strtoupper($extRepr)) {
             case 'T':

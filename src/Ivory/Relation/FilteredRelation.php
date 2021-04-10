@@ -48,7 +48,7 @@ class FilteredRelation extends StreamlinedRelation implements ICachingDataProces
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
-    public function count()
+    public function count(): int
     {
         $this->populate();
         return count($this->acceptMap);
@@ -65,7 +65,7 @@ class FilteredRelation extends StreamlinedRelation implements ICachingDataProces
         }
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $src = parent::getIterator();
         if (!$src instanceof \Iterator && $src instanceof \Traversable) {

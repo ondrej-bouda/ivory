@@ -14,7 +14,7 @@ class TupleFilterIterator extends \FilterIterator
         $this->decider = $decider;
     }
 
-    public function accept()
+    public function accept(): bool
     {
         return $this->decider->accept($this->current());
     }
@@ -25,13 +25,13 @@ class TupleFilterIterator extends \FilterIterator
         return $this->k;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         parent::rewind();
         $this->k = 0;
     }
 
-    public function next()
+    public function next(): void
     {
         parent::next();
         $this->k++;

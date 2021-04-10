@@ -38,7 +38,7 @@ class TxConfig
     private $deferrable = null;
 
 
-    public static function create($transactionOptions)
+    public static function create($transactionOptions): TxConfig
     {
         if ($transactionOptions instanceof TxConfig) {
             return $transactionOptions;
@@ -121,7 +121,7 @@ class TxConfig
      *                                   the isolation level
      * @return $this
      */
-    public function setIsolationLevel(?int $isolationLevel)
+    public function setIsolationLevel(?int $isolationLevel): TxConfig
     {
         static $levels = [
             null,

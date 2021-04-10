@@ -6,7 +6,7 @@ class Ltree
 {
     private $labels;
 
-    public static function fromArray(array $labels)
+    public static function fromArray(array $labels): Ltree
     {
         foreach ($labels as $label) {
             self::checkLabel($label);

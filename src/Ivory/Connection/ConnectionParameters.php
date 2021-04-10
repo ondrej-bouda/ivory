@@ -230,13 +230,13 @@ class ConnectionParameters implements \ArrayAccess, \IteratorAggregate
     }
 
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->params);
     }
 
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->params);
     }

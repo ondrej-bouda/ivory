@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class DateTest extends TestCase
 {
-    private static function d($year, $month, $day)
+    private static function d($year, $month, $day): Date
     {
         return Date::fromPartsStrict($year, $month, $day);
     }

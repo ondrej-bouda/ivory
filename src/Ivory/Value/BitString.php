@@ -367,7 +367,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      * @return bool <tt>true</tt> if the bit string has <tt>$offset</tt>-th bit defined,
      *              <tt>false</tt> if the bit string is too short (i.e., shorter than <tt>$offset+1</tt> bits)
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         if ($offset < 0 && PHP_VERSION_ID < 70100) { // PHP < 7.1 did not support negative string offsets
             $offset = $this->len + $offset;
@@ -381,7 +381,7 @@ abstract class BitString implements IComparable, \ArrayAccess
      * @return int|null 0 or 1 depending on whether the <tt>$offset</tt>-th bit is set, or
      *                  <tt>null</tt> if outside of the bit string
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): ?int
     {
         if ($offset < 0 && PHP_VERSION_ID < 70100) { // PHP < 7.1 did not support negative string offsets
             $offset = $this->len + $offset;

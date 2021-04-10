@@ -106,7 +106,7 @@ class FilteredColumn implements \IteratorAggregate, IColumn, ICachingDataProcess
 
     //region \Countable
 
-    public function count()
+    public function count(): int
     {
         $this->populate();
         return count($this->data);
@@ -116,7 +116,7 @@ class FilteredColumn implements \IteratorAggregate, IColumn, ICachingDataProcess
 
     //region \IteratorAggregate
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $this->populate();
         return new \ArrayIterator($this->data);

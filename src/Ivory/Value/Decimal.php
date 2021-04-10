@@ -683,7 +683,7 @@ class Decimal implements IComparable
      * @return \GMP a {@link \GMP} object representing the same integer as this number
      * @throws UndefinedOperationException if this number is not an integer, i.e., has some non-zero fractional digits
      */
-    public function toGMP()
+    public function toGMP(): \GMP
     {
         if (!System::hasGMP()) {
             throw new \RuntimeException('The PHP gmp extension is not available');

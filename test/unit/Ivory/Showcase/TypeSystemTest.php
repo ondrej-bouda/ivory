@@ -178,7 +178,7 @@ SQL
         // will help...
         $customTimeType = new class('pg_catalog', 'time') extends TypeBase
         {
-            public function parseValue(string $extRepr)
+            public function parseValue(string $extRepr): \DateTime
             {
                 $dt = \DateTime::createFromFormat('H:i:s.u', $extRepr);
                 if ($dt === false) {

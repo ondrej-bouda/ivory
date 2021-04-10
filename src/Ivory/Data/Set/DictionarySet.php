@@ -66,7 +66,7 @@ class DictionarySet implements ISet
 
     //region \Countable
 
-    public function count()
+    public function count(): int
     {
         return count($this->data);
     }

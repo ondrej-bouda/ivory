@@ -17,27 +17,27 @@ class ColumnIterator implements \SeekableIterator
         return $this->column->value($this->pos);
     }
 
-    public function next()
+    public function next(): void
     {
         $this->pos++;
     }
 
-    public function key()
+    public function key(): int
     {
         return $this->pos;
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return ($this->pos < $this->column->count());
     }
 
-    public function rewind()
+    public function rewind(): void
     {
-        return $this->pos = 0;
+        $this->pos = 0;
     }
 
-    public function seek($offset)
+    public function seek($offset): void
     {
         $this->pos = $offset;
     }

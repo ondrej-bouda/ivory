@@ -332,7 +332,7 @@ class ConnConfigTestObserver implements IConfigObserver
     /**
      * @return array list of events received since the previous call to this method
      */
-    public function fetchObserved()
+    public function fetchObserved(): array
     {
         $o = $this->observed;
         $this->observed = [];

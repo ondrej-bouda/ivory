@@ -71,7 +71,7 @@ class CompositeTypeTest extends TestCase
         );
     }
 
-    private function intText($a, $b)
+    private function intText($a, $b): Composite
     {
         return Composite::fromMap(['a' => $a, 'b' => $b]);
     }

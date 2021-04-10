@@ -12,6 +12,7 @@ use Ivory\Type\TypeBase;
  */
 class VoidType extends TypeBase
 {
+    /** @noinspection PhpMissingReturnTypeInspection no need to expose as the interface constract */
     public static function void()
     {
         static $inst = null;
@@ -21,6 +22,7 @@ class VoidType extends TypeBase
         return $inst;
     }
 
+    /** @noinspection PhpMissingReturnTypeInspection no need to expose as the interface constract */
     public function parseValue(string $extRepr)
     {
         return self::void();
