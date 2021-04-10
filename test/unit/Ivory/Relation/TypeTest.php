@@ -309,7 +309,7 @@ class TypeTest extends IvoryTestCase
             ];
             foreach ($dateStyles as $dateStyle) {
                 $this->conn->getConfig()->setForTransaction(ConfigParam::DATE_STYLE, $dateStyle);
-                foreach ($timeZones as $tz => list($tzStdSpec, $tzSmrSpec, $lmtOffset)) {
+                foreach ($timeZones as $tz => [$tzStdSpec, $tzSmrSpec, $lmtOffset]) {
                     $tzStd = ($dateStyle == 'ISO' ? $tzStdSpec[0] : $tzStdSpec[1]);
                     $tzSmr = ($dateStyle == 'ISO' ? $tzSmrSpec[0] : $tzSmrSpec[1]);
                     $msg = "$dateStyle; $tz";

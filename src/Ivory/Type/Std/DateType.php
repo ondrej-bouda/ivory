@@ -123,27 +123,27 @@ class DateType extends ConnectionDependentBaseType implements ITotallyOrderedTyp
                 if ($bcPos === false) {
                     return Date::fromISOString($extRepr); // optimization of the major case
                 }
-                list($y, $m, $d) = explode('-', $datePart);
+                [$y, $m, $d] = explode('-', $datePart);
                 break;
 
             case self::MODE_GERMAN: // e.g., 17.12.1997
-                list($d, $m, $y) = explode('.', $datePart);
+                [$d, $m, $y] = explode('.', $datePart);
                 break;
 
             case self::MODE_SQL_DMY: // e.g., 17/12/1997
-                list($d, $m, $y) = explode('/', $datePart);
+                [$d, $m, $y] = explode('/', $datePart);
                 break;
 
             case self::MODE_SQL_MDY: // e.g., 12/17/1997
-                list($m, $d, $y) = explode('/', $datePart);
+                [$m, $d, $y] = explode('/', $datePart);
                 break;
 
             case self::MODE_PG_DMY: // e.g., 17-12-1997
-                list($d, $m, $y) = explode('-', $datePart);
+                [$d, $m, $y] = explode('-', $datePart);
                 break;
 
             case self::MODE_PG_MDY: // e.g., 12-17-1997
-                list($m, $d, $y) = explode('-', $datePart);
+                [$m, $d, $y] = explode('-', $datePart);
                 break;
 
             default:

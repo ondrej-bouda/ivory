@@ -21,7 +21,7 @@ class LaravelPerformanceTest implements IPerformanceTest
             'dbname' => 'database',
         ];
         foreach (explode(' ', $connString) as $pair) {
-            list($k, $v) = explode('=', $pair);
+            [$k, $v] = explode('=', $pair);
             $config[$trans[$k]] = $v;
         }
 

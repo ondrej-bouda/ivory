@@ -40,7 +40,7 @@ class Timestamp extends TimestampBase
             }
             return new Timestamp(0, $datetime);
         } else {
-            list($micro, $sec) = explode(' ', microtime());
+            [$micro, $sec] = explode(' ', microtime());
             $microFrac = substr($micro, 1); // cut off the whole part (always a zero)
             $inputStr = gmdate('Y-m-d\TH:i:s', $sec) . $microFrac . 'UTC';
             try {

@@ -38,7 +38,7 @@ abstract class RowTypeBase extends TypeBase implements ITotallyOrderedType
 
         $atts = [];
         $pos = 0;
-        foreach ($matches[0] as list($att, $attOffset)) {
+        foreach ($matches[0] as [$att, $attOffset]) {
             for (; $strOffset < $attOffset; $strOffset++) {
                 if ($extRepr[$strOffset] == ',') {
                     $atts[] = null;

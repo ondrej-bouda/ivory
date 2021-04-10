@@ -35,7 +35,7 @@ class TimestampTz extends TimestampBase
                 throw new \LogicException('Date/time error', 0, $e);
             }
         } else {
-            list($micro, $sec) = explode(' ', microtime());
+            [$micro, $sec] = explode(' ', microtime());
             $microFrac = substr($micro, 1); // cut off the whole part (always a zero)
             $inputStr = date('Y-m-d\TH:i:s', $sec) . $microFrac;
             try {

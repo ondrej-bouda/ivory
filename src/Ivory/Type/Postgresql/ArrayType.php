@@ -159,7 +159,7 @@ class ArrayType extends TypeBase implements ITotallyOrderedType
         // map: dimension => reference to the array to add the next element to at the dimension
         $refs = [$dim => &$result];
 
-        foreach ($matches[0] as list($elem, $elemOffset)) {
+        foreach ($matches[0] as [$elem, $elemOffset]) {
             for (; $strOffset < $elemOffset; $strOffset++) {
                 $c = $extRepr[$strOffset];
                 if (ctype_space($c)) {

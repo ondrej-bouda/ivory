@@ -86,7 +86,7 @@ class Decimal implements IComparable
             if ($ePos > 0) {
                 $exp = (int)substr($val, $ePos + 1);
                 $decs = substr($val, 0, $ePos);
-                list($wp, $dp) = explode('.', $decs, 2);
+                [$wp, $dp] = explode('.', $decs, 2);
 
                 if ($exp >= 0) {
                     $dpLen = strlen($dp);

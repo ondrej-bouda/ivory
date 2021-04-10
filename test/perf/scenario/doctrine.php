@@ -15,7 +15,7 @@ class DoctrinePerformanceTest implements IPerformanceTest
         $config = new Configuration();
         $params = ['driver' => 'pdo_pgsql'];
         foreach (explode(' ', $connString) as $pair) {
-            list($k, $v) = explode('=', $pair);
+            [$k, $v] = explode('=', $pair);
             $params[$k] = $v;
         }
         $this->conn = DriverManager::getConnection($params, $config);

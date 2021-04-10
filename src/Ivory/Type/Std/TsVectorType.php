@@ -54,7 +54,7 @@ class TsVectorType extends TypeBase
             $tok = preg_replace('~.*[\s\':].*~', "'\\0'", strtr($lex, ["'" => "''"]));
             if ($positions) {
                 $tokPos = [];
-                foreach ($positions as list($pos, $weight)) {
+                foreach ($positions as [$pos, $weight]) {
                     $tp = $pos;
                     if ($weight != self::DEFAULT_WEIGHT) {
                         $tp .= $weight;

@@ -15,7 +15,7 @@ class PgDatabaseWideRefType extends PgObjectRefTypeBase
 {
     public function parseValue(string $extRepr)
     {
-        list($nspName, $objectName) = $this->parseObjectRef($extRepr);
+        [$nspName, $objectName] = $this->parseObjectRef($extRepr);
         if ($nspName === null) {
             return $objectName;
         } else {

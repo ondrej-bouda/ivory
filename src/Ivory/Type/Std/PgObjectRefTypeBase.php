@@ -84,7 +84,7 @@ abstract class PgObjectRefTypeBase extends TypeBase
         }
         if ($signatureStr[$offset] != ')') {
             while (true) {
-                list($argTypeSchema, $argTypeName) = $this->parseObjectRefSubstr($signatureStr, $offset);
+                [$argTypeSchema, $argTypeName] = $this->parseObjectRefSubstr($signatureStr, $offset);
                 $result[] = PgTypeRef::fromQualifiedName($argTypeSchema, $argTypeName);
                 if (($signatureStr[$offset] ?? '') == ')') {
                     break;

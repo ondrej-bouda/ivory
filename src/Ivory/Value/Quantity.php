@@ -178,8 +178,8 @@ class Quantity implements IEqualable
                 return false;
             }
 
-            list($thisBase, $thisMult) = self::CONVERSION[$this->unit];
-            list($otherBase, $otherMult) = self::CONVERSION[$other->unit];
+            [$thisBase, $thisMult] = self::CONVERSION[$this->unit];
+            [$otherBase, $otherMult] = self::CONVERSION[$other->unit];
             if ($thisBase != $otherBase) {
                 return false;
             }
@@ -215,8 +215,8 @@ class Quantity implements IEqualable
             throw new UnsupportedException("Conversion to an unsupported unit '$destUnit'");
         }
 
-        list($thisBase, $thisMult) = self::CONVERSION[$this->unit];
-        list($destBase, $destMult) = self::CONVERSION[$destUnit];
+        [$thisBase, $thisMult] = self::CONVERSION[$this->unit];
+        [$destBase, $destMult] = self::CONVERSION[$destUnit];
         if ($thisBase != $destBase) {
             throw new UndefinedOperationException("Conversion from '$this->unit' to '$destUnit' is not defined.");
         }

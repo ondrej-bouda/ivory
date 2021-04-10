@@ -100,7 +100,7 @@ class RelationSerializer extends ConnectionDependentValueSerializer
     private function serializeEmptyRelation(array $columns): string
     {
         $result = 'SELECT';
-        foreach ($columns as $i => list($colName, $serializer)) {
+        foreach ($columns as $i => [$colName, $serializer]) {
             $result .= ($i == 0 ? ' ' : ', ') . 'NULL';
             if ($serializer instanceof IType) {
                 $result .= "::{$serializer->getSchemaName()}.{$serializer->getName()}";
@@ -141,7 +141,7 @@ class RelationSerializer extends ConnectionDependentValueSerializer
         $result .=
             "\n" .
             ") t (";
-        foreach ($columns as $i => list($name, $serializer)) {
+        foreach ($columns as $i => [$name, $serializer]) {
             if ($i > 0) {
                 $result .= ', ';
             }
