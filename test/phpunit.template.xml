@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!-- Create a phpunit.xml based on this template. -->
 <phpunit>
 	<php>
+		<!-- Ensure the database cluster, on which you will be running tests, has max_prepared_transactions = 1 or
+		     higher configured in postgresql.conf.
+		 -->
 		<var name="DB_HOST" value="localhost"/>
 		<var name="DB_PORT" value=""/>
-		<var name="DB_USER" value="user"/>
+		<!-- Create a test PG user using, e.g.,
+		     CREATE USER "ivory-tester" WITH SUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION PASSWORD 'xxxxxx'
+		 -->
+		<var name="DB_USER" value="ivory-tester"/>
 		<var name="DB_PASSWD" value="passwd"/>
-		<var name="DB_DBNAME" value="mydb"/>
+		<!-- Create an empty PG database for testing using, e.g.,
+		     CREATE DATABASE "ivory-test" WITH OWNER = "ivory-tester" ENCODING = 'UTF8'
+         -->
+		<var name="DB_DBNAME" value="ivory-test"/>
 	</php>
 </phpunit>
