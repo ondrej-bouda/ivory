@@ -318,6 +318,7 @@ class DecimalTest extends TestCase
             Decimal::fromNumber(1)->divide(0);
             self::fail('\RuntimeException expected');
         } catch (\RuntimeException $e) {
+        } catch (\DivisionByZeroError $e) {
         }
 
         self::assertTrue(Decimal::fromNumber(7.4)->divide(Decimal::createNaN())->isNaN());

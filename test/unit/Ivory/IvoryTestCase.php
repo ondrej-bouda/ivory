@@ -52,17 +52,16 @@ abstract class IvoryTestCase extends TestCase
     protected function errorNonInterruptMode($errorTypes = E_ALL)
     {
         $origHandler = set_error_handler(
-            function ($errNo, $errStr, $errFile, $errLine, $errContext) use ($errorTypes) {
+            function ($errNo, $errStr, $errFile, $errLine) use ($errorTypes) {
                 if ($errNo & $errorTypes) {
                     $this->triggeredErrors[] = [
                         'type' => $errNo,
                         'msg' => $errStr,
                         'file' => $errFile,
                         'line' => $errLine,
-                        'context' => $errContext,
                     ];
                 } else {
-                    call_user_func($this->origErrHandler, $errNo, $errStr, $errFile, $errLine, $errContext);
+                    call_user_func($this->origErrHandler, $errNo, $errStr, $errFile, $errLine);
                 }
             },
             E_ALL
