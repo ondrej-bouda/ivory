@@ -126,7 +126,6 @@ class TupleTest extends TestCase
 
 
         try {
-            /** @noinspection PhpUndefinedFieldInspection */
             $this->simpleTuple->a = 'x';
             self::fail(ImmutableException::class . ' was expected');
         } catch (ImmutableException $e) {

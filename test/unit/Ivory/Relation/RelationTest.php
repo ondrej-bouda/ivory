@@ -143,7 +143,7 @@ class RelationTest extends IvoryTestCase
             "SELECT 1 AS a, 'foo' AS b, 3 AS c, 4 AS d"
         );
         $cols = $rel->getColumns();
-        self::assertEquals(4, count($cols));
+        self::assertCount(4, $cols);
         self::assertSame(['a', 'b', 'c', 'd'], array_map(function (IColumn $c) { return $c->getName(); }, $cols));
         self::assertSame([[1], ['foo'], [3], [4]], array_map(function (IColumn $c) { return $c->toArray(); }, $cols));
     }
@@ -187,8 +187,8 @@ class RelationTest extends IvoryTestCase
             array_map(function (IColumn $c) { return $c->getName(); }, $ext2->getColumns())
         );
 
-        self::assertEquals(5, $ext->tuple(0)->dist, '', 1e-9);
-        self::assertEquals(8.993886812719, $ext2->tuple(1)->dist, '', 1e-9);
+        self::assertEqualsWithDelta(5, $ext->tuple(0)->dist, 1e-9);
+        self::assertEqualsWithDelta(8.993886812719, $ext2->tuple(1)->dist, 1e-9);
 
         self::assertEquals(Point::fromCoords(0, 4), $ext2->tuple(0)->upleft);
         self::assertEquals(Point::fromCoords(1.3, 4), $ext2->tuple(1)->upleft);

@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpInappropriateInheritDocUsageInspection PhpStorm bug WI-54015 */
 declare(strict_types=1);
 namespace Ivory\Data\Set;
 
@@ -6,7 +7,9 @@ use Ivory\Value\Alg\CallbackValueHasher;
 use Ivory\Value\Alg\IValueHasher;
 
 /**
- * {@inheritdoc}
+ * An array-based set of values, using a custom hashing function.
+ *
+ * {@inheritDoc}
  *
  * This implementation employs a custom function converting the input values to dictionary keys.
  */

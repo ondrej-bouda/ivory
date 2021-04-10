@@ -52,9 +52,10 @@ class TransactionControlTest extends IvoryTestCase
             unset($tx);
             self::fail('A warning was expected due to destroying an open transaction handle.');
         } catch (Warning $warning) {
-            self::assertContains(
-                'open', $warning->getMessage(),
-                'The warning message should mention the transaction handle stayed open', true
+            self::assertStringContainsStringIgnoringCase(
+                'open',
+                $warning->getMessage(),
+                'The warning message should mention the transaction handle stayed open'
             );
         }
     }
@@ -133,6 +134,41 @@ class TransactionControlTest extends IvoryTestCase
             }
             $conn1->disconnect();
         }
+    }
+
+    public function testAutoTransaction()
+    {
+        $observer = new class() extends TransactionControlObserverBase
+        {
+            public $rollbackCalled = 0;
+
+            /** @noinspection PhpMissingParentCallCommonInspection */
+            public function handleTransactionRollback(): void
+            {
+                $this->rollbackCalled++;
+            }
+        };
+        $this->conn->addTransactionControlObserver($observer);
+
+        $f = function () {
+            $tx = $this->conn->startAutoTransaction();
+            self::assertTrue($this->conn->inTransaction());
+            $tx->commit();
+            self::assertFalse($this->conn->inTransaction());
+        };
+        $f();
+        self::assertFalse($this->conn->inTransaction());
+        self::assertEquals(0, $observer->rollbackCalled);
+
+        $f = function () {
+            $tx = $this->conn->startAutoTransaction();
+            self::assertTrue($this->conn->inTransaction());
+            unset($tx);
+            self::assertFalse($this->conn->inTransaction());
+        };
+        $f();
+        self::assertFalse($this->conn->inTransaction());
+        self::assertEquals(1, $observer->rollbackCalled);
     }
 
     public function testPrepareTransaction()

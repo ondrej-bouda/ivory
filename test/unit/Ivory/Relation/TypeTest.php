@@ -156,7 +156,7 @@ class TypeTest extends IvoryTestCase
             assert($box instanceof Box);
             $areaSum += $box->getArea();
         }
-        self::assertEquals(112, $areaSum, '', 1e-9);
+        self::assertEqualsWithDelta(112, $areaSum, 1e-9);
     }
 
     public function testDate()
@@ -572,7 +572,7 @@ class TypeTest extends IvoryTestCase
             );
         } catch (UndefinedTypeException $e) {
             self::assertStringContainsStringIgnoringCase('did you mean', $e->getMessage());
-            self::assertContains('%{ident}.pg_class', $e->getMessage());
+            self::assertStringContainsString('%{ident}.pg_class', $e->getMessage());
         }
 
         $res = $this->conn->querySingleValue('SELECT 1 FROM %{ident}.pg_class LIMIT 1', 'pg_catalog');

@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpInappropriateInheritDocUsageInspection PhpStorm bug WI-54015 */
 declare(strict_types=1);
 namespace Ivory\Connection\Config;
 
@@ -11,7 +12,7 @@ use Ivory\Value\Quantity;
 /**
  * The standard implementation of runtime database configuration manager.
  *
- * {@inheritdoc}
+ * {@inheritDoc}
  *
  * Besides the interface-specified methods, this implementation exposes the database configuration parameters as dynamic
  * ("overloaded") properties. The value currently in effect is always returned. For accessing properties with non-word

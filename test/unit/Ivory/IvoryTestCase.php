@@ -307,7 +307,7 @@ abstract class IvoryTestCase extends TestCase
 
     private function initDbSchema()
     {
-        $this->phpUnitConn->getConnection()->exec(<<<SQL
+        $this->phpUnitConn->getConnection()->exec(<<<'SQL'
 DROP TABLE IF EXISTS artist, album, album_artist, album_track;
 
 CREATE TABLE artist (

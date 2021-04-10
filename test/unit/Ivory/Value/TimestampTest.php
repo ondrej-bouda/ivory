@@ -80,6 +80,6 @@ class TimestampTest extends TestCase
 
         $partsWithFracSec = Timestamp::fromISOString('2016-03-01T14:30:16.0123')->toParts();
         self::assertSame([2016, 3, 1, 14, 30], array_slice($partsWithFracSec, 0, 5));
-        self::assertEquals(16.0123, $partsWithFracSec[5], '', 1e-9);
+        self::assertEqualsWithDelta(16.0123, $partsWithFracSec[5], 1e-9);
     }
 }

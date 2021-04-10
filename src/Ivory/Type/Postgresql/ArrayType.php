@@ -99,7 +99,7 @@ class ArrayType extends TypeBase implements ITotallyOrderedType
             $decorSepPos = strpos($extRepr, '=');
             $decoration = substr($extRepr, 0, $decorSepPos);
 
-            preg_match_all('~\[(\d+):\d+\]~', $decoration, $m);
+            preg_match_all('~\[(\d+):\d+]~', $decoration, $m);
             if ($decorSepPos === false || !$m) {
                 $this->throwParseException($extRepr, 'Invalid array bounds decoration');
             }
@@ -152,11 +152,11 @@ class ArrayType extends TypeBase implements ITotallyOrderedType
         }
 
         $strOffset++;
-        /** @var int $dim the current dimension of the input being processed */
+        // the current dimension of the input being processed
         $dim = 0;
-        /** @var array $keys map: dimension => key under which to add the next element in the dimension */
+        // map: dimension => key under which to add the next element in the dimension
         $keys = [$dim => $lowerBounds[$dim]];
-        /** @var array $refs map: dimension => reference to the array to add the next element to at the dimension */
+        // map: dimension => reference to the array to add the next element to at the dimension
         $refs = [$dim => &$result];
 
         foreach ($matches[0] as list($elem, $elemOffset)) {
@@ -202,7 +202,9 @@ class ArrayType extends TypeBase implements ITotallyOrderedType
     }
 
     /**
-     * {@inheritdoc}
+     * Serializes an array to the corresponding SQL literal.
+     *
+     * {@inheritDoc}
      *
      * Note that, in the strict mode, the `ARRAY[1,2,3]` syntax cannot be used as it does not allow for specifying
      * custom array bounds. Instead, the string representation (e.g., `'{1,2,3}'`) is employed.

@@ -23,7 +23,7 @@ class ArrayRelationTest extends IvoryTestCase
         );
         self::assertSame(5, $tuple->num);
         self::assertSame('g', $tuple->letter);
-        self::assertEquals(2.81, $tuple->decim, '', 1e-12);
+        self::assertEqualsWithDelta(2.81, $tuple->decim, 1e-12);
         self::assertSame(true, $tuple->flag);
         self::assertSame('text', $tuple->txt);
     }

@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpInappropriateInheritDocUsageInspection PhpStorm bug WI-54015 */
 declare(strict_types=1);
 namespace Ivory\Relation;
 
@@ -7,6 +8,8 @@ use Ivory\Exception\ClosedCursorException;
 use Ivory\Query\SqlRelationDefinition;
 
 /**
+ * Handle for controlling a cursor.
+ *
  * {@inheritDoc}
  *
  * Note the implementation checks its local _closed_ flag not only to save queries to the database, but also to prevent
@@ -37,7 +40,7 @@ class Cursor implements ICursor
     }
 
     /**
-     * {@inheritDoc}
+     * Returns characteristics of the cursor.
      *
      * Note that finding out for the first time might invoke a database query. (For next time, it is cached.)
      */
@@ -145,7 +148,7 @@ class Cursor implements ICursor
     }
 
     /**
-     * {@inheritDoc}
+     * Tells whether the cursor is already closed.
      *
      * Note that until the cursor is known to be closed, calling this method will invoke a database query.
      */
@@ -174,9 +177,11 @@ class Cursor implements ICursor
     }
 
     /**
+     * Retrieves an iterator to traverse rows of this cursor.
+     *
      * {@inheritDoc}
      *
-     * In the buffered mode, the implementation fetches the first batch of `$bufferSize` rows immediately, and while
+     * In the buffered mode, this implementation fetches the first batch of `$bufferSize` rows immediately, and while
      * iterating through the rows, it fetches another batch of rows in the background.
      */
     public function getIterator(int $bufferSize = 0): \Traversable

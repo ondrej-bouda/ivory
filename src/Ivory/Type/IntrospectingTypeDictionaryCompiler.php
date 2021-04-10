@@ -18,9 +18,42 @@ class IntrospectingTypeDictionaryCompiler extends TypeDictionaryCompilerBase
 
     protected function yieldTypes(ITypeProvider $typeProvider, ITypeDictionary $dict): \Generator
     {
-        $enumLabels = $this->retrieveEnumLabels();
+        $compositeAttrMap = [];
+        foreach ($this->queryTypes() as $row) {
+            $schemaName = $row['nspname'];
+            $typeName = $row['typname'];
 
-        $query = <<<SQL
+            if ($row['composite_attributes']) {
+                $attrs = json_decode($row['composite_attributes']);
+                if (is_array($attrs)) {
+                    $compositeAttrMap[$row['oid']] = $attrs;
+                } else {
+                    $err = (json_last_error_msg() ?: '?');
+                    throw new \RuntimeException(
+                        "Error decoding attributes of composite type `$schemaName`.`$typeName`: $err"
+                    );
+                }
+            }
+
+            /* OPT: This leads to a great flexibility - any type may be registered explicitly, bypassing the generic
+             *      type constructors offered by Ivory. It may as well lead to a performance penalty, though.
+             */
+            $providedType = $typeProvider->provideType($schemaName, $typeName);
+            if ($providedType !== null) {
+                $type = clone $providedType; // clone: do not touch the original object - it might be reused by others
+            } else {
+                $type = $this->createTypeFromRow($row, $typeProvider, $dict);
+            }
+
+            yield (int)$row['oid'] => $type;
+        }
+
+        $this->addCompositeAttributes($dict, $compositeAttrMap);
+    }
+
+    private function queryTypes(): \Generator
+    {
+        $query = <<<'SQL'
 WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypdelim) AS (
     SELECT
         t.oid,
@@ -31,7 +64,28 @@ WITH RECURSIVE typeinfo (oid, nspname, typname, typtype, parenttype, arrelemtypd
               WHEN t.typtype = 'd' THEN t.typbasetype
               WHEN t.typtype = 'r' THEN rngsubtype
          END),
-        arrelemtype.typdelim
+        arrelemtype.typdelim,
+        (
+            CASE WHEN t.typtype = 'e' THEN
+                (
+                    SELECT to_json(array_agg(enumlabel ORDER BY enumsortorder))
+                    FROM pg_catalog.pg_enum
+                    WHERE enumtypid = t.oid
+                )
+            END
+        ) AS enum_labels,
+        (
+            CASE WHEN t.typtype = 'c' THEN
+                (
+                    SELECT json_agg(ARRAY[attname::TEXT, atttypid::TEXT] ORDER BY attnum)
+                    FROM pg_catalog.pg_attribute
+                    WHERE
+                        attrelid = t.typrelid AND
+                        attnum > 0 AND
+                        NOT attisdropped
+                )
+            END
+        ) AS composite_attributes
     FROM
         pg_catalog.pg_type t
         JOIN pg_catalog.pg_namespace nsp ON nsp.oid = t.typnamespace
@@ -42,12 +96,14 @@ typetree (oid, depth) AS (
     SELECT oid, 0 FROM typeinfo WHERE parenttype IS NULL
     UNION ALL
     SELECT ti.oid, tt.depth + 1
-    FROM typeinfo ti
-         JOIN typetree tt ON tt.oid = ti.parenttype
+    FROM
+        typeinfo ti
+        JOIN typetree tt ON tt.oid = ti.parenttype
 )
 SELECT ti.*
-FROM typeinfo ti
-     JOIN typetree tt USING (oid)
+FROM
+    typeinfo ti
+    JOIN typetree tt USING (oid)
 ORDER BY tt.depth
 SQL;
         /* NOTE: The query sorts the types so that, when processing them one by one, there are no forward references.
@@ -79,118 +135,79 @@ SQL;
                  ii) Types in the level N+1 only have dependencies on types in the level N, which have already been
                      processed, and thus all the (N+1)-level types may be processed, in any order.
          */
-        $errorDesc = 'Error fetching types';
-        foreach ($this->query($query, $errorDesc) as $row) {
-            $schemaName = $row['nspname'];
-            $typeName = $row['typname'];
 
-            /* OPT: This leads to a great flexibility - any type may be registered explicitly, bypassing the generic
-             *      type constructors offered by Ivory. It may as well lead to a performance penalty, though.
-             */
-            $providedType = $typeProvider->provideType($schemaName, $typeName);
-            if ($providedType !== null) {
-                $type = clone $providedType; // clone: do not touch the original object - it might be reused by others
-            } else {
-                switch ($row['typtype']) {
-                    case 'A':
-                        $elemType = $dict->requireTypeByOid((int)$row['parenttype']);
-                        assert($elemType instanceof IType,
-                            new InternalException('Only named types are supposed to be used as array element types.')
-                        );
-                        $type = $this->createArrayType($elemType, $row['arrelemtypdelim']);
-                        // NOTE: typdelim of the array type itself seems irrelevant
-                        break;
-
-                    case 'b':
-                    case 'p': // treating pseudo-types as base types - they must be recognized by Ivory
-                        $type = $this->createBaseType($schemaName, $typeName, $typeProvider);
-                        // OPT: types not recognized by the type provider are queried twice
-                        break;
-
-                    case 'c':
-                        $type = $this->createCompositeType($schemaName, $typeName); // attributes added later
-                        break;
-
-                    case 'd':
-                        $baseType = $dict->requireTypeByOid((int)$row['parenttype']);
-                        assert($baseType instanceof IType,
-                            new InternalException('Only named types are supposed to be used as domain base types.')
-                        );
-                        $type = $this->createDomainType($schemaName, $typeName, $baseType);
-                        break;
-
-                    case 'e':
-                        $labels = ($enumLabels[$row['oid']] ?? []);
-                        $type = $this->createEnumType($schemaName, $typeName, $labels);
-                        break;
-
-                    case 'r':
-                        $subtype = $dict->requireTypeByOid((int)$row['parenttype']);
-                        if ($subtype instanceof ITotallyOrderedType) {
-                            $type = $this->createRangeType($schemaName, $typeName, $subtype);
-                        } elseif ($subtype instanceof UndefinedType) {
-                            $type = new UndefinedType($schemaName, $typeName);
-                        } else {
-                            $type = new UnorderedRangeType($schemaName, $typeName);
-                        }
-                        break;
-
-                    default:
-                        throw new \RuntimeException("Error fetching types: unexpected typtype '$row[typtype]'");
-                }
-            }
-
-            yield (int)$row['oid'] => $type;
-        }
-
-        $this->fetchCompositeAttributes($dict);
-    }
-
-    private function retrieveEnumLabels(): array
-    {
-        $query = <<<'SQL'
-SELECT enumtypid, enumlabel
-FROM pg_catalog.pg_enum
-ORDER BY enumtypid, enumsortorder
-SQL;
-        $errorDesc = 'Error fetching enum labels';
-        $labels = [];
-        foreach ($this->query($query, $errorDesc) as $row) {
-            $oid = $row['enumtypid'];
-            if (!isset($labels[$oid])) {
-                $labels[$oid] = [];
-            }
-            $labels[$oid][] = $row['enumlabel'];
-        }
-        return $labels;
-    }
-
-    private function fetchCompositeAttributes(ITypeDictionary $dict): void
-    {
-        $query = <<<'SQL'
-SELECT pg_type.oid, attname, atttypid
-FROM pg_catalog.pg_attribute
-     JOIN pg_catalog.pg_type ON typrelid = attrelid
-WHERE attnum > 0 AND NOT attisdropped
-ORDER BY attrelid, attnum
-SQL;
-        $errorDesc = 'Error fetching composite type attributes';
-        foreach ($this->query($query, $errorDesc) as $row) {
-            $compType = $dict->requireTypeByOid((int)$row['oid']);
-            assert($compType instanceof CompositeType);
-            $attType = $dict->requireTypeByOid((int)$row['atttypid']);
-            $compType->addAttribute($row['attname'], $attType);
-        }
-    }
-
-    private function query(string $query, string $errorDesc): \Generator
-    {
         $result = pg_query($this->connHandler, $query);
         if (!is_resource($result)) {
-            throw new \RuntimeException("$errorDesc: " . pg_last_error($this->connHandler));
+            throw new \RuntimeException("Error fetching types: " . pg_last_error($this->connHandler));
         }
         while (($row = pg_fetch_assoc($result)) !== false) {
             yield $row;
+        }
+    }
+
+    private function createTypeFromRow(array $row, ITypeProvider $typeProvider, ITypeDictionary $dict): IType
+    {
+        $schemaName = $row['nspname'];
+        $typeName = $row['typname'];
+
+        switch ($row['typtype']) {
+            case 'A':
+                $elemType = $dict->requireTypeByOid((int)$row['parenttype']);
+                assert($elemType instanceof IType,
+                    new InternalException('Only named types are supposed to be used as array element types.')
+                );
+                return $this->createArrayType($elemType, $row['arrelemtypdelim']);
+                // NOTE: typdelim of the array type itself seems irrelevant
+
+            case 'b':
+            case 'p': // treating pseudo-types as base types - they must be recognized by Ivory
+                return $this->createBaseType($schemaName, $typeName, $typeProvider);
+                // OPT: types not recognized by the type provider are queried twice
+
+            case 'c':
+                return $this->createCompositeType($schemaName, $typeName); // attributes added later
+
+            case 'd':
+                $baseType = $dict->requireTypeByOid((int)$row['parenttype']);
+                assert($baseType instanceof IType,
+                    new InternalException('Only named types are supposed to be used as domain base types.')
+                );
+                return $this->createDomainType($schemaName, $typeName, $baseType);
+
+            case 'e':
+                $labels = ($row['enum_labels'] ? json_decode($row['enum_labels']) : []);
+                if (!is_array($labels)) {
+                    $err = (json_last_error_msg() ?: '?');
+                    throw new \RuntimeException(
+                        "Error decoding labels of enum type `$schemaName`.`$typeName`: $err"
+                    );
+                }
+                return $this->createEnumType($schemaName, $typeName, $labels);
+
+            case 'r':
+                $subtype = $dict->requireTypeByOid((int)$row['parenttype']);
+                if ($subtype instanceof ITotallyOrderedType) {
+                    return $this->createRangeType($schemaName, $typeName, $subtype);
+                } elseif ($subtype instanceof UndefinedType) {
+                    return new UndefinedType($schemaName, $typeName);
+                } else {
+                    return new UnorderedRangeType($schemaName, $typeName);
+                }
+
+            default:
+                throw new \RuntimeException("Error fetching types: unexpected typtype '$row[typtype]'");
+        }
+    }
+
+    private function addCompositeAttributes(ITypeDictionary $dict, array $attrMap): void
+    {
+        foreach ($attrMap as $compTypeOid => $attrs) {
+            $compType = $dict->requireTypeByOid($compTypeOid);
+            assert($compType instanceof CompositeType);
+            foreach ($attrs as [$attrName, $attrTypeOid]) {
+                $attrType = $dict->requireTypeByOid((int)$attrTypeOid);
+                $compType->addAttribute($attrName, $attrType);
+            }
         }
     }
 }

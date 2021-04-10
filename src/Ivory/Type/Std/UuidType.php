@@ -30,7 +30,7 @@ class UuidType extends TypeBase implements ITotallyOrderedType
             return $this->typeCastExpr($strictType, 'NULL');
         }
 
-        if (!preg_match('~^(\{)?(?:[[:xdigit:]]{4}-?){7}[[:xdigit:]]{4}(?(1)\})$~i', $val)) {
+        if (!preg_match('~^({)?(?:[[:xdigit:]]{4}-?){7}[[:xdigit:]]{4}(?(1)})$~i', $val)) {
             throw $this->invalidValueException($val);
         }
 

@@ -38,7 +38,7 @@ class FilteredRelation extends StreamlinedRelation implements ICachingDataProces
         foreach ($this->source as $i => $tuple) {
             if ($this->decider->accept($tuple)) {
                 $this->acceptMap[] = $i;
-            };
+            }
         }
     }
 

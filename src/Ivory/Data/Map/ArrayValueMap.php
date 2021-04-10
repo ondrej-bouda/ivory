@@ -1,9 +1,12 @@
 <?php
+/** @noinspection PhpInappropriateInheritDocUsageInspection PhpStorm bug WI-54015 */
 declare(strict_types=1);
 namespace Ivory\Data\Map;
 
 /**
- * {@inheritdoc}
+ * A value map.
+ *
+ * {@inheritDoc}
  *
  * This implementation uses a plain PHP array to store the mapping. Thus, it is limited to only store string or integer
  * keys.

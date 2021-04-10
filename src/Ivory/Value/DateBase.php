@@ -284,7 +284,6 @@ abstract class DateBase implements IComparable
         );
 
         if ($fracSec != 0) {
-            /** @noinspection PhpUndefinedVariableInspection */
             $resFracSecStr = substr((string)$resFracSec, 2); // cut off the leading '0.'
             $isoStr = $dt->format('Y-m-d H:i:s.') . $resFracSecStr;
             $tz = self::getUTCTimeZone();

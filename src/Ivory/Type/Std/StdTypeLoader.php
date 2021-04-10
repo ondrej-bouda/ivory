@@ -135,6 +135,7 @@ class StdTypeLoader implements ITypeLoader
                     case 'refcursor':
                         return new RefCursorType($schemaName, $typeName);
 
+                    /** @noinspection PhpDuplicateSwitchCaseBodyInspection */
                     case 'oid':
                         return new IntegerType($schemaName, $typeName);
                     case 'regproc':

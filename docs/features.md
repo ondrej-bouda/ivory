@@ -81,7 +81,39 @@ try {
     $tx->rollbackIfOpen();
 }
 ```
-* Prepared transactions (a.k.a. two-phase commits) are supported.
+* In the typical case when a transaction is performed within a function or method, **automatic transaction handles** may
+  come in handy. Instead of writing the explicit boilerplate to rollback the transaction upon an exception, the
+  `$tx->rollbackIfOpen()` gets called automatically when destructed. As a result, the code is simpler and foolproof.
+```php
+<?php
+function () use ($conn)
+{
+    $tx = $conn->startAutoTransaction();
+    // do stuff, exceptions expected
+    $conn->command('INSERT INTO usr (username) VALUES (%s)', 'admin');
+    $conn->command(
+        "INSERT INTO usrrole (usr_id, role_id)
+         SELECT currval(REGCLASS 'usr_id_seq'), id
+         FROM role"
+    );
+    $tx->commit(); // if the program does not reach this statement due to an exception (perhaps due
+                   // to a unique constraint fail), the transaction gets rolled back
+}
+```
+* Prepared transactions (a.k.a. two-phase commits) are supported by an API, too.
+{% highlight php %}
+<?php
+$tx = $conn->startTransaction();
+$conn->command('...');
+$txName = $tx->prepareTransaction();
+// ...
+$conn->commitPreparedTransaction($txName); // $conn is not necessarily the same connection
+// or
+$conn->rollbackPreparedTransaction($txName);
+
+$conn->listPreparedTransactions(); // lists all prepared transactions
+{% endhighlight %}
+
 
 ### Session Control
 * Type-safe encapsulation of the database session configuration (e.g., statement timeout or search path).
@@ -184,15 +216,6 @@ try {
 
 ### High-Level Transaction API
 * <!-- #6 --> Emulate nested transactions.
-* <!-- #5 --> Introduce auto-transactions, rolling back the transaction on error implicitly:
-```php
-<?php
-function foo() {
-    $tx = $conn->startAutoTransaction();
-    // do stuff, exceptions expected - if thrown, transaction is rolled back
-    $tx->commit();
-}
-```
 
 ### <!-- #13 --> BLOBS
 * Implement support for large binary objects.

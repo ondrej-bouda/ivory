@@ -80,6 +80,7 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
         $dateStyle = $this->dateStyleRetriever->getValue();
         assert($dateStyle instanceof DateStyle);
         switch ($dateStyle->getFormat()) {
+            /** @noinspection PhpMissingBreakStatementInspection */
             default:
                 trigger_error(
                     "Unexpected DateStyle format '{$dateStyle->getFormat()}', assuming the ISO style",
@@ -87,18 +88,18 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
                 );
             case DateStyle::FORMAT_ISO:
                 preg_match('~^(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+(?:\.\d+)?)([-+][^ ]+)( BC)?$~', $extRepr, $matches);
-                list(, $y, $m, $d, $h, $i, $s, $z) = $matches;
+                [, $y, $m, $d, $h, $i, $s, $z] = $matches;
                 break;
             case DateStyle::FORMAT_GERMAN:
                 preg_match('~^(\d+)\.(\d+)\.(\d+) (\d+):(\d+):(\d+(?:\.\d+)?) ([^ ]+)( BC)?$~', $extRepr, $matches);
-                list(, $d, $m, $y, $h, $i, $s, $z) = $matches;
+                [, $d, $m, $y, $h, $i, $s, $z] = $matches;
                 break;
             case DateStyle::FORMAT_SQL:
                 preg_match('~^(\d+)/(\d+)/(\d+) (\d+):(\d+):(\d+(?:\.\d+)?) ([^ ]+)( BC)?$~', $extRepr, $matches);
                 if ($dateStyle->getOrder() == DateStyle::ORDER_DMY) {
-                    list(, $d, $m, $y, $h, $i, $s, $z) = $matches;
+                    [, $d, $m, $y, $h, $i, $s, $z] = $matches;
                 } else {
-                    list(, $m, $d, $y, $h, $i, $s, $z) = $matches;
+                    [, $m, $d, $y, $h, $i, $s, $z] = $matches;
                 }
                 break;
             case DateStyle::FORMAT_POSTGRES:
@@ -108,9 +109,9 @@ class TimestampTzType extends ConnectionDependentBaseType implements ITotallyOrd
                     $matches
                 );
                 if ($dateStyle->getOrder() == DateStyle::ORDER_DMY) {
-                    list(, $d, $ms, $h, $i, $s, $y, $z) = $matches;
+                    [, $d, $ms, $h, $i, $s, $y, $z] = $matches;
                 } else {
-                    list(, $ms, $d, $h, $i, $s, $y, $z) = $matches;
+                    [, $ms, $d, $h, $i, $s, $y, $z] = $matches;
                 }
                 static $monthNames = [
                     'Jan' => 1, 'Feb' => 2, 'Mar' => 3, 'Apr' => 4, 'May' => 5, 'Jun' => 6,

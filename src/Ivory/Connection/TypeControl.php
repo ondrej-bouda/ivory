@@ -142,9 +142,7 @@ class TypeControl implements ITypeControl
         $typeProvider->appendTypeProvider($this->getTypeRegister());
         $typeProvider->appendTypeProvider(Ivory::getTypeRegister());
 
-        $dict = $compiler->compileTypeDictionary($typeProvider);
-
-        return $dict;
+        return $compiler->compileTypeDictionary($typeProvider);
     }
 
     private function setupTypeDictionarySearchPath(ITypeDictionary $typeDictionary): void

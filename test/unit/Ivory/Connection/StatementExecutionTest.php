@@ -319,7 +319,7 @@ class StatementExecutionTest extends IvoryTestCase
                  INSERT INTO t (a) VALUES (1), (2);
                  SELECT * FROM t'
             );
-            self::assertEquals(3, count($results));
+            self::assertCount(3, $results);
 
             self::assertInstanceOf(ICommandResult::class, $results[0]);
             self::assertSame('CREATE TABLE', $results[0]->getCommandTag());

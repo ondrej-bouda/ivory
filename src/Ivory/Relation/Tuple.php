@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpInappropriateInheritDocUsageInspection PhpStorm bug WI-54015 */
 declare(strict_types=1);
 namespace Ivory\Relation;
 
@@ -9,7 +10,9 @@ use Ivory\Value\Alg\ITupleEvaluator;
 use Ivory\Value\Alg\ComparisonUtils;
 
 /**
- * {@inheritdoc}
+ * Represents one relation row.
+ *
+ * {@inheritDoc}
  *
  * This implementation is immutable, i.e., once constructed, the tuple values cannot be changed. Thus, both `__set()`
  * and `ArrayAccess` write operations (namely {@link \ArrayAccess::offsetSet()} and {@link \ArrayAccess::offsetUnset()})

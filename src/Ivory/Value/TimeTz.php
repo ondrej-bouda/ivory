@@ -59,25 +59,11 @@ class TimeTz extends TimeBase
             throw new \InvalidArgumentException('$timeString');
         }
 
-        $hour = $m[1];
-        $min = $m[2];
+        $hour = (int)$m[1];
+        $min = (int)$m[2];
         $sec = (!empty($m[3]) ? $m[3] : 0);
 
-        if ($hour == 24) {
-            if ($min > 0 || $sec > 0) {
-                throw new \OutOfRangeException('with hour 24, the minutes and seconds must be zero');
-            }
-        } elseif ($hour < 0 || $hour > 24) {
-            throw new \OutOfRangeException('hours');
-        }
-
-        if ($min < 0 || $min > 59) {
-            throw new \OutOfRangeException('minutes');
-        }
-
-        if ($sec < 0 || $sec >= 61) {
-            throw new \OutOfRangeException('seconds');
-        }
+        self::checkTimeParts($hour, $min, $sec);
 
         if (!isset($m['zone'])) {
             try {

@@ -230,6 +230,11 @@ class Connection implements IConnection
         return $this->txCtl->startTransaction($transactionOptions);
     }
 
+    public function startAutoTransaction($transactionOptions = 0): ITxHandle
+    {
+        return $this->txCtl->startAutoTransaction($transactionOptions);
+    }
+
     public function setupSubsequentTransactions($transactionOptions): void
     {
         $this->txCtl->setupSubsequentTransactions($transactionOptions);
@@ -343,19 +348,16 @@ class Connection implements IConnection
 
     public function cachePermanently(string $cacheKey, $object): bool
     {
-        /** @noinspection PhpUnhandledExceptionInspection PhpStorm bug WI-38168 */
         return $this->cacheCtl->cachePermanently($cacheKey, $object);
     }
 
     public function getCached(string $cacheKey)
     {
-        /** @noinspection PhpUnhandledExceptionInspection PhpStorm bug WI-38168 */
         return $this->cacheCtl->getCached($cacheKey);
     }
 
     public function flushCache(string $cacheKey): bool
     {
-        /** @noinspection PhpUnhandledExceptionInspection PhpStorm bug WI-38168 */
         return $this->cacheCtl->flushCache($cacheKey);
     }
 
