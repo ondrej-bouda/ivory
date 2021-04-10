@@ -20,7 +20,7 @@ class Circle
      * @param float $radius radius of the circle
      * @return Circle
      */
-    public static function fromCoords($center, $radius): Circle
+    public static function fromCoords($center, float $radius): Circle
     {
         if (is_array($center)) {
             $center = Point::fromCoords($center);
@@ -28,11 +28,7 @@ class Circle
             throw new \InvalidArgumentException('center');
         }
 
-        if (!is_numeric($radius)) {
-            throw new \InvalidArgumentException('radius');
-        }
-
-        return new Circle($center, (float)$radius);
+        return new Circle($center, $radius);
     }
 
 

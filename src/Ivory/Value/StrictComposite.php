@@ -22,7 +22,7 @@ abstract class StrictComposite extends Composite
         );
     }
 
-    public function __get($name)
+    public function __get(string $name)
     {
         $val = parent::__get($name);
 

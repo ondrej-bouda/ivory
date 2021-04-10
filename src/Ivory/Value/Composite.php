@@ -58,7 +58,7 @@ class Composite implements IComparable, \IteratorAggregate
      * @param string $name attribute name
      * @return mixed value of the given attribute, or <tt>null</tt> if no such attribute is defined on this value
      */
-    public function __get($name)
+    public function __get(string $name)
     {
         return ($this->values[$name] ?? null);
     }
@@ -67,7 +67,7 @@ class Composite implements IComparable, \IteratorAggregate
      * @param string $name attribute name
      * @return bool whether the attribute is defined and non-null on this value
      */
-    public function __isset($name): bool
+    public function __isset(string $name): bool
     {
         return isset($this->values[$name]);
     }

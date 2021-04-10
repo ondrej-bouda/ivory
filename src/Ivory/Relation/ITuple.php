@@ -75,11 +75,11 @@ interface ITuple extends \ArrayAccess, IEqualable
      * @throws UndefinedColumnException if there is no column of the given name
      * @throws AmbiguousException if there are multiple columns of the given name
      */
-    function __get($name);
+    function __get(string $name);
 
     /**
      * @param string $name column name
      * @return bool whether the column is defined above the tuple
      */
-    function __isset($name);
+    function __isset(string $name): bool;
 }

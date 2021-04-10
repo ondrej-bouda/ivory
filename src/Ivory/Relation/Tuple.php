@@ -100,7 +100,7 @@ class Tuple implements ITuple
 
     //region dynamic properties
 
-    public function __get($name)
+    public function __get(string $name)
     {
         if (!isset($this->colNameMap[$name])) {
             throw new UndefinedColumnException("No column named $name");
@@ -111,7 +111,7 @@ class Tuple implements ITuple
         }
     }
 
-    public function __isset($name)
+    public function __isset(string $name): bool
     {
         return isset($this->colNameMap[$name]);
     }

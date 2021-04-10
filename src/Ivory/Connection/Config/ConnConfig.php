@@ -71,7 +71,7 @@ class ConnConfig implements IObservableConnConfig
      * @return bool|float|int|Quantity|string|null current value of the requested option, or <tt>null</tt> if no such
      *                                               option has been defined yet
      */
-    public function __get($propertyName)
+    public function __get(string $propertyName)
     {
         return $this->get($propertyName);
     }
@@ -82,7 +82,7 @@ class ConnConfig implements IObservableConnConfig
      * @param string $propertyName name of a configuration option
      * @return bool whether the option is defined
      */
-    public function __isset($propertyName): bool
+    public function __isset(string $propertyName): bool
     {
         return $this->defined($propertyName);
     }
@@ -94,7 +94,7 @@ class ConnConfig implements IObservableConnConfig
      * @param bool|string|int|float|Quantity $value the new value, or {@link ConnConfig::DEFAULT_VALUE} to use the
      *                                                option's default
      */
-    public function __set($propertyName, $value): void
+    public function __set(string $propertyName, $value): void
     {
         $this->setForSession($propertyName, $value);
     }
