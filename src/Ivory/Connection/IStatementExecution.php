@@ -90,7 +90,7 @@ interface IStatementExecution
      * again, fill that with parameter values._
      *
      * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
-     * @param array ...$fragmentsAndParams
+     * @param mixed ...$fragmentsAndParams
      * @return IQueryResult
      * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
@@ -122,7 +122,7 @@ interface IStatementExecution
      * </code>
      *
      * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
-     * @param array ...$fragmentsAndParams
+     * @param mixed ...$fragmentsAndParams
      * @return IAsyncQueryResult encapsulation of the result
      * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
@@ -145,7 +145,7 @@ interface IStatementExecution
      *
      * @see query() for detailed specification
      * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
-     * @param array ...$fragmentsAndParams
+     * @param mixed ...$fragmentsAndParams
      * @return ITuple|null the single row from the result, or <tt>null</tt> if there are is no data
      * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
@@ -168,7 +168,7 @@ interface IStatementExecution
      *
      * @see query() for detailed specification
      * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
-     * @param array ...$fragmentsAndParams
+     * @param mixed ...$fragmentsAndParams
      * @return IColumn
      * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
@@ -191,7 +191,7 @@ interface IStatementExecution
      *   thrown as it marks a program logic error.
      *
      * @param string|SqlPattern|IRelationDefinition $sqlFragmentPatternOrRelationDefinition
-     * @param array ...$fragmentsAndParams
+     * @param mixed ...$fragmentsAndParams
      * @return mixed value of the only row from the only column the relation has, or <tt>null</tt> if there is no data
      * @throws StatementException when the query is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
@@ -216,7 +216,7 @@ interface IStatementExecution
      * query is executed using this method, a {@link UsageException} is thrown after the query execution.
      *
      * @param string|SqlPattern|ICommand $sqlFragmentPatternOrCommand
-     * @param array ...$fragmentsAndParams
+     * @param mixed ...$fragmentsAndParams
      * @return ICommandResult
      * @throws StatementException when the command is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it
@@ -233,7 +233,7 @@ interface IStatementExecution
      * This is an asynchronous variant of {@link command()}.
      *
      * @param string|SqlPattern|ICommand $sqlFragmentPatternOrCommand
-     * @param array ...$fragmentsAndParams
+     * @param mixed ...$fragmentsAndParams
      * @return IAsyncCommandResult encapsulation of the result
      * @throws StatementException when the command is erroneous and PostgreSQL returns an error
      * @throws \InvalidArgumentException when any fragment is not followed by the exact number of parameter values it

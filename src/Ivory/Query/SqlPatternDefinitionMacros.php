@@ -60,7 +60,7 @@ trait SqlPatternDefinitionMacros
      * and reuse them for the same pattern next time.
      *
      * @param string|SqlPattern $sqlPattern
-     * @param array ...$positionalParameters
+     * @param mixed ...$positionalParameters
      * @return static
      * @throws \InvalidArgumentException when the number of provided positional parameters differs from the number of
      *                                     positional parameters required by the pattern
@@ -121,7 +121,7 @@ trait SqlPatternDefinitionMacros
      * query from several parts, thus, it is legitimate the query is modified appropriately._
      *
      * @param string|SqlPattern $fragment
-     * @param array ...$fragmentsAndParamValues
+     * @param mixed ...$fragmentsAndParamValues
      *                                  further fragments (each of which is either a <tt>string</tt> or an
      *                                    {@link SqlPattern} object) and values of their parameters;
      *                                  the very last argument may be a map of values for named parameters to set

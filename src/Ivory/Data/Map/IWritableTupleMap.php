@@ -30,7 +30,7 @@ interface IWritableTupleMap extends ITupleMap
     /**
      * Removes a map entry (either an {@link ITuple} or {@link ITupleMap}) under a given key or series of keys.
      *
-     * @param array ...$key
+     * @param string|int ...$key
      * @return bool <tt>true</tt> if the entry has been removed, <tt>false</tt> if there was no such entry
      */
     function remove(...$key): bool;

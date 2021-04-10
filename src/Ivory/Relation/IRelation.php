@@ -204,10 +204,12 @@ interface IRelation extends \Traversable, \Countable
      * a situation happens, only the first tuple is considered, the other conflicting tuples are ignored, and a warning
      * is issued.
      *
-     * @param int|string|ITupleEvaluator|\Closure $col1 the first column specifying the association
-     * @param int|string|ITupleEvaluator|\Closure $col2 the first column specifying the association
-     * @param array ...$moreCols optional additional columns specifying further dimensions of the association, each of
-     *                             type <tt>(int|string|ITupleEvaluator|\Closure)</tt>
+     * @param int|string|ITupleEvaluator|\Closure $col1
+     *                                  the first column specifying the association
+     * @param int|string|ITupleEvaluator|\Closure $col2
+     *                                  the first column specifying the association
+     * @param int|string|ITupleEvaluator|\Closure ...$moreCols
+     *                                  optional additional columns specifying further dimensions of the association
      * @return IValueMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns
@@ -234,8 +236,8 @@ interface IRelation extends \Traversable, \Countable
      *
      * @param int|string|ITupleEvaluator|\Closure $mappingCol
      *                                  the first column specifying the mapping
-     * @param array ...$moreMappingCols optional additional columns specifying further dimensions of the mapping, each
-     *                                    of type <tt>(int|string|ITupleEvaluator|\Closure)</tt>
+     * @param int|string|ITupleEvaluator|\Closure ...$moreMappingCols
+     *                                  optional additional columns specifying further dimensions of the mapping
      * @return ITupleMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns
@@ -253,8 +255,8 @@ interface IRelation extends \Traversable, \Countable
      *
      * @param int|string|ITupleEvaluator|\Closure $mappingCol
      *                                  the first column specifying the mapping
-     * @param array ...$moreMappingCols optional additional columns specifying further dimensions of the mapping, each
-     *                                    of type <tt>(int|string|ITupleEvaluator|\Closure)</tt>
+     * @param int|string|ITupleEvaluator|\Closure ...$moreMappingCols
+     *                                  optional additional columns specifying further dimensions of the mapping
      * @return IRelationMap
      * @throws UndefinedColumnException if there is no column matching the specification of an argument
      * @throws AmbiguousException if referring to the column by its name, which is used by multiple columns

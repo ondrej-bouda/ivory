@@ -15,7 +15,7 @@ interface IRelationMap extends IMappedObject
     /**
      * Returns the relation mapped by the given key or series of keys.
      *
-     * @param array ...$key
+     * @param string|int ...$key
      * @return IRelation|IRelationMap the relation, or inner map in case of multi-level map, mapped by the given key
      * @throws \OutOfBoundsException if the requested key is not present in the map;
      *                               for a more tolerant version, returning <tt>null</tt> instead of throwing exception,
@@ -26,7 +26,7 @@ interface IRelationMap extends IMappedObject
     /**
      * Returns the relation mapped by the given key or series of keys, or <tt>null</tt> if there is no such relation.
      *
-     * @param array ...$key
+     * @param string|int ...$key
      * @return IRelation|IRelationMap|null the relation, or inner map in case of multi-level map, mapped by the given
      *                                          key, or <tt>null</tt> if no entry is mapped by the given key
      */
