@@ -43,15 +43,12 @@ _Record of decisions made during designing Ivory._
    output. And, by the way, PHP's `DateInterval` only represents the duration, without any reasonable operations on
    them.
 
-6. Ivory is for PHP >= 7.1. Those who will be stuck on a PHP 7.0 (or even PHP 5) hosting will probably not change the
-   database layer in their project, while new projects will be started right on PHP 7.1.
-
-7. Coding issue: naturally, strict types declaration does not make sense in pure interface source files. However,
+6. Coding issue: naturally, strict types declaration does not make sense in pure interface source files. However,
    PhpStorm inspection "Missing strict type declaration" reports such interfaces, and there seems to be no reasonable
    way to mute the inspection on interface source files. It is better to use the inspection at the cost of a little
    nonsense in interface files.
 
-8. Using SQL patterns in production for some time, the `%ident` (and possibly the `%sql`) placeholders have often been
+7. Using SQL patterns in production for some time, the `%ident` (and possibly the `%sql`) placeholders have often been
    used for table names, followed by a dot and a column name: `%ident.c`. However, as per the SQL pattern syntax, Ivory
    reads this as to take type `c` from schema `ident` -- which will probably be unintended. Correctly, one should use
    `%{ident}.c`. Switching the parsing rules not to take the dot unless within the braces was considered to prevent such

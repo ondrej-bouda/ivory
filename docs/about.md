@@ -17,7 +17,7 @@ Ivory aspires to offer a **rich feature set**. Just as PostgreSQL is not a light
 a robust database layer, too. All major features of PostgreSQL are either supported already, or planned for a future
 release. See the [Features](features.md).
 
-Officialy supported are PHP ≥ 7.1 and PostgreSQL ≥ 9.4, although it *might* work on older PostgreSQL versions.
+Officialy supported are PHP ≥ 7.2 and PostgreSQL ≥ 9.4, although it *might* work on older PostgreSQL versions.
 
 
 

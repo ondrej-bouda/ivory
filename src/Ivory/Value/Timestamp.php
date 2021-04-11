@@ -30,26 +30,14 @@ class Timestamp extends TimestampBase
      */
     public static function now(): Timestamp
     {
-        // In PHP 7.1.3 (due to bug #74258), new \DateTimeImmutable('now') had only precision up to seconds.
-        if (PHP_VERSION_ID != 70103) {
-            $tz = self::getUTCTimeZone();
-            try {
-                $datetime = new \DateTimeImmutable('now', $tz);
-            } catch (\Exception $e) {
-                throw new \LogicException('Date/time error', 0, $e);
-            }
-            return new Timestamp(0, $datetime);
-        } else {
-            [$micro, $sec] = explode(' ', microtime());
-            $microFrac = substr($micro, 1); // cut off the whole part (always a zero)
-            $inputStr = gmdate('Y-m-d\TH:i:s', $sec) . $microFrac . 'UTC';
-            try {
-                $dateTime = new \DateTimeImmutable($inputStr);
-            } catch (\Exception $e) {
-                throw new \LogicException('Date/time error', 0, $e);
-            }
-            return new Timestamp(0, $dateTime);
+        $tz = self::getUTCTimeZone();
+        try {
+            $datetime = new \DateTimeImmutable('now', $tz);
+        } catch (\Exception $e) {
+            throw new \LogicException('Date/time error', 0, $e);
         }
+
+        return new Timestamp(0, $datetime);
     }
 
     /**

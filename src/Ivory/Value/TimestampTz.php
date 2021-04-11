@@ -27,22 +27,10 @@ class TimestampTz extends TimestampBase
      */
     public static function now(): TimestampTz
     {
-        // In PHP 7.1.3 (due to bug #74258), new \DateTimeImmutable('now') had only precision up to seconds.
-        if (PHP_VERSION_ID != 70103) {
-            try {
-                $datetime = new \DateTimeImmutable('now');
-            } catch (\Exception $e) {
-                throw new \LogicException('Date/time error', 0, $e);
-            }
-        } else {
-            [$micro, $sec] = explode(' ', microtime());
-            $microFrac = substr($micro, 1); // cut off the whole part (always a zero)
-            $inputStr = date('Y-m-d\TH:i:s', $sec) . $microFrac;
-            try {
-                $datetime = new \DateTimeImmutable($inputStr);
-            } catch (\Exception $e) {
-                throw new \LogicException('Date/time error', 0, $e);
-            }
+        try {
+            $datetime = new \DateTimeImmutable('now');
+        } catch (\Exception $e) {
+            throw new \LogicException('Date/time error', 0, $e);
         }
 
         return new TimestampTz(0, $datetime);

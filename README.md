@@ -9,7 +9,7 @@ Ivory
 [![Build Status](https://img.shields.io/travis/ondrej-bouda/ivory/master.svg?style=flat-square)](
     https://travis-ci.org/ondrej-bouda/ivory
 )
-[![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.1-8892BF.svg?style=flat-square)](https://php.net/)
+[![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.2-8892BF.svg?style=flat-square)](https://php.net/)
 [![License](https://img.shields.io/badge/license-BSD%203--Clause-green.svg?style=flat-square)](
     https://opensource.org/licenses/BSD-3-Clause
 )

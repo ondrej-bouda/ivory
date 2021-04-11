@@ -13,7 +13,7 @@ Using [Composer](https://getcomposer.org), the installation is trivial:
 ```
 composer require ondrej-bouda/ivory
 ```
-PHP ≥ 7.1 is required with several standard extensions<sup>[1](#footnote1)</sup>, checked by Composer.
+PHP ≥ 7.2 is required with several standard extensions<sup>[1](#footnote1)</sup>, checked by Composer.
 PostgreSQL ≥ 9.4 is officially supported, although older PostgreSQL versions might work just fine.
     
 During installation, a [PSR-6](http://www.php-fig.org/psr/psr-6/)-compliant cache is suggested. We'll get back to it
