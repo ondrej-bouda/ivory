@@ -66,7 +66,7 @@ layout: default
 
 
 Latest version:
-: <a href="https://github.com/ondrej-bouda/ivory/releases/tag/0.1.1" target="_blank">0.1.1</a>
+: <a href="https://github.com/ondrej-bouda/ivory/releases/tag/0.2.0" target="_blank">0.2.0</a>
 
 Released on:
-: 2020-06-21
+: 2021-04-12

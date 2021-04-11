@@ -7,11 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 _no items so far_
 
-## [0.1.3] - 2021-04-11
-### Fixed
+## [0.2.0] - 2021-04-12
+### Added
 - Support PHP 8.0
+### Fixed
 - Fix PHPDoc comments on method varargs
 - Fix ConnConfig::get() for case there is a database error when querying for the setting values
+### Removed
+- Remove support for PHP 7.1
 
 ## [0.1.2] - 2020-12-05
 ### Added
