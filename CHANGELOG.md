@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+_no items so far_
+
+## [0.1.3] - 2021-04-11
+### Fixed
+- Support PHP 8.0
+- Fix PHPDoc comments on method varargs
+- Fix ConnConfig::get() for case there is a database error when querying for the setting values
 
 ## [0.1.2] - 2020-12-05
 ### Added

@@ -13,7 +13,7 @@ class ArrayTypeTest extends TestCase
     /** @var ArrayType */
     private $strArrayType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -25,7 +25,7 @@ class ArrayTypeTest extends TestCase
     }
 
 
-    public function testSerializeList()
+    public function testSerializeList(): void
     {
         self::assertSame("'[0:2]={1,4,5}'::pg_catalog.int4[]", $this->intArrayType->serializeValue([1, 4, 5]));
         self::assertSame("'{}'::pg_catalog.int4[]", $this->intArrayType->serializeValue([]));
@@ -45,7 +45,7 @@ class ArrayTypeTest extends TestCase
         }
     }
 
-    public function testSerializeSpecialStrings()
+    public function testSerializeSpecialStrings(): void
     {
         self::assertSame(<<<'STR'
 '{abc,NULL,"NULL",NULLs,"","x,y","{}","1\\2","p q","\"r\"",''}'::pg_catalog.text[]
@@ -57,7 +57,7 @@ STR
         );
     }
 
-    public function testSerializeMultiDimensional()
+    public function testSerializeMultiDimensional(): void
     {
         self::assertSame(
             "'[0:1][0:2]={{1,4,5},{7,NULL,0}}'::pg_catalog.int4[]",
@@ -82,7 +82,7 @@ STR
         }
     }
 
-    public function testSerializeCustomBounds()
+    public function testSerializeCustomBounds(): void
     {
         self::assertSame(
             "'[0:1][-3:-1]={{1,2,3},{4,5,6}}'::pg_catalog.int4[]",
@@ -102,7 +102,7 @@ STR
         }
     }
 
-    public function testSerializePlainMode()
+    public function testSerializePlainMode(): void
     {
         $this->intArrayType->switchToPlainMode();
         $this->strArrayType->switchToPlainMode();
@@ -145,7 +145,7 @@ STR
         }
     }
 
-    public function testParseSingleDimensional()
+    public function testParseSingleDimensional(): void
     {
         self::assertSame([], $this->intArrayType->parseValue('{}'));
         self::assertSame([], $this->strArrayType->parseValue('{}'));
@@ -161,7 +161,7 @@ STR
         );
     }
 
-    public function testParseSpecialStrings()
+    public function testParseSpecialStrings(): void
     {
         self::assertSame(
             [1 => 'abc', null, 'NULL', 'NULLs', '', 'x,y', '{}', '1\\2', 'ab', 'p q', '"r"', "'", '  , \\ " \''],
@@ -177,7 +177,7 @@ STR
         );
     }
 
-    public function testParseMultiDimensional()
+    public function testParseMultiDimensional(): void
     {
         self::assertSame(
             [1 => [1 => 'a', '1'], [1 => 'b', '2'], [1 => 'c', null]],
@@ -195,7 +195,7 @@ STR
         );
     }
 
-    public function testParseWhitespace()
+    public function testParseWhitespace(): void
     {
         // "You can add whitespace before a left brace or after a right brace."
         self::assertSame(

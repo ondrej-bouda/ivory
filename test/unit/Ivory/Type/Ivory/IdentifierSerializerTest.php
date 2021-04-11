@@ -9,26 +9,26 @@ class IdentifierSerializerTest extends TestCase
     /** @var IdentifierSerializer */
     private $identSerializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->identSerializer = new IdentifierSerializer();
     }
 
-    public function testSerializeUnquoted()
+    public function testSerializeUnquoted(): void
     {
         self::assertSame('wheee', $this->identSerializer->serializeValue('wheee'));
         self::assertSame("_\u{010D}a\u{010D}a1\$", $this->identSerializer->serializeValue("_\u{010D}a\u{010D}a1\$"));
     }
 
-    public function testSerializeQuoted()
+    public function testSerializeQuoted(): void
     {
         self::assertSame('"whEEE"', $this->identSerializer->serializeValue('whEEE'));
         self::assertSame('"1whEEE"', $this->identSerializer->serializeValue('1whEEE'));
         self::assertSame('""', $this->identSerializer->serializeValue(''));
     }
 
-    public function testSerializeNull()
+    public function testSerializeNull(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->identSerializer->serializeValue(null);

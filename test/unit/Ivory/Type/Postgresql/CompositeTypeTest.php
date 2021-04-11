@@ -16,7 +16,7 @@ class CompositeTypeTest extends TestCase
     /** @var CompositeType */
     private $intTextPairType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +30,7 @@ class CompositeTypeTest extends TestCase
         $this->intTextPairType->addAttribute('b', new StringType('pg_catalog', 'text'));
     }
 
-    public function testParseSimple()
+    public function testParseSimple(): void
     {
         self::assertSame([], $this->zeroType->parseValue('()')->toMap());
 
@@ -42,7 +42,7 @@ class CompositeTypeTest extends TestCase
         self::assertSame(['a' => 0, 'b' => null], $this->intTextPairType->parseValue('(0,)')->toMap());
     }
 
-    public function testSerializeSimple()
+    public function testSerializeSimple(): void
     {
         self::assertSame('NULL::s.t1', $this->intSingletonType->serializeValue(null));
 

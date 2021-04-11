@@ -18,7 +18,7 @@ class TupleTest extends TestCase
     /** @var ITuple */
     private $ambiguousColsTuple;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,14 +40,14 @@ class TupleTest extends TestCase
         );
     }
 
-    public function testToList()
+    public function testToList(): void
     {
         self::assertSame([1, 2, null, false], $this->simpleTuple->toList());
         self::assertSame([1, 3, null, 4], $this->anonymousColsTuple->toList());
         self::assertSame([1, 3, 5, 7], $this->ambiguousColsTuple->toList());
     }
 
-    public function testToMap()
+    public function testToMap(): void
     {
         self::assertSame(['a' => 1, 'b' => 2, 'c' => null, 'some col' => false], $this->simpleTuple->toMap());
         self::assertSame(['a' => 1, 'b' => 3], $this->anonymousColsTuple->toMap());
@@ -59,7 +59,7 @@ class TupleTest extends TestCase
         }
     }
 
-    public function testArrayAccess()
+    public function testArrayAccess(): void
     {
         self::assertSame(1, $this->simpleTuple[0]);
         self::assertSame(false, $this->simpleTuple[3]);
@@ -98,7 +98,7 @@ class TupleTest extends TestCase
         }
     }
 
-    public function testOverloadedAccess()
+    public function testOverloadedAccess(): void
     {
         self::assertSame(2, $this->simpleTuple->b);
         self::assertSame(null, $this->simpleTuple->c);
@@ -138,7 +138,7 @@ class TupleTest extends TestCase
         }
     }
 
-    public function testValue()
+    public function testValue(): void
     {
         self::assertSame(2, $this->simpleTuple->value('b'));
         self::assertSame(null, $this->simpleTuple->value(2));
@@ -183,7 +183,7 @@ class TupleTest extends TestCase
         }
     }
 
-    public function testEqualable()
+    public function testEqualable(): void
     {
         $odd1Tuple = Tuple::fromMap(['a' => new TupleTestEqualable(1), 'b' => null]);
         $odd2Tuple = Tuple::fromMap(['a' => new TupleTestEqualable(3), 'b' => null]);

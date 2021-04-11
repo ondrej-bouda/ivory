@@ -5,21 +5,14 @@ namespace Ivory;
 use Ivory\Connection\ConnectionParameters;
 use Ivory\Connection\IConnection;
 use Ivory\Relation\ITuple;
-use PHPUnit\DbUnit\Database\Connection as DbUnitConnection;
-use PHPUnit\DbUnit\DataSet\IDataSet;
-use PHPUnit\DbUnit\TestCase;
-use PHPUnit\DbUnit\Tester;
 use PHPUnit\Framework\Constraint;
+use PHPUnit\Framework\TestCase;
 
 abstract class IvoryTestCase extends TestCase
 {
-    /** @var \PDO only instantiated once for test clean-up/fixture load */
-    private static $pdo = null;
-
-    /** @var DbUnitConnection instantiated once per test */
-    private $phpUnitConn = null;
-
-    /** @var IConnection|null */
+    /** @var resource|null connection for setting up and cleaning up fixture */
+    private $pgConn = null;
+    /** @var IConnection|null Ivory connection to provide to the tests */
     private $ivoryConn = null;
 
     /** @var bool whether in the error-interrupt mode */
@@ -32,18 +25,28 @@ abstract class IvoryTestCase extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->pgConn = $this->connectTestDatabase();
+        $this->initTestDatabase();
+
         $this->triggeredErrors = [];
     }
 
     protected function tearDown(): void
     {
-        parent::tearDown();
         if (!$this->errorInterrupt) {
             $this->errorInterruptMode();
         }
         if ($this->ivoryConn !== null) {
             $this->ivoryConn->disconnect();
         }
+
+        if ($this->pgConn !== null) {
+            $this->cleanUpTestDatabase();
+            $this->disconnectTestDatabase();
+        }
+
+        parent::tearDown();
     }
 
     /**
@@ -51,7 +54,7 @@ abstract class IvoryTestCase extends TestCase
      *                        only those errors will be caught and preserved, other errors will still be handled by the
      *                          original error handler
      */
-    protected function errorNonInterruptMode($errorTypes = E_ALL)
+    protected function errorNonInterruptMode(int $errorTypes = E_ALL): void
     {
         $origHandler = set_error_handler(
             function ($errNo, $errStr, $errFile, $errLine) use ($errorTypes) {
@@ -75,7 +78,7 @@ abstract class IvoryTestCase extends TestCase
         }
     }
 
-    protected function errorInterruptMode()
+    protected function errorInterruptMode(): void
     {
         if (!$this->errorInterrupt) {
             restore_error_handler();
@@ -238,10 +241,7 @@ abstract class IvoryTestCase extends TestCase
         return (self::ERROR_TYPES[$errorType] ?? (string)$errorType);
     }
 
-    /**
-     * @param string $message
-     */
-    protected function assertNoMoreErrors($message = '')
+    protected function assertNoMoreErrors(string $message = ''): void
     {
         if ($this->triggeredErrors) {
             $failMsg = "There is error '{$this->triggeredErrors[0]['msg']}'";
@@ -261,31 +261,45 @@ abstract class IvoryTestCase extends TestCase
         self::assertEmpty($this->triggeredErrors, $message);
     }
 
-
-    final protected function getConnection()
+    private function connectTestDatabase()
     {
-        if ($this->phpUnitConn === null) {
-            if (self::$pdo === null) {
-                $dsnParts = [];
-                if (!empty($GLOBALS['DB_HOST'])) {
-                    $dsnParts[] = "host=$GLOBALS[DB_HOST]";
-                }
-                if (!empty($GLOBALS['DB_PORT'])) {
-                    $dsnParts[] = "port=$GLOBALS[DB_PORT]";
-                }
-                $dsnParts[] = "dbname=$GLOBALS[DB_DBNAME]";
-
-                $dsn = 'pgsql:' . implode(';', $dsnParts);
-                self::$pdo = new \PDO($dsn, $GLOBALS['DB_USER'], $GLOBALS['DB_PASSWD']);
+        $params = [
+            'host' => $GLOBALS['DB_HOST'],
+            'port' => $GLOBALS['DB_PORT'],
+            'dbname' => $GLOBALS['DB_DBNAME'],
+            'user' => $GLOBALS['DB_USER'],
+            'password' => $GLOBALS['DB_PASSWD'],
+        ];
+        $pieces = [];
+        foreach ($params as $key => $value) {
+            if (strlen($value) > 0) {
+                $pieces[] = "$key='" . strtr($value, ["'" => "\\'", '\\' => '\\\\']) . "'";
             }
-            $this->phpUnitConn = $this->createDefaultDBConnection(self::$pdo, $GLOBALS['DB_DBNAME']);
-            $this->initDbSchema();
         }
-
-        return $this->phpUnitConn;
+        $connStr = implode(' ', $pieces);
+        $conn = pg_connect($connStr, PGSQL_CONNECT_FORCE_NEW);
+        if (!$conn) {
+            throw new \RuntimeException('Cannot connect to the test database. Please, check test/phpunit.xml');
+        }
+        return $conn;
     }
 
-    protected function getIvoryConnection(): IConnection
+    private function disconnectTestDatabase(): void
+    {
+        assert($this->pgConn !== null);
+        pg_close($this->pgConn);
+    }
+
+    private function pgQuery(string $query): void
+    {
+        assert($this->pgConn !== null);
+        $res = pg_query($this->pgConn, $query);
+        if (!$res) {
+            throw new \RuntimeException('Error executing query: ' . pg_last_error($this->pgConn));
+        }
+    }
+
+    final protected function getIvoryConnection(): IConnection
     {
         if ($this->ivoryConn === null) {
             $this->ivoryConn = $this->createNewIvoryConnection();
@@ -294,7 +308,7 @@ abstract class IvoryTestCase extends TestCase
         return $this->ivoryConn;
     }
 
-    protected function createNewIvoryConnection(string $name = 'default'): IConnection
+    final protected function createNewIvoryConnection(string $name = 'default'): IConnection
     {
         $params = ConnectionParameters::fromArray([
             ConnectionParameters::HOST => ($GLOBALS['DB_HOST'] ? : null),
@@ -307,170 +321,168 @@ abstract class IvoryTestCase extends TestCase
         return $coreFactory->createConnection($name, $params);
     }
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function newDatabaseTester(): Tester
+    private function cleanUpTestDatabase(): void
     {
-        return new IvoryTester($this->getConnection());
-    }
-
-    private function initDbSchema()
-    {
-        $this->phpUnitConn->getConnection()->exec(<<<'SQL'
-DROP TABLE IF EXISTS artist, album, album_artist, album_track;
-
-CREATE TABLE artist (
-  id BIGSERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  is_active BOOL
-);
-CREATE TABLE album (
-  id BIGSERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  year SMALLINT,
-  released DATE
-);
-CREATE TABLE album_artist (
-  album_id BIGINT NOT NULL REFERENCES album,
-  artist_id BIGINT NOT NULL REFERENCES artist,
-  PRIMARY KEY (album_id, artist_id)
-);
-CREATE TABLE album_track (
-  album_id BIGINT NOT NULL,
-  disc_no SMALLINT NOT NULL DEFAULT 1,
-  track_no SMALLINT NOT NULL,
-  name VARCHAR(100) NOT NULL,
-  PRIMARY KEY (album_id, disc_no, track_no)
-);
-
-CREATE EXTENSION IF NOT EXISTS hstore;
-SQL
+        $this->pgQuery(
+            'DROP TABLE IF EXISTS artist, album, album_artist, album_track'
         );
     }
 
-    protected function getDataSet(): IDataSet
+    private function initTestDatabase(): void
     {
-        return new ArrayDataSet([
-            'artist' => [
-                ['id' => 1, 'name' => 'The Piano Guys', 'is_active' => 't'],
-                ['id' => 2, 'name' => 'Metallica', 'is_active' => 'f'],
-                ['id' => 3, 'name' => 'Tommy Emmanuel', 'is_active' => null],
-                ['id' => 4, 'name' => 'Robbie Williams', 'is_active' => null],
-                ['id' => 5, 'name' => 'B-Side Band', 'is_active' => 't'],
-            ],
-            'album' => [
-                ['id' => 1, 'name' => 'The Piano Guys', 'year' => 2012, 'released' => '2012-10-02'],
-                ['id' => 2, 'name' => 'Black Album', 'year' => 1991, 'released' => '1991-08-12'],
-                ['id' => 3, 'name' => 'S & M', 'year' => 1999, 'released' => '1999-11-23'],
-                ['id' => 4, 'name' => 'Live One', 'year' => 2005, 'released' => '2005-01-01'],
-                ['id' => 5, 'name' => 'Meeting Point', 'year' => 2014, 'released' => '2014-10-27'],
-                ['id' => 6, 'name' => 'Deska', 'year' => 2014, 'released' => '2014-12-10'],
-            ],
-            'album_artist' => [
-                ['album_id' => 1, 'artist_id' => 1],
-                ['album_id' => 2, 'artist_id' => 2],
-                ['album_id' => 3, 'artist_id' => 2],
-                ['album_id' => 4, 'artist_id' => 3],
-                ['album_id' => 5, 'artist_id' => 5],
-                ['album_id' => 6, 'artist_id' => 5],
-            ],
-            'album_track' => [
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 1, 'name' => 'Pavane // Titanium'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 2, 'name' => 'Peponi (Paradise)'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 3, 'name' => 'Code Name Vivaldi'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 4, 'name' => 'Beethoven´s 5 Secrets'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 5, 'name' => 'Simple Gifts Over The Rainbow'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 6, 'name' => 'Cello Wars'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 7, 'name' => 'Arwen´s Vigil'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 8, 'name' => 'Moonlight'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 9, 'name' => 'A Thousand Years'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 10, 'name' => 'Michael Meets Mozart'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 11, 'name' => 'The Cello Song'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 12, 'name' => 'Rolling in the Deep'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 13, 'name' => 'Whats Makes you Beautiful'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 14, 'name' => 'Bring him home'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 15, 'name' => 'Without You'],
-                ['album_id' => 1, 'disc_no' => 1, 'track_no' => 16, 'name' => 'Nearer my God to thee'],
-                ['album_id' => 2, 'disc_no' => 1, 'track_no' => 1, 'name' => 'Enter Sandman'],
-                ['album_id' => 2, 'disc_no' => 1, 'track_no' => 2, 'name' => 'Sad But True'],
-                ['album_id' => 2, 'disc_no' => 1, 'track_no' => 3, 'name' => 'Holier Than Thou'],
-                ['album_id' => 2, 'disc_no' => 1, 'track_no' => 4, 'name' => 'The Unforgiven'],
-                ['album_id' => 2, 'disc_no' => 1, 'track_no' => 5, 'name' => 'Wherever I May Roam'],
-                ['album_id' => 2, 'disc_no' => 1, 'track_no' => 6, 'name' => 'Don\'t Tread on Me'],
-                ['album_id' => 2, 'disc_no' => 1, 'track_no' => 7, 'name' => 'Through the Never'],
-                ['album_id' => 2, 'disc_no' => 1, 'track_no' => 8, 'name' => 'Nothing Else Matters'],
-                ['album_id' => 2, 'disc_no' => 1, 'track_no' => 9, 'name' => 'Of Wolf And Man'],
-                ['album_id' => 2, 'disc_no' => 1, 'track_no' => 10, 'name' => 'The God That Failed'],
-                ['album_id' => 2, 'disc_no' => 1, 'track_no' => 11, 'name' => 'My Friend of Misery'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 1, 'name' => 'The Struggle Within'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 2, 'name' => 'The Ecstasy Of Gold'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 3, 'name' => 'The Call Of The Ktulu'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 4, 'name' => 'Master Of Puppets'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 5, 'name' => 'Of Wolf And Man'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 6, 'name' => 'The Thing That Should Not Be'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 7, 'name' => 'Fuel'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 8, 'name' => 'The Memory Remains'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 9, 'name' => 'No Leave Clover'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 10, 'name' => 'Hero Of The Day'],
-                ['album_id' => 3, 'disc_no' => 1, 'track_no' => 11, 'name' => 'Devil\'s Dance'],
-                ['album_id' => 3, 'disc_no' => 2, 'track_no' => 1, 'name' => 'Nothing Else Matters'],
-                ['album_id' => 3, 'disc_no' => 2, 'track_no' => 2, 'name' => 'Until It Sleeps'],
-                ['album_id' => 3, 'disc_no' => 2, 'track_no' => 3, 'name' => 'For Whom The Bell Tolls'],
-                ['album_id' => 3, 'disc_no' => 2, 'track_no' => 4, 'name' => '- Human'],
-                ['album_id' => 3, 'disc_no' => 2, 'track_no' => 5, 'name' => 'Wherever I May Roam'],
-                ['album_id' => 3, 'disc_no' => 2, 'track_no' => 6, 'name' => 'Outlaw Torn'],
-                ['album_id' => 3, 'disc_no' => 2, 'track_no' => 7, 'name' => 'Sad But True'],
-                ['album_id' => 3, 'disc_no' => 2, 'track_no' => 8, 'name' => 'One'],
-                ['album_id' => 3, 'disc_no' => 2, 'track_no' => 9, 'name' => 'Enter Sandman'],
-                ['album_id' => 3, 'disc_no' => 2, 'track_no' => 10, 'name' => 'Battery'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 1, 'name' => 'Beatles Medley'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 2, 'name' => 'Peter Allen Medley/Waltzing Mathilda'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 3, 'name' => 'Classical Gas'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 4, 'name' => 'Old Fashioned Love Song'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 5, 'name' => 'Son Of A Gun'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 6, 'name' => 'Dixie McGuire'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 7, 'name' => 'Country Wide'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 8, 'name' => 'Saltwater'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 9, 'name' => 'Borsalino'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 10, 'name' => 'Up From Down Under'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 11, 'name' => 'Morning Aire'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 12, 'name' => 'Those Who Wait'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 13, 'name' => 'Michelle'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 14, 'name' => 'Questions'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 15, 'name' => 'Angelina'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 16, 'name' => 'Precious Time/That\'s The Spirit'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 17, 'name' => 'Mona Lisa'],
-                ['album_id' => 4, 'disc_no' => 1, 'track_no' => 18, 'name' => 'Mombasa'],
-                ['album_id' => 4, 'disc_no' => 2, 'track_no' => 1, 'name' => 'Amazing Grace'],
-                ['album_id' => 4, 'disc_no' => 2, 'track_no' => 2, 'name' => 'House Of The Rising Sun'],
-                ['album_id' => 4, 'disc_no' => 2, 'track_no' => 3, 'name' => 'Guitar Rag'],
-                ['album_id' => 4, 'disc_no' => 2, 'track_no' => 4, 'name' => 'Blue Moon'],
-                ['album_id' => 4, 'disc_no' => 2, 'track_no' => 5, 'name' => 'Mozzarella Tarantella'],
-                ['album_id' => 4, 'disc_no' => 2, 'track_no' => 6, 'name' => 'Guitar Boogie'],
-                ['album_id' => 4, 'disc_no' => 2, 'track_no' => 7, 'name' => 'Train To Dusseldorf'],
-                ['album_id' => 4, 'disc_no' => 2, 'track_no' => 8, 'name' => 'One Mint Julep'],
-                ['album_id' => 4, 'disc_no' => 2, 'track_no' => 9, 'name' => 'The Hunt'],
-                ['album_id' => 4, 'disc_no' => 2, 'track_no' => 10, 'name' => 'Initiation'],
-                ['album_id' => 5, 'disc_no' => 1, 'track_no' => 1, 'name' => 'Nebe je jasné'],
-                ['album_id' => 5, 'disc_no' => 1, 'track_no' => 2, 'name' => 'Birdland'],
-                ['album_id' => 5, 'disc_no' => 1, 'track_no' => 3, 'name' => 'Tajné místo'],
-                ['album_id' => 5, 'disc_no' => 1, 'track_no' => 4, 'name' => "What's This"],
-                ['album_id' => 5, 'disc_no' => 1, 'track_no' => 5, 'name' => 'Tržnice světa'],
-                ['album_id' => 5, 'disc_no' => 1, 'track_no' => 6, 'name' => 'Radio Time'],
-                ['album_id' => 5, 'disc_no' => 1, 'track_no' => 7, 'name' => 'Orient Express'],
-                ['album_id' => 5, 'disc_no' => 1, 'track_no' => 8, 'name' => 'My French Honey'],
-                ['album_id' => 5, 'disc_no' => 1, 'track_no' => 9, 'name' => 'Města nad řekou'],
-                ['album_id' => 5, 'disc_no' => 1, 'track_no' => 10, 'name' => 'One Last Call'],
-                ['album_id' => 5, 'disc_no' => 1, 'track_no' => 11, 'name' => 'Largo Live'],
-                ['album_id' => 6, 'disc_no' => 1, 'track_no' => 1, 'name' => 'Meeting Point'],
-                ['album_id' => 6, 'disc_no' => 1, 'track_no' => 2, 'name' => 'Podivnost'],
-                ['album_id' => 6, 'disc_no' => 1, 'track_no' => 3, 'name' => 'Starý Landštejn'],
-                ['album_id' => 6, 'disc_no' => 1, 'track_no' => 4, 'name' => 'Piece of Cake'],
-                ['album_id' => 6, 'disc_no' => 1, 'track_no' => 5, 'name' => 'Place du Grand Sablon'],
-                ['album_id' => 6, 'disc_no' => 1, 'track_no' => 6, 'name' => 'Přístaviště'],
-                ['album_id' => 6, 'disc_no' => 1, 'track_no' => 7, 'name' => 'Chaazi'],
-                ['album_id' => 6, 'disc_no' => 1, 'track_no' => 8, 'name' => 'The Shadow of Vulcan'],
-                ['album_id' => 6, 'disc_no' => 1, 'track_no' => 9, 'name' => 'Ornis'],
-            ],
-        ]);
+        $this->pgQuery(<<<'SQL'
+DROP TABLE IF EXISTS artist, album, album_artist, album_track;
+
+CREATE TABLE artist (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    is_active BOOL
+);
+CREATE TABLE album (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    year SMALLINT,
+    released DATE
+);
+CREATE TABLE album_artist (
+    album_id BIGINT NOT NULL REFERENCES album,
+    artist_id BIGINT NOT NULL REFERENCES artist,
+    PRIMARY KEY (album_id, artist_id)
+);
+CREATE TABLE album_track (
+    album_id BIGINT NOT NULL,
+    disc_no SMALLINT NOT NULL DEFAULT 1,
+    track_no SMALLINT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    PRIMARY KEY (album_id, disc_no, track_no)
+);
+
+CREATE EXTENSION IF NOT EXISTS hstore;
+
+
+INSERT INTO artist (id, name, is_active) VALUES
+    (1, 'The Piano Guys',  TRUE),
+    (2, 'Metallica',       FALSE),
+    (3, 'Tommy Emmanuel',  NULL),
+    (4, 'Robbie Williams', NULL),
+    (5, 'B-Side Band',     TRUE);
+SELECT setval('artist_id_seq'::REGCLASS, (SELECT MAX(id) FROM artist));
+
+INSERT INTO album (id, name, year, released) VALUES
+    (1, 'The Piano Guys', 2012, '2012-10-02'),
+    (2, 'Black Album',    1991, '1991-08-12'),
+    (3, 'S & M',          1999, '1999-11-23'),
+    (4, 'Live One',       2005, '2005-01-01'),
+    (5, 'Meeting Point',  2014, '2014-10-27'),
+    (6, 'Deska',          2014, '2014-12-10');
+SELECT setval('album_id_seq'::REGCLASS, (SELECT MAX(id) FROM album));
+
+INSERT INTO album_artist (album_id, artist_id) VALUES
+    (1, 1),
+    (2, 2),
+    (3, 2),
+    (4, 3),
+    (5, 5),
+    (6, 5);
+
+INSERT INTO album_track (album_id, disc_no, track_no, name) VALUES
+    (1, 1, 1, 'Pavane // Titanium'),
+    (1, 1, 2, 'Peponi (Paradise)'),
+    (1, 1, 3, 'Code Name Vivaldi'),
+    (1, 1, 4, 'Beethoven´s 5 Secrets'),
+    (1, 1, 5, 'Simple Gifts Over The Rainbow'),
+    (1, 1, 6, 'Cello Wars'),
+    (1, 1, 7, 'Arwen´s Vigil'),
+    (1, 1, 8, 'Moonlight'),
+    (1, 1, 9, 'A Thousand Years'),
+    (1, 1, 10, 'Michael Meets Mozart'),
+    (1, 1, 11, 'The Cello Song'),
+    (1, 1, 12, 'Rolling in the Deep'),
+    (1, 1, 13, 'Whats Makes you Beautiful'),
+    (1, 1, 14, 'Bring him home'),
+    (1, 1, 15, 'Without You'),
+    (1, 1, 16, 'Nearer my God to thee'),
+    (2, 1, 1, 'Enter Sandman'),
+    (2, 1, 2, 'Sad But True'),
+    (2, 1, 3, 'Holier Than Thou'),
+    (2, 1, 4, 'The Unforgiven'),
+    (2, 1, 5, 'Wherever I May Roam'),
+    (2, 1, 6, 'Don''t Tread on Me'),
+    (2, 1, 7, 'Through the Never'),
+    (2, 1, 8, 'Nothing Else Matters'),
+    (2, 1, 9, 'Of Wolf And Man'),
+    (2, 1, 10, 'The God That Failed'),
+    (2, 1, 11, 'My Friend of Misery'),
+    (3, 1, 1, 'The Struggle Within'),
+    (3, 1, 2, 'The Ecstasy Of Gold'),
+    (3, 1, 3, 'The Call Of The Ktulu'),
+    (3, 1, 4, 'Master Of Puppets'),
+    (3, 1, 5, 'Of Wolf And Man'),
+    (3, 1, 6, 'The Thing That Should Not Be'),
+    (3, 1, 7, 'Fuel'),
+    (3, 1, 8, 'The Memory Remains'),
+    (3, 1, 9, 'No Leave Clover'),
+    (3, 1, 10, 'Hero Of The Day'),
+    (3, 1, 11, 'Devil''s Dance'),
+    (3, 2, 1, 'Nothing Else Matters'),
+    (3, 2, 2, 'Until It Sleeps'),
+    (3, 2, 3, 'For Whom The Bell Tolls'),
+    (3, 2, 4, '- Human'),
+    (3, 2, 5, 'Wherever I May Roam'),
+    (3, 2, 6, 'Outlaw Torn'),
+    (3, 2, 7, 'Sad But True'),
+    (3, 2, 8, 'One'),
+    (3, 2, 9, 'Enter Sandman'),
+    (3, 2, 10, 'Battery'),
+    (4, 1, 1, 'Beatles Medley'),
+    (4, 1, 2, 'Peter Allen Medley/Waltzing Mathilda'),
+    (4, 1, 3, 'Classical Gas'),
+    (4, 1, 4, 'Old Fashioned Love Song'),
+    (4, 1, 5, 'Son Of A Gun'),
+    (4, 1, 6, 'Dixie McGuire'),
+    (4, 1, 7, 'Country Wide'),
+    (4, 1, 8, 'Saltwater'),
+    (4, 1, 9, 'Borsalino'),
+    (4, 1, 10, 'Up From Down Under'),
+    (4, 1, 11, 'Morning Aire'),
+    (4, 1, 12, 'Those Who Wait'),
+    (4, 1, 13, 'Michelle'),
+    (4, 1, 14, 'Questions'),
+    (4, 1, 15, 'Angelina'),
+    (4, 1, 16, 'Precious Time/That''s The Spirit'),
+    (4, 1, 17, 'Mona Lisa'),
+    (4, 1, 18, 'Mombasa'),
+    (4, 2, 1, 'Amazing Grace'),
+    (4, 2, 2, 'House Of The Rising Sun'),
+    (4, 2, 3, 'Guitar Rag'),
+    (4, 2, 4, 'Blue Moon'),
+    (4, 2, 5, 'Mozzarella Tarantella'),
+    (4, 2, 6, 'Guitar Boogie'),
+    (4, 2, 7, 'Train To Dusseldorf'),
+    (4, 2, 8, 'One Mint Julep'),
+    (4, 2, 9, 'The Hunt'),
+    (4, 2, 10, 'Initiation'),
+    (5, 1, 1, 'Nebe je jasné'),
+    (5, 1, 2, 'Birdland'),
+    (5, 1, 3, 'Tajné místo'),
+    (5, 1, 4, 'What''s This'),
+    (5, 1, 5, 'Tržnice světa'),
+    (5, 1, 6, 'Radio Time'),
+    (5, 1, 7, 'Orient Express'),
+    (5, 1, 8, 'My French Honey'),
+    (5, 1, 9, 'Města nad řekou'),
+    (5, 1, 10, 'One Last Call'),
+    (5, 1, 11, 'Largo Live'),
+    (6, 1, 1, 'Meeting Point'),
+    (6, 1, 2, 'Podivnost'),
+    (6, 1, 3, 'Starý Landštejn'),
+    (6, 1, 4, 'Piece of Cake'),
+    (6, 1, 5, 'Place du Grand Sablon'),
+    (6, 1, 6, 'Přístaviště'),
+    (6, 1, 7, 'Chaazi'),
+    (6, 1, 8, 'The Shadow of Vulcan'),
+    (6, 1, 9, 'Ornis');
+SQL
+        );
     }
 }

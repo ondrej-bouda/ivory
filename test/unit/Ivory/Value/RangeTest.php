@@ -15,7 +15,7 @@ class RangeTest extends TestCase
     /** @var Range */
     private $infinite;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +29,7 @@ class RangeTest extends TestCase
         return Range::fromBounds($lower, $upper);
     }
 
-    public function testEmpty()
+    public function testEmpty(): void
     {
         self::assertTrue($this->empty->isEmpty());
         self::assertNull($this->empty->getBoundsSpec());
@@ -41,7 +41,7 @@ class RangeTest extends TestCase
         self::assertNull($this->empty->toBounds('[]'));
     }
 
-    public function testFromBounds()
+    public function testFromBounds(): void
     {
         self::assertTrue(
             Range::fromBounds(1, 4)
@@ -67,7 +67,7 @@ class RangeTest extends TestCase
         self::assertFalse(Range::fromBounds(3, 3, '[]')->isEmpty());
     }
 
-    public function testEquals()
+    public function testEquals(): void
     {
         self::assertTrue(
             Range::fromBounds(1, 4)
@@ -95,7 +95,7 @@ class RangeTest extends TestCase
         );
     }
 
-    public function testBounds()
+    public function testBounds(): void
     {
         self::assertSame(1, $this->finite->getLower());
         self::assertTrue($this->finite->isLowerInc());
@@ -110,13 +110,13 @@ class RangeTest extends TestCase
         self::assertFalse($this->infinite->isUpperInc());
     }
 
-    public function testBoundsSpec()
+    public function testBoundsSpec(): void
     {
         self::assertSame('[)', $this->finite->getBoundsSpec());
         self::assertSame('()', $this->infinite->getBoundsSpec());
     }
 
-    public function testIsSinglePoint()
+    public function testIsSinglePoint(): void
     {
         self::assertFalse($this->empty->isSinglePoint());
         self::assertFalse($this->intRng(1, 4)->isSinglePoint());
@@ -127,7 +127,7 @@ class RangeTest extends TestCase
         self::assertFalse($this->intRng(null, null)->isSinglePoint());
     }
 
-    public function testToBounds()
+    public function testToBounds(): void
     {
         self::assertSame([1, 4], $this->finite->toBounds('[)'));
         self::assertSame([1, 3], $this->finite->toBounds('[]'));
@@ -140,7 +140,7 @@ class RangeTest extends TestCase
         self::assertSame([null, 3], $this->infinite->toBounds('(]'));
     }
 
-    public function testContainsElement()
+    public function testContainsElement(): void
     {
         self::assertNull($this->empty->containsElement(null));
         self::assertNull($this->intRng(1, 4)->containsElement(null));
@@ -170,7 +170,7 @@ class RangeTest extends TestCase
         self::assertTrue($this->intRng(null, null)->containsElement(PHP_INT_MAX));
     }
 
-    public function testLeftOfElement()
+    public function testLeftOfElement(): void
     {
         self::assertNull($this->empty->leftOfElement(null));
         self::assertNull($this->intRng(1, 4)->leftOfElement(null));
@@ -199,7 +199,7 @@ class RangeTest extends TestCase
         self::assertFalse($this->intRng(null, null)->leftOfElement(PHP_INT_MAX));
     }
 
-    public function testRightOfElement()
+    public function testRightOfElement(): void
     {
         self::assertNull($this->empty->rightOfElement(null));
         self::assertNull($this->intRng(1, 4)->rightOfElement(null));
@@ -228,7 +228,7 @@ class RangeTest extends TestCase
         self::assertFalse($this->intRng(null, null)->rightOfElement(PHP_INT_MAX));
     }
 
-    public function testContainsRange()
+    public function testContainsRange(): void
     {
         self::assertNull($this->empty->containsRange(null));
         self::assertNull($this->intRng(1, 4)->containsRange(null));
@@ -253,7 +253,7 @@ class RangeTest extends TestCase
         self::assertTrue($this->intRng(null, null)->containsRange($this->empty));
     }
 
-    public function testContainedInRange()
+    public function testContainedInRange(): void
     {
         self::assertNull($this->empty->containedInRange(null));
         self::assertNull($this->intRng(1, 4)->containedInRange(null));
@@ -278,7 +278,7 @@ class RangeTest extends TestCase
         self::assertFalse($this->intRng(null, null)->containedInRange($this->empty));
     }
 
-    public function testOverlaps()
+    public function testOverlaps(): void
     {
         self::assertNull($this->empty->overlaps(null));
         self::assertNull($this->intRng(1, 4)->overlaps(null));
@@ -303,7 +303,7 @@ class RangeTest extends TestCase
         self::assertFalse($this->intRng(null, null)->overlaps($this->empty));
     }
 
-    public function testIntersect()
+    public function testIntersect(): void
     {
         self::assertNull($this->empty->intersect(null));
         self::assertNull($this->intRng(1, 4)->intersect(null));
@@ -330,7 +330,7 @@ class RangeTest extends TestCase
         self::assertTrue($this->empty->equals($this->intRng(null, null)->intersect($this->empty)));
     }
 
-    public function testIsFinite()
+    public function testIsFinite(): void
     {
         self::assertTrue($this->empty->isFinite());
         self::assertTrue($this->intRng(1, 2)->isFinite());
@@ -341,7 +341,7 @@ class RangeTest extends TestCase
         self::assertFalse($this->intRng(null, null)->isFinite());
     }
 
-    public function testStrictlyLeftOf()
+    public function testStrictlyLeftOf(): void
     {
         self::assertNull($this->empty->strictlyLeftOf(null));
         self::assertNull($this->intRng(1, 4)->strictlyLeftOf(null));
@@ -366,7 +366,7 @@ class RangeTest extends TestCase
         self::assertFalse($this->intRng(null, null)->strictlyLeftOf($this->intRng(3, 9)));
     }
 
-    public function testStrictlyRightOf()
+    public function testStrictlyRightOf(): void
     {
         self::assertNull($this->empty->strictlyRightOf(null));
         self::assertNull($this->intRng(1, 4)->strictlyRightOf(null));
@@ -391,7 +391,7 @@ class RangeTest extends TestCase
         self::assertFalse($this->intRng(null, null)->strictlyRightOf($this->intRng(3, 9)));
     }
 
-    public function testIntRange()
+    public function testIntRange(): void
     {
         $range = Range::fromBounds(5, 10); // range from 5 (inclusive) to 10 (exclusive)
 
@@ -404,7 +404,7 @@ class RangeTest extends TestCase
         self::assertSame([4, 9], $range->toBounds('(]'));
     }
 
-    public function testDateRange()
+    public function testDateRange(): void
     {
         $range = Range::fromBounds(
             Date::fromParts(2018, 1, 15),
@@ -437,7 +437,7 @@ class RangeTest extends TestCase
         );
     }
 
-    public function testFloatRange()
+    public function testFloatRange(): void
     {
         $range = Range::fromBounds(1.1, 4.2);
 
@@ -454,7 +454,7 @@ class RangeTest extends TestCase
         }
     }
 
-    public function testCustomDiscreteStepper()
+    public function testCustomDiscreteStepper(): void
     {
         $decimalStepper = new class implements IDiscreteStepper
         {

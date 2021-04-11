@@ -8,10 +8,10 @@ use PHPUnit\Framework\TestCase;
 
 class RangeTypeTest extends TestCase
 {
-    /** @var  RangeType */
+    /** @var RangeType */
     private $intRangeType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -19,7 +19,7 @@ class RangeTypeTest extends TestCase
         $this->intRangeType = new RangeType('pg_catalog', 'int4range', $int);
     }
 
-    public function testParseValue()
+    public function testParseValue(): void
     {
         $rng1 = $this->intRangeType->parseValue('[1,4)');
         self::assertSame(1, $rng1->getLower());
@@ -49,7 +49,7 @@ class RangeTypeTest extends TestCase
         self::assertTrue($rng7->isEmpty());
     }
 
-    public function testSerializeValue()
+    public function testSerializeValue(): void
     {
         self::assertSame(
             'NULL',

@@ -9,13 +9,13 @@ class SqlPatternParserTest extends TestCase
     /** @var ISqlPatternParser */
     private $parser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->parser = new SqlPatternParser();
     }
 
-    public function testPositionalPlaceholder()
+    public function testPositionalPlaceholder(): void
     {
         $pattern = $this->parser->parse('SELECT * FROM person WHERE id = % AND is_active');
         self::assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getSqlTorso());
@@ -26,7 +26,7 @@ class SqlPatternParserTest extends TestCase
         self::assertEmpty($pattern->getNamedPlaceholderMap());
     }
 
-    public function testPositionalTypedPlaceholder()
+    public function testPositionalTypedPlaceholder(): void
     {
         $pattern = $this->parser->parse('SELECT * FROM person WHERE id = %ivory.d AND is_active');
         self::assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getSqlTorso());
@@ -37,7 +37,7 @@ class SqlPatternParserTest extends TestCase
         self::assertEmpty($pattern->getNamedPlaceholderMap());
     }
 
-    public function testNamedPlaceholder()
+    public function testNamedPlaceholder(): void
     {
         $pattern = $this->parser->parse('SELECT * FROM person WHERE id = %:id AND is_active');
         self::assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getSqlTorso());
@@ -48,7 +48,7 @@ class SqlPatternParserTest extends TestCase
         );
     }
 
-    public function testNamedTypedPlaceholder()
+    public function testNamedTypedPlaceholder(): void
     {
         $pattern = $this->parser->parse('SELECT * FROM person WHERE id = %i:id AND is_active');
         self::assertEquals('SELECT * FROM person WHERE id =  AND is_active', $pattern->getSqlTorso());
@@ -59,7 +59,7 @@ class SqlPatternParserTest extends TestCase
         );
     }
 
-    public function testSquareBrackets()
+    public function testSquareBrackets(): void
     {
         $pattern = $this->parser->parse('SELECT %bigint[][][][2]');
         self::assertEquals('SELECT [2]', $pattern->getSqlTorso());
@@ -70,7 +70,7 @@ class SqlPatternParserTest extends TestCase
         self::assertEmpty($pattern->getNamedPlaceholderMap());
     }
 
-    public function testCurlyBracesInTypeSpecification()
+    public function testCurlyBracesInTypeSpecification(): void
     {
         $pattern = $this->parser->parse('SELECT %{double precision}, %{"quotes included"}:named');
         self::assertEquals('SELECT , ', $pattern->getSqlTorso());
@@ -90,7 +90,7 @@ class SqlPatternParserTest extends TestCase
         );
     }
 
-    public function testQuotedTypeSpecification()
+    public function testQuotedTypeSpecification(): void
     {
         $pattern = $this->parser->parse('SELECT %"quoted type", %"schema with """."t", %"z":named');
         self::assertEquals('SELECT , , ', $pattern->getSqlTorso());
@@ -111,7 +111,7 @@ class SqlPatternParserTest extends TestCase
         );
     }
 
-    public function testMultiplePlaceholders()
+    public function testMultiplePlaceholders(): void
     {
         $pattern = $this->parser->parse(
             'SELECT * FROM %:tbl WHERE name = % AND %:cond AND ord %% 2 = %i AND %(name) AND %s:cond'
@@ -145,7 +145,7 @@ class SqlPatternParserTest extends TestCase
         );
     }
 
-    public function testPercentEscapes()
+    public function testPercentEscapes(): void
     {
         $pattern = $this->parser->parse('SELECT * FROM person WHERE id %% 2 = 0');
         self::assertEquals('SELECT * FROM person WHERE id % 2 = 0', $pattern->getSqlTorso());
@@ -153,7 +153,7 @@ class SqlPatternParserTest extends TestCase
         self::assertEmpty($pattern->getNamedPlaceholderMap());
     }
 
-    public function testLooseTypeModePlaceholders()
+    public function testLooseTypeModePlaceholders(): void
     {
         $pattern = $this->parser->parse('SELECT %?, %t?, %?:name, %t?:name');
         self::assertEquals('SELECT , , , ', $pattern->getSqlTorso());

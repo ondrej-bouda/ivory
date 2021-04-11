@@ -7,3 +7,5 @@
 /test/phpunit.xml
 /test/perf/scenario/out/cache/
 /vendor
+
+.phpunit.result.cache

@@ -9,14 +9,14 @@ class HstoreTypeTest extends TestCase
     /** @var HstoreType */
     private $hstoreType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->hstoreType = new HstoreType('public', 'hstore');
     }
 
-    public function testSerializeValue()
+    public function testSerializeValue(): void
     {
         self::assertSame('NULL', $this->hstoreType->serializeValue(null, false));
         self::assertSame("public.hstore ''", $this->hstoreType->serializeValue([]));
@@ -51,7 +51,7 @@ class HstoreTypeTest extends TestCase
         }
     }
 
-    public function testParseValue()
+    public function testParseValue(): void
     {
         self::assertSame([], $this->hstoreType->parseValue(''));
         self::assertSame(['a' => 'b'], $this->hstoreType->parseValue('"a"=>"b"'));
@@ -77,7 +77,7 @@ class HstoreTypeTest extends TestCase
     /**
      * @depends testParseValue
      */
-    public function testParseLongValue()
+    public function testParseLongValue(): void
     {
         // Some strings are too long for being processed by PCRE with JIT enabled. E.g., on Windows PHP 7.0.4, more than
         // 2725 in the str_repeat below results in an error.
