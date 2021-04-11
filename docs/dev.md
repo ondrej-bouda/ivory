@@ -118,14 +118,20 @@ _Record of decisions made during designing Ivory._
 ## Type System
 
 * true data types support
-  * the result of a query is a data row, which is nothing else than an item of the type `RECORD` - a data type like any other, having nested attributes of other types
-  * names and types of a database table columns are just a data type; PostgreSQL has this attitude, too - it generates the corresponding composite data type for each table
+  * the result of a query is a data row, which is nothing else than an item of the type `RECORD` - a data type like any
+    other, having nested attributes of other types
+  * names and types of a database table columns are just a data type; PostgreSQL has this attitude, too - it generates
+    the corresponding composite data type for each table
 * Model classes reflecting database tables are just sources of relations, giving items of a given type
    auto-generate them, including nullable information, comments, etc.
-   table (set-returning) functions are also sources of relations, like tables or views; corresponding classes should also be auto-generated for them (also support function aliases)
+   table (set-returning) functions are also sources of relations, like tables or views; corresponding classes should
+  also be auto-generated for them (also support function aliases)
 * see the PostgreSQL object types sketch from the DVN project to get the notion of all data types
-  * the sketch only reflects the static types, i.e., those recognized or stored permanently by the database; dynamic runtime types shall be addressed, too
-* shortcut for inferring relation data types for expanding further filter conditions: execute the query with FALSE condition, grab the column data types, then use the columns name and type information for serializing input variables correctly as filter conditions; cache the result
+  * the sketch only reflects the static types, i.e., those recognized or stored permanently by the database; dynamic
+    runtime types shall be addressed, too
+* shortcut for inferring relation data types for expanding further filter conditions: execute the query with FALSE
+  condition, grab the column data types, then use the columns name and type information for serializing input variables
+  correctly as filter conditions; cache the result
 
 
 ## Generator
@@ -145,7 +151,8 @@ _Record of decisions made during designing Ivory._
     * for enum types, it creates an enum object, holding the enum type name and the value string
     * for range types, it creates an appropriate range type object based on the subtype
     * for composite types, it creates a generic composite type object with attributes corresponding to the database type
-  * the auto-generated type gets registered so that further processing of this type does not query the database repeatedly
+  * the auto-generated type gets registered so that further processing of this type does not query the database
+    repeatedly
 
 
 ## Relation Features
@@ -172,10 +179,12 @@ _Record of decisions made during designing Ivory._
 
 * plugin for correct syntax highlight of SQL patterns
   * see http://www.jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support_tutorial.html
-* investigate whether it is possible to define the number of arguments accepted by a sprintf-like method, apply to query(), command() and similar methods
+* investigate whether it is possible to define the number of arguments accepted by a sprintf-like method, apply 
+  to query(), command() and similar methods
 * static analysis
 * ability to systematically recognize all database queries or input yielding a query, and search just within them
-* ability to search for all usages of a database object (table, view, column, function, ...); e.g., search for all usages of person.name column
+* ability to search for all usages of a database object (table, view, column, function, ...); e.g., search for all
+  usages of person.name column
 * symbols completion, ideally context-sensitive; especially, names of attributes of queried relations
 
 
