@@ -739,7 +739,7 @@ SQL
                     987::oid AS oid,
                     'pg_catalog.pg_typeof'::regproc AS regproc,
                     'pg_catalog.abs(integer)'::regprocedure AS regprocedure,
-                    '!'::regoper AS regoper,
+                    '||/'::regoper AS regoper,
                     '+(integer, integer)'::regoperator AS regoperator,
                     'pg_catalog.pg_class'::regclass AS regclass,
                     '"some.""schema"""."""tbl"""'::regclass AS regclass_tbl,
@@ -757,7 +757,7 @@ SQL
                 PgProcedureRef::fromUnqualifiedName('abs', PgTypeRef::fromUnqualifiedName('integer')),
                 $tuple->regprocedure
             );
-            self::assertEquals(PgOperatorNameRef::fromUnqualifiedName('!'), $tuple->regoper);
+            self::assertEquals(PgOperatorNameRef::fromUnqualifiedName('||/'), $tuple->regoper);
             self::assertEquals(
                 PgOperatorRef::fromUnqualifiedName(
                     '+',
