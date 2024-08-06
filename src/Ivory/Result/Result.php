@@ -11,7 +11,7 @@ abstract class Result implements IResult
 
     protected function __construct($resultHandler, ?string $lastNotice = null)
     {
-        if (!is_resource($resultHandler)) {
+        if (!is_resource($resultHandler) && !$resultHandler instanceof \PgSql\Result) {
             throw new \InvalidArgumentException('$handler');
         }
         $this->handler = $resultHandler;

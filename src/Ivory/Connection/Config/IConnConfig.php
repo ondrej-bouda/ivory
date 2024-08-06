@@ -101,7 +101,7 @@ interface IConnConfig
     function getMoneyDecimalSeparator(): string;
 
     /**
-     * @return int the PostgreSQL server version number, e.g., <tt>90600</tt> for 9.6.0 or <tt>110001</tt> for 11.1
+     * @return int the PostgreSQL server version number, e.g., <tt>90600</tt> for 9.6.0 or <tt>110001</tt> for 11.0.1
      */
     function getServerVersionNumber(): int;
 

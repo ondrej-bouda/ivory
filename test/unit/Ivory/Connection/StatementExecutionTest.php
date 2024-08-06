@@ -387,8 +387,13 @@ SQL
                 self::assertSame(SqlState::UNDEFINED_COLUMN, $e->getSqlStateCode());
                 self::assertNull($e->getStatementPosition());
                 self::assertSame('PL/pgSQL function foo() line 3 at RETURN', $e->getContext());
-                self::assertSame(8, $e->getInternalPosition());
-                self::assertSame('SELECT bar', $e->getInternalQuery());
+                if ($this->conn->getConfig()->getServerVersionNumber() >= 160000) {
+                    self::assertSame(1, $e->getInternalPosition());
+                    self::assertSame('bar', $e->getInternalQuery());
+                } else {
+                    self::assertSame(8, $e->getInternalPosition());
+                    self::assertSame('SELECT bar', $e->getInternalQuery());
+                }
                 if (PHP_VERSION_ID >= 70300 && $this->conn->getConfig()->getServerVersionNumber() >= 90600) {
                     self::assertSame('ERROR', $e->getNonlocalizedSeverity());
                 }

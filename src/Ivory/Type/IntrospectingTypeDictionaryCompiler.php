@@ -137,7 +137,7 @@ SQL;
          */
 
         $result = pg_query($this->connHandler, $query);
-        if (!is_resource($result)) {
+        if (!is_resource($result) && !$result instanceof \PgSql\Result) {
             throw new \RuntimeException("Error fetching types: " . pg_last_error($this->connHandler));
         }
         /** @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection pg_fetch_assoc() may return FALSE */
@@ -195,6 +195,9 @@ SQL;
                 } else {
                     return new UnorderedRangeType($schemaName, $typeName);
                 }
+
+            case 'm':
+                return new UndefinedType($schemaName, $typeName);
 
             default:
                 throw new \RuntimeException("Error fetching types: unexpected typtype '$row[typtype]'");

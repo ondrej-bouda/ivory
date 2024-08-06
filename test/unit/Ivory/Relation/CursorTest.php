@@ -588,7 +588,7 @@ SQL
         $conn = $this->getIvoryConnection();
         $tx = $conn->startTransaction();
         try {
-            $cur = $conn->declareCursor('no-scroll-cur', $relDef, ICursor::NON_SCROLLABLE);
+            $cur = $conn->declareCursor('no-scroll-cur', $relDef, ICursor::SCROLLABLE);
 
             $actualValues = [];
             foreach ($cur as $key => $tuple) {
@@ -618,7 +618,7 @@ SQL
         $conn = $this->getIvoryConnection();
         $tx = $conn->startTransaction();
         try {
-            $cur = $conn->declareCursor('no-scroll-cur', $relDef, ICursor::NON_SCROLLABLE);
+            $cur = $conn->declareCursor('no-scroll-cur', $relDef, ICursor::SCROLLABLE);
 
             $bufSizes = [0, 1, 2, 4, 5, 10];
             foreach ($bufSizes as $bufSize) {
